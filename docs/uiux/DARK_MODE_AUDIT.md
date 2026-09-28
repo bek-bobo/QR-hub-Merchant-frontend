@@ -1,8 +1,8 @@
 # UIX.THEME.0 — Dark mode audit and design
 
 Date: **2026-09-28**  
-Status: **UIX.THEME.0/UIX.THEME.1/UIX.THEME.2 COMPLETE; UIX.THEME.3 IMPLEMENTED_PENDING_USER_COMMAND_GATE**  
-Scope: **audit and design only; no production-source change authorized**
+Status: **UIX.THEME.0–4P COMPLETE; FINAL-R1 COMMAND GATE PASS; FINAL-R2 READ-ONLY AUDIT COMPLETE_PENDING_USER_BROWSER_GATE**
+Scope: **historical audit/design plus final implementation record; production deployment excluded**
 
 ## 1. Current theme architecture
 
@@ -248,6 +248,10 @@ Theme preference is an independent, non-sensitive presentation setting. It must 
 
 ## Decision and implementation state
 
-The class-based three-mode architecture, canonical token strategy, versioned `localStorage` key, pre-paint bootstrap, authenticated selector, shell, core primitives, and production feature-select migration are complete through UIX.THEME.3. UIX.THEME.4 passed its user command gate and its browser gate was otherwise reported as passing before UIX.THEME.4P. Exact light/dark semantic status tokens and a non-component tone helper replace the 21 audited direct fixed-palette lines; the chart uses dedicated series/axis semantics and retains its exact-values table; scoped errors no longer borrow brand styling; and the full-viewBox fixed-light QR remains unchanged without a redundant wrapper.
+The class-based Light/Dark/System architecture is complete. One `ThemeProvider` wraps both runtime roots; `qrhub:theme:v1`, the pre-paint bootstrap, root `html.dark`, synchronized `color-scheme`, OS preference listening, and cross-tab reconciliation remain contract-aligned without mount or echo writes. The authenticated header owns the only switcher; login inherits the root theme without a second control or state.
 
-UIX.THEME.4P adds human-readable management and P5 status presentation without changing raw DTO values or behavior. Source-confirmed mappings are: Static QR, terminal, bank-account, and cashier entity `0` = success `Faol`, with every other value neutral `Noma’lum`; cashier-terminal assignment `0` = success `Faol`, `1` = neutral `Faol emas`, and every other value neutral `Noma’lum`; P5 device `0` = success `Faol`, `1` = neutral `Faol emas / administrator belgisi`, and unknown/`null` = neutral `Holat noma’lum`. Raw status numbers are no longer visible on those result surfaces. Filters, queries, pagination, P5 reset, API contracts, and backend behavior remain unchanged. See `docs/uiux/UIX_THEME_4_RESULT.md`. UIX.THEME.FINAL has not started.
+The canonical token graph, production shared-Select migration, semantic status roles, dedicated chart presentation, and fixed-light payment QR are complete through UIX.THEME.4. UIX.THEME.4P adds source-confirmed human-readable management/P5 labels while preserving raw models and query behavior. UIX.THEME.FINAL-R1 removes unknown raw QR codes from the shared user-facing fallback: Dashboard, Dashboard preview, and Dynamic QR now display neutral `Noma’lum` while known mappings remain unchanged.
+
+The resumed FINAL-R2 read-only audit found no additional Theme regression. Auth/session, API/query/router, mutation, pagination/filter, amount, phone, P5 reset, Dynamic QR cancel, cashier runtime, and backend contracts remain outside theme state and unchanged by this work. The user-reported FINAL-R1 command gate passed with 94/94 test files, 686/686 tests, typecheck/build passes, and lint at 0 errors with 2 accepted warnings. Codex did not rerun commands or browser automation during FINAL-R2. Final rendered browser verification remains user-owned; production deployment readiness is not claimed. See `docs/uiux/UIX_THEME_FINAL_RESULT.md`.
+
+Intentional deferrals remain: collapsible filters; page-size removal/default changes; pagination redesign; column reordering; phone-input UX; favicon/product identity; auth persistence; desktop sidebar collapse; B-08; B-09; Dynamic QR cancel; P5 reset; the cashier backend/runtime issue; and production deployment.
