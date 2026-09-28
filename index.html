@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QRHub Merchant</title>
+    <script data-qrhub-theme-bootstrap>
+      (() => {
+        try {
+          const root = document.documentElement
+          let mode = 'system'
+
+          try {
+            const stored = window.localStorage.getItem('qrhub:theme:v1')
+            if (stored === 'light' || stored === 'dark' || stored === 'system') {
+              mode = stored
+            }
+          } catch {}
+
+          let resolvedTheme = mode
+          if (mode === 'system') {
+            let prefersDark = false
+            try {
+              prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+            } catch {}
+            resolvedTheme = prefersDark ? 'dark' : 'light'
+          }
+
+          try {
+            root.classList.toggle('dark', resolvedTheme === 'dark')
+          } catch {}
+          try {
+            root.style.colorScheme = resolvedTheme
+          } catch {}
+        } catch {}
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
