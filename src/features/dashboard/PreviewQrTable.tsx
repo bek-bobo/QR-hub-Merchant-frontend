@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import type { LucideIcon } from 'lucide-react'
 import {
   CircleCheckIcon,
   CircleHelpIcon,
@@ -40,31 +39,30 @@ const statusOptions = [
   { code: 20, label: 'Bekor qilingan' },
 ] as const
 
-function getStatusIcon(statusCode: number): LucideIcon {
+function StatusIcon({ statusCode }: { statusCode: number }) {
   switch (statusCode) {
     case 0:
-      return CircleIcon
+      return <CircleIcon aria-hidden="true" />
     case 10:
-      return LoaderCircleIcon
+      return <LoaderCircleIcon aria-hidden="true" />
     case 50:
-      return CircleCheckIcon
+      return <CircleCheckIcon aria-hidden="true" />
     case 5:
-      return ClockAlertIcon
+      return <ClockAlertIcon aria-hidden="true" />
     case 20:
     case 25:
-      return CircleXIcon
+      return <CircleXIcon aria-hidden="true" />
     default:
-      return CircleHelpIcon
+      return <CircleHelpIcon aria-hidden="true" />
   }
 }
 
 function StatusBadge({ statusCode }: { statusCode: number }) {
   const status = presentQrStatus(statusCode)
-  const Icon = getStatusIcon(statusCode)
 
   return (
     <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-      <Icon aria-hidden="true" />
+      <StatusIcon statusCode={statusCode} />
       {status.label}
     </Badge>
   )
