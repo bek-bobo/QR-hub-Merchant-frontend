@@ -26,7 +26,7 @@ describe('static QR page contract', () => {
     ]) expect(() => decodeStaticQrPage({ success: true, data })).toThrow()
   })
 
-  it('keeps server order and neutral numeric status without exposing unverified links', () => {
+  it('keeps server order and raw status data while presenting safe labels without unverified links', () => {
     const decoded = decodeStaticQrPage({ success: true, data: {
       content: [
         { id: 'QR-B', terminalName: 'B', merchantName: 'M', status: 50,
@@ -37,7 +37,11 @@ describe('static QR page contract', () => {
     expect(decoded.content.map((row) => row.id)).toEqual(['QR-B', 'QR-A'])
     const html = renderToString(createElement(StaticQrTable, { rows: decoded.content }))
     expect(html.indexOf('QR-B')).toBeLessThan(html.indexOf('QR-A'))
-    expect(html).toContain('>50<')
+    expect(decoded.content.map((row) => row.statusCode)).toEqual([50, 0])
+    expect(html).toContain('>Noma’lum<')
+    expect(html).toContain('>Faol<')
+    expect(html).not.toContain('>50<')
+    expect(html).not.toContain('>0<')
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(html).not.toContain('example.test')
     expect(html).not.toContain('<svg')

@@ -1,8 +1,11 @@
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
+import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { statusToneClasses } from '@/shared/presentation/status-tone'
 
 interface TerminalResultsProps {
   readonly blocked: boolean
@@ -24,10 +27,13 @@ export function TerminalResults({ blocked, pending, error, data, onRetry, onPage
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
         <div role="region" aria-label="Terminal jadvali" tabIndex={0} className="max-w-full overflow-x-auto">
           <table className="w-full min-w-[40rem] text-left text-sm">
-            <thead><tr className="border-b"><th scope="col" className="p-3">Terminal ID</th><th scope="col" className="p-3">Nomi</th><th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">Bank hisobi</th><th scope="col" className="p-3">Status kodi</th></tr></thead>
-            <tbody>{data.content.map((row, index) => <tr className="border-b" key={`${row.id}-${index}`}>
-              <td className="break-all p-3">{row.id}</td><td className="p-3">{row.name}</td><td className="p-3">{row.merchantName}</td><td className="p-3">{row.bankAccountName}</td><td className="p-3">{row.statusCode}</td>
-            </tr>)}</tbody>
+            <thead><tr className="border-b"><th scope="col" className="p-3">Terminal ID</th><th scope="col" className="p-3">Nomi</th><th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">Bank hisobi</th><th scope="col" className="p-3">Holat</th></tr></thead>
+            <tbody>{data.content.map((row, index) => {
+              const status = presentActiveStatus(row.statusCode)
+              return <tr className="border-b" key={`${row.id}-${index}`}>
+                <td className="break-all p-3">{row.id}</td><td className="p-3">{row.name}</td><td className="p-3">{row.merchantName}</td><td className="p-3">{row.bankAccountName}</td><td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
+              </tr>
+            })}</tbody>
           </table>
         </div>
       </CardContent></Card>}

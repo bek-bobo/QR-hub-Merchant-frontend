@@ -6,8 +6,11 @@ import type { StaticQrRow } from './contract'
 import { StaticQrResults } from './StaticQrResults'
 
 const data: Page<StaticQrRow> = {
-  content: [{ id: 'QR-1', terminalName: 'Terminal A', merchantName: 'Merchant A', statusCode: 777 }],
-  totalElements: 1, totalPages: 2, page: 0, size: 10,
+  content: [
+    { id: 'QR-1', terminalName: 'Terminal A', merchantName: 'Merchant A', statusCode: 0 },
+    { id: 'QR-2', terminalName: 'Terminal B', merchantName: 'Merchant B', statusCode: 777 },
+  ],
+  totalElements: 2, totalPages: 2, page: 0, size: 10,
 }
 
 function resultProps(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) {
@@ -37,14 +40,18 @@ function paginationText(overrides: Partial<Parameters<typeof StaticQrResults>[0]
 }
 
 describe('static QR result presentation', () => {
-  it('shows raw status with semantic headers and no preview or link action', () => {
+  it('shows human-readable active and unknown statuses without raw codes or actions', () => {
     const html = render()
     expect(html).toContain('scope="col"')
-    expect(html).toContain('>777<')
+    expect(html).toContain('>Faol<')
+    expect(html).toContain('>Noma’lum<')
+    expect(html).not.toContain('>0<')
+    expect(html).not.toContain('>777<')
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(html).not.toContain('<svg')
     expect(html).not.toContain('<a ')
     expect(html).not.toContain('Nusxalash')
+    expect(data.content.map((row) => row.statusCode)).toEqual([0, 777])
   })
 
   it('keeps loading, error, malformed and empty outcomes distinct', () => {

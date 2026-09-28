@@ -43,11 +43,11 @@ describe('P5 page state', () => {
   })
 
   it('presents only source-backed status meanings and keeps unknown/null neutral', () => {
-    expect(presentP5Status(0)).toEqual({ label: 'Faol (0)', active: true, tone: 'success' })
+    expect(presentP5Status(0)).toEqual({ label: 'Faol', active: true, tone: 'success' })
     expect(presentP5Status(1)).toEqual({
-      label: 'Faol emas / administrator belgisi (1)', active: false, tone: 'neutral',
+      label: 'Faol emas / administrator belgisi', active: false, tone: 'neutral',
     })
-    expect(presentP5Status(777)).toEqual({ label: 'Holat: 777', active: false, tone: 'neutral' })
+    expect(presentP5Status(777)).toEqual({ label: 'Holat noma’lum', active: false, tone: 'neutral' })
     expect(presentP5Status(null)).toEqual({ label: 'Holat noma’lum', active: false, tone: 'neutral' })
   })
 

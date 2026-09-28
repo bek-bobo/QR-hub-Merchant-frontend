@@ -10,7 +10,7 @@ const data: Page<BankAccountRow> = { content: [row, { ...row, id: '12', name: 'S
 const render = (overrides: Partial<Parameters<typeof BankAccountResults>[0]> = {}) => renderToString(createElement(BankAccountResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('bank-account results', () => {
-  it('preserves source order, exact account text, raw status, and server totals', () => {
+  it('preserves source order, exact account text, neutral fallback, and server totals', () => {
     const html = render()
     const text = html.replace(/<!-- -->/g, '')
     expect(html.indexOf('Main')).toBeLessThan(html.indexOf('Second'))
@@ -18,11 +18,19 @@ describe('bank-account results', () => {
     expect(html).toContain('00045')
     expect(html).toContain('00123')
     expect(html).toContain('0007')
-    expect(html).toContain('>777<')
+    expect(html.match(/>Noma’lum</g)).toHaveLength(2)
+    expect(html).not.toContain('>777<')
     expect(text).toContain('47 ta bank hisobi')
     expect(text).toContain('1 / 5')
     expect(html).not.toContain('Balans')
     expect(html).not.toContain('Muvaffaqiyatli')
+    expect(data.content.map((item) => item.statusCode)).toEqual([777, 777])
+  })
+
+  it('presents confirmed status zero as active without exposing the raw code', () => {
+    const html = render({ data: { ...data, content: [{ ...row, statusCode: 0 }] } })
+    expect(html).toContain('>Faol<')
+    expect(html).not.toContain('>0<')
   })
 
   it('keeps nullable optional fields safe and blocked/error/empty distinct', () => {

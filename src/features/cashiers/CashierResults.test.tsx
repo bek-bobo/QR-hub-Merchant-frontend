@@ -19,10 +19,12 @@ describe('cashier results', () => {
     expect(html).not.toContain('term-inactive-filter')
     expect(text).toContain('47 ta kassir')
     expect(text).toContain('1 / 5')
-    expect(html).toContain('>777<')
+    expect(html).toContain('>Noma’lum<')
+    expect(html).not.toContain('>777<')
     expect(html).toContain('Merchant user')
     expect(html).not.toContain('Biriktirishni bekor qilish')
     expect(html).not.toContain('Kassir yaratish')
+    expect(page.content.map((item) => item.statusCode)).toEqual([777, 777])
   })
 
   it('does not manufacture a terminal-filter match into decoded active memberships', () => {
@@ -41,6 +43,14 @@ describe('cashier results', () => {
     expect(html).toContain('term-active')
     expect(html).toContain('term-second')
     expect(html).toContain('aria-label="Faol terminal biriktirishlari"')
+    expect(html.match(/>Faol</g)?.length).toBeGreaterThanOrEqual(2)
+    expect(html).not.toContain('Status kodi: 0')
+  })
+
+  it('presents confirmed cashier status zero as active without exposing the raw code', () => {
+    const html = render({ data: { ...page, content: [{ ...cashier, statusCode: 0 }] } })
+    expect(html).toContain('>Faol<')
+    expect(html).not.toContain('>0<')
   })
 
   it('places the optional assign surface only inside an open current membership panel', () => {

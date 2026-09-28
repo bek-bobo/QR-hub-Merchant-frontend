@@ -113,7 +113,8 @@ describe('dynamic QR page state', () => {
     expect(presentNullableCell(null)).toBe('—')
     expect(presentNullableCell('Merchant A')).toBe('Merchant A')
     expect(presentQrStatus(25).label).toBe('Rad etilgan')
-    expect(presentQrStatus(777).label).toBe('Noma’lum (777)')
+    expect(presentQrStatus(777).label).toBe('Noma’lum')
+    expect(presentQrStatus(777).label).not.toContain('777')
   })
 
   it('maps all status to undefined without coercing an empty string', () => {

@@ -36,9 +36,9 @@ export interface P5StatusPresentation {
 }
 
 export function presentP5Status(status: number | null): P5StatusPresentation {
-  if (status === 0) return { label: 'Faol (0)', active: true, tone: 'success' }
-  if (status === 1) return { label: 'Faol emas / administrator belgisi (1)', active: false, tone: 'neutral' }
-  return { label: status === null ? 'Holat noma’lum' : `Holat: ${status}`, active: false, tone: 'neutral' }
+  if (status === 0) return { label: 'Faol', active: true, tone: 'success' }
+  if (status === 1) return { label: 'Faol emas / administrator belgisi', active: false, tone: 'neutral' }
+  return { label: 'Holat noma’lum', active: false, tone: 'neutral' }
 }
 
 export interface P5Target {

@@ -16,14 +16,14 @@ describe('management read boundaries', () => {
 
   it('preserves account identifiers as exact text', () => {
     const row = { id: 4, name: 'Account', bankName: 'Bank', bankAccount: '0000123', tin: '0012', bankMfo: '00045', contractNumber: '0007', merchantId: 2, merchantName: 'M', status: 0 }
-    expect(decodeBankAccountPage(page(row)).content[0]).toMatchObject({ accountNumber: '0000123', tin: '0012', mfo: '00045', contractNumber: '0007' })
+    expect(decodeBankAccountPage(page(row)).content[0]).toMatchObject({ accountNumber: '0000123', tin: '0012', mfo: '00045', contractNumber: '0007', statusCode: 0 })
     expect(() => decodeBankAccountPage(page({ ...row, bankAccount: 123 }))).toThrow()
     expect(decodeBankAccountPage(page({ ...row, contractNumber: null })).content[0]?.contractNumber).toBeNull()
   })
 
   it('requires cashier active-membership array and never fabricates a filtered terminal', () => {
     const row = { id: 5, fullname: 'Cashier', phone: '998901234567', status: 0, role: 'ROLE_MERCHANT_USER', terminals: [] }
-    expect(decodeCashierPage(page(row)).content[0]?.terminals).toEqual([])
+    expect(decodeCashierPage(page(row)).content[0]).toMatchObject({ statusCode: 0, terminals: [] })
     expect(decodeCashierPage(page(row)).content[0]?.roleDisplay).toBe('ROLE_MERCHANT_USER')
     expect(() => decodeCashierPage(page({ ...row, terminals: null }))).toThrow()
     expect(() => decodeCashierPage(page({ ...row, id: Number.MAX_SAFE_INTEGER + 1 }))).toThrow()

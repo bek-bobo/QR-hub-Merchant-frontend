@@ -76,7 +76,7 @@ export function presentQrStatus(statusCode: number): QrStatusPresentation {
     case 50:
       return { label: 'Muvaffaqiyatli', tone: 'success' }
     default:
-      return { label: `Noma’lum (${statusCode})`, tone: 'neutral' }
+      return { label: 'Noma’lum', tone: 'neutral' }
   }
 }
 

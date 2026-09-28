@@ -185,7 +185,8 @@ describe('D4 static preview data', () => {
       pending: false, error: false, data: page, page: 0, onRetry: () => undefined,
       onPageChange: () => undefined }))
     expect(page.content[0]?.statusCode).toBe(777)
-    expect(html).toContain('>777<')
+    expect(html).toContain('>Noma’lum<')
+    expect(html).not.toContain('>777<')
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(html).not.toContain('<svg')
     expect(html).not.toContain('<a ')

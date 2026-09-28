@@ -1,7 +1,7 @@
-# UIX.THEME.4 Implementation Result
+# UIX.THEME.4 / UIX.THEME.4P Implementation Result
 
-**Checkpoint:** UIX.THEME.4  
-**Status:** IMPLEMENTED_PENDING_USER_COMMAND_AND_BROWSER_GATES  
+**Checkpoint:** UIX.THEME.4P
+**Status:** IMPLEMENTED_PENDING_USER_COMMAND_GATE
 **Date:** 2026-09-28
 
 ## Implemented
@@ -30,9 +30,21 @@
 - Expanded `src/features/p5/page-state.test.ts` to cover exact label/active/tone results for `0`, `1`, unknown, and `null`.
 - The existing focused QR test already asserts black/white colors, quiet zone, level, title, and exact payload; it was not weakened or duplicated.
 
+## UIX.THEME.4P status-label follow-up
+
+Source review confirms these presentation mappings:
+
+- Static QR, terminal, bank-account, and cashier entity status: raw `0` is active and displays `Faol` with the success tone; every other raw value has no confirmed shared meaning and displays neutral `Noma’lum`.
+- Cashier-terminal assignment status: raw `0` displays success `Faol`; raw `1` is the confirmed inactive/unassigned state and displays neutral `Faol emas`; every other value displays neutral `Noma’lum`.
+- P5 device status: raw `0` displays success `Faol`; raw `1` displays neutral `Faol emas / administrator belgisi`; unknown and `null` values display neutral `Holat noma’lum`.
+
+The list DTOs continue to preserve their raw numeric values. Only their visible presentation changed: raw status numbers are no longer exposed in the affected management and P5 result surfaces. Filters, query serialization, pagination, P5 reset eligibility, API contracts, and backend behavior are unchanged.
+
+Focused tests cover the confirmed active labels, neutral unknown fallback, absence of visible raw status codes, preserved decoded raw values, the P5 mapping/reset boundary, and unchanged management/P5 query serialization.
+
 ## Verification status
 
-Codex did not run lint, typecheck, tests, build, browser automation, or API requests under the checkpoint command policy. Static source review confirms the previous 21 direct fixed `sky`/`emerald`/`amber`/`red` status-palette lines are absent from the audited dashboard/P5 production files and all `presentQrStatus` consumers use semantic tones. This is not a command, browser, or WCAG PASS claim.
+UIX.THEME.4 had already passed its user command gate, with its browser gate otherwise reported as passing before this follow-up. Codex did not run lint, typecheck, tests, build, browser automation, or API requests for UIX.THEME.4P under the checkpoint command policy. Static source review confirms the previous 21 direct fixed `sky`/`emerald`/`amber`/`red` status-palette lines are absent from the audited dashboard/P5 production files and all `presentQrStatus` consumers use semantic tones. UIX.THEME.4P remains implemented pending the user command gate. This is not a new command, browser, or WCAG PASS claim.
 
 User verification required:
 

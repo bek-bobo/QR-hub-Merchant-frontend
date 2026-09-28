@@ -23,7 +23,8 @@ describe('P5 results', () => {
   it('preserves server rows/order/metadata and renders neutral data without static QR actions', () => {
     const html = render().replace(/<!-- -->/g, '')
     expect(html.match(/00AbC-9/g)?.length).toBeGreaterThanOrEqual(2)
-    expect(html).toContain('Holat: 777')
+    expect(html).toContain('Holat noma’lum')
+    expect(html).not.toContain('Holat: 777')
     expect(html).toContain('23.09.2026 14:05')
     expect(html).toContain('19 ta qurilma')
     expect(html).toContain('1 / 2')
@@ -33,6 +34,14 @@ describe('P5 results', () => {
     expect(html).not.toContain('QR preview')
     expect(html).toContain('PIN reset')
     expect(html).not.toContain('yangi PIN')
+  })
+
+  it('shows confirmed status zero as active without changing reset availability rules', () => {
+    const html = render({ data: { ...data, content: [{ ...row, deviceStatus: 0 }] }, resetAvailable: true })
+    expect(html).toContain('>Faol<')
+    expect(html).not.toContain('Faol (0)')
+    expect(html).not.toContain('>0<')
+    expect(html).toContain('>PIN reset</button>')
   })
 
   it('does not sort rows on the client', () => {

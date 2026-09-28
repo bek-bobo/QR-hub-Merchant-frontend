@@ -10,15 +10,22 @@ const data: Page<TerminalRow> = { content: [row, row], totalElements: 47, totalP
 const render = (overrides: Partial<Parameters<typeof TerminalResults>[0]> = {}) => renderToString(createElement(TerminalResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('terminal results', () => {
-  it('preserves duplicate rows, raw unknown status, and authoritative total', () => {
+  it('preserves duplicate rows and totals while presenting unknown status neutrally', () => {
     const html = render()
     const normalizedHtml = html.replace(/<!-- -->/g, '')
     expect(html.match(/Terminal A/g)).toHaveLength(2)
-    expect(html).toContain('>777<')
+    expect(html.match(/>Noma’lum</g)).toHaveLength(2)
+    expect(html).not.toContain('>777<')
     expect(normalizedHtml).toContain('47 ta terminal')
     expect(normalizedHtml).toContain('1 / 5')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')
+    expect(data.content.map((item) => item.statusCode)).toEqual([777, 777])
+  })
+  it('presents confirmed status zero as active without exposing the raw code', () => {
+    const html = render({ data: { ...data, content: [{ ...row, statusCode: 0 }] } })
+    expect(html).toContain('>Faol<')
+    expect(html).not.toContain('>0<')
   })
   it('keeps blocked, loading, error and empty distinct from stale data', () => {
     expect(render({ blocked: true })).not.toContain('Terminal A')
