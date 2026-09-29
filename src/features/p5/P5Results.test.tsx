@@ -12,7 +12,7 @@ const row: P5Row = {
   staticQrId: 'qr-1', staticQrLink: 'https://example.test/secret', staticQrStatus: 0,
   createdAt: '2026-09-23T14:05:06',
 }
-const data: Page<P5Row> = { content: [row, row], totalElements: 19, totalPages: 2, page: 0, size: 10 }
+const data: Page<P5Row> = { content: [row, row], totalElements: 19, totalPages: 2, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof P5Results>[0]> = {}) => renderToString(createElement(P5Results, {
   blocked: false, pending: false, error: null, data, selected: null,
   onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined,
@@ -26,8 +26,8 @@ describe('P5 results', () => {
     expect(html).toContain('Holat noma’lum')
     expect(html).not.toContain('Holat: 777')
     expect(html).toContain('23.09.2026 14:05')
-    expect(html).toContain('19 ta qurilma')
-    expect(html).toContain('1 / 2')
+    expect(html).toContain('Jami: 19')
+    expect(html).toContain('aria-current="page"')
     expect(html).toContain('>—<')
     expect(html).not.toContain('https://example.test/secret')
     expect(html).not.toContain('<a')

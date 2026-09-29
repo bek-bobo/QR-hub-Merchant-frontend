@@ -6,7 +6,7 @@ import type { Page } from '@/shared/contracts/merchant-read'
 import { BankAccountResults } from './BankAccountResults'
 
 const row: BankAccountRow = { id: '11', name: 'Main', bankName: 'Bank', accountNumber: '00000000000000000001', mfo: '00045', tin: '00123', contractNumber: '0007', merchantId: '2', merchantName: 'Merchant', statusCode: 777 }
-const data: Page<BankAccountRow> = { content: [row, { ...row, id: '12', name: 'Second' }], totalElements: 47, totalPages: 5, page: 0, size: 10 }
+const data: Page<BankAccountRow> = { content: [row, { ...row, id: '12', name: 'Second' }], totalElements: 47, totalPages: 5, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof BankAccountResults>[0]> = {}) => renderToString(createElement(BankAccountResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('bank-account results', () => {
@@ -20,8 +20,8 @@ describe('bank-account results', () => {
     expect(html).toContain('0007')
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
-    expect(text).toContain('47 ta bank hisobi')
-    expect(text).toContain('1 / 5')
+    expect(text).toContain('Jami: 47')
+    expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Balans')
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(data.content.map((item) => item.statusCode)).toEqual([777, 777])

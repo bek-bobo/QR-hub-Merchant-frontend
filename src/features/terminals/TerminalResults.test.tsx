@@ -6,7 +6,7 @@ import type { TerminalRow } from '@/shared/contracts/management-read'
 import { TerminalResults } from './TerminalResults'
 
 const row: TerminalRow = { id: 't-1', name: 'Terminal A', merchantId: '2', merchantName: 'Merchant A', bankAccountId: '3', bankAccountName: 'Bank A', statusCode: 777, terminalType: null, address: null, regionName: null, districtName: null }
-const data: Page<TerminalRow> = { content: [row, row], totalElements: 47, totalPages: 5, page: 0, size: 10 }
+const data: Page<TerminalRow> = { content: [row, row], totalElements: 47, totalPages: 5, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof TerminalResults>[0]> = {}) => renderToString(createElement(TerminalResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('terminal results', () => {
@@ -16,8 +16,8 @@ describe('terminal results', () => {
     expect(html.match(/Terminal A/g)).toHaveLength(2)
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
-    expect(normalizedHtml).toContain('47 ta terminal')
-    expect(normalizedHtml).toContain('1 / 5')
+    expect(normalizedHtml).toContain('Jami: 47')
+    expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(data.content.map((item) => item.statusCode)).toEqual([777, 777])

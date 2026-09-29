@@ -2,9 +2,10 @@ import { safeContractError } from '@/shared/api/errors'
 import { applyManagementFilters, type CashierListFilters, type DependentLookupGateInput } from '@/shared/contracts/management-filters'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import type { Page, ReadScope } from '@/shared/contracts/merchant-read'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 
 export function createDefaultCashierFilters(): CashierListFilters {
-  return { search: '', page: 0, size: 10 }
+  return { search: '', page: 0, size: DEFAULT_PAGE_SIZE }
 }
 
 export type MerchantLookupState = { readonly kind: 'ready'; readonly ids: readonly string[] } | { readonly kind: 'denied' | 'unavailable' | 'loading' | 'error' }

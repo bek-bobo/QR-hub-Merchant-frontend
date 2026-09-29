@@ -1,7 +1,7 @@
 import type { AccessContextValue, Capability } from '@/shared/auth/access'
 import type { CurrencyOption } from '@/shared/contracts/currency.contract'
 import type { CreateTerminalOption } from '@/shared/contracts/terminal-lookup.contract'
-import type { DynamicQrRow, Money, Page, ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
+import type { DynamicQrRow, Money, Page, PageSize, ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from '@/features/static-qr/contract'
 import type { CreateQrPort } from '@/features/dynamic-qr/create-qr'
 import type { CancelQrPort } from '@/features/dynamic-qr/cancel-qr'
@@ -93,7 +93,7 @@ export const d4StaticRows: readonly StaticQrRow[] = Object.freeze([
   Object.freeze({ id: 'D4-QR-DEMO-STATIC-002', terminalName: 'D4 terminal', merchantName: 'D4 merchant', statusCode: 777 }),
 ])
 
-export function staticDemoPage(scenario: StaticScenario, page: number, size: 10 | 25 | 50): Page<StaticQrRow> {
+export function staticDemoPage(scenario: StaticScenario, page: number, size: PageSize): Page<StaticQrRow> {
   const rows = scenario === 'STATIC_EMPTY' ? [] : scenario === 'STATIC_UNKNOWN_STATUS'
     ? d4StaticRows.slice(1) : d4StaticRows
   return { content: rows.slice(page * size, (page + 1) * size), totalElements: rows.length,

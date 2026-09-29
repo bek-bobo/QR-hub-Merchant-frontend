@@ -1,8 +1,9 @@
 import { safeContractError } from '@/shared/api/errors'
 import { applyManagementFilters, type DependentLookupGateInput, type TerminalListFilters } from '@/shared/contracts/management-filters'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 
 export function createDefaultTerminalFilters(): TerminalListFilters {
-  return { search: '', page: 0, size: 10 }
+  return { search: '', page: 0, size: DEFAULT_PAGE_SIZE }
 }
 
 export type ParentLookupState = { readonly kind: 'ready'; readonly ids: readonly string[] } | { readonly kind: 'denied' | 'unavailable' | 'loading' | 'error' }

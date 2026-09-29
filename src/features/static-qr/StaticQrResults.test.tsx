@@ -1,4 +1,4 @@
-import { Children, createElement, isValidElement, type ReactNode } from 'react'
+import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { Page } from '@/shared/contracts/merchant-read'
@@ -10,7 +10,7 @@ const data: Page<StaticQrRow> = {
     { id: 'QR-1', terminalName: 'Terminal A', merchantName: 'Merchant A', statusCode: 0 },
     { id: 'QR-2', terminalName: 'Terminal B', merchantName: 'Merchant B', statusCode: 777 },
   ],
-  totalElements: 2, totalPages: 2, page: 0, size: 10,
+  totalElements: 2, totalPages: 2, page: 0, size: 20,
 }
 
 function resultProps(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) {
@@ -24,21 +24,6 @@ function render(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) 
   return renderToString(createElement(StaticQrResults, resultProps(overrides)))
 }
 
-function paginationText(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) {
-  const view = StaticQrResults(resultProps(overrides))
-  if (!isValidElement<{ children: ReactNode }>(view)) throw new Error('Missing results view')
-  const navigation = Children.toArray(view.props.children).find(
-    (child) => isValidElement(child) && child.type === 'nav',
-  )
-  if (!isValidElement<{ children: ReactNode }>(navigation)) throw new Error('Missing pagination')
-  const liveText = Children.toArray(navigation.props.children).find(
-    (child) => isValidElement<{ 'aria-live'?: string }>(child) &&
-      child.props['aria-live'] === 'polite',
-  )
-  if (!isValidElement<{ children: ReactNode }>(liveText)) throw new Error('Missing live page text')
-  return Children.toArray(liveText.props.children).join('')
-}
-
 describe('static QR result presentation', () => {
   it('shows human-readable active and unknown statuses without raw codes or actions', () => {
     const html = render()
@@ -48,7 +33,6 @@ describe('static QR result presentation', () => {
     expect(html).not.toContain('>0<')
     expect(html).not.toContain('>777<')
     expect(html).not.toContain('Muvaffaqiyatli')
-    expect(html).not.toContain('<svg')
     expect(html).not.toContain('<a ')
     expect(html).not.toContain('Nusxalash')
     expect(data.content.map((row) => row.statusCode)).toEqual([0, 777])
@@ -76,9 +60,11 @@ describe('static QR result presentation', () => {
     const first = render()
     expect(first).toContain('aria-label="Oldingi sahifa" disabled=""')
     expect(first).toContain('aria-label="Keyingi sahifa"')
-    expect(paginationText()).toBe('1 / 2')
+    expect(first.replace(/<!-- -->/g, '')).toContain('Jami: 2')
+    expect(first).toContain('aria-current="page"')
+    expect(first).toContain('>1</button>')
     const last = render({ page: 1, data: { ...data, page: 1 } })
     expect(last).toContain('aria-label="Keyingi sahifa" disabled=""')
-    expect(paginationText({ page: 1, data: { ...data, page: 1 } })).toBe('2 / 2')
+    expect(last).toContain('>2</button>')
   })
 })

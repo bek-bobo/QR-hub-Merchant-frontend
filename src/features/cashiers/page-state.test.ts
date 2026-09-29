@@ -1,21 +1,20 @@
 import { describe, expect, it } from 'vitest'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import type { Page, ReadScope } from '@/shared/contracts/merchant-read'
-import { changeManagementPage, changeManagementSize, changeMerchantDraft, clearManagementFilters, toCashierListQuery } from '@/shared/contracts/management-filters'
+import { changeManagementPage, changeMerchantDraft, clearManagementFilters, toCashierListQuery } from '@/shared/contracts/management-filters'
 import { applyCashierDraft, cashierParentState, cashierSelectionKey, createCashierTarget, createDefaultCashierFilters, resolveCashierTarget } from './page-state'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
 const cashier: CashierRow = { id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [] }
 
 describe('cashier filter state', () => {
-  it('serializes only the supported server subset and resets page on apply, clear and size change', () => {
+  it('serializes only the supported server subset and resets page on apply and clear', () => {
     const applied = applyCashierDraft({ ...createDefaultCashierFilters(), merchantId: '2', terminalId: 'term-3', search: '  Cashier A ', page: 4 }, {
       merchantIds: ['2'], terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['term-3'] },
     })
-    expect(toCashierListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'term-3', search: 'Cashier A', page: '0', size: '10' })
+    expect(toCashierListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'term-3', search: 'Cashier A', page: '0', size: '20' })
     expect(changeManagementPage(applied, 2).page).toBe(2)
-    expect(changeManagementSize(applied, 25)).toMatchObject({ page: 0, size: 25 })
-    expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, terminalId: undefined, search: '', page: 0, size: 10 })
+    expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, terminalId: undefined, search: '', page: 0, size: 20 })
   })
 
   it('clears the dependent terminal draft and rejects wrong-parent delayed options', () => {

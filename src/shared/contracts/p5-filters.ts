@@ -29,7 +29,7 @@ function integerStatus(value: number | undefined): number | undefined {
 }
 
 export function toP5ListQuery(filters: P5Filters): Readonly<Record<string, string>> {
-  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
+  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 20, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
   const query: Record<string, string> = { page: String(filters.page), size: String(filters.size) }
   const merchantId = optionalLongId(filters.merchantId)
   const terminalId = optionalText(filters.terminalId)
@@ -58,9 +58,4 @@ export function clearP5Filters<T extends P5Filters>(filters: T): T {
 export function changeP5Page<T extends P5Filters>(filters: T, page: number): T {
   if (!Number.isSafeInteger(page) || page < 0) throw safeContractError()
   return { ...filters, page }
-}
-
-export function changeP5Size<T extends P5Filters>(filters: T, size: PageSize): T {
-  if (!([10, 25, 50] as readonly number[]).includes(size)) throw safeContractError()
-  return { ...filters, size, page: 0 }
 }

@@ -34,6 +34,7 @@ import {
   ErrorState,
   NoAccessState,
 } from '@/shared/ui/AsyncState'
+import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { DashboardPageHeader } from './DashboardPageHeader'
 import { MetricCards } from './MetricCards'
 import {
@@ -246,14 +247,16 @@ export function DashboardReadPage({
     setValidationMessage(null)
   }
 
-  function applyFilters() {
+  function applyFilters(): boolean {
     try {
       const next = applyDashboardFilters(draft)
       setApplied(next)
       setDraft(next)
       setValidationMessage(null)
+      return true
     } catch {
       setValidationMessage('Sana oralig‘ini to‘g‘ri kiriting.')
+      return false
     }
   }
 
@@ -301,12 +304,11 @@ export function DashboardReadPage({
         onRefresh={() => void refreshMountedQueries()}
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filterlar</CardTitle>
-          <CardDescription>O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <FilterDrawer
+        description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
+        onApply={applyFilters}
+        onReset={clearFilters}
+      >
           <div className="flex flex-wrap gap-2" aria-label="Davr presetlari">
             {([1, 7, 30] as const).map((days) => (
               <Button key={days} type="button" variant="outline" size="sm" onClick={() => selectPreset(days)}>
@@ -314,8 +316,8 @@ export function DashboardReadPage({
               </Button>
             ))}
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+          <div className="grid gap-4">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Boshlanish sanasi
               <Input
                 type="date"
@@ -324,7 +326,7 @@ export function DashboardReadPage({
                 onChange={(event) => setDraft({ ...draft, fromDate: event.target.value })}
               />
             </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Tugash sanasi
               <Input
                 type="date"
@@ -333,7 +335,7 @@ export function DashboardReadPage({
                 onChange={(event) => setDraft({ ...draft, toDate: event.target.value })}
               />
             </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Terminal
               <Select
                 value={draft.terminalId ?? ''}
@@ -367,12 +369,7 @@ export function DashboardReadPage({
               </Button>
             </div>
           ) : null}
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" onClick={applyFilters}>Qo‘llash</Button>
-            <Button type="button" variant="outline" onClick={clearFilters}>Tozalash</Button>
-          </div>
-        </CardContent>
-      </Card>
+      </FilterDrawer>
 
       {dashboard.isPending ? (
         <DashboardSkeleton />

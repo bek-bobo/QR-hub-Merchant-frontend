@@ -2,11 +2,10 @@ import { safeContractError } from '@/shared/api/errors'
 import type {
   DashboardFilters,
   DynamicQrFilters,
-  Page,
-  PageSize,
   QrStatusFilter,
   TerminalOption,
 } from '@/shared/contracts/merchant-read'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 import {
   getTashkentDatePreset,
   isValidDateRange,
@@ -29,7 +28,7 @@ export function createDefaultDynamicQrFilters(
     status: undefined,
     search: '',
     page: 0,
-    size: 10,
+    size: DEFAULT_PAGE_SIZE,
   })
 }
 
@@ -54,26 +53,6 @@ export function parseQrStatusInput(
   }
 }
 
-export function parsePageSizeInput(value: string): PageSize {
-  switch (value) {
-    case '10':
-      return 10
-    case '25':
-      return 25
-    case '50':
-      return 50
-    default:
-      throw safeContractError()
-  }
-}
-
-export function changeDynamicQrPageSize(
-  filters: DynamicQrFilters,
-  size: PageSize,
-): DynamicQrFilters {
-  return Object.freeze({ ...filters, page: 0, size })
-}
-
 export function changeDynamicQrPage(
   filters: DynamicQrFilters,
   page: number,
@@ -82,17 +61,6 @@ export function changeDynamicQrPage(
     throw safeContractError()
   }
   return Object.freeze({ ...filters, page })
-}
-
-export function getPaginationState(
-  page: Pick<Page<unknown>, 'page' | 'totalPages'>,
-) {
-  return Object.freeze({
-    uiPage: page.page + 1,
-    previousDisabled: page.page <= 0,
-    nextDisabled:
-      page.totalPages <= 0 || page.page >= page.totalPages - 1,
-  })
 }
 
 export function parseDashboardDynamicQrState(

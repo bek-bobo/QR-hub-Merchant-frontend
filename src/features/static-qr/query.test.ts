@@ -9,8 +9,8 @@ import type { ProtectedReadContextValue } from '@/shared/api/ProtectedReadContex
 import { createStaticQrQueryOptions } from './query'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
-const filters = { page: 0, size: 10 as const }
-const page = { content: [], totalElements: 0, totalPages: 0, page: 0, size: 10 }
+const filters = { page: 0, size: 20 as const }
+const page = { content: [], totalElements: 0, totalPages: 0, page: 0, size: 20 }
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -72,10 +72,10 @@ describe('static QR safe read boundary', () => {
   it('runs unfiltered static-only read without terminal lookup grant', async () => {
     const read = setup()
     expect(read.options.enabled).toBe(true)
-    expect(read.options.queryKey).toEqual(readKeys.staticQrs(scope, undefined, 0, 10))
+    expect(read.options.queryKey).toEqual(readKeys.staticQrs(scope, undefined, 0, 20))
     expect(await read.options.queryFn({ signal: new AbortController().signal })).toEqual(page)
     expect(read.calls()).toBe(1)
-    expect(read.received()).toMatchObject({ endpoint: endpoints.staticQrs, query: { page: '0', size: '10' } })
+    expect(read.received()).toMatchObject({ endpoint: endpoints.staticQrs, query: { page: '0', size: '20' } })
   })
 
   it('keys source, session, permission revision, terminal, page and size separately', () => {

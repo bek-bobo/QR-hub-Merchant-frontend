@@ -4,9 +4,10 @@ import type { DependentLookupGateInput } from '@/shared/contracts/management-fil
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import type { StatusTone } from '@/shared/presentation/status-tone'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 
 export function createDefaultP5Filters(): P5Filters {
-  return { search: '', page: 0, size: 10 }
+  return { search: '', page: 0, size: DEFAULT_PAGE_SIZE }
 }
 
 export type MerchantLookupState =

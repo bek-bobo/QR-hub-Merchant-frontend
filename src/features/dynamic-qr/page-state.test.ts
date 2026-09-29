@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import type { DynamicQrFilters, TerminalOption } from '@/shared/contracts/merchant-read'
 import { presentQrStatus } from '@/features/dashboard/presenters'
+import { toDynamicQrQuery } from './filters'
 import {
-  changeDynamicQrPageSize,
   createDefaultDynamicQrFilters,
-  getPaginationState,
   getTerminalFilterState,
   parseDashboardDynamicQrState,
-  parsePageSizeInput,
   parseQrStatusInput,
   presentNullableCell,
 } from './page-state'
@@ -19,55 +17,21 @@ const filters: DynamicQrFilters = {
   status: 0,
   search: 'qr',
   page: 4,
-  size: 10,
+  size: 20,
 }
 
 describe('dynamic QR page state', () => {
   it('creates the seven-day Tashkent default without optional filters', () => {
-    expect(
-      createDefaultDynamicQrFilters(new Date('2026-09-14T20:30:00Z')),
-    ).toEqual({
+    const defaults = createDefaultDynamicQrFilters(new Date('2026-09-14T20:30:00Z'))
+    expect(defaults).toEqual({
       fromDate: '2026-09-09',
       toDate: '2026-09-15',
       status: undefined,
       search: '',
       page: 0,
-      size: 10,
+      size: 20,
     })
-  })
-
-  it.each([10, 25, 50] as const)(
-    'accepts size %i and resets the backend page to zero',
-    (size) => {
-      expect(changeDynamicQrPageSize(filters, size)).toMatchObject({
-        page: 0,
-        size,
-        terminalId: 'terminal-a',
-        status: 0,
-      })
-    },
-  )
-
-  it('accepts only supported page-size values', () => {
-    expect(parsePageSizeInput('10')).toBe(10)
-    expect(parsePageSizeInput('25')).toBe(25)
-    expect(parsePageSizeInput('50')).toBe(50)
-    expect(() => parsePageSizeInput('100')).toThrow()
-  })
-
-  it('uses one-based UI pages and backend response boundaries', () => {
-    expect(
-      getPaginationState({
-        totalPages: 4,
-        page: 0,
-      }),
-    ).toEqual({ uiPage: 1, previousDisabled: true, nextDisabled: false })
-    expect(
-      getPaginationState({
-        totalPages: 4,
-        page: 3,
-      }),
-    ).toEqual({ uiPage: 4, previousDisabled: false, nextDisabled: true })
+    expect(toDynamicQrQuery(defaults)).toMatchObject({ page: '0', size: '20' })
   })
 
   it('revalidates dashboard router state and ignores extra filters', () => {

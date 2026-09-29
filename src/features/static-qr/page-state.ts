@@ -1,4 +1,5 @@
 import type { PageSize, TerminalOption } from '@/shared/contracts/merchant-read'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 
 export interface StaticQrFilters {
   readonly terminalId?: string
@@ -13,7 +14,7 @@ export interface StaticTerminalLookup {
   readonly terminals?: readonly TerminalOption[]
 }
 
-export const defaultStaticFilters: StaticQrFilters = Object.freeze({ page: 0, size: 10 })
+export const defaultStaticFilters: StaticQrFilters = Object.freeze({ page: 0, size: DEFAULT_PAGE_SIZE })
 
 export function getStaticTerminalState(filters: StaticQrFilters, lookup: StaticTerminalLookup): 'valid' | 'unconfirmed' {
   if (!filters.terminalId) return 'valid'
@@ -35,11 +36,6 @@ export function applyStaticTerminal(
 
 export function clearStaticTerminal(current: StaticQrFilters): StaticQrFilters {
   return Object.freeze({ page: 0, size: current.size })
-}
-
-export function changeStaticPageSize(current: StaticQrFilters, rawSize: string): StaticQrFilters {
-  if (rawSize !== '10' && rawSize !== '25' && rawSize !== '50') throw new Error('Unsupported static QR page size.')
-  return Object.freeze({ ...current, page: 0, size: Number(rawSize) as PageSize })
 }
 
 export function toStaticQrQuery(filters: StaticQrFilters): Readonly<Record<string, string>> {

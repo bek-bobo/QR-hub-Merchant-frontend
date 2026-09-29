@@ -21,17 +21,16 @@ import {
   ErrorState,
   NoAccessState,
 } from '@/shared/ui/AsyncState'
+import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { applyQrFilters, type DynamicQrFilterDraft } from './filters'
 import { DynamicQrTable } from './DynamicQrTable'
 import { ExportButton } from './ExportButton'
 import {
   changeDynamicQrPage,
-  changeDynamicQrPageSize,
   createDefaultDynamicQrFilters,
-  getPaginationState,
   parseDashboardDynamicQrState,
-  parsePageSizeInput,
   parseQrStatusInput,
 } from './page-state'
 import { useDynamicQrReadQueries } from './queries'
@@ -90,14 +89,16 @@ export function DynamicQrPage({
   const queries = useDynamicQrReadQueries(applied)
   const { runtime, terminals, list, terminalFilterState, enabled } = queries
 
-  function applyFilters() {
+  function applyFilters(): boolean {
     try {
       const next = applyQrFilters(draft)
       setDraft(next)
       setApplied(next)
       setValidationMessage(null)
+      return true
     } catch {
       setValidationMessage('Sana oralig‘ini to‘g‘ri kiriting.')
+      return false
     }
   }
 
@@ -127,7 +128,6 @@ export function DynamicQrPage({
     )
   }
 
-  const pagination = list.data ? getPaginationState(list.data) : null
   const emptyHighPage = Boolean(
     list.data && list.data.page > 0 && list.data.content.length === 0,
   )
@@ -139,7 +139,7 @@ export function DynamicQrPage({
         title="Dinamik QRlar"
         description={
           <>
-            Filterlash va sahifalash server tomonidan bajariladi.
+            Filtrlash va sahifalash server tomonidan bajariladi.
             {can(access, 'dynamicQr.cancel', false) ? (
               <span role="status" className="mt-2 block">
                 Bekor qilish hozircha mavjud emas.
@@ -174,16 +174,13 @@ export function DynamicQrPage({
         }
       />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filterlar</CardTitle>
-          <CardDescription>
-            O‘zgarishlar faqat “Qo‘llash” bosilganda so‘rovga qo‘shiladi.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+      <FilterDrawer
+        description="O‘zgarishlar faqat “Qo‘llash” bosilganda so‘rovga qo‘shiladi."
+        onApply={applyFilters}
+        onReset={clearFilters}
+      >
+          <div className="grid gap-4">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Boshlanish sanasi
               <Input
                 type="date"
@@ -194,7 +191,7 @@ export function DynamicQrPage({
                 }
               />
             </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Tugash sanasi
               <Input
                 type="date"
@@ -205,7 +202,7 @@ export function DynamicQrPage({
                 }
               />
             </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Terminal
               <Select
                 value={draft.terminalId ?? ''}
@@ -225,7 +222,7 @@ export function DynamicQrPage({
                 ))}
               </Select>
             </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
+            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
               Status
               <Select
                 value={draft.status === undefined ? '' : String(draft.status)}
@@ -241,24 +238,6 @@ export function DynamicQrPage({
                     {option.label}
                   </option>
                 ))}
-              </Select>
-            </label>
-            <label className="space-y-1.5 text-sm font-medium text-text-primary">
-              Sahifa hajmi
-              <Select
-                value={draft.size}
-                onChange={(event) =>
-                  setDraft((current) =>
-                    changeDynamicQrPageSize(
-                      current,
-                      parsePageSizeInput(event.target.value),
-                    ),
-                  )
-                }
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
               </Select>
             </label>
           </div>
@@ -297,14 +276,7 @@ export function DynamicQrPage({
               </Button>
             </div>
           ) : null}
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" onClick={applyFilters}>Qo‘llash</Button>
-            <Button type="button" variant="outline" onClick={clearFilters}>
-              Tozalash
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      </FilterDrawer>
 
       {terminalFilterState === 'checking' ? (
         <Card>
@@ -332,7 +304,7 @@ export function DynamicQrPage({
               <CardDescription>
                 {list.data
                   ? `${list.data.totalElements.toLocaleString('uz-UZ')} ta server natijasi`
-                  : 'Qo‘llangan filterlar bo‘yicha'}
+                  : 'Qo‘llangan filtrlar bo‘yicha'}
               </CardDescription>
             </div>
           </CardHeader>
@@ -347,7 +319,7 @@ export function DynamicQrPage({
                 description="Natijalar o‘zgargan bo‘lishi mumkin. Birinchi sahifaga qayting."
               />
             ) : list.data && list.data.content.length === 0 ? (
-              <EmptyState description="Qo‘llangan filterlar bo‘yicha ma’lumot topilmadi." />
+              <EmptyState description="Qo‘llangan filtrlar bo‘yicha ma’lumot topilmadi." />
             ) : list.data ? (
               <DynamicQrTable rows={list.data.content} />
             ) : null}
@@ -360,38 +332,10 @@ export function DynamicQrPage({
             {list.isRefetchError && list.data ? (
               <p role="alert" className="text-sm text-destructive">Yangilanmadi</p>
             ) : null}
-            {list.data && pagination ? (
-              <nav
-                aria-label="Dinamik QR sahifalari"
-                className="flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <p className="text-sm text-text-secondary">
-                  {pagination.uiPage}-sahifa
-                  {list.data.totalPages > 0
-                    ? ` / ${list.data.totalPages.toLocaleString('uz-UZ')}`
-                    : ''}
-                </p>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pagination.previousDisabled}
-                    aria-label="Oldingi sahifa"
-                    onClick={() => goToPage(list.data!.page - 1)}
-                  >
-                    Oldingi
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pagination.nextDisabled}
-                    aria-label="Keyingi sahifa"
-                    onClick={() => goToPage(list.data!.page + 1)}
-                  >
-                    Keyingi
-                  </Button>
-                </div>
-              </nav>
+            {list.data ? (
+              <PaginationBar ariaLabel="Dinamik QR sahifalari"
+                currentPage={list.data.page} totalPages={list.data.totalPages}
+                totalItems={list.data.totalElements} onPageChange={goToPage} />
             ) : null}
           </CardContent>
         </Card>

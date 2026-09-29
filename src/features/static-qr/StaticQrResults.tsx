@@ -1,9 +1,9 @@
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from './contract'
 import { StaticQrTable } from './StaticQrTable'
+import { PaginationBar } from '@/shared/ui/PaginationBar'
 
 interface StaticQrResultsProps {
   readonly terminalConfirmed: boolean
@@ -31,13 +31,8 @@ export function StaticQrResults({ terminalConfirmed, pending, error, data,
           <StaticQrTable rows={data.content} />
         </div>
       </CardContent></Card>}
-    <nav aria-label="Statik QR sahifalari" className="flex flex-wrap items-center gap-3 text-sm">
-      <Button type="button" variant="outline" aria-label="Oldingi sahifa"
-        disabled={page <= 0} onClick={() => onPageChange(page - 1)}>Oldingi</Button>
-      <span aria-live="polite">{data.page + 1} / {Math.max(1, data.totalPages)}</span>
-      <Button type="button" variant="outline" aria-label="Keyingi sahifa"
-        disabled={data.page + 1 >= data.totalPages}
-        onClick={() => onPageChange(page + 1)}>Keyingi</Button>
-    </nav>
+    <PaginationBar ariaLabel="Statik QR sahifalari" currentPage={page}
+      totalPages={data.totalPages} totalItems={data.totalElements}
+      onPageChange={onPageChange} />
   </div>
 }

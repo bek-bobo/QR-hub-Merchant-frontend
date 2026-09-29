@@ -144,7 +144,7 @@ export function PreviewQrTable({ rows }: PreviewQrTableProps) {
         </p>
 
         <p id="preview-table-help" className="text-sm text-text-secondary">
-          Filterlar faqat namuna ro‘yxatiga ta’sir qiladi. Yuqoridagi
+          Filtrlar faqat namuna ro‘yxatiga ta’sir qiladi. Yuqoridagi
           ko‘rsatkichlar to‘liq namuna bo‘yicha o‘zgarmaydi.
         </p>
 

@@ -188,8 +188,10 @@ describe('D4 static preview data', () => {
     expect(html).toContain('>Noma’lum<')
     expect(html).not.toContain('>777<')
     expect(html).not.toContain('Muvaffaqiyatli')
-    expect(html).not.toContain('<svg')
+    expect(html).not.toContain('To‘lov havolasi QR kodi')
+    expect(html).not.toContain('Havolani nusxalash')
     expect(html).not.toContain('<a ')
+    expect(html).not.toContain('href=')
     expect(d4StaticRows.every((row) => !('link' in row) && !('redirectUrl' in row))).toBe(true)
   })
 

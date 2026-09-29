@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
-import { changeP5MerchantDraft, changeP5Page, changeP5Size, clearP5Filters, toP5ListQuery } from '@/shared/contracts/p5-filters'
+import { changeP5MerchantDraft, changeP5Page, clearP5Filters, toP5ListQuery } from '@/shared/contracts/p5-filters'
 import {
   applyP5Draft,
   createDefaultP5Filters,
@@ -27,7 +27,7 @@ describe('P5 page state', () => {
       merchantIds: ['2'],
       terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['terminal-a'] },
     })
-    expect(toP5ListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'terminal-a', status: '0', search: 'Device', page: '0', size: '10' })
+    expect(toP5ListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'terminal-a', status: '0', search: 'Device', page: '0', size: '20' })
     expect(() => applyP5Draft(draft, { merchantIds: ['1'], terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['terminal-a'] } })).toThrow()
     expect(() => applyP5Draft(draft, { merchantIds: ['2'], terminal: { lookupParentId: '1', lookupState: 'ready', optionIds: ['terminal-a'] } })).toThrow()
   })
@@ -37,9 +37,8 @@ describe('P5 page state', () => {
     expect(p5ParentState('2', { kind: 'denied' })).toBe('pause')
     expect(changeP5MerchantDraft({ ...createDefaultP5Filters(), merchantId: '1', terminalId: 'terminal-a' }, '2').terminalId).toBeUndefined()
     const applied = { ...createDefaultP5Filters(), merchantId: '2', terminalId: 'terminal-a', status: 1, search: 'A', page: 3 }
-    expect(clearP5Filters(applied)).toEqual(expect.objectContaining({ merchantId: undefined, terminalId: undefined, status: undefined, search: '', page: 0, size: 10 }))
+    expect(clearP5Filters(applied)).toEqual(expect.objectContaining({ merchantId: undefined, terminalId: undefined, status: undefined, search: '', page: 0, size: 20 }))
     expect(changeP5Page(applied, 2).page).toBe(2)
-    expect(changeP5Size(applied, 25)).toMatchObject({ page: 0, size: 25 })
   })
 
   it('presents only source-backed status meanings and keeps unknown/null neutral', () => {

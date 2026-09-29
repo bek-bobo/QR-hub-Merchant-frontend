@@ -14,7 +14,7 @@ function optionalLongId(value: string | undefined): string | undefined {
 }
 function optionalText(value: string | undefined): string | undefined { return value?.trim() || undefined }
 function base(filters: Pick<ManagementFilters, 'search' | 'page' | 'size'>): Record<string, string> {
-  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
+  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 20, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
   const query: Record<string, string> = { page: String(filters.page), size: String(filters.size) }
   const search = optionalText(filters.search)
   if (search) query.search = search
@@ -61,10 +61,6 @@ export function clearManagementFilters<T extends ManagementFilters>(filters: T):
 export function changeManagementPage<T extends ManagementFilters>(filters: T, page: number): T {
   if (!Number.isSafeInteger(page) || page < 0) throw safeContractError()
   return { ...filters, page }
-}
-export function changeManagementSize<T extends ManagementFilters>(filters: T, size: PageSize): T {
-  if (!([10, 25, 50] as readonly number[]).includes(size)) throw safeContractError()
-  return { ...filters, size, page: 0 }
 }
 export type LookupState = 'ready' | 'denied' | 'unavailable' | 'error' | 'loading'
 export interface DependentLookupGateInput { readonly lookupParentId?: string; readonly lookupState: LookupState; readonly optionIds?: readonly string[] }

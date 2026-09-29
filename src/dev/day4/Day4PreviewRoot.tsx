@@ -9,7 +9,7 @@ import { CreateQrResult } from '@/features/dynamic-qr/CreateQrResult'
 import { presentCreateResult } from '@/features/dynamic-qr/create-result'
 import { handoffXlsxDownload } from '@/features/dynamic-qr/export-download'
 import { StaticQrResults } from '@/features/static-qr/StaticQrResults'
-import { applyStaticTerminal, changeStaticPageSize, clearStaticTerminal,
+import { applyStaticTerminal, clearStaticTerminal,
   getStaticTerminalState, type StaticQrFilters } from '@/features/static-qr/page-state'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import { can } from '@/shared/auth/access'
@@ -20,6 +20,12 @@ import { actionScenarios, createDemoCancelPort, createDemoExportScenario, create
   type ActionScenario, type StaticScenario } from './scenarios'
 
 // D4-ACTIONS-DEMO-ONLY. The entire route is loaded only through the DEV/demo boundary.
+function changePreviewStaticPageSize(current: StaticQrFilters, rawSize: string): StaticQrFilters {
+  if (rawSize !== '10' && rawSize !== '25' && rawSize !== '50') throw new Error('Unsupported preview page size.')
+  const size = rawSize === '25' ? 25 : rawSize === '50' ? 50 : 10
+  return { ...current, page: 0, size }
+}
+
 function CreateScenarioView({ scenario }: { readonly scenario: ActionScenario }) {
   const [demo] = useState(() => {
     let dispatches = 0
@@ -178,7 +184,7 @@ function StaticScenarioView({ scenario }: { readonly scenario: StaticScenario })
       <Button type="button" variant="outline" onClick={() => { setDraft(''); setFilters(clearStaticTerminal(filters)) }}>Tozalash</Button>
       <label className="text-sm">Sahifa hajmi
         <select className="block rounded-lg border bg-surface p-2" value={filters.size}
-          onChange={(event) => setFilters(changeStaticPageSize(filters, event.target.value))}>
+          onChange={(event) => setFilters(changePreviewStaticPageSize(filters, event.target.value))}>
           <option value="10">10</option><option value="25">25</option><option value="50">50</option>
         </select>
       </label>

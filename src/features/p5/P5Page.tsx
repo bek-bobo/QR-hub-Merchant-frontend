@@ -1,16 +1,15 @@
-import { useState, useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore, type Dispatch, type SetStateAction } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ReadRegistration } from '@/app/read/createLiveReadApi'
-import { changeP5MerchantDraft, changeP5Page, changeP5Size, type P5Filters } from '@/shared/contracts/p5-filters'
+import { changeP5MerchantDraft, changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
 import type { LookupState } from '@/shared/contracts/management-filters'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import type { Page } from '@/shared/contracts/merchant-read'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
+import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import {
   applyP5Draft,
@@ -40,6 +39,50 @@ function merchantFilterMessage(state: Exclude<MerchantLookupState, { readonly ki
     ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.'
     : 'filtrsiz ro‘yxat ishlaydi.'
   return `Merchant filtri ${availability}; ${consequence}`
+}
+
+interface P5FiltersProps {
+  readonly draft: P5FilterValues
+  readonly applied: P5FilterValues
+  readonly merchantLookupState: MerchantLookupState
+  readonly merchants: readonly { readonly id: string; readonly name: string }[] | undefined
+  readonly draftTerminalState: LookupState
+  readonly draftTerminals: readonly { readonly id: string; readonly name: string }[] | undefined
+  readonly validationMessage: string | null
+  readonly onDraftChange: Dispatch<SetStateAction<P5FilterValues>>
+}
+
+export function P5Filters({
+  draft,
+  applied,
+  merchantLookupState,
+  merchants,
+  draftTerminalState,
+  draftTerminals,
+  validationMessage,
+  onDraftChange,
+}: P5FiltersProps) {
+  return <>
+    {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
+      <Select value={draft.merchantId ?? ''} onChange={(event) => onDraftChange((current) => changeP5MerchantDraft(current, event.target.value || undefined))}>
+        <option value="">Barcha merchantlar</option>{merchants?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+      </Select>
+    </label> : null}
+    {draft.merchantId && draftTerminalState === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Terminal
+      <Select value={draft.terminalId ?? ''} onChange={(event) => onDraftChange((current) => ({ ...current, terminalId: event.target.value || undefined }))}>
+        <option value="">Barcha terminallar</option>{draftTerminals?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+      </Select>
+    </label> : null}
+    <label className="block min-w-0 space-y-1 text-sm">Status kodi
+      <Input type="number" step={1} min={-2147483648} max={2147483647} value={draft.status ?? ''} aria-describedby={validationMessage ? 'p5-filter-error' : undefined} onChange={(event) => onDraftChange((current) => ({ ...current, status: event.target.value === '' ? undefined : Number(event.target.value) }))} placeholder="Masalan: 0" />
+    </label>
+    <label className="block min-w-0 space-y-1 text-sm">Qurilma ID yoki terminal nomi
+      <Input value={draft.search} aria-describedby="p5-search-help" onChange={(event) => onDraftChange((current) => ({ ...current, search: event.target.value }))} placeholder="Qurilma ID yoki terminal" />
+    </label>
+    {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">{merchantFilterMessage(merchantLookupState, Boolean(applied.merchantId))}</p> : null}
+    {!draft.merchantId || draftTerminalState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak; filtrsiz ro‘yxat ishlaydi.</p> : null}
+    {validationMessage ? <p id="p5-filter-error" role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
+  </>
 }
 
 type P5ResetController = ReturnType<typeof createP5ResetController>
@@ -94,8 +137,8 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, p
 
 export function P5Page({ resetPort = null, resetRegistration }: { readonly resetPort?: P5ResetPort | null; readonly resetRegistration?: ReadRegistration } = {}) {
   const runtime = useReadRuntime()
-  const [draft, setDraft] = useState<P5Filters>(createDefaultP5Filters)
-  const [applied, setApplied] = useState<P5Filters>(createDefaultP5Filters)
+  const [draft, setDraft] = useState<P5FilterValues>(createDefaultP5Filters)
+  const [applied, setApplied] = useState<P5FilterValues>(createDefaultP5Filters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
 
   const merchantBase = runtime.queries.merchantLookupOptions()
@@ -140,7 +183,7 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
   const resetReady = (resetRegistration ?? runtime.readiness.p5Reset).kind === 'configured'
   const resetAvailable = runtime.capabilities.p5ResetPin && resetReady && Boolean(resetPort)
 
-  function applyFilters() {
+  function applyFilters(): boolean {
     try {
       const next = applyP5Draft(draft, {
         merchantIds: merchantLookupState.kind === 'ready' ? merchantLookupState.ids : undefined,
@@ -153,9 +196,18 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
       setDraft(next)
       setApplied(next)
       setValidationMessage(null)
+      return true
     } catch {
       setValidationMessage('Merchant, terminal yoki status kodi tasdiqlanmadi. Filtrlarni tekshiring yoki tozalang.')
+      return false
     }
+  }
+
+  function resetFilters() {
+    const next = createDefaultP5Filters()
+    setDraft(next)
+    setApplied(next)
+    setValidationMessage(null)
   }
 
   if (!runtime.capabilities.p5List) return <NoAccessState description="P5 qurilmalari ro‘yxatini ko‘rish huquqi mavjud emas." />
@@ -167,40 +219,18 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
       description="Qidiruv faqat qurilma ID va terminal nomi bo‘yicha ishlaydi."
       descriptionId="p5-search-help"
     />
-    <Card className="min-w-0"><CardHeader><CardTitle>Filterlar</CardTitle></CardHeader>
-      <CardContent className="grid min-w-0 gap-3 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
-        {merchantLookupState.kind === 'ready' ? <label className="min-w-0 space-y-1 text-sm">Merchant
-          <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => changeP5MerchantDraft(current, event.target.value || undefined))}>
-            <option value="">Barcha merchantlar</option>{merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-          </Select>
-        </label> : null}
-        {draft.merchantId && draftTerminalState === 'ready' ? <label className="min-w-0 space-y-1 text-sm">Terminal
-          <Select value={draft.terminalId ?? ''} onChange={(event) => setDraft((current) => ({ ...current, terminalId: event.target.value || undefined }))}>
-            <option value="">Barcha terminallar</option>{draftTerminals.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-          </Select>
-        </label> : null}
-        <label className="min-w-0 space-y-1 text-sm">Status kodi
-          <Input type="number" step={1} min={-2147483648} max={2147483647} value={draft.status ?? ''} aria-describedby={validationMessage ? 'p5-filter-error' : undefined} onChange={(event) => setDraft((current) => ({ ...current, status: event.target.value === '' ? undefined : Number(event.target.value) }))} placeholder="Masalan: 0" />
-        </label>
-        <label className="min-w-0 space-y-1 text-sm">Qurilma ID yoki terminal nomi
-          <Input value={draft.search} aria-describedby="p5-search-help" onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} placeholder="Qurilma ID yoki terminal" />
-        </label>
-        <label className="min-w-0 space-y-1 text-sm">Sahifa hajmi
-          <Select value={applied.size} onChange={(event) => {
-            const size = event.target.value === '25' ? 25 : event.target.value === '50' ? 50 : 10
-            setApplied((current) => changeP5Size(current, size))
-            setDraft((current) => changeP5Size(current, size))
-          }}><option value={10}>10</option><option value={25}>25</option><option value={50}>50</option></Select>
-        </label>
-        {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">{merchantFilterMessage(merchantLookupState, Boolean(applied.merchantId))}</p> : null}
-        {!draft.merchantId || draftTerminalState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak; filtrsiz ro‘yxat ishlaydi.</p> : null}
-        {validationMessage ? <p id="p5-filter-error" role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
-        <div className="flex flex-wrap gap-2 sm:col-span-2 lg:col-span-5">
-          <Button type="button" onClick={applyFilters}>Qo‘llash</Button>
-          <Button type="button" variant="outline" onClick={() => { const next = createDefaultP5Filters(); setDraft(next); setApplied(next); setValidationMessage(null) }}>Tozalash</Button>
-        </div>
-      </CardContent>
-    </Card>
+    <FilterDrawer onApply={applyFilters} onReset={resetFilters}>
+      <P5Filters
+        draft={draft}
+        applied={applied}
+        merchantLookupState={merchantLookupState}
+        merchants={merchants.data}
+        draftTerminalState={draftTerminalState}
+        draftTerminals={draftTerminals.data}
+        validationMessage={validationMessage}
+        onDraftChange={setDraft}
+      />
+    </FilterDrawer>
     {visibleData ? <ScopedP5Results key={p5SelectionKey(listOptions.queryKey, visibleData.content)} rows={visibleData.content} queryKey={listOptions.queryKey} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />
       : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data} selected={null}

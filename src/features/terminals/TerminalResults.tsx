@@ -1,11 +1,11 @@
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { PaginationBar } from '@/shared/ui/PaginationBar'
 
 interface TerminalResultsProps {
   readonly blocked: boolean
@@ -37,11 +37,8 @@ export function TerminalResults({ blocked, pending, error, data, onRetry, onPage
           </table>
         </div>
       </CardContent></Card>}
-    <nav aria-label="Terminal sahifalari" className="flex flex-wrap items-center gap-3 text-sm">
-      <Button type="button" variant="outline" aria-label="Oldingi sahifa" disabled={data.page <= 0} onClick={() => onPageChange(data.page - 1)}>Oldingi</Button>
-      <span aria-live="polite">{data.page + 1} / {Math.max(1, data.totalPages)}</span>
-      <Button type="button" variant="outline" aria-label="Keyingi sahifa" disabled={data.page + 1 >= data.totalPages} onClick={() => onPageChange(data.page + 1)}>Keyingi</Button>
-      <span>{data.totalElements} ta terminal</span>
-    </nav>
+    <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
+      totalPages={data.totalPages} totalItems={data.totalElements}
+      onPageChange={onPageChange} />
   </div>
 }

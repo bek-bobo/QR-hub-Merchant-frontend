@@ -11,7 +11,7 @@ export type QrStatusKind =
   | 'rejected'
   | 'success'
   | 'unknown'
-export type PageSize = 10 | 25 | 50
+export type PageSize = 10 | 20 | 25 | 50
 export type Outcome = 'total' | 'success' | 'processing' | 'failed'
 export type ChartGroupBy = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
 

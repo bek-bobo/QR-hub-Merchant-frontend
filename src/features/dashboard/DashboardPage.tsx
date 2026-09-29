@@ -104,7 +104,7 @@ function QrNoAccessState() {
         <CardDescription>Bu bo‘lim alohida ko‘rish huquqini talab qiladi.</CardDescription>
       </CardHeader>
       <CardContent>
-        <NoAccessState description="QR yozuvlari va filterlar bu persona uchun ko‘rsatilmaydi." />
+        <NoAccessState description="QR yozuvlari va filtrlar bu persona uchun ko‘rsatilmaydi." />
       </CardContent>
     </Card>
   )

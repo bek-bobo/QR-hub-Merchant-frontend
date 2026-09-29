@@ -1,8 +1,9 @@
 import { safeContractError } from '@/shared/api/errors'
 import { applyManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
+import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
 
 export function createDefaultBankAccountFilters(): BankAccountListFilters {
-  return { search: '', page: 0, size: 10 }
+  return { search: '', page: 0, size: DEFAULT_PAGE_SIZE }
 }
 
 export type MerchantLookupState = { readonly kind: 'ready'; readonly ids: readonly string[] } | { readonly kind: 'denied' | 'unavailable' | 'loading' | 'error' }

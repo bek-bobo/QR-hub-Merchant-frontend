@@ -9,7 +9,7 @@ const filters: DynamicQrFilters = {
   status: 0,
   search: '',
   page: 0,
-  size: 10,
+  size: 20,
 }
 
 describe('dynamic QR query composition', () => {

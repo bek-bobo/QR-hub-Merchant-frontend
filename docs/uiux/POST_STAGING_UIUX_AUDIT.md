@@ -24,6 +24,12 @@ The user subsequently reported the UIX.2A command gate PASS (lint, typecheck, 60
 
 UIX.2A-R2 tightened the shared page-header spacing and typography without changing heading ownership or feature behavior. `PageHeader` gained a small generic meta slot and a compact responsive grid; Dashboard uses that slot to place `Oxirgi yangilanish` beside its descriptive context while the existing refresh button remains the sole action. The existing timestamp formatter, refresh/query behavior, loading/disabled state, permissions, routes, mobile navigation, desktop sidebar, filters, pagination, API/auth contracts, and staging gates remain unchanged. The user subsequently confirmed UIX.2A-R2 complete with its command and browser gate.
 
+### UIX.2B-R1 implementation status — 2026-09-28
+
+The initial inline-collapse implementation passed its command gate but was superseded before browser acceptance. UIX.2B-R1 now uses one compact `Filtrlar` button per migrated page to open a shared right-side `FilterDrawer`. The existing Radix Sheet owns focus trapping, Escape/overlay dismissal, and focus restoration. Current controls render vertically in one scrolling body, while a non-scrolling footer exposes `Qayta tiklash` and `Qo‘llash`. Close never applies; successful local Apply closes; validation failure stays open; Reset delegates to each page’s prior immediate behavior and stays open. Dashboard, Dynamic QR list/export, Static QR, Terminals, Bank Accounts, Cashiers, and P5 are migrated. The numeric active-filter count is deferred because defaults and dependent lookup states make a uniform count ambiguous. Filter/query/API behavior remains unchanged. See `docs/uiux/UIX_02B_RESULT.md`.
+
+UIX.2C is now implemented pending user command/browser/staging gates. Dynamic QR, Static QR, Terminals, Bank Accounts, Cashiers, and P5 use a shared zero-based `PaginationBar` with one-based visible labels, authoritative `Jami` totals, deterministic numbered-page windows, and non-actionable ellipses. Their production defaults use the shared `DEFAULT_PAGE_SIZE = 20`; the visible 10/25/50 selectors and production size-mutation paths were removed. Existing filter page resets and feature-owned out-of-range policies remain unchanged, and rendering does not auto-request a corrected page. `STAGING_SIZE_20_VERIFICATION` remains pending. See `docs/uiux/UIX_02C_RESULT.md`.
+
 ### UIX.4A Account phone-display status — 2026-09-28
 
 UIX.4A adds a shared string-only Uzbekistan phone display formatter and applies it only to the authenticated Account page. Supported `998XXXXXXXXX` and `+998XXXXXXXXX` values render as `+998 XX XXX XX XX`; malformed values remain visible after trimming, and nullish values render neutrally. The source profile value, API/wire contracts, profile fetching, refresh/logout behavior, and auth/session logic remain unchanged. Login and cashier phone-input UX and dark mode remain deferred. UIX.4A command and browser verification are pending and are not marked PASS. See `docs/uiux/UIX_04A_RESULT.md` for the scoped record.
@@ -110,13 +116,13 @@ Detailed decision answers:
 
 - **Classification / priority:** `UX_FRICTION`, P2.
 - **Source:** six list pages and their page-state/contracts: Dynamic QR, Static QR, Terminals, Bank Accounts, Cashiers, and P5. Dashboard recent items also request size 10 but do not expose a selector.
-- **Current behavior:** defaults are 10 and visible selectors offer 10/25/50. `PageSize` is a frontend union (`10 | 25 | 50`), with repeated validators and tests. Some selectors update both draft and applied state immediately, unlike other filters that wait for “Qo‘llash”.
+- **Current behavior:** UIX.2C implementation uses one shared production default of 20 and removes the visible selectors and their production mutation handlers from all six target lists. Legacy size literals remain compatible only for unrelated fixtures/contracts.
 - **Desired behavior:** remove selectors and use one `DEFAULT_PAGE_SIZE = 20` for the six lists; keep dashboard preview sizing separately intentional. Twenty is the more conventional balance for a desktop merchant table. Backend resource parameters accept integer `size`, use SQL `LIMIT`, and show no 10/25/50 enum restriction; verify 20 once in staging before rollout.
 - **Contract/API impact:** no backend change expected, but frontend types/query guards and fixtures must be migrated together. Pagination page resets remain unchanged.
 - **Accessibility / responsive:** removes a control and vertical density, especially on mobile. Page navigation must still announce current/total pages.
 - **Tests:** all query serializers, defaults, page-reset behavior, result fixtures, empty/last-page navigation, and one staging request per endpoint during the implementation checkpoint.
 - **Complexity / reuse:** low-to-medium because the value is duplicated widely. Centralize list pagination configuration and a shared pagination control.
-- **Checkpoint:** UIX.2.
+- **Checkpoint:** UIX.2C implemented pending command/browser gates and required staging verification for `size=20`.
 
 ### UIX-06 — Created date/time presentation
 
@@ -134,13 +140,13 @@ Detailed decision answers:
 
 - **Classification / priority:** `UX_FRICTION`, P1.
 - **Source:** filter cards on Dashboard, Dynamic QR, Static QR, Terminals, Bank Accounts, Cashiers, P5, and the separate export page.
-- **Current behavior:** each page hardcodes an always-open card. Draft/applied state is already separated on the more complex pages, so visual collapse need not affect requests. Copy alternates between `Filterlar` and `Filtrlar`.
-- **Desired behavior:** a shared `CollapsibleFilterPanel` with an actual button, `aria-expanded`, `aria-controls`, active-filter count/indicator, and preserved mounted draft/applied state. Default open on desktop and collapsed on narrow screens; if viewport detection is used, avoid hydration/state flicker. Export may remain open initially because filtering is its primary task.
-- **Contract/API impact:** none. Collapse must never apply, clear, or refetch by itself.
-- **Accessibility / responsive:** keyboard activation and visible focus are required; the active-filter summary must remain available while collapsed. This is a direct mobile-space improvement.
-- **Tests:** toggle semantics, retained draft/applied values, active count, clear/apply behavior, focus, and desktop/mobile initial policy.
-- **Complexity / reuse:** medium. One shared shell; page-specific fields and active-count calculation remain local.
-- **Checkpoint:** UIX.2.
+- **UIX.2B-R1 implementation:** one shared `FilterDrawer` gives all eight real filter surfaces a compact `Filtrlar` trigger and right-side Sheet. The prior inline-collapse presentation was removed before browser acceptance.
+- **Terminology:** shared headings use `Filtrlar`; the audited `Filterlar` and `Filterlash` presentation copy was normalized without rewriting grammatical helper phrases such as `terminal filtri`.
+- **Contract/API impact:** none. Sheet open/close never applies, clears, or refetches. Successful explicit Apply may close locally; validation failure remains open; Reset preserves each page’s established contract.
+- **Accessibility / responsive:** the semantic trigger and existing Sheet provide keyboard activation, visible focus, focus trap/restoration, Escape/overlay dismissal, a labelled close control, viewport-safe width, one scrolling body, and a reachable footer.
+- **Tests:** shared closed-trigger terminology plus pure open/close, Apply-success, Apply-failure, close-without-Apply, draft-retention, and Reset-delegation behavior. Existing feature tests continue to own filter/query semantics.
+- **Complexity / reuse:** medium. One shared Sheet owns presentation state and action delegation; page-specific fields and all feature behavior remain local.
+- **Checkpoint:** UIX.2B-R1 implemented pending user command gate.
 
 ### UIX-08 — User-reorderable table columns
 
@@ -172,19 +178,19 @@ Detailed decision answers:
 - **Accessibility / responsive:** restores one clear primary heading per page and avoids duplicated announcements. Mobile shell context can stay compact without competing with content hierarchy.
 - **Tests:** route-by-route heading count/order, unavailable/403/404 states, long title truncation, and narrow header layout.
 - **Complexity / reuse:** medium because all routes migrate together.
-- **Checkpoint:** UIX.2.
+- **Checkpoint:** UIX.2A.
 
 ## 3. Additional audit findings
 
 | ID | Finding | Category | Priority | Recommendation / checkpoint |
 |---|---|---|---|---|
-| AF-01 | `LiveShellLayout` renders the full sidebar as a normal block on small screens, and `LiveRouter` never supplies `Header.onOpenNavigation`; mobile users encounter the entire navigation before page content. | `RESPONSIVE` | P1 | Add an accessible sheet/drawer with focus return and keep the desktop sidebar at `lg`; UIX.2. |
+| AF-01 | `LiveShellLayout` renders the full sidebar as a normal block on small screens, and `LiveRouter` never supplies `Header.onOpenNavigation`; mobile users encounter the entire navigation before page content. | `RESPONSIVE` | P1 | Add an accessible sheet/drawer with focus return and keep the desktop sidebar at `lg`; UIX.2A. |
 | AF-02 | Static QR, Terminal, Bank Account, and Cashier tables expose raw numeric status codes while Dynamic QR/P5 use labelled badges. Unknown codes still need a neutral explicit fallback. | `UX_FRICTION` | P1 | Add domain-specific status presenters only where mappings are confirmed; do not guess mappings; UIX.3. |
 | AF-03 | Long QR/device/terminal IDs and account numbers use either `break-all` or visual truncation with no consistent reveal/copy affordance. | `UX_FRICTION` | P1 | Add a `LongValue`/`IdentifierCell` pattern with readable truncation, accessible full text, and explicit copy; UIX.3. |
 | AF-04 | Several invalid fields are not programmatically associated with their error text: for example create-amount has `aria-invalid` without `aria-describedby`, and management filter alerts are often page-level only. | `ACCESSIBILITY` | P1 | Standardize field IDs, help/error IDs, and focus-on-submit-error behavior; UIX.1/UIX.2. |
 | AF-05 | Five feature tables use native markup while newer tables use shared table components, producing inconsistent density and making table-wide improvements expensive. | `VISUAL_POLISH` | P2 | Migrate through one `DataTable` presentation model; UIX.3. |
-| AF-06 | Pagination markup, labels, counts, and locale formatting are duplicated across six list implementations. | `UX_FRICTION` | P2 | Introduce one `PaginationBar` with localized counts and live page announcement; UIX.2. |
-| AF-07 | Uzbek filter terminology is inconsistent: most pages say `Filterlar`, while export uses `Filtrlar`; helper/error copy uses both roots. | `VISUAL_POLISH` | P2 | Choose the product copy standard with an Uzbek reviewer and apply it centrally; UIX.2. |
+| AF-06 | The six server-paginated lists now share zero-based `PaginationBar` state, localized authoritative totals, numbered pages, and deterministic ellipses. | `UX_FRICTION` | P2 | Implemented in UIX.2C; command/browser/staging gates pending. |
+| AF-07 | UIX.2B normalized filter headings to `Filtrlar` and the remaining audited `Filterlar`/`Filterlash` presentation copy to the same Uzbek root. | `VISUAL_POLISH` | P2 | Implemented pending the UIX.2B user command gate. |
 | AF-08 | Native selects use ad-hoc `p-2` styling while shared inputs are `h-8`; form rows can have uneven control height, focus treatment, and disabled styling. | `VISUAL_POLISH` | P2 | Add/reuse a shared select control before filter migration; UIX.1. |
 | AF-09 | `Yangi kassir` is a peer primary navigation item although it is an action subordinate to `Kassirlar`, increasing a long flat navigation list. | `UX_FRICTION` | P2 | Keep route/permissions unchanged; move the entry to a Cashiers page action or grouped subnavigation after STG cashier investigation; UIX.2, gated by `STG-ISSUE-CASHIER-01`. |
 | AF-10 | `@fontsource-variable/geist` is installed but not loaded; CSS declares Inter without bundling it, so typography depends on client availability and can vary by OS. | `VISUAL_POLISH` | P2 | Choose and explicitly load one bundled product font or intentionally use a system stack; UIX.4. |
@@ -205,8 +211,8 @@ Positive/no-change observations:
 | `UzbekistanPhoneInput` + normalizer | Login/reset flow and cashier create | Medium: paste/autofill/caret behavior | Shared normalizer, component, login, cashier |
 | Shared offsetless and instant date formatters | Dynamic QR, dashboard, P5; future management timestamp cells | Low if kept lexical | Formatter tests, current cells, future cells |
 | `Select` / `FormField` error association | All filter/create forms | Low-to-medium | Primitives first, then touched forms |
-| `DEFAULT_PAGE_SIZE` + `PaginationBar` | Six paginated lists | Medium: broad query/test migration | Confirm backend 20, shared constant, serializers, pages |
-| `CollapsibleFilterPanel` | Dashboard and seven filter surfaces | Medium: state/focus/mobile initial state | Shell first, simple pages, complex dependent filters, export last |
+| `DEFAULT_PAGE_SIZE` + `PaginationBar` | Six paginated lists | Implemented locally; staging compatibility remains unverified | Verify `size=20` on every affected staging endpoint before completion |
+| `FilterDrawer` | Dashboard and seven filter surfaces | Implemented: right Sheet, scrolling body, fixed footer, local presentation state | Shared primitive plus all eight real filter surfaces in UIX.2B-R1 |
 | `PageHeader` and title ownership rule | All authenticated routes and error states | Medium: semantic regression if partial | Shell contract and all routes in one checkpoint |
 | `DataTable` column metadata + `IdentifierCell` | All GET/list tables | Medium-to-high | Dynamic QR pilot, read-only management tables, action tables last |
 | Domain status presenters | Static QR, terminals, bank accounts, cashiers; preserve existing Dynamic/P5 | High if mappings are guessed | Confirm mappings per domain, then migrate; unknown stays neutral/raw |
@@ -241,12 +247,14 @@ None identified within UI/UX presentation scope. Existing contract/backend gates
 ## 6. Proposed checkpoint sequence
 
 1. **UIX.1 — Presentation and form foundations:** exact grouped money display/input, offsetless/instant date formatting, shared select/form-field error associations; no API changes.
-2. **UIX.2 — Page structure, responsive shell, filters, pagination:** page-owned `h1`, mobile navigation drawer, collapsible filter shell, fixed page size 20 after staging confirmation, shared pagination, copy normalization. Preserve all draft/applied query semantics.
-3. **UIX.3 — Table readability and metadata:** Dynamic QR metadata pilot, consistent identifiers, dates, confirmed status mappings, then migrate simple management tables. Establish column models but do not add drag yet.
-4. **UIX.4 — Phone and product identity:** shared Uzbekistan phone input in login/cashier creation, favicon/title/theme/font cleanup.
-5. **UIX.5 — Column preferences and reordering:** versioned per-table preferences, reset, keyboard ordering, mobile chooser, then optional drag enhancement.
-6. **UIX.AUTH — Session persistence decision:** architecture decision record and threat-model approval first; implementation only in a separately authorized checkpoint.
-7. **UIX.FINAL — Regression and polish:** source tests plus authorized browser checks for responsive layout, keyboard/focus, screen-reader semantics, visual consistency, and unchanged request behavior.
+2. **UIX.2A — Page structure and responsive shell:** page-owned `h1`, mobile navigation drawer, and shared page headers.
+3. **UIX.2B — Filter presentation:** compact `Filtrlar` trigger and right-side Sheet with explicit Apply/Reset while preserving all draft/applied query semantics.
+4. **UIX.2C — Pagination only:** implemented locally with fixed page size 20 and shared pagination; command/browser gates and staging verification for `size=20` remain pending.
+5. **UIX.3 — Table readability and metadata:** Dynamic QR metadata pilot, consistent identifiers, dates, confirmed status mappings, then migrate simple management tables. Establish column models but do not add drag yet.
+6. **UIX.4 — Phone and product identity:** shared Uzbekistan phone input in login/cashier creation, favicon/title/theme/font cleanup.
+7. **UIX.5 — Column preferences and reordering:** versioned per-table preferences, reset, keyboard ordering, mobile chooser, then optional drag enhancement.
+8. **UIX.AUTH — Session persistence decision:** architecture decision record and threat-model approval first; implementation only in a separately authorized checkpoint.
+9. **UIX.FINAL — Regression and polish:** source tests plus authorized browser checks for responsive layout, keyboard/focus, screen-reader semantics, visual consistency, and unchanged request behavior.
 
 ## 7. Explicit deferred and gated items
 

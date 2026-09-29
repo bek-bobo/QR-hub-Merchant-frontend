@@ -44,7 +44,7 @@ export function toDynamicQrQuery(
     !isValidDateRange(filters) ||
     !Number.isSafeInteger(filters.page) ||
     filters.page < 0 ||
-    !([10, 25, 50] as readonly number[]).includes(filters.size) ||
+    !([10, 20, 25, 50] as readonly number[]).includes(filters.size) ||
     (filters.status !== undefined && !allowedStatuses.includes(filters.status))
   ) {
     throw safeContractError()

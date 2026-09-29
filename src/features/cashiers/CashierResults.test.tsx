@@ -6,7 +6,7 @@ import type { Page } from '@/shared/contracts/merchant-read'
 import { CashierResults } from './CashierResults'
 
 const cashier: CashierRow = { id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [{ id: 'term-active', name: 'Active Terminal', statusCode: 0 }, { id: 'term-second', name: 'Second Terminal', statusCode: 0 }] }
-const page: Page<CashierRow> = { content: [cashier, { ...cashier, id: '12', fullname: 'Cashier B', terminals: [] }], totalElements: 47, totalPages: 5, page: 0, size: 10 }
+const page: Page<CashierRow> = { content: [cashier, { ...cashier, id: '12', fullname: 'Cashier B', terminals: [] }], totalElements: 47, totalPages: 5, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof CashierResults>[0]> = {}) => renderToString(createElement(CashierResults, { data: page, selected: null, blocked: false, pending: false, error: false, onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined, onClose: () => undefined, ...overrides }))
 
 describe('cashier results', () => {
@@ -17,8 +17,8 @@ describe('cashier results', () => {
     expect(html).toContain('Cashier B')
     expect(html).toContain('Terminal biriktirilmagan')
     expect(html).not.toContain('term-inactive-filter')
-    expect(text).toContain('47 ta kassir')
-    expect(text).toContain('1 / 5')
+    expect(text).toContain('Jami: 47')
+    expect(html).toContain('aria-current="page"')
     expect(html).toContain('>Noma’lum<')
     expect(html).not.toContain('>777<')
     expect(html).toContain('Merchant user')

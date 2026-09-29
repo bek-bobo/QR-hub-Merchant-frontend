@@ -3,13 +3,14 @@ import { renderToString } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
-import { P5Page } from './P5Page'
+import { P5Filters, P5Page } from './P5Page'
+import { createDefaultP5Filters } from './page-state'
 
 vi.mock('@tanstack/react-query', () => ({ useQuery: vi.fn(), useQueryClient: vi.fn() }))
 vi.mock('@/app/read/useReadRuntime', () => ({ useReadRuntime: vi.fn() }))
 
 const scope = { source: 'live' as const, sessionScopeId: 'session-a', accessRevision: 1 }
-const page = { content: [], totalElements: 0, totalPages: 0, page: 0, size: 10 }
+const page = { content: [], totalElements: 0, totalPages: 0, page: 0, size: 20 }
 let runtimeValue: ReturnType<typeof useReadRuntime>
 
 beforeEach(() => {
@@ -40,12 +41,26 @@ describe('P5 page optional lookups', () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1)
     expect(html).toContain('>P5 qurilmalari</h1>')
     expect(html).toContain('id="p5-search-help"')
-    expect(html).toContain('aria-describedby="p5-search-help"')
+    expect(html).toContain('>Filtrlar</button>')
+    expect(html).not.toContain('aria-describedby="p5-search-help"')
     expect(html).toContain('P5 qurilmalari')
-    expect(html).toContain('Merchant filtri uchun ruxsat yo‘q; filtrsiz ro‘yxat ishlaydi.')
-    expect(html).toContain('Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak')
     expect(html).toContain('P5 qurilmasi topilmadi')
     expect(vi.mocked(useQuery).mock.calls[3]?.[0]).toMatchObject({ enabled: true })
+
+    const draft = createDefaultP5Filters()
+    const filtersHtml = renderToString(<P5Filters
+      draft={draft}
+      applied={draft}
+      merchantLookupState={{ kind: 'denied' }}
+      merchants={undefined}
+      draftTerminalState="denied"
+      draftTerminals={undefined}
+      validationMessage={null}
+      onDraftChange={() => undefined}
+    />)
+    expect(filtersHtml).toContain('aria-describedby="p5-search-help"')
+    expect(filtersHtml).toContain('Merchant filtri uchun ruxsat yo‘q; filtrsiz ro‘yxat ishlaydi.')
+    expect(filtersHtml).toContain('Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak')
   })
 
   it('promises search only by device ID and terminal name', () => {

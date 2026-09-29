@@ -5,15 +5,46 @@ import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select } from '@/components/ui/select'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
+import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { PageHeader } from '@/shared/ui/PageHeader'
-import { applyStaticTerminal, changeStaticPageSize, clearStaticTerminal,
+import { applyStaticTerminal, clearStaticTerminal,
   defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
 import { createStaticQrQueryOptions } from './query'
 import { StaticQrResults } from './StaticQrResults'
+
+interface StaticQrFiltersProps {
+  readonly draftTerminal: string
+  readonly applied: StaticQrFilters
+  readonly terminals: readonly { readonly id: string; readonly name: string }[] | undefined
+  readonly lookupUsable: boolean
+  readonly onDraftTerminalChange: (terminalId: string) => void
+}
+
+export function StaticQrFilters({
+  draftTerminal,
+  applied,
+  terminals,
+  lookupUsable,
+  onDraftTerminalChange,
+}: StaticQrFiltersProps) {
+  return <>
+    <label className="block min-w-0 space-y-1 text-sm">Terminal
+      <Select value={draftTerminal}
+        disabled={!lookupUsable}
+        onChange={(event) => onDraftTerminalChange(event.target.value)}>
+        <option value="">Barcha terminallar</option>
+        {terminals?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+      </Select>
+    </label>
+    {!lookupUsable ? <p role="status" className="text-sm text-text-secondary">
+      {applied.terminalId
+        ? 'Terminal filtri hozir mavjud emas; qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.'
+        : 'Terminal filtri hozir mavjud emas; ro‘yxat filtrsiz ishlaydi.'}
+    </p> : null}
+  </>
+}
 
 export function StaticQrPage() {
   const runtime = useReadRuntime()
@@ -40,6 +71,18 @@ export function StaticQrPage() {
     terminalConfirmed: selectedValid, transport, bridge, getSessionSnapshot,
   }))
 
+  function applyFilters(): boolean {
+    const next = applyStaticTerminal(applied, draftTerminal, lookup)
+    if (!next) return false
+    setApplied(next)
+    return true
+  }
+
+  function resetFilters() {
+    setDraftTerminal('')
+    setApplied((current) => clearStaticTerminal(current))
+  }
+
   if (!staticReadAllowed) return <NoAccessState description="Statik QR ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title="Statik QR autentifikatsiyasi sozlanmagan" />
   if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
@@ -54,34 +97,20 @@ export function StaticQrPage() {
         </>
       }
     />
-    <Card className="min-w-0"><CardHeader><CardTitle>Filterlar</CardTitle></CardHeader>
-      <CardContent className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-      <label className="min-w-0 space-y-1 text-sm">Terminal
-        <Select className="sm:w-auto" value={draftTerminal}
-          disabled={!lookupUsable}
-          onChange={(event) => setDraftTerminal(event.target.value)}>
-          <option value="">Barcha terminallar</option>
-          {terminals.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </Select>
-      </label>
-      {!lookupUsable ? <p role="status" className="text-sm text-text-secondary">
-        {applied.terminalId
-          ? 'Terminal filtri hozir mavjud emas; qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.'
-          : 'Terminal filtri hozir mavjud emas; ro‘yxat filtrsiz ishlaydi.'}
-      </p> : null}
-      <Button type="button" disabled={Boolean(draftTerminal) &&
+    <FilterDrawer
+      onApply={applyFilters}
+      onReset={resetFilters}
+      applyDisabled={Boolean(draftTerminal) &&
         getStaticTerminalState({ ...applied, terminalId: draftTerminal }, lookup) !== 'valid'}
-        onClick={() => { const next = applyStaticTerminal(applied, draftTerminal, lookup); if (next) setApplied(next) }}>Qo‘llash</Button>
-      <Button type="button" variant="outline" onClick={() => {
-        setDraftTerminal(''); setApplied((current) => clearStaticTerminal(current))
-      }}>Tozalash</Button>
-      <label className="min-w-0 space-y-1 text-sm">Sahifa hajmi
-        <Select className="sm:w-auto" value={applied.size}
-          onChange={(event) => { const nextSize = event.target.value; setApplied((current) => changeStaticPageSize(current, nextSize)) }}>
-          <option value={10}>10</option><option value={25}>25</option><option value={50}>50</option>
-        </Select>
-      </label>
-    </CardContent></Card>
+    >
+      <StaticQrFilters
+        draftTerminal={draftTerminal}
+        applied={applied}
+        terminals={terminals.data}
+        lookupUsable={lookupUsable}
+        onDraftTerminalChange={setDraftTerminal}
+      />
+    </FilterDrawer>
     <StaticQrResults terminalConfirmed={selectedValid} pending={list.isPending}
       error={list.isError} data={list.data} page={applied.page}
       onRetry={() => void list.refetch()}

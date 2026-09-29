@@ -8,6 +8,7 @@ import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { presentP5Status } from './page-state'
+import { PaginationBar } from '@/shared/ui/PaginationBar'
 
 interface P5ResultsProps {
   readonly blocked: boolean
@@ -59,11 +60,8 @@ export function P5Results({ blocked, pending, error, data, selected, onRetry, on
           </table>
         </div>
       </CardContent></Card>}
-    <nav aria-label="P5 qurilmalari sahifalari" className="flex flex-wrap items-center gap-3 text-sm">
-      <Button type="button" variant="outline" aria-label="Oldingi sahifa" disabled={data.page <= 0} onClick={() => onPageChange(data.page - 1)}>Oldingi</Button>
-      <span aria-live="polite">{data.page + 1} / {Math.max(1, data.totalPages)}</span>
-      <Button type="button" variant="outline" aria-label="Keyingi sahifa" disabled={data.page + 1 >= data.totalPages} onClick={() => onPageChange(data.page + 1)}>Keyingi</Button>
-      <span>{data.totalElements} ta qurilma</span>
-    </nav>
+    <PaginationBar ariaLabel="P5 qurilmalari sahifalari" currentPage={data.page}
+      totalPages={data.totalPages} totalItems={data.totalElements}
+      onPageChange={onPageChange} />
   </div>
 }

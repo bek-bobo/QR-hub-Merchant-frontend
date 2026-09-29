@@ -8,6 +8,7 @@ import type { Page } from '@/shared/contracts/merchant-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { presentCashierTerminalStatus } from './status-presentation'
+import { PaginationBar } from '@/shared/ui/PaginationBar'
 
 interface CashierResultsProps {
   readonly blocked: boolean
@@ -58,11 +59,8 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
       {unassignSurface}
       {assignSurface}
     </CardContent></Card> : null}
-    <nav aria-label="Kassir sahifalari" className="flex flex-wrap items-center gap-3 text-sm">
-      <Button type="button" variant="outline" aria-label="Oldingi sahifa" disabled={data.page <= 0} onClick={() => onPageChange(data.page - 1)}>Oldingi</Button>
-      <span aria-live="polite">{data.page + 1} / {Math.max(1, data.totalPages)}</span>
-      <Button type="button" variant="outline" aria-label="Keyingi sahifa" disabled={data.page + 1 >= data.totalPages} onClick={() => onPageChange(data.page + 1)}>Keyingi</Button>
-      <span>{data.totalElements} ta kassir</span>
-    </nav>
+    <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
+      totalPages={data.totalPages} totalItems={data.totalElements}
+      onPageChange={onPageChange} />
   </div>
 }

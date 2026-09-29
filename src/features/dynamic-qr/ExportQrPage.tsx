@@ -1,16 +1,75 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
 import { createDefaultDynamicQrFilters, getTerminalFilterState, parseQrStatusInput } from './page-state'
 import { applyExportDraft } from './export-page-state'
 import type { DynamicQrFilterDraft } from './filters'
 import type { DynamicQrFilters } from '@/shared/contracts/merchant-read'
+import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { ExportButton } from './ExportButton'
+
+interface ExportQrFiltersProps {
+  readonly draft: DynamicQrFilterDraft
+  readonly terminals: readonly { readonly id: string; readonly name: string }[] | undefined
+  readonly terminalSelectorAvailable: boolean
+  readonly terminalUnavailableMessage: string
+  readonly appliedTerminalValid: boolean
+  readonly message: string | null
+  readonly onDraftChange: (draft: DynamicQrFilterDraft) => void
+}
+
+export function ExportQrFilters({
+  draft,
+  terminals,
+  terminalSelectorAvailable,
+  terminalUnavailableMessage,
+  appliedTerminalValid,
+  message,
+  onDraftChange,
+}: ExportQrFiltersProps) {
+  return <>
+    <div className="grid gap-3">
+      <label className="space-y-1 text-sm">Boshlanish sanasi<Input type="date" value={draft.fromDate}
+        aria-invalid={message === 'Sana oralig‘ini to‘g‘ri kiriting.'}
+        onChange={(event) => onDraftChange({ ...draft, fromDate: event.target.value })} /></label>
+      <label className="space-y-1 text-sm">Tugash sanasi<Input type="date" value={draft.toDate}
+        aria-invalid={message === 'Sana oralig‘ini to‘g‘ri kiriting.'}
+        onChange={(event) => onDraftChange({ ...draft, toDate: event.target.value })} /></label>
+    </div>
+    <label className="block space-y-1 text-sm">Terminal
+      <Select
+        value={draft.terminalId ?? ''} disabled={!terminalSelectorAvailable}
+        onChange={(event) => onDraftChange({ ...draft, terminalId: event.target.value || undefined })}>
+        <option value="">Barcha terminallar</option>
+        {terminals?.map((terminal) => <option key={terminal.id} value={terminal.id}>{terminal.name}</option>)}
+      </Select>
+    </label>
+    {!terminalSelectorAvailable ? <p className="text-sm text-text-secondary">
+      {terminalUnavailableMessage}
+    </p> : null}
+    {!appliedTerminalValid ? <p role="alert" className="text-sm text-destructive">
+      Qo‘llangan terminal endi tasdiqlanmayapti. Eksportni davom ettirish uchun filtrni aniq tozalang.
+    </p> : null}
+    <label className="block space-y-1 text-sm">Terminal nomi bo‘yicha qidiruv
+      <Input type="search" value={draft.search} placeholder="Terminal nomi bo‘yicha"
+        onChange={(event) => onDraftChange({ ...draft, search: event.target.value })} />
+    </label>
+    <label className="block space-y-1 text-sm">Status
+      <Select
+        value={draft.status === undefined ? '' : String(draft.status)}
+        onChange={(event) => onDraftChange({ ...draft, status: parseQrStatusInput(event.target.value) })}>
+        <option value="">Barchasi</option><option value="0">Yangi</option>
+        <option value="10">Jarayonda</option><option value="50">Muvaffaqiyatli</option>
+        <option value="5">Muddati o‘tgan</option><option value="20">Bekor qilingan</option>
+      </Select>
+    </label>
+    {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
+    <p className="text-xs text-text-secondary">Eksport qo‘llangan filtrlarga tegishli; sahifadagi qatorlar bilan cheklanmaydi.</p>
+  </>
+}
 
 export function ExportQrPage() {
   const runtime = useReadRuntime()
@@ -31,18 +90,19 @@ export function ExportQrPage() {
   const terminalSelectorAvailable = terminalOptions.enabled && !terminals.isPending &&
     !terminals.isError && Boolean(terminals.data)
 
-  function apply() {
+  function apply(): boolean {
     const result = applyExportDraft(draft, lookup)
     if (result.kind !== 'applied') {
       setMessage(result.kind === 'invalid-date'
         ? 'Sana oralig‘ini to‘g‘ri kiriting.'
         : 'Tanlangan terminalni tasdiqlab bo‘lmadi. Terminal filtrini tozalang.')
-      return
+      return false
     }
     setDraft(result.filters)
     setApplied(result.filters)
     setRevision((current) => current + 1)
     setMessage(null)
+    return true
   }
 
   function clear() {
@@ -53,53 +113,26 @@ export function ExportQrPage() {
   }
 
   return <div className="mx-auto max-w-2xl space-y-4">
-    <PageHeader title="Dinamik QR XLSX eksporti" />
-    <Card><CardHeader><CardTitle>Filtrlar</CardTitle></CardHeader><CardContent className="space-y-4">
-      <p className="text-sm text-text-secondary">O‘zgarishlar faqat “Qo‘llash” bosilganda eksport filtriga qo‘shiladi.</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <label className="space-y-1 text-sm">Boshlanish sanasi<Input type="date" value={draft.fromDate}
-          aria-invalid={message === 'Sana oralig‘ini to‘g‘ri kiriting.'}
-          onChange={(event) => setDraft({ ...draft, fromDate: event.target.value })} /></label>
-        <label className="space-y-1 text-sm">Tugash sanasi<Input type="date" value={draft.toDate}
-          aria-invalid={message === 'Sana oralig‘ini to‘g‘ri kiriting.'}
-          onChange={(event) => setDraft({ ...draft, toDate: event.target.value })} /></label>
-      </div>
-      <label className="block space-y-1 text-sm">Terminal
-        <Select
-          value={draft.terminalId ?? ''} disabled={!terminalSelectorAvailable}
-          onChange={(event) => setDraft({ ...draft, terminalId: event.target.value || undefined })}>
-          <option value="">Barcha terminallar</option>
-          {terminals.data?.map((terminal) => <option key={terminal.id} value={terminal.id}>{terminal.name}</option>)}
-        </Select>
-      </label>
-      {!terminalSelectorAvailable ? <p className="text-sm text-text-secondary">
-        {terminalOptions.enabled && terminals.isPending
+    <PageHeader
+      title="Dinamik QR XLSX eksporti"
+      actions={<ExportButton applied={applied} terminalValid={appliedTerminalState === 'valid'} intentRevision={revision} />}
+    />
+    <FilterDrawer
+      description="O‘zgarishlar faqat “Qo‘llash” bosilganda eksport filtriga qo‘shiladi."
+      onApply={apply}
+      onReset={clear}
+    >
+      <ExportQrFilters
+        draft={draft}
+        terminals={terminals.data}
+        terminalSelectorAvailable={terminalSelectorAvailable}
+        terminalUnavailableMessage={terminalOptions.enabled && terminals.isPending
           ? 'Terminal ro‘yxati tekshirilmoqda.'
           : 'Terminal filtri mavjud emas. Terminal tanlanmagan eksport davom etishi mumkin.'}
-      </p> : null}
-      {appliedTerminalState !== 'valid' ? <p role="alert" className="text-sm text-destructive">
-        Qo‘llangan terminal endi tasdiqlanmayapti. Eksportni davom ettirish uchun filtrni aniq tozalang.
-      </p> : null}
-      <label className="block space-y-1 text-sm">Terminal nomi bo‘yicha qidiruv
-        <Input type="search" value={draft.search} placeholder="Terminal nomi bo‘yicha"
-          onChange={(event) => setDraft({ ...draft, search: event.target.value })} />
-      </label>
-      <label className="block space-y-1 text-sm">Status
-        <Select
-          value={draft.status === undefined ? '' : String(draft.status)}
-          onChange={(event) => setDraft({ ...draft, status: parseQrStatusInput(event.target.value) })}>
-          <option value="">Barchasi</option><option value="0">Yangi</option>
-          <option value="10">Jarayonda</option><option value="50">Muvaffaqiyatli</option>
-          <option value="5">Muddati o‘tgan</option><option value="20">Bekor qilingan</option>
-        </Select>
-      </label>
-      {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" onClick={apply}>Qo‘llash</Button>
-        <Button type="button" variant="outline" onClick={clear}>Tozalash</Button>
-        <ExportButton applied={applied} terminalValid={appliedTerminalState === 'valid'} intentRevision={revision} />
-      </div>
-      <p className="text-xs text-text-secondary">Eksport qo‘llangan filtrlarga tegishli; sahifadagi qatorlar bilan cheklanmaydi.</p>
-    </CardContent></Card>
+        appliedTerminalValid={appliedTerminalState === 'valid'}
+        message={message}
+        onDraftChange={setDraft}
+      />
+    </FilterDrawer>
   </div>
 }

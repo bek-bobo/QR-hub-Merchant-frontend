@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { changeManagementPage, changeManagementSize, clearManagementFilters, toBankAccountListQuery } from '@/shared/contracts/management-filters'
+import { changeManagementPage, clearManagementFilters, toBankAccountListQuery } from '@/shared/contracts/management-filters'
 import { applyBankAccountDraft, bankAccountParentState, createDefaultBankAccountFilters } from './page-state'
 
 describe('bank-account filter state', () => {
   it('applies only merchant/search/page/size and resets page', () => {
     const draft = { ...createDefaultBankAccountFilters(), merchantId: '2', search: '  0001 ', page: 4 }
     const applied = applyBankAccountDraft(draft, ['2'])
-    expect(toBankAccountListQuery(applied)).toEqual({ merchantId: '2', search: '0001', page: '0', size: '10' })
+    expect(toBankAccountListQuery(applied)).toEqual({ merchantId: '2', search: '0001', page: '0', size: '20' })
     expect(changeManagementPage(applied, 2).page).toBe(2)
-    expect(changeManagementSize(applied, 25)).toMatchObject({ page: 0, size: 25 })
-    expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, search: '', page: 0, size: 10 })
+    expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, search: '', page: 0, size: 20 })
   })
 
   it('pauses an unconfirmed applied merchant but permits unfiltered read without lookup', () => {
