@@ -42,6 +42,14 @@ UIX.4B locally adds a shared `UzbekPhoneInput` with a fixed `+998` prefix, nine 
 
 UIX.5A locally implements a pure stable-ID order normalizer, the shared versioned `qrhub:table-columns:v1` storage adapter, a small React state bridge, and an accessible Up/Down preferences Sheet. Dynamic QR is the only production pilot: its exact seven-column default remains unchanged, and one feature-owned resolved definition sequence now renders both headers and cells. Explicit moves update immediately and use latest-payload read-modify-write persistence; current-table reset preserves other valid table entries, and unavailable or malformed storage is nonfatal. `TableScrollRegion`, filters, pagination, queries/API behavior, row order, permissions, and the cancel gate are unchanged. The remaining six tables stay deferred to UIX.5B/UIX.5C. Command and manual browser gates are pending; UIX.5 is not complete. See `docs/uiux/UIX_05A_RESULT.md`.
 
+### UIX.AUTH.0 session-persistence audit status — 2026-09-29
+
+UIX.AUTH.0 completed a read-only frontend/backend architecture audit. Reload starts anonymous because both bearer tokens, profile, scope, and auth phase exist only in the current JavaScript document; the persisted device UUID and Web Lock are identity/ownership coordination, not authentication persistence. The backend currently accepts a raw refresh token in JSON, rotates it, and returns a new JSON token pair, so JavaScript storage is technically possible but would expose the 15-day renewable bearer credential to same-origin XSS. No cookie auth, HttpOnly cookie, explicit credentialed-CORS policy, or cookie CSRF model was found; API CSRF is currently disabled. The recommended, unapproved direction is an HttpOnly refresh/session cookie with a memory-only access token and a lease-first `BOOTSTRAPPING -> AUTHENTICATED | ANONYMOUS` startup. Backend/security/product approval and backend contract work are required before frontend implementation. See `docs/uiux/UIX_AUTH_SESSION_PERSISTENCE_AUDIT.md`.
+
+### UIX.AUTH.1-CONTRACT web-cookie contract status — 2026-09-29
+
+The HttpOnly refresh/session cookie plus memory-only access-token direction is approved for contract design, not implementation. UIX.AUTH.1-CONTRACT recommends preserving existing native/mobile JSON-token login, `/token/refresh`, and Bearer logout while giving web clients a refresh-token-free access DTO, cookie issuance on completed web login, and explicit `POST /web/token/refresh` and `POST /web/token/logout` endpoints. Cookie rotation must be server-atomic and create at most one successor; the first release preserves the existing single-owner tab lease. Deployment topology, SameSite/Path, session lifetime, and response-loss recovery remain backend/security/product decisions. No frontend or backend production source changed. See `docs/uiux/UIX_AUTH_01_WEB_COOKIE_CONTRACT.md`.
+
 The main polish work is cross-cutting rather than a collection of isolated CSS fixes. Money, phone, offsetless date/time, page headings, filters, pagination, status presentation, long identifiers, and table definitions need small shared foundations before page-by-page migration. Refresh-after-reload is deliberately separate: it is an `AUTH_SESSION_PERSISTENCE_DECISION`, not a visual fix.
 
 Recommended defaults and decisions:
@@ -96,13 +104,13 @@ Recommended defaults and decisions:
 
 - **Classification / priority:** `SECURITY_OR_ARCHITECTURE_DECISION`, P1.
 - **Source:** `src/shared/auth/session-controller.ts`, `AuthProvider.tsx`, `device-lease.ts`, `login-controller.ts`, `src/shared/api/auth-api.ts`, and auth contracts; read-only backend references in `TokenResource`, `TokenServiceImpl`, and token DTOs.
-- **Current behavior:** `SessionController.tokenState` holds both access and refresh tokens only in RAM. `AuthProvider` creates a fresh anonymous controller on application startup and has no persisted-session bootstrap. The local-storage-backed device lease stores a device UUID/ownership coordination value, not credentials. Therefore a full reload necessarily loses the token pair and routes to login.
-- **Desired behavior:** only after an approved security decision, startup may reacquire the device lease, use a persisted refresh capability, rotate it through `/token/refresh`, establish the in-memory session, call `GET_ME`, and clear persisted state on terminal refresh failure/logout.
-- **Contract/API impact:** the current backend can technically support client-managed restoration because `/token/refresh` accepts a refresh token in a JSON body and returns a rotated access/refresh pair. The inspected backend does not expose an HttpOnly-cookie refresh flow. A materially safer cookie design therefore requires backend/gateway, CORS, SameSite, and CSRF work.
+- **Current behavior:** UIX.AUTH.0 source-confirmed that `SessionController.tokenState` holds both access and refresh tokens only in RAM. `AuthProvider` creates a fresh anonymous controller on application startup and has no persisted-session bootstrap. The local-storage-backed device lease stores a device UUID/ownership coordination value, not credentials. Therefore a full reload necessarily loses the token pair and routes to Login.
+- **Desired behavior:** the architecture direction now approves a server-issued HttpOnly refresh/session cookie, a memory-only access token, and a lease-first startup that waits in `BOOTSTRAPPING`, refreshes/rotates, calls `GET_ME`, and then resolves exactly once to authenticated, anonymous, or a bounded retryable bootstrap error. Implementation remains blocked on contract-owner decisions and backend delivery.
+- **Contract/API impact:** the current backend can technically support client-managed restoration because `/token/refresh` accepts a refresh token in a JSON body and returns a rotated access/refresh pair. That is `FRONTEND_ONLY_PATH_EXISTS_WITH_SECURITY_TRADEOFF`, not the preferred security model. The inspected backend exposes no cookie refresh flow, no HttpOnly cookie, no explicit credentialed-CORS policy, and no cookie CSRF model; the API security chain disables CSRF. The preferred design requires backend contract/security work.
 - **Accessibility / responsive:** not a visual or device-width concern; failure/recovery messaging must remain understandable and keyboard reachable.
 - **Tests:** reload bootstrap success/failure, single-use refresh rotation, stale-token replay, concurrent tabs/device lease, cache isolation, logout, revoked/expired token, network ambiguity, and no token leakage in logs/errors.
 - **Complexity / reuse:** high and security-sensitive. Keep out of cosmetic checkpoints.
-- **Checkpoint:** UIX.AUTH only after explicit decision approval.
+- **Checkpoint:** UIX.AUTH.0 audit and UIX.AUTH.1-CONTRACT draft complete; issue remains open. Wait for backend/security/product contract approval and backend implementation before UIX.AUTH.2 frontend work. See `docs/uiux/UIX_AUTH_SESSION_PERSISTENCE_AUDIT.md` and `docs/uiux/UIX_AUTH_01_WEB_COOKIE_CONTRACT.md`.
 
 Detailed decision answers:
 
@@ -261,7 +269,7 @@ None identified within UI/UX presentation scope. Existing contract/backend gates
 5. **UIX.3 — Table readability and metadata:** locally implemented with consistent identifiers, shared table/scroll presentation, existing date/money/status presenters, and management-table migration. Column models and reordering remain deferred; command/browser gates pending.
 6. **UIX.4 — Phone and product identity:** UIX.4A display and UIX.4B Login/Cashier Create input work are locally implemented with verification gates pending; favicon/title/theme/font cleanup remains separate.
 7. **UIX.5 — Column preferences and reordering:** versioned per-table preferences, reset, keyboard ordering, mobile chooser, then optional drag enhancement.
-8. **UIX.AUTH — Session persistence decision:** architecture decision record and threat-model approval first; implementation only in a separately authorized checkpoint.
+8. **UIX.AUTH — Session persistence:** UIX.AUTH.0 audit and UIX.AUTH.1-CONTRACT documentation are complete. Backend/security/product must resolve the contract's owner decisions and the backend must implement the approved web-cookie contract before any separately authorized UIX.AUTH.2 frontend checkpoint.
 9. **UIX.FINAL — Regression and polish:** source tests plus authorized browser checks for responsive layout, keyboard/focus, screen-reader semantics, visual consistency, and unchanged request behavior.
 
 ## 7. Explicit deferred and gated items
@@ -272,7 +280,7 @@ None identified within UI/UX presentation scope. Existing contract/backend gates
 - **P5 reset:** `CONTRACT_GATED`; no enablement or indirect opening.
 - **STG-ISSUE-CASHIER-01:** `BACKEND_RUNTIME`; UIX may style existing surfaces but must not claim to resolve runtime behavior.
 - **Status mappings:** raw codes cannot become friendly labels until each domain mapping is confirmed; unknown values must remain visible and neutral.
-- **Session persistence:** no token storage change without UIX.AUTH approval.
+- **Session persistence:** no production token/cookie change before owner contract approval, backend delivery, and a separately authorized UIX.AUTH.2 frontend checkpoint.
 
 ## 8. No-change areas to preserve
 

@@ -10,7 +10,7 @@ const data: Page<BankAccountRow> = { content: [row, { ...row, id: '12', name: 'S
 const render = (overrides: Partial<Parameters<typeof BankAccountResults>[0]> = {}) => renderToString(createElement(BankAccountResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('bank-account results', () => {
-  it('preserves source order, exact account text, neutral fallback, and server totals', () => {
+  it('preserves source order, exact account text, and neutral fallback while hiding the visible total', () => {
     const html = render()
     const text = html.replace(/<!-- -->/g, '')
     expect(html.indexOf('Main')).toBeLessThan(html.indexOf('Second'))
@@ -20,7 +20,7 @@ describe('bank-account results', () => {
     expect(html).toContain('0007')
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
-    expect(text).toContain('Jami: 47')
+    expect(text).not.toContain('Jami: 47')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Balans')
     expect(html).not.toContain('Muvaffaqiyatli')

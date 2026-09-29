@@ -19,6 +19,7 @@ interface FilterDrawerProps {
   readonly onApply: () => boolean | void
   readonly onReset: () => void
   readonly applyDisabled?: boolean
+  readonly triggerSize?: 'default' | 'sm'
 }
 
 export function FilterDrawer({
@@ -27,6 +28,7 @@ export function FilterDrawer({
   onApply,
   onReset,
   applyDisabled = false,
+  triggerSize = 'default',
 }: FilterDrawerProps) {
   const [open, setOpen] = useState(false)
   const handlers = createFilterDrawerHandlers({ setOpen, onApply, onReset })
@@ -34,7 +36,12 @@ export function FilterDrawer({
   return (
     <Sheet open={open} onOpenChange={handlers.setOpen}>
       <SheetTrigger asChild>
-        <Button type="button" variant="outline" className="w-fit max-w-full">
+        <Button
+          type="button"
+          variant="outline"
+          size={triggerSize}
+          className="w-fit max-w-full"
+        >
           <ListFilterIcon aria-hidden="true" />
           Filtrlar
         </Button>

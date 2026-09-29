@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
@@ -17,17 +18,22 @@ interface BankAccountResultsProps {
   readonly data?: Page<BankAccountRow>
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly headerActions?: ReactNode
 }
 
-export function BankAccountResults({ blocked, pending, error, data, onRetry, onPageChange }: BankAccountResultsProps) {
-  if (blocked) return <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
-  if (pending) return <LoadingState title="Bank hisoblari yuklanmoqda" />
-  if (error) return <ErrorState onRetry={onRetry} />
-  if (!data) return <ErrorState title="Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi" />
-
-  return <div className="min-w-0 space-y-4">
-    {data.content.length === 0 ? <EmptyState description="Bank hisobi topilmadi." />
-      : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
+export function BankAccountResults({ blocked, pending, error, data, onRetry, onPageChange, headerActions }: BankAccountResultsProps) {
+  return <Card className="min-w-0" aria-busy={pending}>
+    <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <CardTitle>Bank hisoblari ro‘yxati</CardTitle>
+      {headerActions}
+    </CardHeader>
+    <CardContent className="min-w-0 space-y-4">
+      {blocked ? <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
+        : pending ? <LoadingState title="Bank hisoblari yuklanmoqda" />
+          : error ? <ErrorState onRetry={onRetry} />
+            : !data ? <ErrorState title="Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi" />
+              : data.content.length === 0 ? <EmptyState description="Bank hisobi topilmadi." />
+                : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Bank hisoblari jadvali">
           <Table className="min-w-[64rem]">
             <TableHeader><TableRow><TableHead>Nomi</TableHead><TableHead>Bank</TableHead><TableHead>Hisob raqami</TableHead><TableHead>Merchant</TableHead><TableHead>MFO</TableHead><TableHead>STIR</TableHead><TableHead>Shartnoma</TableHead><TableHead>Holat</TableHead></TableRow></TableHeader>
@@ -39,9 +45,10 @@ export function BankAccountResults({ blocked, pending, error, data, onRetry, onP
             })}</TableBody>
           </Table>
         </TableScrollRegion>
-      </CardContent></Card>}
-    <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
-      totalPages={data.totalPages} totalItems={data.totalElements}
-      onPageChange={onPageChange} />
-  </div>
+      </div>}
+      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
+        totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+        onPageChange={onPageChange} /> : null}
+    </CardContent>
+  </Card>
 }

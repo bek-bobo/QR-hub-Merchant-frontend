@@ -10,13 +10,13 @@ const data: Page<TerminalRow> = { content: [row, row], totalElements: 47, totalP
 const render = (overrides: Partial<Parameters<typeof TerminalResults>[0]> = {}) => renderToString(createElement(TerminalResults, { data, pending: false, error: false, blocked: false, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
 
 describe('terminal results', () => {
-  it('preserves duplicate rows and totals while presenting unknown status neutrally', () => {
+  it('preserves duplicate rows while hiding the visible total and presenting unknown status neutrally', () => {
     const html = render()
     const normalizedHtml = html.replace(/<!-- -->/g, '')
     expect(html.match(/Terminal A/g)).toHaveLength(2)
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
-    expect(normalizedHtml).toContain('Jami: 47')
+    expect(normalizedHtml).not.toContain('Jami: 47')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')

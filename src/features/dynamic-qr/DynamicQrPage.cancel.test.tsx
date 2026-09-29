@@ -21,9 +21,9 @@ function pageWith(permissions: string[]) {
 }
 
 describe('production cancel list gate', () => {
-  it('shows a non-actionable notice to a cancel grantee without a row cancel button', () => {
+  it('keeps cancel unavailable without rendering the removed notice', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CANCEL_PAYMENT'])
-    expect(html).toContain('Bekor qilish hozircha mavjud emas')
+    expect(html).not.toContain('Bekor qilish hozircha mavjud emas')
     expect(html).not.toContain('Tasdiqlash')
   })
 
@@ -36,5 +36,24 @@ describe('production cancel list gate', () => {
   it('shows create navigation only with CREATE_DYNAMIC_QR', () => {
     expect(pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])).toContain('Yangi QR yaratish')
     expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('Yangi QR yaratish')
+  })
+
+  it('renders the compact table toolbar without the removed helper copy', () => {
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+
+    expect(html).toContain('Dinamik QR ro‘yxati')
+    expect(html).toContain('Filtrlar')
+    expect(html).toContain('Jadval ustunlari')
+    expect(html).not.toContain('Tranzaksiyalar')
+    expect(html).not.toContain('Filtrlash va sahifalash server tomonidan bajariladi.')
+    expect(html).not.toContain('server natijasi')
+  })
+
+  it('renders honest summary placeholders when aggregate fields are unavailable', () => {
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+
+    expect(html).toContain('Jami summa')
+    expect(html).toContain('Xizmat haqi')
+    expect(html.match(/Joriy API javobida agregat mavjud emas/g)).toHaveLength(2)
   })
 })

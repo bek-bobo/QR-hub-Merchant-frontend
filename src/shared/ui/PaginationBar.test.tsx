@@ -56,6 +56,17 @@ describe('PaginationBar', () => {
     expect(html).not.toContain('>0</button>')
   })
 
+  it('can hide the visible total without changing pagination state', () => {
+    const html = renderToString(<PaginationBar ariaLabel="Dinamik QR sahifalari"
+      currentPage={1} totalPages={3} totalItems={47} showTotal={false}
+      onPageChange={() => undefined} />)
+
+    expect(withoutReactSeparators(html)).not.toContain('Jami: 47')
+    expect(html).toContain('2-sahifa, jami 3 sahifa')
+    expect(html).toContain('aria-current="page"')
+    expect(html).toContain('sm:justify-end')
+  })
+
   it('renders numbered pages and decorative ellipses for a middle window', () => {
     const html = renderToString(<PaginationBar ariaLabel="Natija sahifalari"
       currentPage={5} totalPages={13} totalItems={128} onPageChange={() => undefined} />)

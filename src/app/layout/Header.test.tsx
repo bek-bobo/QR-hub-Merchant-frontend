@@ -44,4 +44,36 @@ describe('Header', () => {
     expect(html).toContain('text-sm')
     expect(html).not.toContain('Ko‘rinish')
   })
+
+  it('renders an opt-in page title as the semantic heading', () => {
+    const html = renderToStaticMarkup(
+      <Header title="Dinamik QRlar" titleAsHeading />,
+    )
+
+    expect(html.match(/<h1\b/g)).toHaveLength(1)
+    expect(html).toContain('>Dinamik QRlar</h1>')
+    expect(html).toContain('truncate')
+  })
+
+  it('renders compact account controls with identity, role, avatar, and icon logout', () => {
+    const html = renderToStaticMarkup(
+      <ThemeContext.Provider
+        value={{ mode: 'dark', resolvedTheme: 'dark', setMode: vi.fn() }}
+      >
+        <Header
+          identityLabel="Behzod Yashinov"
+          identitySecondary="MERCHANT"
+          compactAccountControls
+          onLogout={vi.fn()}
+        />
+      </ThemeContext.Provider>,
+    )
+
+    expect(html).toContain('Behzod Yashinov')
+    expect(html).toContain('MERCHANT')
+    expect(html).toContain('aria-label="Ko‘rinish: Tungi. Keyingi rejimga o‘tish"')
+    expect(html).toContain('aria-label="Chiqish"')
+    expect(html).not.toContain('<select')
+    expect(html).not.toContain('>Chiqish</button>')
+  })
 })

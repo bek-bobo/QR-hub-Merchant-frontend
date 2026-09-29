@@ -29,5 +29,19 @@ describe('ThemeModeSelect', () => {
       expect(html).toContain('>System</option>')
     },
   )
+
+  it('renders the compact mode as an icon button instead of a select', () => {
+    const html = renderToStaticMarkup(
+      <ThemeContext.Provider
+        value={{ mode: 'light', resolvedTheme: 'light', setMode: vi.fn() }}
+      >
+        <ThemeModeSelect compact />
+      </ThemeContext.Provider>,
+    )
+
+    expect(html).toContain('<button')
+    expect(html).toContain('aria-label="Ko‘rinish: Yorug‘. Keyingi rejimga o‘tish"')
+    expect(html).not.toContain('<select')
+  })
 })
 

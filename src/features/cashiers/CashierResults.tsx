@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
@@ -23,20 +23,26 @@ interface CashierResultsProps {
   readonly onPageChange: (page: number) => void
   readonly onSelect: (row: CashierRow) => void
   readonly onClose: () => void
+  readonly headerActions?: ReactNode
   readonly assignSurface?: ReactNode
   readonly onUnassign?: (terminal: CashierTerminal) => void
   readonly unassignSurface?: ReactNode
 }
 
-export function CashierResults({ blocked, pending, error, data, selected, onRetry, onPageChange, onSelect, onClose, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
-  if (blocked) return <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
-  if (pending) return <LoadingState title="Kassirlar yuklanmoqda" />
-  if (error) return <ErrorState onRetry={onRetry} />
-  if (!data) return <ErrorState title="Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi" />
-
+export function CashierResults({ blocked, pending, error, data, selected, onRetry, onPageChange, onSelect, onClose, headerActions, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
   return <div className="min-w-0 space-y-4">
-    {data.content.length === 0 ? <EmptyState description="Kassir topilmadi." />
-      : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
+    <Card className="min-w-0" aria-busy={pending}>
+      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <CardTitle>Kassirlar ro‘yxati</CardTitle>
+        {headerActions}
+      </CardHeader>
+      <CardContent className="min-w-0 space-y-4">
+        {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
+          : pending ? <LoadingState title="Kassirlar yuklanmoqda" />
+            : error ? <ErrorState onRetry={onRetry} />
+              : !data ? <ErrorState title="Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi" />
+                : data.content.length === 0 ? <EmptyState description="Kassir topilmadi." />
+                  : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Kassirlar jadvali">
           <Table className="min-w-[46rem]">
             <TableHeader><TableRow><TableHead>F.I.Sh.</TableHead><TableHead>Telefon</TableHead><TableHead>Rol</TableHead><TableHead>Holat</TableHead><TableHead className="text-right">Faol terminallar</TableHead></TableRow></TableHeader>
@@ -49,7 +55,12 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
             })}</TableBody>
           </Table>
         </TableScrollRegion>
-      </CardContent></Card>}
+      </div>}
+        {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
+          totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+          onPageChange={onPageChange} /> : null}
+      </CardContent>
+    </Card>
     {selected ? <Card className="min-w-0"><CardContent className="space-y-3 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">{selected.fullname} — faol terminal biriktirishlari</h3><Button type="button" variant="outline" size="sm" onClick={onClose}>Yopish</Button></div>
       <section aria-label="Faol terminal biriktirishlari">
@@ -62,8 +73,5 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
       {unassignSurface}
       {assignSurface}
     </CardContent></Card> : null}
-    <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
-      totalPages={data.totalPages} totalItems={data.totalElements}
-      onPageChange={onPageChange} />
   </div>
 }

@@ -1,4 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { cn } from 'cn'
 import { Button } from '@/components/ui/button'
 import {
   PAGINATION_ELLIPSIS,
@@ -12,6 +13,7 @@ export interface PaginationBarProps {
   readonly totalItems: number
   readonly onPageChange: (page: number) => void
   readonly disabled?: boolean
+  readonly showTotal?: boolean
 }
 
 export function PaginationBar({
@@ -21,6 +23,7 @@ export function PaginationBar({
   totalItems,
   onPageChange,
   disabled = false,
+  showTotal = true,
 }: PaginationBarProps) {
   const pages = createPaginationWindow(currentPage, totalPages)
   const previousDisabled = disabled || currentPage <= 0
@@ -29,11 +32,16 @@ export function PaginationBar({
   return (
     <nav
       aria-label={ariaLabel}
-      className="flex min-w-0 flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
+      className={cn(
+        'flex min-w-0 flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center',
+        showTotal ? 'sm:justify-between' : 'sm:justify-end',
+      )}
     >
-      <p className="shrink-0 text-sm text-text-secondary">
-        Jami: {totalItems.toLocaleString('uz-UZ')}
-      </p>
+      {showTotal ? (
+        <p className="shrink-0 text-sm text-text-secondary">
+          Jami: {totalItems.toLocaleString('uz-UZ')}
+        </p>
+      ) : null}
       <span aria-live="polite" className="sr-only">
         {totalPages > 0
           ? `${currentPage + 1}-sahifa, jami ${totalPages} sahifa`

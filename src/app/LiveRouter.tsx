@@ -50,7 +50,13 @@ function FullPageLoading() {
   )
 }
 
-function LiveShell({ children }: { children: ReactNode }) {
+function LiveShell({
+  children,
+  pageTitle,
+}: {
+  children: ReactNode
+  pageTitle?: string
+}) {
   const access = useAccessContext()
   const runtime = useReadRuntime()
   const { actions, pending, profile } = useAuth()
@@ -63,11 +69,15 @@ function LiveShell({ children }: { children: ReactNode }) {
     <LiveShellLayout
       header={(navigation) => (
         <Header
+          title={pageTitle}
+          titleAsHeading={Boolean(pageTitle)}
           navigationOpen={navigation.open}
           navigationControls={navigation.controls}
           navigationTriggerRef={navigation.triggerRef}
           onOpenNavigation={navigation.openNavigation}
           identityLabel={identityLabel}
+          identitySecondary={profile?.roles[0]}
+          compactAccountControls
           logoutPending={pending.logout}
           onLogout={() => void actions.logout()}
         />
@@ -194,9 +204,11 @@ const featurePresentation = {
 function LiveFeatureRoute({
   feature,
   children,
+  pageTitle,
 }: {
   feature: LiveFeatureRouteName
   children: ReactNode
+  pageTitle?: string
 }) {
   const access = useAccessContext()
   const { sessionPhase } = useAuth()
@@ -239,7 +251,11 @@ function LiveFeatureRoute({
     )
   }
 
-  return <LiveShell>{children}</LiveShell>
+  return (
+    <LiveShell pageTitle={pageTitle}>
+      {children}
+    </LiveShell>
+  )
 }
 
 function DashboardRoute() {
@@ -254,26 +270,29 @@ function DynamicQrRoute() {
   const location = useLocation()
 
   return (
-    <LiveFeatureRoute feature="dynamicQr">
+    <LiveFeatureRoute
+      feature="dynamicQr"
+      pageTitle="Dinamik QRlar"
+    >
       <DynamicQrPage initialState={location.state} />
     </LiveFeatureRoute>
   )
 }
 
 function StaticQrRoute() {
-  return <LiveFeatureRoute feature="staticQr"><StaticQrPage /></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar"><StaticQrPage /></LiveFeatureRoute>
 }
 
 function TerminalRoute() {
-  return <LiveFeatureRoute feature="terminals"><Suspense fallback={<LoadingState title="Terminallar sahifasi yuklanmoqda" />}><TerminalPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="terminals" pageTitle="Terminallar"><Suspense fallback={<LoadingState title="Terminallar sahifasi yuklanmoqda" />}><TerminalPage /></Suspense></LiveFeatureRoute>
 }
 
 function BankAccountRoute() {
-  return <LiveFeatureRoute feature="bankAccounts"><Suspense fallback={<LoadingState title="Bank hisoblari sahifasi yuklanmoqda" />}><BankAccountPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="bankAccounts" pageTitle="Bank hisoblari"><Suspense fallback={<LoadingState title="Bank hisoblari sahifasi yuklanmoqda" />}><BankAccountPage /></Suspense></LiveFeatureRoute>
 }
 
 function CashierRoute() {
-  return <LiveFeatureRoute feature="cashiers"><Suspense fallback={<LoadingState title="Kassirlar sahifasi yuklanmoqda" />}><CashierPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="cashiers" pageTitle="Kassirlar"><Suspense fallback={<LoadingState title="Kassirlar sahifasi yuklanmoqda" />}><CashierPage /></Suspense></LiveFeatureRoute>
 }
 
 function CreateCashierRoute() {

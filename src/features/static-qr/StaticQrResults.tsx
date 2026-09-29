@@ -1,4 +1,5 @@
-import { Card, CardContent } from '@/components/ui/card'
+import type { ReactNode } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from './contract'
@@ -14,25 +15,31 @@ interface StaticQrResultsProps {
   readonly page: number
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly headerActions?: ReactNode
 }
 
 export function StaticQrResults({ terminalConfirmed, pending, error, data,
-  page, onRetry, onPageChange }: StaticQrResultsProps) {
-  if (!terminalConfirmed) return <ErrorState title="Tanlangan terminal endi tasdiqlanmadi"
-    description="Filtrni tozalang yoki terminalni qayta tanlab qo‘llang." />
-  if (pending) return <LoadingState title="Statik QRlar yuklanmoqda" />
-  if (error) return <ErrorState onRetry={onRetry} />
-  if (!data) return <ErrorState title="Statik QR ro‘yxatini ko‘rsatib bo‘lmadi" />
-
-  return <div className="min-w-0 space-y-4">
-    {data.content.length === 0 ? <EmptyState description="Statik QR topilmadi." />
-      : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
+  page, onRetry, onPageChange, headerActions }: StaticQrResultsProps) {
+  return <Card className="min-w-0" aria-busy={pending}>
+    <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <CardTitle>Statik QR ro‘yxati</CardTitle>
+      {headerActions}
+    </CardHeader>
+    <CardContent className="min-w-0 space-y-4">
+      {!terminalConfirmed ? <ErrorState title="Tanlangan terminal endi tasdiqlanmadi"
+        description="Filtrni tozalang yoki terminalni qayta tanlab qo‘llang." />
+        : pending ? <LoadingState title="Statik QRlar yuklanmoqda" />
+          : error ? <ErrorState onRetry={onRetry} />
+            : !data ? <ErrorState title="Statik QR ro‘yxatini ko‘rsatib bo‘lmadi" />
+              : data.content.length === 0 ? <EmptyState description="Statik QR topilmadi." />
+                : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Statik QR jadvali">
           <StaticQrTable rows={data.content} />
         </TableScrollRegion>
-      </CardContent></Card>}
-    <PaginationBar ariaLabel="Statik QR sahifalari" currentPage={page}
-      totalPages={data.totalPages} totalItems={data.totalElements}
-      onPageChange={onPageChange} />
-  </div>
+      </div>}
+      {data && terminalConfirmed && !pending && !error ? <PaginationBar ariaLabel="Statik QR sahifalari" currentPage={page}
+        totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+        onPageChange={onPageChange} /> : null}
+    </CardContent>
+  </Card>
 }

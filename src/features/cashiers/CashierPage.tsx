@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { RefreshCwIcon } from 'lucide-react'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { can } from '@/shared/auth/access'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -23,7 +24,7 @@ function terminalLookupState(enabled: boolean, error: boolean, data: readonly Te
   return data ? 'ready' : 'loading'
 }
 
-function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurrentScope, onRetry, onPageChange }: {
+function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurrentScope, onRetry, onPageChange, headerActions }: {
   readonly data: Page<CashierRow>
   readonly scope: ReadScope
   readonly resultKey: readonly unknown[]
@@ -31,6 +32,7 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
   readonly getCurrentScope: () => ReadScope
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly headerActions: ReactNode
 }) {
   const access = useAccessContext()
   const [selectedTarget, setSelectedTarget] = useState<CashierTarget | null>(null)
@@ -44,6 +46,7 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
     ? unassignSelection.target : null
   return <CashierResults blocked={false} pending={false} error={false} data={data} selected={selected}
     onRetry={onRetry} onPageChange={onPageChange}
+    headerActions={headerActions}
     onSelect={(row) => { selectedEpochRef.current++; selectedCashierRef.current = row; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(createCashierTarget(row, getCurrentScope())) }}
     onClose={() => { selectedEpochRef.current++; selectedCashierRef.current = null; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(null) }}
     onUnassign={selected !== null && can(access, 'cashier.unassignTerminal', false)
@@ -118,15 +121,9 @@ export function CashierPage() {
     setValidationMessage(null)
   }
 
-  if (!runtime.capabilities.cashierList) return <NoAccessState description="Kassirlar ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.cashierList.kind === 'unavailable') return <ErrorState title="Kassirlar integratsiyasi sozlanmagan" />
-
-  return <div className="mx-auto min-w-0 max-w-7xl space-y-5">
-    <PageHeader
-      title="Kassirlar"
-      description="Qidiruv kassir F.I.Sh. va telefon raqami bo‘yicha ishlaydi."
-    />
-    <FilterDrawer onApply={applyFilters} onReset={resetFilters}>
+  function renderHeaderActions() {
+    return <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+      <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
         {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
           <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => changeMerchantDraft(current, event.target.value || undefined))}>
             <option value="">Barcha merchantlar</option>{merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
@@ -144,11 +141,24 @@ export function CashierPage() {
         {draft.merchantId && draftTerminalState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Terminal filtri {draftTerminalState === 'denied' ? 'uchun ruxsat yo‘q' : draftTerminalState === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}.</p> : null}
         {applied.terminalId ? <p className="text-sm text-text-secondary sm:col-span-2 lg:col-span-4">Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin.</p> : null}
         {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
-    </FilterDrawer>
+      </FilterDrawer>
+      <Button type="button" variant="outline" size="sm"
+        disabled={!listOptions.enabled || list.isFetching} onClick={() => void list.refetch()}>
+        <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
+        Yangilash
+      </Button>
+    </div>
+  }
+
+  if (!runtime.capabilities.cashierList) return <NoAccessState description="Kassirlar ro‘yxatini ko‘rish huquqi mavjud emas." />
+  if (runtime.readiness.cashierList.kind === 'unavailable') return <ErrorState title="Kassirlar integratsiyasi sozlanmagan" />
+
+  return <div className="mx-auto min-w-0 max-w-7xl">
     {visibleData ? <ScopedCashierResults key={cashierSelectionKey(listOptions.queryKey, visibleData)} data={visibleData} scope={runtime.scope} resultKey={listOptions.queryKey} dataUpdatedAt={list.dataUpdatedAt} getCurrentScope={runtime.getCurrentScope}
-      onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))} />
+      onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      headerActions={renderHeaderActions()} />
       : <CashierResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data} selected={null}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
-        onSelect={() => undefined} onClose={() => undefined} />}
+        onSelect={() => undefined} onClose={() => undefined} headerActions={renderHeaderActions()} />}
   </div>
 }

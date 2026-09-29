@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { RefreshCwIcon } from 'lucide-react'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, clearManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
 import { applyBankAccountDraft, bankAccountParentState, createDefaultBankAccountFilters, type MerchantLookupState } from './page-state'
@@ -57,26 +58,29 @@ export function BankAccountPage() {
   if (!runtime.capabilities.bankAccountList) return <NoAccessState description="Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.bankAccountList.kind === 'unavailable') return <ErrorState title="Bank hisoblari integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl space-y-5">
-    <PageHeader
-      title="Bank hisoblari"
-      description="Qidiruv hisob nomi, bank nomi, hisob raqami va STIR bo‘yicha ishlaydi."
-    />
-    <FilterDrawer onApply={applyFilters} onReset={resetFilters}>
-        {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
-          <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => ({ ...current, merchantId: event.target.value || undefined }))}>
-            <option value="">Barcha merchantlar</option>
-            {merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-          </Select>
-        </label> : null}
-        <label className="block min-w-0 space-y-1 text-sm">Hisob nomi, bank nomi, hisob raqami yoki STIR
-          <Input value={draft.search} onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} placeholder="Nomi, bank, hisob raqami yoki STIR" />
-        </label>
-        {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
-        {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
-    </FilterDrawer>
+  return <div className="mx-auto min-w-0 max-w-7xl">
     <BankAccountResults blocked={!parentReady} pending={list.isPending} error={list.isError} data={list.data}
       onRetry={() => void list.refetch()}
-      onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))} />
+      onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+          {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
+            <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => ({ ...current, merchantId: event.target.value || undefined }))}>
+              <option value="">Barcha merchantlar</option>
+              {merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+            </Select>
+          </label> : null}
+          <label className="block min-w-0 space-y-1 text-sm">Hisob nomi, bank nomi, hisob raqami yoki STIR
+            <Input value={draft.search} onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} placeholder="Nomi, bank, hisob raqami yoki STIR" />
+          </label>
+          {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
+          {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
+        </FilterDrawer>
+        <Button type="button" variant="outline" size="sm"
+          disabled={!listOptions.enabled || list.isFetching} onClick={() => void list.refetch()}>
+          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
+          Yangilash
+        </Button>
+      </div>} />
   </div>
 }

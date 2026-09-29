@@ -6,9 +6,10 @@ import { can } from '@/shared/auth/access'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { RefreshCwIcon } from 'lucide-react'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { applyStaticTerminal, clearStaticTerminal,
   defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
 import { createStaticQrQueryOptions } from './query'
@@ -87,33 +88,32 @@ export function StaticQrPage() {
   if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title="Statik QR autentifikatsiyasi sozlanmagan" />
   if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl space-y-5">
-    <PageHeader
-      title="Statik QRlar"
-      description={
-        <>
-          Biriktirilgan terminallar bo‘yicha ro‘yxat.
-          <span className="block">QR ko‘rinishi kontrakt tasdiqlangach mavjud bo‘ladi.</span>
-        </>
-      }
-    />
-    <FilterDrawer
-      onApply={applyFilters}
-      onReset={resetFilters}
-      applyDisabled={Boolean(draftTerminal) &&
-        getStaticTerminalState({ ...applied, terminalId: draftTerminal }, lookup) !== 'valid'}
-    >
-      <StaticQrFilters
-        draftTerminal={draftTerminal}
-        applied={applied}
-        terminals={terminals.data}
-        lookupUsable={lookupUsable}
-        onDraftTerminalChange={setDraftTerminal}
-      />
-    </FilterDrawer>
+  return <div className="mx-auto min-w-0 max-w-7xl">
     <StaticQrResults terminalConfirmed={selectedValid} pending={list.isPending}
       error={list.isError} data={list.data} page={applied.page}
       onRetry={() => void list.refetch()}
-      onPageChange={(page) => setApplied((current) => ({ ...current, page }))} />
+      onPageChange={(page) => setApplied((current) => ({ ...current, page }))}
+      headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+        <FilterDrawer
+          onApply={applyFilters}
+          onReset={resetFilters}
+          applyDisabled={Boolean(draftTerminal) &&
+            getStaticTerminalState({ ...applied, terminalId: draftTerminal }, lookup) !== 'valid'}
+          triggerSize="sm"
+        >
+          <StaticQrFilters
+            draftTerminal={draftTerminal}
+            applied={applied}
+            terminals={terminals.data}
+            lookupUsable={lookupUsable}
+            onDraftTerminalChange={setDraftTerminal}
+          />
+        </FilterDrawer>
+        <Button type="button" variant="outline" size="sm"
+          disabled={!selectedValid || list.isFetching} onClick={() => void list.refetch()}>
+          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
+          Yangilash
+        </Button>
+      </div>} />
   </div>
 }

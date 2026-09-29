@@ -1,5 +1,6 @@
+import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
@@ -17,17 +18,22 @@ interface TerminalResultsProps {
   readonly data?: Page<TerminalRow>
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly headerActions?: ReactNode
 }
 
-export function TerminalResults({ blocked, pending, error, data, onRetry, onPageChange }: TerminalResultsProps) {
-  if (blocked) return <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki bank hisobini qayta tanlab qo‘llang yoki filtrni tozalang." />
-  if (pending) return <LoadingState title="Terminallar yuklanmoqda" />
-  if (error) return <ErrorState onRetry={onRetry} />
-  if (!data) return <ErrorState title="Terminal ro‘yxatini ko‘rsatib bo‘lmadi" />
-
-  return <div className="min-w-0 space-y-4">
-    {data.content.length === 0 ? <EmptyState description="Terminal topilmadi." />
-      : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
+export function TerminalResults({ blocked, pending, error, data, onRetry, onPageChange, headerActions }: TerminalResultsProps) {
+  return <Card className="min-w-0" aria-busy={pending}>
+    <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <CardTitle>Terminallar ro‘yxati</CardTitle>
+      {headerActions}
+    </CardHeader>
+    <CardContent className="min-w-0 space-y-4">
+      {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki bank hisobini qayta tanlab qo‘llang yoki filtrni tozalang." />
+        : pending ? <LoadingState title="Terminallar yuklanmoqda" />
+          : error ? <ErrorState onRetry={onRetry} />
+            : !data ? <ErrorState title="Terminal ro‘yxatini ko‘rsatib bo‘lmadi" />
+              : data.content.length === 0 ? <EmptyState description="Terminal topilmadi." />
+                : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Terminal jadvali">
           <Table className="min-w-[40rem]">
             <TableHeader><TableRow><TableHead>Terminal ID</TableHead><TableHead>Nomi</TableHead><TableHead>Merchant</TableHead><TableHead>Bank hisobi</TableHead><TableHead>Holat</TableHead></TableRow></TableHeader>
@@ -39,9 +45,10 @@ export function TerminalResults({ blocked, pending, error, data, onRetry, onPage
             })}</TableBody>
           </Table>
         </TableScrollRegion>
-      </CardContent></Card>}
-    <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
-      totalPages={data.totalPages} totalItems={data.totalElements}
-      onPageChange={onPageChange} />
-  </div>
+      </div>}
+      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
+        totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+        onPageChange={onPageChange} /> : null}
+    </CardContent>
+  </Card>
 }

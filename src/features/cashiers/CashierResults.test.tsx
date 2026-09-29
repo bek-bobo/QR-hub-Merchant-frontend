@@ -17,7 +17,7 @@ describe('cashier results', () => {
     expect(html).toContain('Cashier B')
     expect(html).toContain('Terminal biriktirilmagan')
     expect(html).not.toContain('term-inactive-filter')
-    expect(text).toContain('Jami: 47')
+    expect(text).not.toContain('Jami: 47')
     expect(html).toContain('aria-current="page"')
     expect(html).toContain('>Noma’lum<')
     expect(html).not.toContain('>777<')
