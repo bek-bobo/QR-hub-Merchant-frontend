@@ -38,6 +38,10 @@ UIX.4A adds a shared string-only Uzbekistan phone display formatter and applies 
 
 UIX.4B locally adds a shared `UzbekPhoneInput` with a fixed `+998` prefix, nine local subscriber digits, derived `XX XXX XX XX` grouping, and explicit local-to-wire conversion. Login and Cashier Create both continue to send the confirmed `998XXXXXXXXX` string; their controller/DTO validation boundaries remain unchanged. Local, full `998...`, and full `+998...` paste forms are supported with harmless separators, while alphabetic, wrong-prefix, and overlength input is rejected without truncation. Command and 390px/320px browser gates remain pending. See `docs/uiux/UIX_04B_RESULT.md`.
 
+### UIX.5A column-preferences foundation status — 2026-09-29
+
+UIX.5A locally implements a pure stable-ID order normalizer, the shared versioned `qrhub:table-columns:v1` storage adapter, a small React state bridge, and an accessible Up/Down preferences Sheet. Dynamic QR is the only production pilot: its exact seven-column default remains unchanged, and one feature-owned resolved definition sequence now renders both headers and cells. Explicit moves update immediately and use latest-payload read-modify-write persistence; current-table reset preserves other valid table entries, and unavailable or malformed storage is nonfatal. `TableScrollRegion`, filters, pagination, queries/API behavior, row order, permissions, and the cancel gate are unchanged. The remaining six tables stay deferred to UIX.5B/UIX.5C. Command and manual browser gates are pending; UIX.5 is not complete. See `docs/uiux/UIX_05A_RESULT.md`.
+
 The main polish work is cross-cutting rather than a collection of isolated CSS fixes. Money, phone, offsetless date/time, page headings, filters, pagination, status presentation, long identifiers, and table definitions need small shared foundations before page-by-page migration. Refresh-after-reload is deliberately separate: it is an `AUTH_SESSION_PERSISTENCE_DECISION`, not a visual fix.
 
 Recommended defaults and decisions:
