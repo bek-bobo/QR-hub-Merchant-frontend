@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { FormField } from '@/components/forms/FormField'
 import { Input } from '@/components/ui/input'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
@@ -12,7 +13,9 @@ import { readKeys } from '@/shared/api/read-keys'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { endpoints } from '@/shared/contracts/endpoints'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
+import { formatUzbekPhoneDisplay, toUzbekPhoneWire } from '@/shared/presentation/phone'
 import { PageHeader } from '@/shared/ui/PageHeader'
+import { UzbekPhoneInput } from '@/shared/ui/UzbekPhoneInput'
 import { buildCashierCreateRequest, createCashierCreateController, invalidateCurrentCashierLists, type CashierCreateDraft, type CashierCreatePort } from './create-cashier'
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
@@ -83,7 +86,8 @@ export function CreateCashierPage() {
   const canCreate = session.phase === 'authenticated' && session.profile.permissions.includes('CREATE_CASHIER')
   const visibleIntent = state.intent && sameScope(state.intent.scope, runtime.scope) ? state.intent : null
   const outcome = visibleIntent ? state.outcome : { kind: 'idle' as const }
-  const draft: CashierCreateDraft = { fullname, phone, terminalIds }
+  const phoneWire = toUzbekPhoneWire(phone)
+  const draft: CashierCreateDraft = { fullname, phone: phoneWire ?? '', terminalIds }
   const validRequest = buildCashierCreateRequest(draft, currentOptions())
   const lookupReason = !runtime.capabilities.terminalLookup ? 'Terminal tanlash uchun ruxsat mavjud emas.'
     : !lookupOptions.enabled ? 'Terminal tanlash integratsiyasi mavjud emas.'
@@ -116,7 +120,24 @@ export function CreateCashierPage() {
     <Card><CardHeader><CardTitle>Yangi kassir</CardTitle></CardHeader><CardContent>
       <form className="space-y-4" onSubmit={submit}>
         <label className="block space-y-1 text-sm">F.I.Sh.<Input value={fullname} onChange={(event) => setFullname(event.target.value)} autoComplete="name" /></label>
-        <label className="block space-y-1 text-sm">Telefon<Input value={phone} onChange={(event) => setPhone(event.target.value)} inputMode="tel" autoComplete="off" placeholder="998901234567" /></label>
+        <FormField
+          id="cashier-phone"
+          label="Telefon"
+          helpText="9 ta mahalliy raqamni kiriting."
+          errorText={phone.length > 0 && !phoneWire
+            ? 'Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.'
+            : undefined}
+        >
+          {(controlProps) => (
+            <UzbekPhoneInput
+              {...controlProps}
+              value={phone}
+              onValueChange={setPhone}
+              autoComplete="off"
+              placeholder="XX XXX XX XX"
+            />
+          )}
+        </FormField>
         <fieldset className="space-y-2"><legend className="text-sm font-medium">Terminallar</legend>
           {terminals.data && currentOptions() ? terminals.data.map((terminal) => <label key={terminal.id} className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={terminalIds.includes(terminal.id)} onChange={(event) => setTerminalIds((ids) => event.target.checked ? [...ids, terminal.id] : ids.filter((id) => id !== terminal.id))} />
@@ -124,14 +145,14 @@ export function CreateCashierPage() {
           </label>) : null}
         </fieldset>
         {lookupReason ? <p role="status" className="text-sm text-text-secondary">{lookupReason}</p> : null}
-        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary">F.I.Sh., 998 formatidagi telefon va kamida bitta joriy terminalni tanlang.</p> : null}
+        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary">F.I.Sh., telefon va kamida bitta joriy terminalni tanlang.</p> : null}
         {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
         <Button type="submit" disabled={!canSubmit}>Kassir yaratish</Button>
       </form>
     </CardContent></Card>
     {outcome.kind === 'pending' ? <p role="status">Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.</p> : null}
     {outcome.kind === 'confirmed' && visibleIntent ? <section role="status" className="space-y-2 rounded-lg border p-4">
-      <h3 className="font-semibold">Kassir yaratildi</h3><p>{visibleIntent.request.fullname}</p><p>{visibleIntent.request.phone}</p>
+      <h3 className="font-semibold">Kassir yaratildi</h3><p>{visibleIntent.request.fullname}</p><p>{formatUzbekPhoneDisplay(visibleIntent.request.phone)}</p>
       <p>{visibleIntent.request.terminalIds.length} ta terminal tanlangan.</p>
       {canReadList ? <Link to="/cashiers">Kassirlar ro‘yxati</Link> : null}
       <Button type="button" onClick={freshIntent}>Yangi kassir</Button>

@@ -1,5 +1,6 @@
 import { ActionNotDispatchedError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
+import { normalizeUzbekPhoneWire } from '@/shared/presentation/phone'
 import type { QueryClient } from '@tanstack/react-query'
 
 export interface CashierCreateDraft {
@@ -19,9 +20,7 @@ export interface CashierCreatePort {
 }
 
 export function normalizeCashierPhone(value: string): string | null {
-  const trimmed = value.trim()
-  const normalized = trimmed.startsWith('+') ? trimmed.slice(1) : trimmed
-  return /^998\d{9}$/.test(normalized) ? normalized : null
+  return normalizeUzbekPhoneWire(value, false)
 }
 
 export function buildCashierCreateRequest(

@@ -1,11 +1,14 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 
 interface TerminalResultsProps {
   readonly blocked: boolean
@@ -25,17 +28,17 @@ export function TerminalResults({ blocked, pending, error, data, onRetry, onPage
   return <div className="min-w-0 space-y-4">
     {data.content.length === 0 ? <EmptyState description="Terminal topilmadi." />
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
-        <div role="region" aria-label="Terminal jadvali" tabIndex={0} className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[40rem] text-left text-sm">
-            <thead><tr className="border-b"><th scope="col" className="p-3">Terminal ID</th><th scope="col" className="p-3">Nomi</th><th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">Bank hisobi</th><th scope="col" className="p-3">Holat</th></tr></thead>
-            <tbody>{data.content.map((row, index) => {
+        <TableScrollRegion ariaLabel="Terminal jadvali">
+          <Table className="min-w-[40rem]">
+            <TableHeader><TableRow><TableHead>Terminal ID</TableHead><TableHead>Nomi</TableHead><TableHead>Merchant</TableHead><TableHead>Bank hisobi</TableHead><TableHead>Holat</TableHead></TableRow></TableHeader>
+            <TableBody>{data.content.map((row, index) => {
               const status = presentActiveStatus(row.statusCode)
-              return <tr className="border-b" key={`${row.id}-${index}`}>
-                <td className="break-all p-3">{row.id}</td><td className="p-3">{row.name}</td><td className="p-3">{row.merchantName}</td><td className="p-3">{row.bankAccountName}</td><td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
-              </tr>
-            })}</tbody>
-          </table>
-        </div>
+              return <TableRow key={`${row.id}-${index}`}>
+                <TableCell><MetadataId value={row.id} /></TableCell><TableCell className="font-medium text-foreground">{row.name}</TableCell><TableCell>{row.merchantName}</TableCell><TableCell>{row.bankAccountName}</TableCell><TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
+              </TableRow>
+            })}</TableBody>
+          </Table>
+        </TableScrollRegion>
       </CardContent></Card>}
     <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
       totalPages={data.totalPages} totalItems={data.totalElements}

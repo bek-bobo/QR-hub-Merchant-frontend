@@ -19,6 +19,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
   Table,
   TableBody,
@@ -148,12 +149,9 @@ export function PreviewQrTable({ rows }: PreviewQrTableProps) {
           ko‘rsatkichlar to‘liq namuna bo‘yicha o‘zgarmaydi.
         </p>
 
-        <div
-          role="region"
-          aria-label="Dinamik QR namuna jadvali"
-          aria-describedby="preview-table-help"
-          tabIndex={0}
-          className="w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain [&>[data-slot=table-container]]:overflow-visible"
+        <TableScrollRegion
+          ariaLabel="Dinamik QR namuna jadvali"
+          ariaDescribedBy="preview-table-help"
         >
           <Table className="min-w-[720px]">
             <TableHeader>
@@ -161,7 +159,7 @@ export function PreviewQrTable({ rows }: PreviewQrTableProps) {
                 <TableHead>QR ID</TableHead>
                 <TableHead>Terminal</TableHead>
                 <TableHead>Vaqt</TableHead>
-                <TableHead>Summa</TableHead>
+                <TableHead className="text-right">Summa</TableHead>
                 <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -180,7 +178,9 @@ export function PreviewQrTable({ rows }: PreviewQrTableProps) {
                     </TableCell>
                     <TableCell>{row.terminalName}</TableCell>
                     <TableCell>{row.createdAtLabel}</TableCell>
-                    <TableCell>{formatPreviewTiyin(row.demoAmountTiyin)}</TableCell>
+                    <TableCell className="text-right tabular-nums">
+                      {formatPreviewTiyin(row.demoAmountTiyin)}
+                    </TableCell>
                     <TableCell>
                       <StatusBadge statusCode={row.statusCode} />
                     </TableCell>
@@ -189,7 +189,7 @@ export function PreviewQrTable({ rows }: PreviewQrTableProps) {
               )}
             </TableBody>
           </Table>
-        </div>
+        </TableScrollRegion>
       </CardContent>
     </Card>
   )

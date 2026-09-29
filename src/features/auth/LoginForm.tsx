@@ -10,12 +10,9 @@ import {
 import { Input } from '@/components/ui/input'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { LoginActions } from '@/shared/auth/useAuth'
-import {
-  formatPhoneInput,
-  isValidOtp,
-  isValidPin,
-  normalizePhone,
-} from '@/features/auth/validation'
+import { isValidOtp, isValidPin } from '@/features/auth/validation'
+import { formatUzbekPhoneDisplay, toUzbekPhoneWire } from '@/shared/presentation/phone'
+import { UzbekPhoneInput } from '@/shared/ui/UzbekPhoneInput'
 
 interface LoginFormProps {
   readonly actions: LoginActions
@@ -73,12 +70,13 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
   const submitPhone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setLocalError(null)
-    if (!normalizePhone(phone)) {
-      setLocalError('Telefon raqamini 998XXXXXXXXX formatida kiriting.')
+    const wirePhone = toUzbekPhoneWire(phone)
+    if (!wirePhone) {
+      setLocalError('Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.')
       return
     }
 
-    await actions.startLogin(phone)
+    await actions.startLogin(wirePhone)
   }
 
   const submitOtp = async (event: FormEvent<HTMLFormElement>) => {
@@ -212,7 +210,7 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
           {snapshot.phase === 'phone'
             ? 'Merchant hisobingiz telefon raqamini kiriting.'
             : snapshot.phone
-              ? `Telefon: +${formatPhoneInput(snapshot.phone)}`
+              ? `Telefon: ${formatUzbekPhoneDisplay(snapshot.phone)}`
               : 'Kirish ma’lumotlarini tasdiqlang.'}
         </CardDescription>
       </CardHeader>
@@ -223,14 +221,12 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
               <label className="text-sm font-medium text-text-primary" htmlFor="login-phone">
                 Telefon raqami
               </label>
-              <Input
+              <UzbekPhoneInput
                 id="login-phone"
-                type="tel"
-                inputMode="tel"
                 autoComplete="tel"
-                placeholder="998 90 123 45 67"
+                placeholder="XX XXX XX XX"
                 value={phone}
-                onChange={(event) => setPhone(formatPhoneInput(event.target.value))}
+                onValueChange={setPhone}
                 aria-invalid={Boolean(message)}
                 aria-describedby="login-feedback"
                 disabled={snapshot.pending}

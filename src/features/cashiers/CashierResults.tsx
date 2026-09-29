@@ -2,13 +2,16 @@ import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { presentCashierTerminalStatus } from './status-presentation'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 
 interface CashierResultsProps {
   readonly blocked: boolean
@@ -34,18 +37,18 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
   return <div className="min-w-0 space-y-4">
     {data.content.length === 0 ? <EmptyState description="Kassir topilmadi." />
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
-        <div role="region" aria-label="Kassirlar jadvali" tabIndex={0} className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[46rem] text-left text-sm">
-            <thead><tr className="border-b"><th scope="col" className="p-3">F.I.Sh.</th><th scope="col" className="p-3">Telefon</th><th scope="col" className="p-3">Rol</th><th scope="col" className="p-3">Holat</th><th scope="col" className="p-3">Faol terminallar</th></tr></thead>
-            <tbody>{data.content.map((row, index) => {
+        <TableScrollRegion ariaLabel="Kassirlar jadvali">
+          <Table className="min-w-[46rem]">
+            <TableHeader><TableRow><TableHead>F.I.Sh.</TableHead><TableHead>Telefon</TableHead><TableHead>Rol</TableHead><TableHead>Holat</TableHead><TableHead className="text-right">Faol terminallar</TableHead></TableRow></TableHeader>
+            <TableBody>{data.content.map((row, index) => {
               const status = presentActiveStatus(row.statusCode)
-              return <tr className="border-b" key={`${row.id}-${index}`}>
-                <td className="p-3">{row.fullname}</td><td className="p-3">{row.phone}</td><td className="p-3">{row.roleDisplay ?? '—'}</td><td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
-                <td className="p-3"><Button type="button" variant="outline" size="sm" aria-label={`${row.fullname}: Biriktirishlarni ko‘rish`} aria-expanded={selected?.id === row.id} onClick={() => onSelect(row)}>Biriktirishlarni ko‘rish</Button></td>
-              </tr>
-            })}</tbody>
-          </table>
-        </div>
+              return <TableRow key={`${row.id}-${index}`}>
+                <TableCell className="font-medium text-foreground">{row.fullname}</TableCell><TableCell className="tabular-nums">{row.phone}</TableCell><TableCell>{row.roleDisplay ?? '—'}</TableCell><TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
+                <TableCell className="text-right"><Button type="button" variant="outline" size="sm" aria-label={`${row.fullname}: Biriktirishlarni ko‘rish`} aria-expanded={selected?.id === row.id} onClick={() => onSelect(row)}>Biriktirishlarni ko‘rish</Button></TableCell>
+              </TableRow>
+            })}</TableBody>
+          </Table>
+        </TableScrollRegion>
       </CardContent></Card>}
     {selected ? <Card className="min-w-0"><CardContent className="space-y-3 p-4">
       <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">{selected.fullname} — faol terminal biriktirishlari</h3><Button type="button" variant="outline" size="sm" onClick={onClose}>Yopish</Button></div>
@@ -53,7 +56,7 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
         {selected.terminals.length === 0 ? <p className="text-sm text-text-secondary">Terminal biriktirilmagan.</p>
           : <ul className="max-h-64 space-y-2 overflow-y-auto text-sm">{selected.terminals.map((terminal, index) => {
             const status = presentCashierTerminalStatus(terminal.statusCode)
-            return <li key={`${terminal.id}-${index}`} className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border p-2"><span>{terminal.name}</span> <span className="break-all text-text-secondary">({terminal.id})</span> <Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge>{onUnassign ? <Button type="button" variant="outline" size="sm" aria-label={`${terminal.name} (${terminal.id}) terminalini ajratish`} onClick={() => onUnassign(terminal)}>Ajratish</Button> : null}</li>
+            return <li key={`${terminal.id}-${index}`} className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border p-2"><span className="font-medium text-foreground">{terminal.name}</span><MetadataId value={terminal.id} variant="secondary" className="max-w-64" /><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge>{onUnassign ? <Button type="button" variant="outline" size="sm" aria-label={`${terminal.name} (${terminal.id}) terminalini ajratish`} onClick={() => onUnassign(terminal)}>Ajratish</Button> : null}</li>
           })}</ul>}
       </section>
       {unassignSurface}

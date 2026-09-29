@@ -1,14 +1,17 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { isSafeApiError } from '@/shared/api/errors'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { presentP5Status } from './page-state'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 
 interface P5ResultsProps {
   readonly blocked: boolean
@@ -39,26 +42,26 @@ export function P5Results({ blocked, pending, error, data, selected, onRetry, on
   return <div className="min-w-0 space-y-4">
     {data.content.length === 0 ? <EmptyState description="P5 qurilmasi topilmadi." />
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
-        <div role="region" aria-label="P5 qurilmalari jadvali" tabIndex={0} className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[70rem] text-left text-sm">
-            <thead><tr className="border-b"><th scope="col" className="p-3">Tanlash</th><th scope="col" className="p-3">Qurilma ID</th><th scope="col" className="p-3">Tavsif</th><th scope="col" className="p-3">Terminal</th><th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">Qurilma holati</th><th scope="col" className="p-3">PIN reset</th><th scope="col" className="p-3">Yaratilgan vaqt</th></tr></thead>
-            <tbody>{data.content.map((row, index) => {
+        <TableScrollRegion ariaLabel="P5 qurilmalari jadvali">
+          <Table className="min-w-[70rem]">
+            <TableHeader><TableRow><TableHead className="text-right">Tanlash</TableHead><TableHead>Qurilma ID</TableHead><TableHead>Tavsif</TableHead><TableHead>Terminal</TableHead><TableHead>Merchant</TableHead><TableHead>Qurilma holati</TableHead><TableHead className="text-right">PIN reset</TableHead><TableHead>Yaratilgan vaqt</TableHead></TableRow></TableHeader>
+            <TableBody>{data.content.map((row, index) => {
               const ambiguous = deviceOccurrences.get(row.deviceId) !== 1
               const status = presentP5Status(row.deviceStatus)
               const isSelected = selected === row
-              return <tr className="border-b" data-state={isSelected ? 'selected' : undefined} key={`${row.deviceId}-${index}`}>
-                <td className="p-3"><Button type="button" size="sm" variant="outline" disabled={ambiguous} aria-pressed={isSelected} aria-label={`${row.deviceId} qurilmasini tanlash`} onClick={() => onSelect(row)}>{isSelected ? 'Tanlangan' : 'Tanlash'}</Button></td>
-                <td className="max-w-52 break-all p-3 font-medium">{row.deviceId}</td>
-                <td className="max-w-72 whitespace-normal break-words p-3">{row.description ?? '—'}</td>
-                <td className="max-w-64 whitespace-normal break-words p-3"><span className="font-medium">{row.terminalName}</span><span className="block break-all text-xs text-text-secondary">{row.terminalId}</span></td>
-                <td className="max-w-56 whitespace-normal break-words p-3">{row.merchantName}</td>
-                <td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
-                <td className="p-3"><Button type="button" size="sm" variant="outline" disabled={!resetAvailable || ambiguous || row.deviceStatus !== 0} onClick={() => onReset?.(row)}>PIN reset</Button></td>
-                <td className="whitespace-nowrap p-3">{formatOffsetlessDateTime(row.createdAt)}</td>
-              </tr>
-            })}</tbody>
-          </table>
-        </div>
+              return <TableRow data-state={isSelected ? 'selected' : undefined} key={`${row.deviceId}-${index}`}>
+                <TableCell className="text-right"><Button type="button" size="sm" variant="outline" disabled={ambiguous} aria-pressed={isSelected} aria-label={`${row.deviceId} qurilmasini tanlash`} onClick={() => onSelect(row)}>{isSelected ? 'Tanlangan' : 'Tanlash'}</Button></TableCell>
+                <TableCell><MetadataId value={row.deviceId} /></TableCell>
+                <TableCell className="max-w-72 whitespace-normal break-words">{row.description ?? '—'}</TableCell>
+                <TableCell className="max-w-64 whitespace-normal break-words"><span className="font-medium text-foreground">{row.terminalName}</span><MetadataId value={row.terminalId} variant="secondary" /></TableCell>
+                <TableCell className="max-w-56 whitespace-normal break-words">{row.merchantName}</TableCell>
+                <TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
+                <TableCell className="text-right"><Button type="button" size="sm" variant="outline" disabled={!resetAvailable || ambiguous || row.deviceStatus !== 0} onClick={() => onReset?.(row)}>PIN reset</Button></TableCell>
+                <TableCell>{formatOffsetlessDateTime(row.createdAt)}</TableCell>
+              </TableRow>
+            })}</TableBody>
+          </Table>
+        </TableScrollRegion>
       </CardContent></Card>}
     <PaginationBar ariaLabel="P5 qurilmalari sahifalari" currentPage={data.page}
       totalPages={data.totalPages} totalItems={data.totalElements}

@@ -32,7 +32,11 @@ UIX.2C is now implemented pending user command/browser/staging gates. Dynamic QR
 
 ### UIX.4A Account phone-display status — 2026-09-28
 
-UIX.4A adds a shared string-only Uzbekistan phone display formatter and applies it only to the authenticated Account page. Supported `998XXXXXXXXX` and `+998XXXXXXXXX` values render as `+998 XX XXX XX XX`; malformed values remain visible after trimming, and nullish values render neutrally. The source profile value, API/wire contracts, profile fetching, refresh/logout behavior, and auth/session logic remain unchanged. Login and cashier phone-input UX and dark mode remain deferred. UIX.4A command and browser verification are pending and are not marked PASS. See `docs/uiux/UIX_04A_RESULT.md` for the scoped record.
+UIX.4A adds a shared string-only Uzbekistan phone display formatter and applies it only to the authenticated Account page. Supported `998XXXXXXXXX` and `+998XXXXXXXXX` values render as `+998 XX XXX XX XX`; malformed values remain visible after trimming, and nullish values render neutrally. The source profile value, API/wire contracts, profile fetching, refresh/logout behavior, and auth/session logic remain unchanged. At the UIX.4A handoff, Login and cashier phone-input UX remained deferred; UIX.4B below supersedes that input status. UIX.4A command and browser verification are pending and are not marked PASS. See `docs/uiux/UIX_04A_RESULT.md` for the scoped record.
+
+### UIX.4B editable phone-input status — 2026-09-29
+
+UIX.4B locally adds a shared `UzbekPhoneInput` with a fixed `+998` prefix, nine local subscriber digits, derived `XX XXX XX XX` grouping, and explicit local-to-wire conversion. Login and Cashier Create both continue to send the confirmed `998XXXXXXXXX` string; their controller/DTO validation boundaries remain unchanged. Local, full `998...`, and full `+998...` paste forms are supported with harmless separators, while alphabetic, wrong-prefix, and overlength input is rejected without truncation. Command and 390px/320px browser gates remain pending. See `docs/uiux/UIX_04B_RESULT.md`.
 
 The main polish work is cross-cutting rather than a collection of isolated CSS fixes. Money, phone, offsetless date/time, page headings, filters, pagination, status presentation, long identifiers, and table definitions need small shared foundations before page-by-page migration. Refresh-after-reload is deliberately separate: it is an `AUTH_SESSION_PERSISTENCE_DECISION`, not a visual fix.
 
@@ -58,19 +62,19 @@ Recommended defaults and decisions:
 - **Accessibility / responsive:** do not make separators part of the semantic label; keep a clear currency label and decimal keyboard. Grouping materially improves scanning on narrow screens.
 - **Tests:** exact positive/negative/zero, very large string amounts, scales 0/2, decimal comma/dot, paste with grouping, caret edits, min/max validation, and unchanged create request payload.
 - **Complexity / reuse:** medium. Add `MoneyDisplay`/grouping utility and a focused `MoneyInput` adapter; keep `parseCreateAmount` or its exact equivalent as the wire boundary.
-- **Checkpoint:** UIX.1 foundation, then migration in UIX.3.
+- **Checkpoint:** UIX.1 foundation and UIX.3 table reuse locally implemented; command/browser gates pending.
 
 ### UIX-02 — Uzbekistan phone prefix UX
 
 - **Classification / priority:** `UX_FRICTION`, P1, with accessibility impact.
 - **Source:** login presentation/normalization in `src/features/auth/LoginForm.tsx` and `validation.ts`; login flow validation in `src/shared/auth/login-controller.ts`; cashier creation in `src/features/cashiers/CreateCashierPage.tsx` and `create-cashier.ts`.
-- **Current behavior:** login accepts and groups a complete 12-digit number, but the user still types `998`; cashier create is an unformatted `tel` input with placeholder `998901234567`. Login normalization accepts punctuation and optional `+`; cashier normalization only trims and removes one leading `+`, so behavior differs.
-- **Desired behavior:** a visible, non-editable `+998` prefix with nine editable local digits, tolerant paste of local, `998...`, or `+998...` forms, predictable backspace, and final normalized wire value `998XXXXXXXXX`.
+- **Current behavior:** UIX.4B locally implements a visible, non-editable `+998` prefix with nine editable local digits for Login and Cashier Create. Both derive `XX XXX XX XX`, tolerate unambiguous local/`998...`/`+998...` paste, and retain the final `998XXXXXXXXX` wire value.
+- **Desired behavior:** implemented locally; user command and 390px/320px browser gates remain pending.
 - **Contract/API impact:** none if normalization remains at the component boundary. Login/reset stages reuse the already captured number; there is no separate reset phone input.
 - **Accessibility / responsive:** expose the prefix as part of the accessible field name/value guidance, retain `type="tel"`/`inputMode="tel"`, associate errors, and avoid a placeholder-only label.
 - **Tests:** typing, paste variants, excess/non-digit input, selection/backspace, autofill, screen-reader label/error association, and exact login/cashier request values.
-- **Complexity / reuse:** medium. One shared `UzbekistanPhoneInput` plus one shared normalizer should replace the two divergent helpers. No masking dependency is necessary.
-- **Checkpoint:** UIX.4.
+- **Complexity / reuse:** implemented with one shared `UzbekPhoneInput` and small pure parsing/formatting/wire helpers. No masking dependency was added.
+- **Checkpoint:** UIX.4B locally implemented; verification gates pending.
 
 ### UIX-03 — Browser tab / app identity
 
@@ -134,7 +138,7 @@ Detailed decision answers:
 - **Accessibility / responsive:** use `time` only if its `dateTime` value accurately represents the offsetless source; compact output helps narrow tables. An accessible full-precision value is optional, not required for routine reading.
 - **Tests:** fractional/no-fraction inputs, leap dates, malformed values, no timezone shift under multiple test timezones, and unchanged raw query data.
 - **Complexity / reuse:** low. Move the formatter out of the dashboard feature into shared presentation code, optionally wrapped by `DateTimeDisplay`.
-- **Checkpoint:** UIX.1 foundation and UIX.3 migration.
+- **Checkpoint:** UIX.1 foundation and UIX.3 table reuse locally implemented; command/browser gates pending.
 
 ### UIX-07 — Collapsible filter panels
 
@@ -166,7 +170,7 @@ Detailed decision answers:
   10. Complexity is high across all tables, medium for a Dynamic-QR-only pilot.
 - **Contract/API impact:** presentation only. Never feed preference order into API sort/filter/query construction.
 - **Tests:** schema migration, malformed/stale storage, new/removed columns, reset, permissions, keyboard reorder, focus retention, mobile chooser, and unchanged request/query data.
-- **Checkpoint:** metadata in UIX.3; opt-in reordering in UIX.5.
+- **Checkpoint:** UIX.3 readability foundation locally implemented without column metadata; column models and opt-in reordering remain deferred to UIX.5.
 
 ### UIX-09 — Duplicated page titles
 
@@ -185,10 +189,10 @@ Detailed decision answers:
 | ID | Finding | Category | Priority | Recommendation / checkpoint |
 |---|---|---|---|---|
 | AF-01 | `LiveShellLayout` renders the full sidebar as a normal block on small screens, and `LiveRouter` never supplies `Header.onOpenNavigation`; mobile users encounter the entire navigation before page content. | `RESPONSIVE` | P1 | Add an accessible sheet/drawer with focus return and keep the desktop sidebar at `lg`; UIX.2A. |
-| AF-02 | Static QR, Terminal, Bank Account, and Cashier tables expose raw numeric status codes while Dynamic QR/P5 use labelled badges. Unknown codes still need a neutral explicit fallback. | `UX_FRICTION` | P1 | Add domain-specific status presenters only where mappings are confirmed; do not guess mappings; UIX.3. |
-| AF-03 | Long QR/device/terminal IDs and account numbers use either `break-all` or visual truncation with no consistent reveal/copy affordance. | `UX_FRICTION` | P1 | Add a `LongValue`/`IdentifierCell` pattern with readable truncation, accessible full text, and explicit copy; UIX.3. |
+| AF-02 | Static QR, Terminal, Bank Account, and Cashier tables previously exposed raw numeric status codes while Dynamic QR/P5 used labelled badges. | `UX_FRICTION` | P1 | Theme 4/4P completed the confirmed `Faol` / `Noma’lum` mappings. UIX.3 preserves those presenters and semantic badges without exposing raw unknown codes. |
+| AF-03 | Long QR/device/terminal IDs and account numbers previously used either `break-all` or ad-hoc visual truncation. | `UX_FRICTION` | P1 | UIX.3 locally implements shared `MetadataId`: short values remain unconstrained; long values are visually constrained while the exact selectable value remains in the DOM and native `title`. No copy-button system was added. User command/browser gates pending. |
 | AF-04 | Several invalid fields are not programmatically associated with their error text: for example create-amount has `aria-invalid` without `aria-describedby`, and management filter alerts are often page-level only. | `ACCESSIBILITY` | P1 | Standardize field IDs, help/error IDs, and focus-on-submit-error behavior; UIX.1/UIX.2. |
-| AF-05 | Five feature tables use native markup while newer tables use shared table components, producing inconsistent density and making table-wide improvements expensive. | `VISUAL_POLISH` | P2 | Migrate through one `DataTable` presentation model; UIX.3. |
+| AF-05 | Five feature tables used native markup while newer tables used shared table components, producing inconsistent density. | `VISUAL_POLISH` | P2 | UIX.3 locally migrates Static QR, Terminal, Bank Account, Cashier, and P5 to the existing shared table primitive and one shared scroll-region presenter. No generic `DataTable` framework or column model was added. User command/browser gates pending. |
 | AF-06 | The six server-paginated lists now share zero-based `PaginationBar` state, localized authoritative totals, numbered pages, and deterministic ellipses. | `UX_FRICTION` | P2 | Implemented in UIX.2C; command/browser/staging gates pending. |
 | AF-07 | UIX.2B normalized filter headings to `Filtrlar` and the remaining audited `Filterlar`/`Filterlash` presentation copy to the same Uzbek root. | `VISUAL_POLISH` | P2 | Implemented pending the UIX.2B user command gate. |
 | AF-08 | Native selects use ad-hoc `p-2` styling while shared inputs are `h-8`; form rows can have uneven control height, focus treatment, and disabled styling. | `VISUAL_POLISH` | P2 | Add/reuse a shared select control before filter migration; UIX.1. |
@@ -208,13 +212,13 @@ Positive/no-change observations:
 | Foundation | Pages affected / duplication removed | Risk | Migration order |
 |---|---|---|---|
 | `MoneyDisplay` + exact grouping utility | Dashboard, Dynamic QR list/create/result, terminal amount bounds | Medium: precision/scale regressions | Utility tests, displays, then caret-safe `MoneyInput` |
-| `UzbekistanPhoneInput` + normalizer | Login/reset flow and cashier create | Medium: paste/autofill/caret behavior | Shared normalizer, component, login, cashier |
+| `UzbekPhoneInput` + local/wire helpers | Login/reset flow and cashier create | UIX.4B locally implemented; paste/autofill/caret browser gate pending | Shared parser/formatter/component, then explicit feature wire boundaries |
 | Shared offsetless and instant date formatters | Dynamic QR, dashboard, P5; future management timestamp cells | Low if kept lexical | Formatter tests, current cells, future cells |
 | `Select` / `FormField` error association | All filter/create forms | Low-to-medium | Primitives first, then touched forms |
 | `DEFAULT_PAGE_SIZE` + `PaginationBar` | Six paginated lists | Implemented locally; staging compatibility remains unverified | Verify `size=20` on every affected staging endpoint before completion |
 | `FilterDrawer` | Dashboard and seven filter surfaces | Implemented: right Sheet, scrolling body, fixed footer, local presentation state | Shared primitive plus all eight real filter surfaces in UIX.2B-R1 |
 | `PageHeader` and title ownership rule | All authenticated routes and error states | Medium: semantic regression if partial | Shell contract and all routes in one checkpoint |
-| `DataTable` column metadata + `IdentifierCell` | All GET/list tables | Medium-to-high | Dynamic QR pilot, read-only management tables, action tables last |
+| Shared `Table` + `TableScrollRegion` + `MetadataId` | All GET/list tables | UIX.3 locally implemented; command/browser gates pending | Existing shared primitive retained; simple read-only tables and action tables migrated without introducing column metadata |
 | Domain status presenters | Static QR, terminals, bank accounts, cashiers; preserve existing Dynamic/P5 | High if mappings are guessed | Confirm mappings per domain, then migrate; unknown stays neutral/raw |
 | Versioned column preferences | Eligible metadata-driven tables | High: accessibility/storage migration | Only after DataTable foundation; Dynamic QR pilot first |
 
@@ -250,8 +254,8 @@ None identified within UI/UX presentation scope. Existing contract/backend gates
 2. **UIX.2A — Page structure and responsive shell:** page-owned `h1`, mobile navigation drawer, and shared page headers.
 3. **UIX.2B — Filter presentation:** compact `Filtrlar` trigger and right-side Sheet with explicit Apply/Reset while preserving all draft/applied query semantics.
 4. **UIX.2C — Pagination only:** implemented locally with fixed page size 20 and shared pagination; command/browser gates and staging verification for `size=20` remain pending.
-5. **UIX.3 — Table readability and metadata:** Dynamic QR metadata pilot, consistent identifiers, dates, confirmed status mappings, then migrate simple management tables. Establish column models but do not add drag yet.
-6. **UIX.4 — Phone and product identity:** shared Uzbekistan phone input in login/cashier creation, favicon/title/theme/font cleanup.
+5. **UIX.3 — Table readability and metadata:** locally implemented with consistent identifiers, shared table/scroll presentation, existing date/money/status presenters, and management-table migration. Column models and reordering remain deferred; command/browser gates pending.
+6. **UIX.4 — Phone and product identity:** UIX.4A display and UIX.4B Login/Cashier Create input work are locally implemented with verification gates pending; favicon/title/theme/font cleanup remains separate.
 7. **UIX.5 — Column preferences and reordering:** versioned per-table preferences, reset, keyboard ordering, mobile chooser, then optional drag enhancement.
 8. **UIX.AUTH — Session persistence decision:** architecture decision record and threat-model approval first; implementation only in a separately authorized checkpoint.
 9. **UIX.FINAL — Regression and polish:** source tests plus authorized browser checks for responsive layout, keyboard/focus, screen-reader semantics, visual consistency, and unchanged request behavior.

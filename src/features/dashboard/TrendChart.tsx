@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import { projectAmountTrend } from './presenters'
 
 interface TrendChartProps {
@@ -79,31 +80,26 @@ export function TrendChart({ view }: TrendChartProps) {
           </div>
         )}
 
-        <div
-          role="region"
-          aria-label="Trendning aniq qiymatlari"
-          tabIndex={0}
-          className="max-w-full overflow-x-auto"
-        >
+        <TableScrollRegion ariaLabel="Trendning aniq qiymatlari">
           <Table className="min-w-[34rem]">
             <TableHeader>
               <TableRow>
                 <TableHead>Davr</TableHead>
-                <TableHead>Jami soni</TableHead>
-                <TableHead>Jami summa</TableHead>
+                <TableHead className="text-right">Jami soni</TableHead>
+                <TableHead className="text-right">Jami summa</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {points.map((point) => (
                 <TableRow key={`${point.period}-${point.x}`}>
                   <TableCell>{point.period}</TableCell>
-                  <TableCell>{point.count.toLocaleString('uz-UZ')}</TableCell>
-                  <TableCell>{formatMoney(point.amount)}</TableCell>
+                  <TableCell className="text-right tabular-nums">{point.count.toLocaleString('uz-UZ')}</TableCell>
+                  <TableCell className="text-right tabular-nums">{formatMoney(point.amount)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
+        </TableScrollRegion>
       </CardContent>
     </Card>
   )

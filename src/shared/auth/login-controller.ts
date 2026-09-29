@@ -58,7 +58,7 @@ interface Command {
 }
 
 const messages = {
-  invalidPhone: 'Telefon raqamini 998XXXXXXXXX formatida kiriting.',
+  invalidPhone: 'Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.',
   invalidOtp: 'Tasdiqlash kodi 6 ta raqamdan iborat bo‘lishi kerak.',
   invalidPin: 'PIN 4–8 ta raqamdan iborat bo‘lishi kerak.',
   pinMismatch: 'PIN tasdig‘i mos kelmadi.',

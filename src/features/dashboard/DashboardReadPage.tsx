@@ -28,6 +28,7 @@ import type {
 import { getTashkentDatePreset, type DatePresetDays } from '@/shared/filters/date-range'
 import { formatMoney } from '@/shared/money/minor'
 import { formatInstantTime, formatOffsetlessDateTime } from '@/shared/presentation/date-time'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import {
   EmptyState,
@@ -35,6 +36,7 @@ import {
   NoAccessState,
 } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import { DashboardPageHeader } from './DashboardPageHeader'
 import { MetricCards } from './MetricCards'
 import {
@@ -127,19 +129,14 @@ function RecentQrTable({ page }: { readonly page: Page<DynamicQrRow> }) {
   }
 
   return (
-    <div
-      role="region"
-      aria-label="So‘nggi dinamik QRlar"
-      tabIndex={0}
-      className="max-w-full overflow-x-auto"
-    >
+    <TableScrollRegion ariaLabel="So‘nggi dinamik QRlar">
       <Table className="min-w-[46rem]">
         <TableHeader>
           <TableRow>
             <TableHead>QR ID</TableHead>
             <TableHead>Vaqt</TableHead>
             <TableHead>Terminal</TableHead>
-            <TableHead>Summa</TableHead>
+            <TableHead className="text-right">Summa</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
@@ -148,12 +145,12 @@ function RecentQrTable({ page }: { readonly page: Page<DynamicQrRow> }) {
             const status = presentQrStatus(row.statusCode)
             return (
               <TableRow key={row.pkey}>
-                <TableCell className="max-w-52 truncate font-medium text-text-primary">
-                  {row.pkey || '—'}
+                <TableCell>
+                  {row.pkey ? <MetadataId value={row.pkey} /> : '—'}
                 </TableCell>
                 <TableCell>{formatOffsetlessDateTime(row.createdAt)}</TableCell>
                 <TableCell>{row.terminalName || '—'}</TableCell>
-                <TableCell>{formatMoney(row.amount)}</TableCell>
+                <TableCell className="text-right tabular-nums">{formatMoney(row.amount)}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
                     {status.label}
@@ -164,7 +161,7 @@ function RecentQrTable({ page }: { readonly page: Page<DynamicQrRow> }) {
           })}
         </TableBody>
       </Table>
-    </div>
+    </TableScrollRegion>
   )
 }
 

@@ -1,18 +1,45 @@
 import { Badge } from '@/components/ui/badge'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { StaticQrRow } from './contract'
 
 export function StaticQrTable({ rows }: { readonly rows: readonly StaticQrRow[] }) {
-  return <table className="w-full min-w-[38rem] text-left text-sm">
-    <thead><tr className="border-b"><th scope="col" className="p-3">QR ID</th><th scope="col" className="p-3">Terminal</th>
-      <th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">Holat</th></tr></thead>
-    <tbody>{rows.map((row) => {
-      const status = presentActiveStatus(row.statusCode)
-      return <tr className="border-b" key={row.id}>
-        <td className="break-all p-3">{row.id}</td><td className="p-3">{row.terminalName}</td>
-        <td className="p-3">{row.merchantName}</td><td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
-      </tr>
-    })}</tbody>
-  </table>
+  return (
+    <Table className="min-w-[38rem]">
+      <TableHeader>
+        <TableRow>
+          <TableHead>QR ID</TableHead>
+          <TableHead>Terminal</TableHead>
+          <TableHead>Merchant</TableHead>
+          <TableHead>Holat</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.map((row) => {
+          const status = presentActiveStatus(row.statusCode)
+          return (
+            <TableRow key={row.id}>
+              <TableCell><MetadataId value={row.id} /></TableCell>
+              <TableCell>{row.terminalName}</TableCell>
+              <TableCell>{row.merchantName}</TableCell>
+              <TableCell>
+                <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
+                  {status.label}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          )
+        })}
+      </TableBody>
+    </Table>
+  )
 }

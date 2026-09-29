@@ -4,6 +4,7 @@ import { ActionBusinessRejectionError, ActionNotDispatchedError } from '@/shared
 import { QueryClient } from '@tanstack/react-query'
 import { readKeys } from '@/shared/api/read-keys'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
+import { toUzbekPhoneWire } from '@/shared/presentation/phone'
 import { buildCashierCreateRequest, createCashierCreateController, decodeCashierCreateSuccess, invalidateCurrentCashierLists, normalizeCashierPhone } from './create-cashier'
 
 const options: readonly TerminalOption[] = [{ id: 'terminal-01', name: 'Terminal A' }, { id: 'terminal-02', name: 'Terminal B' }]
@@ -35,6 +36,15 @@ describe('cashier create contract', () => {
     expect(buildCashierCreateRequest(draft, null)).toBeNull()
     expect(buildCashierCreateRequest(draft, options.slice(1))).toBeNull()
     expect(buildCashierCreateRequest({ ...draft, terminalIds: ['terminal-03'] }, options)).toBeNull()
+  })
+
+  it('keeps the canonical cashier request phone unchanged after local editing', () => {
+    const request = buildCashierCreateRequest({
+      ...draft,
+      phone: toUzbekPhoneWire('901234567') ?? '',
+    }, options)
+
+    expect(request?.phone).toBe('998901234567')
   })
 
   it('confirms only the documented explicit-null void envelope', () => {

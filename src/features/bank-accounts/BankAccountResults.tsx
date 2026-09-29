@@ -1,11 +1,14 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { BankAccountRow } from '@/shared/contracts/management-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 
 interface BankAccountResultsProps {
   readonly blocked: boolean
@@ -25,17 +28,17 @@ export function BankAccountResults({ blocked, pending, error, data, onRetry, onP
   return <div className="min-w-0 space-y-4">
     {data.content.length === 0 ? <EmptyState description="Bank hisobi topilmadi." />
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
-        <div role="region" aria-label="Bank hisoblari jadvali" tabIndex={0} className="max-w-full overflow-x-auto">
-          <table className="w-full min-w-[64rem] text-left text-sm">
-            <thead><tr className="border-b"><th scope="col" className="p-3">Nomi</th><th scope="col" className="p-3">Bank</th><th scope="col" className="p-3">Hisob raqami</th><th scope="col" className="p-3">Merchant</th><th scope="col" className="p-3">MFO</th><th scope="col" className="p-3">STIR</th><th scope="col" className="p-3">Shartnoma</th><th scope="col" className="p-3">Holat</th></tr></thead>
-            <tbody>{data.content.map((row, index) => {
+        <TableScrollRegion ariaLabel="Bank hisoblari jadvali">
+          <Table className="min-w-[64rem]">
+            <TableHeader><TableRow><TableHead>Nomi</TableHead><TableHead>Bank</TableHead><TableHead>Hisob raqami</TableHead><TableHead>Merchant</TableHead><TableHead>MFO</TableHead><TableHead>STIR</TableHead><TableHead>Shartnoma</TableHead><TableHead>Holat</TableHead></TableRow></TableHeader>
+            <TableBody>{data.content.map((row, index) => {
               const status = presentActiveStatus(row.statusCode)
-              return <tr className="border-b" key={`${row.id}-${index}`}>
-                <td className="p-3">{row.name}</td><td className="p-3">{row.bankName}</td><td className="break-all p-3">{row.accountNumber}</td><td className="p-3">{row.merchantName}</td><td className="p-3">{row.mfo ?? '—'}</td><td className="p-3">{row.tin ?? '—'}</td><td className="p-3">{row.contractNumber ?? '—'}</td><td className="p-3"><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></td>
-              </tr>
-            })}</tbody>
-          </table>
-        </div>
+              return <TableRow key={`${row.id}-${index}`}>
+                <TableCell className="font-medium text-foreground">{row.name}</TableCell><TableCell>{row.bankName}</TableCell><TableCell><MetadataId value={row.accountNumber} /></TableCell><TableCell>{row.merchantName}</TableCell><TableCell className="font-mono text-xs tabular-nums">{row.mfo ?? '—'}</TableCell><TableCell className="font-mono text-xs tabular-nums">{row.tin ?? '—'}</TableCell><TableCell>{row.contractNumber ?? '—'}</TableCell><TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
+              </TableRow>
+            })}</TableBody>
+          </Table>
+        </TableScrollRegion>
       </CardContent></Card>}
     <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
       totalPages={data.totalPages} totalItems={data.totalElements}

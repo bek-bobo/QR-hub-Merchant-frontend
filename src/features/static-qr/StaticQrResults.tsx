@@ -4,6 +4,7 @@ import type { Page } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from './contract'
 import { StaticQrTable } from './StaticQrTable'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 
 interface StaticQrResultsProps {
   readonly terminalConfirmed: boolean
@@ -26,10 +27,9 @@ export function StaticQrResults({ terminalConfirmed, pending, error, data,
   return <div className="min-w-0 space-y-4">
     {data.content.length === 0 ? <EmptyState description="Statik QR topilmadi." />
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
-        <div role="region" aria-label="Statik QR jadvali" tabIndex={0}
-          className="max-w-full overflow-x-auto">
+        <TableScrollRegion ariaLabel="Statik QR jadvali">
           <StaticQrTable rows={data.content} />
-        </div>
+        </TableScrollRegion>
       </CardContent></Card>}
     <PaginationBar ariaLabel="Statik QR sahifalari" currentPage={page}
       totalPages={data.totalPages} totalItems={data.totalElements}

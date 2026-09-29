@@ -93,6 +93,11 @@ describe('login controller', () => {
 
     await controller.startLogin('998901234567')
 
+    expect(sendOtp).toHaveBeenCalledWith(
+      'test-session',
+      '998901234567',
+      expect.any(Object),
+    )
     expect(controller.getSnapshot().phase).toBe('pin')
     expect(verifyOtp).not.toHaveBeenCalled()
   })

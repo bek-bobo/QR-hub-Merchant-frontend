@@ -11,7 +11,9 @@ import { presentQrStatus } from '@/features/dashboard/presenters'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
+import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import { presentNullableCell } from './page-state'
 
 interface DynamicQrTableProps {
@@ -20,12 +22,7 @@ interface DynamicQrTableProps {
 
 export function DynamicQrTable({ rows }: DynamicQrTableProps) {
   return (
-    <div
-      role="region"
-      aria-label="Dinamik QR ro‘yxati"
-      tabIndex={0}
-      className="w-full min-w-0 max-w-full overflow-x-auto"
-    >
+    <TableScrollRegion ariaLabel="Dinamik QR ro‘yxati">
       <Table className="min-w-[60rem]">
         <TableHeader>
           <TableRow>
@@ -33,7 +30,7 @@ export function DynamicQrTable({ rows }: DynamicQrTableProps) {
             <TableHead>Yaratilgan vaqt</TableHead>
             <TableHead>Terminal</TableHead>
             <TableHead>Merchant</TableHead>
-            <TableHead>Summa</TableHead>
+            <TableHead className="text-right">Summa</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>RRN</TableHead>
           </TableRow>
@@ -43,13 +40,11 @@ export function DynamicQrTable({ rows }: DynamicQrTableProps) {
             const status = presentQrStatus(row.statusCode)
             return (
               <TableRow key={row.pkey}>
-                <TableCell className="max-w-60 truncate font-medium text-text-primary">
-                  {row.pkey}
-                </TableCell>
+                <TableCell><MetadataId value={row.pkey} /></TableCell>
                 <TableCell>{formatOffsetlessDateTime(row.createdAt)}</TableCell>
                 <TableCell>{presentNullableCell(row.terminalName)}</TableCell>
                 <TableCell>{presentNullableCell(row.merchantName)}</TableCell>
-                <TableCell>{formatMoney(row.amount)}</TableCell>
+                <TableCell className="text-right tabular-nums">{formatMoney(row.amount)}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
                     {status.label}
@@ -61,6 +56,6 @@ export function DynamicQrTable({ rows }: DynamicQrTableProps) {
           })}
         </TableBody>
       </Table>
-    </div>
+    </TableScrollRegion>
   )
 }
