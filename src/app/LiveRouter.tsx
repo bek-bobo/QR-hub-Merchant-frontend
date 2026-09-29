@@ -146,7 +146,7 @@ function AccountRoute() {
   }
 
   return (
-    <LiveShell>
+    <LiveShell pageTitle="Hisob">
       <AccountPage />
     </LiveShell>
   )
@@ -260,7 +260,7 @@ function LiveFeatureRoute({
 
 function DashboardRoute() {
   return (
-    <LiveFeatureRoute feature="dashboard">
+    <LiveFeatureRoute feature="dashboard" pageTitle="Dashboard">
       <DashboardReadPage />
     </LiveFeatureRoute>
   )
@@ -298,11 +298,11 @@ function CashierRoute() {
 function CreateCashierRoute() {
   const runtime = useReadRuntime()
   const scopeKey = `${runtime.scope.source}:${runtime.scope.sessionScopeId}:${runtime.scope.accessRevision}`
-  return <LiveFeatureRoute feature="cashierCreate"><Suspense fallback={<LoadingState title="Kassir yaratish sahifasi yuklanmoqda" />}><CreateCashierPage key={scopeKey} /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="cashierCreate" pageTitle="Kassir yaratish"><Suspense fallback={<LoadingState title="Kassir yaratish sahifasi yuklanmoqda" />}><CreateCashierPage key={scopeKey} /></Suspense></LiveFeatureRoute>
 }
 
 function DevicesRoute() {
-  return <LiveFeatureRoute feature="devices"><Suspense fallback={<LoadingState title="P5 qurilmalari sahifasi yuklanmoqda" />}><P5Page /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="devices" pageTitle="P5 qurilmalari"><Suspense fallback={<LoadingState title="P5 qurilmalari sahifasi yuklanmoqda" />}><P5Page /></Suspense></LiveFeatureRoute>
 }
 
 function CreateQrRoute() {

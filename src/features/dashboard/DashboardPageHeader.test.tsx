@@ -3,24 +3,29 @@ import { describe, expect, it } from 'vitest'
 import { DashboardPageHeader } from './DashboardPageHeader'
 
 describe('DashboardPageHeader', () => {
-  it('groups the formatted updated-at text with page context and keeps refresh available', () => {
+  it('groups filters, refresh, and updated-at metadata without rendering a page heading', () => {
     const html = renderToStaticMarkup(
       <DashboardPageHeader
         updatedAt="17:44:58"
         refreshDisabled={false}
         refreshing={false}
         onRefresh={() => undefined}
-      />,
+      >
+        <button type="button">Filtrlar</button>
+      </DashboardPageHeader>,
     )
 
-    expect(html.match(/<h1\b/g)).toHaveLength(1)
-    expect(html).toContain('>Dashboard</h1>')
-    expect(html).toContain('Tranzaksiyalar')
-    expect(html).toContain('Qo‘llangan davr bo‘yicha backend ko‘rsatkichlari.')
+    expect(html.match(/<h1\b/g)).toBeNull()
+    expect(html).not.toContain('Tranzaksiyalar')
+    expect(html).not.toContain('Qo‘llangan davr bo‘yicha backend ko‘rsatkichlari.')
+    expect(html).toContain('>Filtrlar</button>')
     expect(html).toContain('Oxirgi yangilanish: 17:44:58')
     expect(html).toContain('>Yangilash</button>')
-    expect(html.indexOf('Oxirgi yangilanish: 17:44:58')).toBeLessThan(
+    expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(
       html.indexOf('>Yangilash</button>'),
+    )
+    expect(html.indexOf('>Yangilash</button>')).toBeLessThan(
+      html.indexOf('Oxirgi yangilanish: 17:44:58'),
     )
   })
 
@@ -30,7 +35,9 @@ describe('DashboardPageHeader', () => {
         refreshDisabled
         refreshing
         onRefresh={() => undefined}
-      />,
+      >
+        <button type="button">Filtrlar</button>
+      </DashboardPageHeader>,
     )
 
     expect(html).not.toContain('Oxirgi yangilanish:')

@@ -2,6 +2,8 @@ import { useState, useSyncExternalStore, type Dispatch, type SetStateAction } fr
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { RefreshCwIcon } from 'lucide-react'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ReadRegistration } from '@/app/read/createLiveReadApi'
 import { changeP5MerchantDraft, changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
@@ -10,7 +12,7 @@ import type { P5Row } from '@/shared/contracts/p5-read'
 import type { Page } from '@/shared/contracts/merchant-read'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
-import { PageHeader } from '@/shared/ui/PageHeader'
+import { formatInstantTime } from '@/shared/presentation/date-time'
 import {
   applyP5Draft,
   createDefaultP5Filters,
@@ -77,7 +79,7 @@ export function P5Filters({
       <Input type="number" step={1} min={-2147483648} max={2147483647} value={draft.status ?? ''} aria-describedby={validationMessage ? 'p5-filter-error' : undefined} onChange={(event) => onDraftChange((current) => ({ ...current, status: event.target.value === '' ? undefined : Number(event.target.value) }))} placeholder="Masalan: 0" />
     </label>
     <label className="block min-w-0 space-y-1 text-sm">Qurilma ID yoki terminal nomi
-      <Input value={draft.search} aria-describedby="p5-search-help" onChange={(event) => onDraftChange((current) => ({ ...current, search: event.target.value }))} placeholder="Qurilma ID yoki terminal" />
+      <Input value={draft.search} onChange={(event) => onDraftChange((current) => ({ ...current, search: event.target.value }))} placeholder="Qurilma ID yoki terminal" />
     </label>
     {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">{merchantFilterMessage(merchantLookupState, Boolean(applied.merchantId))}</p> : null}
     {!draft.merchantId || draftTerminalState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak; filtrsiz ro‘yxat ishlaydi.</p> : null}
@@ -93,12 +95,13 @@ function ResetControllerView({ controller }: { readonly controller: P5ResetContr
     onAcknowledgeUnknown={() => { controller.beginNewIntent(true) }} />
 }
 
-function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, pending, error, data, onRetry, onPageChange }: {
+function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, resetUnavailableMessage, pending, error, data, onRetry, onPageChange }: {
   readonly rows: readonly P5Row[]
   readonly queryKey: readonly unknown[]
   readonly runtime: ReturnType<typeof useReadRuntime>
   readonly resetPort: P5ResetPort | null
   readonly resetAvailable: boolean
+  readonly resetUnavailableMessage: string | undefined
   readonly pending: boolean
   readonly error: unknown
   readonly data: NonNullable<Parameters<typeof P5Results>[0]['data']>
@@ -129,9 +132,8 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, p
   return <><P5Results blocked={false} pending={pending} error={error} data={data} selected={selected}
     onRetry={onRetry} onPageChange={onPageChange}
     onSelect={(row) => setTarget(createP5Target(row, runtime.scope, queryKey))}
-    resetAvailable={resetAvailable} onReset={requestReset} />
+    resetAvailable={resetAvailable} resetUnavailableMessage={resetUnavailableMessage} onReset={requestReset} />
     {resetController ? <ResetControllerView controller={resetController} /> : null}
-    {runtime.capabilities.p5ResetPin && !resetAvailable ? <p role="status" className="text-sm text-text-secondary">PIN reset funksiyasi hozir mavjud emas.</p> : null}
   </>
 }
 
@@ -213,25 +215,38 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
   if (!runtime.capabilities.p5List) return <NoAccessState description="P5 qurilmalari ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.p5List.kind === 'unavailable') return <ErrorState title="P5 qurilmalari integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl space-y-5">
-    <PageHeader
-      title="P5 qurilmalari"
-      description="Qidiruv faqat qurilma ID va terminal nomi bo‘yicha ishlaydi."
-      descriptionId="p5-search-help"
-    />
-    <FilterDrawer onApply={applyFilters} onReset={resetFilters}>
-      <P5Filters
-        draft={draft}
-        applied={applied}
-        merchantLookupState={merchantLookupState}
-        merchants={merchants.data}
-        draftTerminalState={draftTerminalState}
-        draftTerminals={draftTerminals.data}
-        validationMessage={validationMessage}
-        onDraftChange={setDraft}
-      />
-    </FilterDrawer>
+  const resetUnavailableMessage = runtime.capabilities.p5ResetPin && !resetAvailable
+    ? 'PIN reset funksiyasi hozir mavjud emas.'
+    : undefined
+
+  return <div className="mx-auto min-w-0 max-w-7xl space-y-4">
+    <div className="flex min-w-0 flex-col gap-2 sm:items-end">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+          <P5Filters
+            draft={draft}
+            applied={applied}
+            merchantLookupState={merchantLookupState}
+            merchants={merchants.data}
+            draftTerminalState={draftTerminalState}
+            draftTerminals={draftTerminals.data}
+            validationMessage={validationMessage}
+            onDraftChange={setDraft}
+          />
+        </FilterDrawer>
+        <Button type="button" variant="outline" size="sm"
+          disabled={!listOptions.enabled || list.isFetching}
+          onClick={() => void list.refetch()}>
+          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
+          Yangilash
+        </Button>
+      </div>
+      {list.dataUpdatedAt > 0 ? <span className="text-xs text-text-secondary">
+        Yangilangan: {formatInstantTime(list.dataUpdatedAt)}
+      </span> : null}
+    </div>
     {visibleData ? <ScopedP5Results key={p5SelectionKey(listOptions.queryKey, visibleData.content)} rows={visibleData.content} queryKey={listOptions.queryKey} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
+      resetUnavailableMessage={resetUnavailableMessage}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />
       : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data} selected={null}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} onSelect={() => undefined} />}

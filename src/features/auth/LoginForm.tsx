@@ -217,7 +217,7 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
       <CardContent className="space-y-4">
         {snapshot.phase === 'phone' && (
           <form className="space-y-4" onSubmit={submitPhone} noValidate>
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <label className="text-sm font-medium text-text-primary" htmlFor="login-phone">
                 Telefon raqami
               </label>
@@ -294,7 +294,7 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
 
         {snapshot.phase === 'pin' && (
           <form className="space-y-4" onSubmit={submitPin} noValidate>
-            <div className="space-y-1.5">
+            <div className="space-y-2.5">
               <label className="text-sm font-medium text-text-primary" htmlFor="login-pin">
                 PIN
               </label>

@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react'
 import { RefreshCwIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { PageHeader } from '@/shared/ui/PageHeader'
 
 interface DashboardPageHeaderProps {
+  readonly children: ReactNode
   readonly updatedAt?: string
   readonly refreshDisabled: boolean
   readonly refreshing: boolean
@@ -10,28 +11,32 @@ interface DashboardPageHeaderProps {
 }
 
 export function DashboardPageHeader({
+  children,
   updatedAt,
   refreshDisabled,
   refreshing,
   onRefresh,
 }: DashboardPageHeaderProps) {
   return (
-    <PageHeader
-      eyebrow="Tranzaksiyalar"
-      title="Dashboard"
-      description="Qo‘llangan davr bo‘yicha backend ko‘rsatkichlari."
-      meta={updatedAt ? `Oxirgi yangilanish: ${updatedAt}` : undefined}
-      actions={
+    <div className="flex min-w-0 flex-col gap-2 sm:items-end">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+        {children}
         <Button
           type="button"
           variant="outline"
+          size="sm"
           disabled={refreshDisabled}
           onClick={onRefresh}
         >
           <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} aria-hidden="true" />
           Yangilash
         </Button>
-      }
-    />
+      </div>
+      {updatedAt ? (
+        <span className="text-xs text-text-secondary">
+          Oxirgi yangilanish: {updatedAt}
+        </span>
+      ) : null}
+    </div>
   )
 }

@@ -53,6 +53,9 @@ describe('AccountPage', () => {
 
     expect(html).toContain('+998 88 101 79 80')
     expect(html).not.toContain('+998881017980')
+    expect(html.match(/<h1\b/g)).toBeNull()
+    expect(html).toContain('Hisob ma’lumotlari')
+    expect(html).not.toContain('Joriy kirish sessiyasiga tegishli tasdiqlangan profil.')
     expect(profile.phone).toBe('998881017980')
   })
 })

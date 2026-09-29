@@ -26,7 +26,7 @@ describe('P5 results', () => {
     expect(html).toContain('Holat noma’lum')
     expect(html).not.toContain('Holat: 777')
     expect(html).toContain('23.09.2026 14:05')
-    expect(html).toContain('Jami: 19')
+    expect(html).not.toContain('Jami: 19')
     expect(html).toContain('aria-current="page"')
     expect(html).toContain('>—<')
     expect(html).not.toContain('https://example.test/secret')
@@ -42,6 +42,16 @@ describe('P5 results', () => {
     expect(html).not.toContain('Faol (0)')
     expect(html).not.toContain('>0<')
     expect(html).toContain('>PIN reset</button>')
+  })
+
+  it('presents unavailable PIN reset guidance as an accessible compact tooltip', () => {
+    const html = render({
+      data: { ...data, content: [{ ...row, deviceStatus: 0 }] },
+      resetUnavailableMessage: 'PIN reset funksiyasi hozir mavjud emas.',
+    })
+    expect(html).toContain('aria-label="PIN reset haqida ma’lumot"')
+    expect(html).toContain('role="tooltip"')
+    expect(html).toContain('PIN reset funksiyasi hozir mavjud emas.')
   })
 
   it('does not sort rows on the client', () => {

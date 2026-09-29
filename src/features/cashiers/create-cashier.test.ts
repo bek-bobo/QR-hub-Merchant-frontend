@@ -8,7 +8,7 @@ import { toUzbekPhoneWire } from '@/shared/presentation/phone'
 import { buildCashierCreateRequest, createCashierCreateController, decodeCashierCreateSuccess, invalidateCurrentCashierLists, normalizeCashierPhone } from './create-cashier'
 
 const options: readonly TerminalOption[] = [{ id: 'terminal-01', name: 'Terminal A' }, { id: 'terminal-02', name: 'Terminal B' }]
-const draft = { fullname: '  Oʻtkir Qodirov  ', phone: ' +998901234567 ', terminalIds: ['terminal-01', 'terminal-01', 'terminal-02'] }
+const draft = { fullname: '  Oʻtkir Qodirov  ', phone: ' +998901234567 ', terminalIds: ['terminal-01'] }
 const success = { success: true, data: null }
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-1', accessRevision: 1 }
 
@@ -27,9 +27,9 @@ describe('cashier create contract', () => {
     }
   })
 
-  it('builds only the three Java request fields and deduplicates current string IDs', () => {
+  it('builds the compatible array payload with exactly one selected terminal', () => {
     const request = buildCashierCreateRequest(draft, options)
-    expect(request).toEqual({ fullname: 'Oʻtkir Qodirov', phone: '998901234567', terminalIds: ['terminal-01', 'terminal-02'] })
+    expect(request).toEqual({ fullname: 'Oʻtkir Qodirov', phone: '998901234567', terminalIds: ['terminal-01'] })
     expect(Object.keys(request ?? {})).toEqual(['fullname', 'phone', 'terminalIds'])
     expect(buildCashierCreateRequest({ ...draft, fullname: '   ' }, options)).toBeNull()
     expect(buildCashierCreateRequest({ ...draft, terminalIds: [] }, options)).toBeNull()

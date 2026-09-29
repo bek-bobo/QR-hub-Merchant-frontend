@@ -2,13 +2,11 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { useAuth } from '@/shared/auth/useAuth'
 import { formatUzbekPhoneDisplay } from '@/shared/presentation/phone'
-import { PageHeader } from '@/shared/ui/PageHeader'
 
 export function AccountPage() {
   const { actions, pending, profile, profileRefreshMessage } = useAuth()
@@ -18,15 +16,11 @@ export function AccountPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-6">
-      <PageHeader title="Hisob" />
+    <div className="mx-auto w-full max-w-2xl">
       <section aria-labelledby="account-title">
         <Card>
           <CardHeader>
             <CardTitle id="account-title">Hisob ma’lumotlari</CardTitle>
-            <CardDescription>
-              Joriy kirish sessiyasiga tegishli tasdiqlangan profil.
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <dl className="grid gap-4 sm:grid-cols-2">

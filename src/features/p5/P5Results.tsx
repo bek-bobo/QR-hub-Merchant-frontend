@@ -23,10 +23,11 @@ interface P5ResultsProps {
   readonly onPageChange: (page: number) => void
   readonly onSelect: (row: P5Row) => void
   readonly resetAvailable?: boolean
+  readonly resetUnavailableMessage?: string | undefined
   readonly onReset?: (row: P5Row) => void
 }
 
-export function P5Results({ blocked, pending, error, data, selected, onRetry, onPageChange, onSelect, resetAvailable = false, onReset }: P5ResultsProps) {
+export function P5Results({ blocked, pending, error, data, selected, onRetry, onPageChange, onSelect, resetAvailable = false, resetUnavailableMessage, onReset }: P5ResultsProps) {
   if (blocked) return <ErrorState title="Qo‘llangan P5 filtri tasdiqlanmadi" description="Filtrni tozalang yoki merchant va terminalni qayta tanlab qo‘llang." />
   if (pending) return <LoadingState title="P5 qurilmalari yuklanmoqda" />
   if (error) {
@@ -44,7 +45,7 @@ export function P5Results({ blocked, pending, error, data, selected, onRetry, on
       : <Card className="min-w-0"><CardContent className="min-w-0 p-0">
         <TableScrollRegion ariaLabel="P5 qurilmalari jadvali">
           <Table className="min-w-[70rem]">
-            <TableHeader><TableRow><TableHead className="text-right">Tanlash</TableHead><TableHead>Qurilma ID</TableHead><TableHead>Tavsif</TableHead><TableHead>Terminal</TableHead><TableHead>Merchant</TableHead><TableHead>Qurilma holati</TableHead><TableHead className="text-right">PIN reset</TableHead><TableHead>Yaratilgan vaqt</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow><TableHead className="text-right">Tanlash</TableHead><TableHead>Qurilma ID</TableHead><TableHead>Tavsif</TableHead><TableHead>Terminal</TableHead><TableHead>Merchant</TableHead><TableHead>Qurilma holati</TableHead><TableHead className="text-right"><span className="inline-flex items-center justify-end gap-1">PIN reset{resetUnavailableMessage ? <span className="group relative inline-flex"><button type="button" className="inline-flex size-8 items-center justify-center rounded-md text-text-secondary hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" aria-label="PIN reset haqida ma’lumot" aria-describedby="p5-reset-info"><InfoIcon className="size-4" aria-hidden="true" /></button><span id="p5-reset-info" role="tooltip" className="invisible absolute right-0 top-full z-20 mt-1 w-64 rounded-md border bg-popover px-3 py-2 text-left text-xs font-normal text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">{resetUnavailableMessage}</span></span> : null}</span></TableHead><TableHead>Yaratilgan vaqt</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
               const ambiguous = deviceOccurrences.get(row.deviceId) !== 1
               const status = presentP5Status(row.deviceStatus)
@@ -64,7 +65,8 @@ export function P5Results({ blocked, pending, error, data, selected, onRetry, on
         </TableScrollRegion>
       </CardContent></Card>}
     <PaginationBar ariaLabel="P5 qurilmalari sahifalari" currentPage={data.page}
-      totalPages={data.totalPages} totalItems={data.totalElements}
+      totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
       onPageChange={onPageChange} />
   </div>
 }
+import { InfoIcon } from 'lucide-react'

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormField } from '@/components/forms/FormField'
 import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/select'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
 import { safeHttpError } from '@/shared/api/errors'
@@ -14,7 +15,6 @@ import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { endpoints } from '@/shared/contracts/endpoints'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
 import { formatUzbekPhoneDisplay, toUzbekPhoneWire } from '@/shared/presentation/phone'
-import { PageHeader } from '@/shared/ui/PageHeader'
 import { UzbekPhoneInput } from '@/shared/ui/UzbekPhoneInput'
 import { buildCashierCreateRequest, createCashierCreateController, invalidateCurrentCashierLists, type CashierCreateDraft, type CashierCreatePort } from './create-cashier'
 
@@ -29,7 +29,7 @@ export function CreateCashierPage() {
   const { getSessionSnapshot, protectedMutation } = useProtectedReadContext()
   const [fullname, setFullname] = useState('')
   const [phone, setPhone] = useState('')
-  const [terminalIds, setTerminalIds] = useState<string[]>([])
+  const [selectedTerminalId, setSelectedTerminalId] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const lookupOptions = runtime.queries.terminalLookupOptions()
   const terminals = useQuery(lookupOptions)
@@ -87,7 +87,11 @@ export function CreateCashierPage() {
   const visibleIntent = state.intent && sameScope(state.intent.scope, runtime.scope) ? state.intent : null
   const outcome = visibleIntent ? state.outcome : { kind: 'idle' as const }
   const phoneWire = toUzbekPhoneWire(phone)
-  const draft: CashierCreateDraft = { fullname, phone: phoneWire ?? '', terminalIds }
+  const draft: CashierCreateDraft = {
+    fullname,
+    phone: phoneWire ?? '',
+    terminalIds: selectedTerminalId ? [selectedTerminalId] : [],
+  }
   const validRequest = buildCashierCreateRequest(draft, currentOptions())
   const lookupReason = !runtime.capabilities.terminalLookup ? 'Terminal tanlash uchun ruxsat mavjud emas.'
     : !lookupOptions.enabled ? 'Terminal tanlash integratsiyasi mavjud emas.'
@@ -108,15 +112,11 @@ export function CreateCashierPage() {
     if (!controller.beginNewIntent()) return
     setFullname('')
     setPhone('')
-    setTerminalIds([])
+    setSelectedTerminalId('')
     setMessage(null)
   }
 
   return <div className="mx-auto max-w-2xl space-y-5">
-    <PageHeader
-      title="Kassir yaratish"
-      description="Kassir ma’lumotlari faqat ushbu sahifada saqlanadi."
-    />
     <Card><CardHeader><CardTitle>Yangi kassir</CardTitle></CardHeader><CardContent>
       <form className="space-y-4" onSubmit={submit}>
         <label className="block space-y-1 text-sm">F.I.Sh.<Input value={fullname} onChange={(event) => setFullname(event.target.value)} autoComplete="name" /></label>
@@ -138,14 +138,16 @@ export function CreateCashierPage() {
             />
           )}
         </FormField>
-        <fieldset className="space-y-2"><legend className="text-sm font-medium">Terminallar</legend>
-          {terminals.data && currentOptions() ? terminals.data.map((terminal) => <label key={terminal.id} className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={terminalIds.includes(terminal.id)} onChange={(event) => setTerminalIds((ids) => event.target.checked ? [...ids, terminal.id] : ids.filter((id) => id !== terminal.id))} />
-            <span>{terminal.name}</span>
-          </label>) : null}
-        </fieldset>
+        <label className="block space-y-1 text-sm">Terminal
+          <Select value={selectedTerminalId} disabled={!terminals.data || !currentOptions()}
+            onChange={(event) => setSelectedTerminalId(event.target.value)}>
+            <option value="">Terminalni tanlang</option>
+            {terminals.data && currentOptions() ? terminals.data.map((terminal) =>
+              <option key={terminal.id} value={terminal.id}>{terminal.name}</option>) : null}
+          </Select>
+        </label>
         {lookupReason ? <p role="status" className="text-sm text-text-secondary">{lookupReason}</p> : null}
-        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary">F.I.Sh., telefon va kamida bitta joriy terminalni tanlang.</p> : null}
+        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary">F.I.Sh., telefon va bitta joriy terminalni tanlang.</p> : null}
         {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
         <Button type="submit" disabled={!canSubmit}>Kassir yaratish</Button>
       </form>

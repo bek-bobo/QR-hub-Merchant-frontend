@@ -299,12 +299,12 @@ export function DashboardReadPage({
         refreshDisabled={!enabled.dashboard || refreshing}
         refreshing={refreshing}
         onRefresh={() => void refreshMountedQueries()}
-      />
-
-      <FilterDrawer
+      >
+        <FilterDrawer
         description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
         onApply={applyFilters}
         onReset={clearFilters}
+        triggerSize="sm"
       >
           <div className="flex flex-wrap gap-2" aria-label="Davr presetlari">
             {([1, 7, 30] as const).map((days) => (
@@ -366,7 +366,8 @@ export function DashboardReadPage({
               </Button>
             </div>
           ) : null}
-      </FilterDrawer>
+        </FilterDrawer>
+      </DashboardPageHeader>
 
       {dashboard.isPending ? (
         <DashboardSkeleton />
