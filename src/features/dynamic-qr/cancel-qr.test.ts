@@ -8,8 +8,12 @@ import { shouldInvalidateAfterCancel } from './cancel-invalidation'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
 const row: DynamicQrRow = {
-  pkey: 'actual-row-pkey', link: null, createdAt: '2026-09-17T12:00:00', terminalName: 'A', merchantName: 'M',
-  amount: { minorUnits: '100000', currency: 'UZS', scale: 2 }, statusCode: 0, rrn: null,
+  pkey: 'actual-row-pkey', link: null, terminalType: null, terminalId: null,
+  createdAt: '2026-09-17T12:00:00', updatedAt: null, terminalName: 'A', merchantId: null,
+  merchantName: 'M', bankAccountId: null, bankAccountName: null,
+  amount: { minorUnits: '100000', currency: 'UZS', scale: 2 }, currencyAmount: null,
+  currencyCode: null, rate: null, serviceFeeAmount: null, statusCode: 0,
+  distributionStatus: null, rrn: null,
 }
 const success = { success: true, data: null }
 const accepted = { kind: 'response' as const, ok: true, status: 200, body: success }

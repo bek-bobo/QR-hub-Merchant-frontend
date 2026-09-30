@@ -5,11 +5,22 @@ import { presentDynamicQrRowLink } from './qr-presentation'
 const row: DynamicQrRow = {
   pkey: 'qr-row-1',
   link: 'https://qrhub.uz/Exact/%2fPath?type=02&case=MiXeD#Part%2FOne',
+  terminalType: null,
+  terminalId: null,
   createdAt: '2026-09-30T10:20:30',
+  updatedAt: null,
   terminalName: 'Terminal A',
+  merchantId: null,
   merchantName: 'Merchant A',
+  bankAccountId: null,
+  bankAccountName: null,
   amount: { minorUnits: '100000', currency: 'UZS', scale: 2 },
+  currencyAmount: null,
+  currencyCode: null,
+  rate: null,
+  serviceFeeAmount: null,
   statusCode: 50,
+  distributionStatus: null,
   rrn: null,
 }
 

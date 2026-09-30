@@ -344,11 +344,22 @@ function publicRow(row: (typeof d3DynamicQrRows)[number]): DynamicQrRow {
   return Object.freeze({
     pkey: row.pkey,
     link: row.link,
+    terminalType: row.terminalType,
+    terminalId: row.terminalId,
     createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
     terminalName: row.terminalName,
+    merchantId: row.merchantId,
     merchantName: row.merchantName,
+    bankAccountId: row.bankAccountId,
+    bankAccountName: row.bankAccountName,
     amount: row.amount,
+    currencyAmount: row.currencyAmount,
+    currencyCode: row.currencyCode,
+    rate: row.rate,
+    serviceFeeAmount: row.serviceFeeAmount,
     statusCode: row.statusCode,
+    distributionStatus: row.distributionStatus,
     rrn: row.rrn,
   })
 }

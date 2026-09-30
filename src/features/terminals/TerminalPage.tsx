@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, changeMerchantDraft, clearManagementFilters, type LookupState, type TerminalListFilters } from '@/shared/contracts/management-filters'
 import type { ManagementOption } from '@/shared/contracts/management-read'
@@ -111,11 +111,12 @@ export function TerminalPage() {
           {draftBankState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Bank hisobi filtri {draftBankState === 'denied' ? 'uchun ruxsat yo‘q' : draftBankState === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}.</p> : null}
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
-        <Button type="button" variant="outline" size="sm"
-          disabled={!listOptions.enabled || list.isFetching} onClick={() => void list.refetch()}>
-          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
-          Yangilash
-        </Button>
+        <RefreshIconButton
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          disabled={!listOptions.enabled || list.isFetching}
+          loading={list.isFetching}
+          onClick={() => void list.refetch()}
+        />
       </div>} />
   </div>
 }

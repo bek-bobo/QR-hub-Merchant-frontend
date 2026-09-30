@@ -47,11 +47,22 @@ export type TerminalOption = Readonly<{ id: string; name: string }>
 export type DynamicQrRow = Readonly<{
   pkey: string
   link: string | null
+  terminalType: string | null
+  terminalId: string | null
   createdAt: string
+  updatedAt: string | null
   terminalName: string
+  merchantId: string | null
   merchantName: string
+  bankAccountId: string | null
+  bankAccountName: string | null
   amount: Money
+  currencyAmount: number | null
+  currencyCode: string | null
+  rate: number | null
+  serviceFeeAmount: number | null
   statusCode: number
+  distributionStatus: number | null
   rrn: string | null
 }>
 

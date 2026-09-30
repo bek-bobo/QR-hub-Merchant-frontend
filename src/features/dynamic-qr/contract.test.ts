@@ -9,14 +9,23 @@ function response(statusCode: number, overrides: Record<string, unknown> = {}) {
         {
           pkey: '0123456789abcdef0123456789abcdef',
           link: 'https://qrhub.uz/ExactPath?type=02&case=MiXeD',
+          terminalType: 'WEB',
+          terminalId: 'terminal-1',
           terminalName: 'Terminal A',
+          merchantId: 2,
           merchantName: 'Merchant A',
+          bankAccountId: 3,
+          bankAccountName: 'Account A',
           amount: 100000,
-          currencyAmount: null,
-          currencyCode: null,
+          currencyAmount: 8.25,
+          currencyCode: 'USD',
+          rate: 12150.5,
+          serviceFeeAmount: 125,
           statusCode,
+          distributionStatus: 0,
           rrn: null,
           createdAt: '2026-09-15T10:30:45',
+          updatedAt: '2026-09-15T10:35:45',
           ...overrides,
         },
       ],
@@ -69,6 +78,31 @@ describe('dynamic QR read contract', () => {
   it('preserves an unknown future integer status neutrally', () => {
     expect(decodeDynamicQrPageResponse(response(777)).content[0]?.statusCode)
       .toBe(777)
+  })
+
+  it('preserves source-confirmed detail fields without changing their values', () => {
+    const row = decodeDynamicQrPageResponse(response(50)).content[0]
+    expect(row).toMatchObject({
+      terminalType: 'WEB', terminalId: 'terminal-1', merchantId: '2',
+      bankAccountId: '3', bankAccountName: 'Account A', currencyAmount: 8.25,
+      currencyCode: 'USD', rate: 12150.5, serviceFeeAmount: 125,
+      distributionStatus: 0, updatedAt: '2026-09-15T10:35:45',
+    })
+  })
+
+  it('keeps malformed or absent detail-only fields nullable', () => {
+    const row = decodeDynamicQrPageResponse(response(50, {
+      terminalType: null, terminalId: null, merchantId: 9007199254740992,
+      bankAccountId: undefined, bankAccountName: null, currencyAmount: Number.NaN,
+      currencyCode: null, rate: 'bad', serviceFeeAmount: undefined,
+      distributionStatus: 1.5, updatedAt: 'not-a-date',
+    })).content[0]
+    expect(row).toMatchObject({
+      terminalType: null, terminalId: null, merchantId: null,
+      bankAccountId: null, bankAccountName: null, currencyAmount: null,
+      currencyCode: null, rate: null, serviceFeeAmount: null,
+      distributionStatus: null, updatedAt: null,
+    })
   })
 
   it('rejects malformed pagination instead of creating a fake empty page', () => {

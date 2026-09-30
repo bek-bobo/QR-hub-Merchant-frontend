@@ -6,10 +6,10 @@ import { can } from '@/shared/auth/access'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { formatInstantTime } from '@/shared/presentation/date-time'
 import { applyStaticTerminal, clearStaticTerminal,
   defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
 import { createStaticQrQueryOptions } from './query'
@@ -109,11 +109,12 @@ export function StaticQrPage() {
             onDraftTerminalChange={setDraftTerminal}
           />
         </FilterDrawer>
-        <Button type="button" variant="outline" size="sm"
-          disabled={!selectedValid || list.isFetching} onClick={() => void list.refetch()}>
-          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
-          Yangilash
-        </Button>
+        <RefreshIconButton
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          disabled={!selectedValid || list.isFetching}
+          loading={list.isFetching}
+          onClick={() => void list.refetch()}
+        />
       </div>} />
   </div>
 }

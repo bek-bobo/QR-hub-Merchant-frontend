@@ -2,8 +2,7 @@ import { useState, useSyncExternalStore, type Dispatch, type SetStateAction } fr
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ReadRegistration } from '@/app/read/createLiveReadApi'
 import { changeP5MerchantDraft, changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
@@ -234,16 +233,13 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
             onDraftChange={setDraft}
           />
         </FilterDrawer>
-        <Button type="button" variant="outline" size="sm"
+        <RefreshIconButton
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
-          onClick={() => void list.refetch()}>
-          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
-          Yangilash
-        </Button>
+          loading={list.isFetching}
+          onClick={() => void list.refetch()}
+        />
       </div>
-      {list.dataUpdatedAt > 0 ? <span className="text-xs text-text-secondary">
-        Yangilangan: {formatInstantTime(list.dataUpdatedAt)}
-      </span> : null}
     </div>
     {visibleData ? <ScopedP5Results key={p5SelectionKey(listOptions.queryKey, visibleData.content)} rows={visibleData.content} queryKey={listOptions.queryKey} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       resetUnavailableMessage={resetUnavailableMessage}

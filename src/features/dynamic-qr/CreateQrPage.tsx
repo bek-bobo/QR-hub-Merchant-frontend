@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore, type FormEvent } from 'react'
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { readQueryPolicy } from '@/app/read/read-runtime'
@@ -38,6 +38,14 @@ interface CreateQrPageProps {
   readonly onPendingChange?: (pending: boolean) => void
   readonly onResultModeChange?: (kind: CreateResultModel['kind'] | null) => void
   readonly onClose?: () => void
+}
+
+function CreateFormShell({ embedded, children }: { readonly embedded: boolean; readonly children: ReactNode }) {
+  if (embedded) return <>{children}</>
+  return <Card>
+    <CardHeader><CardTitle>Yangi QR</CardTitle></CardHeader>
+    <CardContent>{children}</CardContent>
+  </Card>
 }
 
 export function CreateQrPage({
@@ -202,9 +210,7 @@ export function CreateQrPage({
 
   return <div className={embedded ? 'space-y-4' : 'mx-auto max-w-2xl space-y-4'}>
     {!embedded ? <PageHeader title="Dinamik QR yaratish" description="Summa UZSda kiritiladi." /> : null}
-    {!result && !controllerState.closed ? <Card className={embedded ? 'border-0 shadow-none' : undefined}>
-      {!embedded ? <CardHeader><CardTitle>Yangi QR</CardTitle></CardHeader> : null}
-      <CardContent className={embedded ? 'px-0 pb-0' : undefined}>
+    {!result && !controllerState.closed ? <CreateFormShell embedded={embedded}>
       <form className="space-y-4" onSubmit={submit}>
         <FormField id="create-qr-terminal" label="Terminal">
           {(controlProps) => <Select {...controlProps} value={terminalId}
@@ -234,11 +240,11 @@ export function CreateQrPage({
         {currencies.data && !currencyCode ?
           <p role="alert" className="text-sm text-destructive">UZS valyutasi mavjud emas.</p> : null}
         <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-          <Button type="submit" className="sm:min-w-32" disabled={!canSubmit}>QR yaratish</Button>
+          <Button type="submit" className="w-full sm:w-auto sm:min-w-36" disabled={!canSubmit}>QR yaratish</Button>
         </div>
         {actionMessage ? <p role="status" className="text-sm">{actionMessage}</p> : null}
       </form>
-    </CardContent></Card> : null}
+    </CreateFormShell> : null}
     {controllerState.outcome.kind === 'pending' ?
       <p role="status">Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.</p> : null}
     {result && sameScope(result.scope, runtime.getCurrentScope()) ?

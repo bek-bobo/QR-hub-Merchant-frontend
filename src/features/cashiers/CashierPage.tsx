@@ -2,10 +2,10 @@ import { useRef, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { formatInstantTime } from '@/shared/presentation/date-time'
 import { can } from '@/shared/auth/access'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -142,11 +142,12 @@ export function CashierPage() {
         {applied.terminalId ? <p className="text-sm text-text-secondary sm:col-span-2 lg:col-span-4">Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin.</p> : null}
         {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
       </FilterDrawer>
-      <Button type="button" variant="outline" size="sm"
-        disabled={!listOptions.enabled || list.isFetching} onClick={() => void list.refetch()}>
-        <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
-        Yangilash
-      </Button>
+      <RefreshIconButton
+        updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+        disabled={!listOptions.enabled || list.isFetching}
+        loading={list.isFetching}
+        onClick={() => void list.refetch()}
+      />
     </div>
   }
 

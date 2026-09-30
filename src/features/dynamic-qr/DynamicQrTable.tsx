@@ -6,8 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { QrCodeIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
@@ -17,11 +15,13 @@ import {
   type DynamicQrColumn,
   type DynamicQrColumnId,
 } from './columns'
+import { DynamicQrActionsMenu } from './DynamicQrActionsMenu'
 
 interface DynamicQrTableProps {
   readonly rows: readonly DynamicQrRow[]
   readonly columnOrder: readonly string[]
   readonly onViewQr: (row: DynamicQrRow) => void
+  readonly onViewDetails: (row: DynamicQrRow) => void
 }
 
 function resolveColumns(order: readonly string[]): readonly DynamicQrColumn[] {
@@ -44,6 +44,7 @@ export function DynamicQrTableContent({
   rows,
   columnOrder,
   onViewQr,
+  onViewDetails,
 }: DynamicQrTableContentProps) {
   const columns = resolveColumns(columnOrder)
 
@@ -56,7 +57,7 @@ export function DynamicQrTableContent({
               {column.label}
             </TableHead>
           ))}
-          <TableHead className="sticky right-0 bg-surface text-right">QR ko‘rish</TableHead>
+          <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -68,10 +69,7 @@ export function DynamicQrTableContent({
               </TableCell>
             ))}
             <TableCell className="sticky right-0 bg-surface text-right">
-              <Button type="button" variant="outline" size="sm" onClick={() => onViewQr(row)}>
-                <QrCodeIcon aria-hidden="true" />
-                QR ko‘rish
-              </Button>
+              <DynamicQrActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />
             </TableCell>
           </TableRow>
         ))}
@@ -80,10 +78,11 @@ export function DynamicQrTableContent({
   )
 }
 
-export function DynamicQrTable({ rows, columnOrder, onViewQr }: DynamicQrTableProps) {
+export function DynamicQrTable({ rows, columnOrder, onViewQr, onViewDetails }: DynamicQrTableProps) {
   return (
     <TableScrollRegion ariaLabel="Dinamik QR ro‘yxati">
-      <DynamicQrTableContent rows={rows} columnOrder={columnOrder} onViewQr={onViewQr} />
+      <DynamicQrTableContent rows={rows} columnOrder={columnOrder}
+        onViewQr={onViewQr} onViewDetails={onViewDetails} />
     </TableScrollRegion>
   )
 }

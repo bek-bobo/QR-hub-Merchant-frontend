@@ -32,12 +32,22 @@ function row(
   return Object.freeze({
     pkey: `D3-QR-DEMO-${String(sequence).padStart(3, '0')}`,
     link: null,
-    createdAt,
+    terminalType: null,
     terminalId,
+    createdAt,
+    updatedAt: null,
     terminalName: terminal.name,
+    merchantId: null,
     merchantName: sequence % 4 === 0 ? 'QRHub Demo Savdo' : 'QRHub Demo Merchant',
+    bankAccountId: null,
+    bankAccountName: null,
     amount: money(String(amountMinorUnits)),
+    currencyAmount: null,
+    currencyCode: null,
+    rate: null,
+    serviceFeeAmount: null,
     statusCode,
+    distributionStatus: null,
     rrn,
   })
 }

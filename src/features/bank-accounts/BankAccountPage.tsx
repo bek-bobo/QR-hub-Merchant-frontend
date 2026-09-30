@@ -2,10 +2,10 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { Button } from '@/components/ui/button'
-import { RefreshCwIcon } from 'lucide-react'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
+import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, clearManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
 import { applyBankAccountDraft, bankAccountParentState, createDefaultBankAccountFilters, type MerchantLookupState } from './page-state'
@@ -76,11 +76,12 @@ export function BankAccountPage() {
           {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
-        <Button type="button" variant="outline" size="sm"
-          disabled={!listOptions.enabled || list.isFetching} onClick={() => void list.refetch()}>
-          <RefreshCwIcon aria-hidden="true" className={list.isFetching ? 'animate-spin' : ''} />
-          Yangilash
-        </Button>
+        <RefreshIconButton
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          disabled={!listOptions.enabled || list.isFetching}
+          loading={list.isFetching}
+          onClick={() => void list.refetch()}
+        />
       </div>} />
   </div>
 }

@@ -42,8 +42,8 @@ describe('production cancel list gate', () => {
 
   it('renders primary controls before the secondary quick-filter actions', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])
-    expect(html.indexOf('Yangi QR yaratish')).toBeLessThan(html.indexOf('Yangilangan:'))
-    expect(html.indexOf('Yangilangan:')).toBeLessThan(html.indexOf('aria-label="Jadval ustunlari"'))
+    expect(html.indexOf('Yangi QR yaratish')).toBeLessThan(html.indexOf('aria-label="Jadval ustunlari"'))
+    expect(html.indexOf('aria-label="Jadval ustunlari"')).toBeLessThan(html.indexOf('aria-label="Yangilash"'))
     expect(html.indexOf('aria-label="Yangilash"')).toBeLessThan(html.indexOf('Filtrlar'))
   })
 
@@ -68,9 +68,8 @@ describe('production cancel list gate', () => {
     expect(refreshButton).toBeDefined()
     expect(refreshButton).not.toContain('>Yangilash<')
     expect(html).toContain('>Jadval ustunlari</span>')
-    expect(html).toContain('>Yangilangan vaqt</span>')
     expect(html).toContain('Yangilangan:')
-    expect(html.indexOf('Yangilangan:')).toBeLessThan(html.indexOf('aria-label="Jadval ustunlari"'))
+    expect(html.indexOf('Yangilangan:')).toBeGreaterThan(html.indexOf('aria-label="Yangilash"'))
   })
 
   it('renders honest summary placeholders when aggregate fields are unavailable', () => {

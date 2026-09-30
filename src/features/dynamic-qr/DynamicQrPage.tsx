@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
-import { HandCoinsIcon, RefreshCwIcon, WalletCardsIcon } from 'lucide-react'
+import { HandCoinsIcon, WalletCardsIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { RefreshIconButton } from '@/components/RefreshIconButton'
 import {
   Card,
   CardContent,
@@ -32,6 +33,7 @@ import {
 import { ExportButton } from './ExportButton'
 import { CreateQrDialog } from './CreateQrDialog'
 import { QrDisplayDialog } from './QrDisplayDialog'
+import { DynamicQrDetailsSheet } from './DynamicQrDetailsSheet'
 import {
   changeDynamicQrPage,
   createDefaultDynamicQrFilters,
@@ -96,6 +98,7 @@ export function DynamicQrPage({
   const [applied, setApplied] = useState<DynamicQrFilters>(initialFilters)
   const [createOpen, setCreateOpen] = useState(false)
   const [selectedQrRow, setSelectedQrRow] = useState<DynamicQrRow | null>(null)
+  const [selectedDetailsRow, setSelectedDetailsRow] = useState<DynamicQrRow | null>(null)
   const queries = useDynamicQrReadQueries(applied)
   const { runtime, terminals, list, terminalFilterState, enabled } = queries
   const columnOrder = useTableColumnOrder({
@@ -212,11 +215,6 @@ export function DynamicQrPage({
           <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>Yangi QR yaratish</Button>
         ) : null}
         <div className="flex min-w-0 items-center gap-2">
-          {list.dataUpdatedAt > 0 ? (
-            <span className="whitespace-nowrap text-xs text-text-secondary">
-              Yangilangan: {formatInstantTime(list.dataUpdatedAt)}
-            </span>
-          ) : null}
           <TableColumnPreferences
             tableLabel="Dinamik QR"
             items={dynamicQrColumns}
@@ -226,29 +224,12 @@ export function DynamicQrPage({
             onMoveDown={columnOrder.moveDown}
             onReset={columnOrder.reset}
           />
-          <div className="group relative inline-flex">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              aria-label="Yangilash"
-              aria-describedby="dynamic-qr-refresh-tooltip"
-              disabled={!enabled.list || list.isFetching}
-              onClick={() => void list.refetch()}
-            >
-              <RefreshCwIcon
-                aria-hidden="true"
-                className={list.isFetching ? 'animate-spin' : ''}
-              />
-            </Button>
-            <span
-              id="dynamic-qr-refresh-tooltip"
-              role="tooltip"
-              className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
-            >
-              Yangilangan vaqt
-            </span>
-          </div>
+          <RefreshIconButton
+            updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+            disabled={!enabled.list || list.isFetching}
+            loading={list.isFetching}
+            onClick={() => void list.refetch()}
+          />
         </div>
       </div>
     )
@@ -278,6 +259,12 @@ export function DynamicQrPage({
       <CreateQrDialog open={createOpen} onOpenChange={setCreateOpen} />
       <QrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
         if (!open) setSelectedQrRow(null)
+      }} />
+      <DynamicQrDetailsSheet row={selectedDetailsRow} onOpenChange={(open) => {
+        if (!open) setSelectedDetailsRow(null)
+      }} onViewQr={(row) => {
+        setSelectedDetailsRow(null)
+        setSelectedQrRow(row)
       }} />
       <Card className="min-w-0 overflow-hidden">
         <CardContent className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
@@ -362,6 +349,7 @@ export function DynamicQrPage({
                 rows={list.data.content}
                 columnOrder={columnOrder.order}
                 onViewQr={setSelectedQrRow}
+                onViewDetails={setSelectedDetailsRow}
               />
             ) : null}
 
@@ -385,3 +373,4 @@ export function DynamicQrPage({
     </div>
   )
 }
+

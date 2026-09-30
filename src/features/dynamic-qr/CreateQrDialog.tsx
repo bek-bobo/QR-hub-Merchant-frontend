@@ -23,11 +23,11 @@ export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/45 supports-backdrop-filter:backdrop-blur-xs" />
       <DialogPrimitive.Content
-        className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-1.5rem)] w-[calc(100%-1.5rem)] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-popover p-0 text-popover-foreground shadow-2xl"
+        className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100vh-1rem)] w-[calc(100%-1rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-2xl border bg-popover p-0 text-popover-foreground shadow-2xl sm:max-h-[calc(100vh-2rem)] sm:w-[calc(100%-2rem)]"
         onEscapeKeyDown={(event) => { if (pending) event.preventDefault() }}
         onPointerDownOutside={(event) => { if (pending) event.preventDefault() }}
       >
-        <header className="border-b px-5 py-4 pr-14 sm:px-6 sm:py-5">
+        <header className="border-b px-5 py-4 pr-14 sm:px-6">
           <DialogPrimitive.Title className="text-xl font-semibold text-text-primary">
             {resultKind === 'confirmed' ? 'QR ko‘rsatish'
               : resultKind === 'unknown' ? 'Natija tasdiqlanmadi'
@@ -46,7 +46,7 @@ export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
             <XIcon aria-hidden="true" />
           </Button>
         </DialogPrimitive.Close>
-        <div className="p-4 sm:p-6">
+        <div className="px-4 py-4 sm:px-6 sm:py-5">
           <CreateQrPage embedded resetOnMount onPendingChange={setPending}
             onResultModeChange={setResultKind} onClose={() => changeOpen(false)} />
         </div>
