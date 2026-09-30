@@ -6,9 +6,12 @@ import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, clearManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
 import { applyBankAccountDraft, bankAccountParentState, createDefaultBankAccountFilters, type MerchantLookupState } from './page-state'
+import { bankAccountColumns } from './columns'
 import { BankAccountResults } from './BankAccountResults'
 
 export function BankAccountPage() {
@@ -16,6 +19,10 @@ export function BankAccountPage() {
   const [draft, setDraft] = useState<BankAccountListFilters>(createDefaultBankAccountFilters)
   const [applied, setApplied] = useState<BankAccountListFilters>(createDefaultBankAccountFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: 'bankAccounts',
+    columns: bankAccountColumns,
+  })
 
   const merchantBase = runtime.queries.merchantLookupOptions()
   const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.bankAccountList }
@@ -60,6 +67,8 @@ export function BankAccountPage() {
 
   return <div className="mx-auto min-w-0 max-w-7xl">
     <BankAccountResults blocked={!parentReady} pending={list.isPending} error={list.isError} data={list.data}
+      columnOrder={columnPreferences.order}
+      visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
@@ -76,6 +85,19 @@ export function BankAccountPage() {
           {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
+        <TableColumnPreferences
+          tableLabel="Bank hisoblari"
+          items={bankAccountColumns}
+          order={columnPreferences.order}
+          hidden={columnPreferences.hidden}
+          iconOnly
+          onMoveUp={columnPreferences.moveUp}
+          onMoveDown={columnPreferences.moveDown}
+          onMove={columnPreferences.move}
+          onToggleVisibility={columnPreferences.toggleVisibility}
+          canHide={columnPreferences.canHide}
+          onReset={columnPreferences.reset}
+        />
         <RefreshIconButton
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}

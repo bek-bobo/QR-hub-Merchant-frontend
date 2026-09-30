@@ -6,6 +6,8 @@ import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { can } from '@/shared/auth/access'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -17,6 +19,7 @@ import { CashierResults } from './CashierResults'
 import { AssignTerminalsPanel } from './AssignTerminalsPanel'
 import { UnassignTerminalPanel } from './UnassignTerminalPanel'
 import type { UnassignTarget } from './unassign-terminal'
+import { cashierColumns } from './columns'
 
 function terminalLookupState(enabled: boolean, error: boolean, data: readonly TerminalOption[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -24,12 +27,15 @@ function terminalLookupState(enabled: boolean, error: boolean, data: readonly Te
   return data ? 'ready' : 'loading'
 }
 
-function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurrentScope, onRetry, onPageChange, headerActions }: {
+function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurrentScope,
+  columnOrder, visibleColumnIds, onRetry, onPageChange, headerActions }: {
   readonly data: Page<CashierRow>
   readonly scope: ReadScope
   readonly resultKey: readonly unknown[]
   readonly dataUpdatedAt: number
   readonly getCurrentScope: () => ReadScope
+  readonly columnOrder: readonly string[]
+  readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly headerActions: ReactNode
@@ -45,6 +51,7 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
   const currentUnassign = selected && unassignSelection?.target.cashier === selected && selected.terminals.includes(unassignSelection.target.terminal)
     ? unassignSelection.target : null
   return <CashierResults blocked={false} pending={false} error={false} data={data} selected={selected}
+    columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
     onRetry={onRetry} onPageChange={onPageChange}
     headerActions={headerActions}
     onSelect={(row) => { selectedEpochRef.current++; selectedCashierRef.current = row; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(createCashierTarget(row, getCurrentScope())) }}
@@ -68,6 +75,10 @@ export function CashierPage() {
   const [draft, setDraft] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [applied, setApplied] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: 'cashiers',
+    columns: cashierColumns,
+  })
 
   const merchantBase = runtime.queries.merchantLookupOptions()
   const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.cashierList }
@@ -142,6 +153,19 @@ export function CashierPage() {
         {applied.terminalId ? <p className="text-sm text-text-secondary sm:col-span-2 lg:col-span-4">Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin.</p> : null}
         {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
       </FilterDrawer>
+      <TableColumnPreferences
+        tableLabel="Kassirlar"
+        items={cashierColumns}
+        order={columnPreferences.order}
+        hidden={columnPreferences.hidden}
+        iconOnly
+        onMoveUp={columnPreferences.moveUp}
+        onMoveDown={columnPreferences.moveDown}
+        onMove={columnPreferences.move}
+        onToggleVisibility={columnPreferences.toggleVisibility}
+        canHide={columnPreferences.canHide}
+        onReset={columnPreferences.reset}
+      />
       <RefreshIconButton
         updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
         disabled={!listOptions.enabled || list.isFetching}
@@ -156,9 +180,11 @@ export function CashierPage() {
 
   return <div className="mx-auto min-w-0 max-w-7xl">
     {visibleData ? <ScopedCashierResults key={cashierSelectionKey(listOptions.queryKey, visibleData)} data={visibleData} scope={runtime.scope} resultKey={listOptions.queryKey} dataUpdatedAt={list.dataUpdatedAt} getCurrentScope={runtime.getCurrentScope}
+      columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       headerActions={renderHeaderActions()} />
       : <CashierResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data} selected={null}
+        columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
         onSelect={() => undefined} onClose={() => undefined} headerActions={renderHeaderActions()} />}
   </div>

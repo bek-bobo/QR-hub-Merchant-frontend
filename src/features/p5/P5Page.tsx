@@ -12,6 +12,8 @@ import type { Page } from '@/shared/contracts/merchant-read'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import {
   applyP5Draft,
   createDefaultP5Filters,
@@ -25,6 +27,7 @@ import {
 import { P5Results } from './P5Results'
 import { P5ResetDialog } from './P5ResetDialog'
 import { createP5ResetController, invalidateCurrentP5Lists, p5ResetIntentKey, type P5ResetPort } from './p5-reset'
+import { p5Columns } from './columns'
 
 function terminalLookupState(enabled: boolean, error: boolean, data: readonly unknown[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -94,7 +97,9 @@ function ResetControllerView({ controller }: { readonly controller: P5ResetContr
     onAcknowledgeUnknown={() => { controller.beginNewIntent(true) }} />
 }
 
-function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, resetUnavailableMessage, pending, error, data, onRetry, onPageChange }: {
+function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable,
+  resetUnavailableMessage, pending, error, data, columnOrder, visibleColumnIds,
+  onRetry, onPageChange }: {
   readonly rows: readonly P5Row[]
   readonly queryKey: readonly unknown[]
   readonly runtime: ReturnType<typeof useReadRuntime>
@@ -104,6 +109,8 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, r
   readonly pending: boolean
   readonly error: unknown
   readonly data: NonNullable<Parameters<typeof P5Results>[0]['data']>
+  readonly columnOrder: readonly string[]
+  readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
 }) {
@@ -129,6 +136,7 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable, r
     if (controller.request(row)) setResetController(controller)
   }
   return <><P5Results blocked={false} pending={pending} error={error} data={data} selected={selected}
+    columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
     onRetry={onRetry} onPageChange={onPageChange}
     onSelect={(row) => setTarget(createP5Target(row, runtime.scope, queryKey))}
     resetAvailable={resetAvailable} resetUnavailableMessage={resetUnavailableMessage} onReset={requestReset} />
@@ -141,6 +149,10 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
   const [draft, setDraft] = useState<P5FilterValues>(createDefaultP5Filters)
   const [applied, setApplied] = useState<P5FilterValues>(createDefaultP5Filters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: 'p5Devices',
+    columns: p5Columns,
+  })
 
   const merchantBase = runtime.queries.merchantLookupOptions()
   const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.p5List }
@@ -233,6 +245,19 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
             onDraftChange={setDraft}
           />
         </FilterDrawer>
+        <TableColumnPreferences
+          tableLabel="P5 qurilmalari"
+          items={p5Columns}
+          order={columnPreferences.order}
+          hidden={columnPreferences.hidden}
+          iconOnly
+          onMoveUp={columnPreferences.moveUp}
+          onMoveDown={columnPreferences.moveDown}
+          onMove={columnPreferences.move}
+          onToggleVisibility={columnPreferences.toggleVisibility}
+          canHide={columnPreferences.canHide}
+          onReset={columnPreferences.reset}
+        />
         <RefreshIconButton
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
@@ -243,8 +268,10 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
     </div>
     {visibleData ? <ScopedP5Results key={p5SelectionKey(listOptions.queryKey, visibleData.content)} rows={visibleData.content} queryKey={listOptions.queryKey} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       resetUnavailableMessage={resetUnavailableMessage}
+      columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />
       : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data} selected={null}
+        columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} onSelect={() => undefined} />}
   </div>
 }

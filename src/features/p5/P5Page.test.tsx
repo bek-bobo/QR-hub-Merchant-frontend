@@ -41,6 +41,14 @@ describe('P5 page optional lookups', () => {
     expect(html.match(/<h1\b/g)).toBeNull()
     expect(html).not.toContain('Qidiruv faqat qurilma ID va terminal nomi bo‘yicha ishlaydi.')
     expect(html).toContain('>Filtrlar</button>')
+    expect(html.match(/aria-label="Jadval ustunlarini sozlash"/g)).toHaveLength(1)
+    expect(html).toContain('>Ustunlar</span>')
+    expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(
+      html.indexOf('aria-label="Jadval ustunlarini sozlash"'),
+    )
+    expect(html.indexOf('aria-label="Jadval ustunlarini sozlash"')).toBeLessThan(
+      html.indexOf('aria-label="Yangilash"'),
+    )
     expect(html).toContain('aria-label="Yangilash"')
     expect(html).not.toContain('>Yangilash</button>')
     expect(html).toContain('role="tooltip"')

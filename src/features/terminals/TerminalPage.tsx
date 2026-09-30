@@ -6,10 +6,13 @@ import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, changeMerchantDraft, clearManagementFilters, type LookupState, type TerminalListFilters } from '@/shared/contracts/management-filters'
 import type { ManagementOption } from '@/shared/contracts/management-read'
 import { applyTerminalDraft, createDefaultTerminalFilters, terminalParentState, type ParentLookupState } from './page-state'
+import { terminalColumns } from './columns'
 import { TerminalResults } from './TerminalResults'
 
 function lookupState(enabled: boolean, error: boolean, data: readonly ManagementOption[] | undefined, granted: boolean): LookupState {
@@ -23,6 +26,10 @@ export function TerminalPage() {
   const [draft, setDraft] = useState<TerminalListFilters>(createDefaultTerminalFilters)
   const [applied, setApplied] = useState<TerminalListFilters>(createDefaultTerminalFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: 'terminals',
+    columns: terminalColumns,
+  })
 
   const merchantBase = runtime.queries.merchantLookupOptions()
   const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.terminalList }
@@ -88,6 +95,8 @@ export function TerminalPage() {
 
   return <div className="mx-auto min-w-0 max-w-7xl">
     <TerminalResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data}
+      columnOrder={columnPreferences.order}
+      visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
@@ -111,6 +120,19 @@ export function TerminalPage() {
           {draftBankState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Bank hisobi filtri {draftBankState === 'denied' ? 'uchun ruxsat yo‘q' : draftBankState === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}.</p> : null}
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
+        <TableColumnPreferences
+          tableLabel="Terminallar"
+          items={terminalColumns}
+          order={columnPreferences.order}
+          hidden={columnPreferences.hidden}
+          iconOnly
+          onMoveUp={columnPreferences.moveUp}
+          onMoveDown={columnPreferences.moveDown}
+          onMove={columnPreferences.move}
+          onToggleVisibility={columnPreferences.toggleVisibility}
+          canHide={columnPreferences.canHide}
+          onReset={columnPreferences.reset}
+        />
         <RefreshIconButton
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}

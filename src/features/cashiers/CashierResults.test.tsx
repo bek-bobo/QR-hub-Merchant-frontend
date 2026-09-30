@@ -3,11 +3,17 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { decodeCashierPage, type CashierRow } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
+import { CASHIER_DEFAULT_COLUMN_ORDER } from './columns'
 import { CashierResults } from './CashierResults'
 
 const cashier: CashierRow = { id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [{ id: 'term-active', name: 'Active Terminal', statusCode: 0 }, { id: 'term-second', name: 'Second Terminal', statusCode: 0 }] }
 const page: Page<CashierRow> = { content: [cashier, { ...cashier, id: '12', fullname: 'Cashier B', terminals: [] }], totalElements: 47, totalPages: 5, page: 0, size: 20 }
-const render = (overrides: Partial<Parameters<typeof CashierResults>[0]> = {}) => renderToString(createElement(CashierResults, { data: page, selected: null, blocked: false, pending: false, error: false, onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined, onClose: () => undefined, ...overrides }))
+const render = (overrides: Partial<Parameters<typeof CashierResults>[0]> = {}) => renderToString(createElement(CashierResults, { data: page, selected: null, blocked: false, pending: false, error: false, columnOrder: CASHIER_DEFAULT_COLUMN_ORDER, visibleColumnIds: CASHIER_DEFAULT_COLUMN_ORDER, onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined, onClose: () => undefined, ...overrides }))
+
+function cellTexts(html: string, tag: 'th' | 'td'): string[] {
+  return Array.from(html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'g')))
+    .map((match) => match[1]?.replace(/<[^>]+>/g, '').replace(/<!-- -->/g, '') ?? '')
+}
 
 describe('cashier results', () => {
   it('preserves server rows even when filtered terminal is absent from active memberships', () => {
@@ -79,5 +85,50 @@ describe('cashier results', () => {
 
   it('rejects malformed required memberships instead of presenting an empty list', () => {
     expect(() => decodeCashierPage({ success: true, data: { content: [{ id: 11, fullname: 'Cashier A', phone: '+998900000001', status: 0, terminals: null }], totalElements: 1, totalPages: 1, page: 0, size: 10 } })).toThrow()
+  })
+
+  it('renders default business columns with Faol terminallar fixed final', () => {
+    expect(cellTexts(render({ data: { ...page, content: [cashier] } }), 'th')).toEqual([
+      'F.I.Sh.', 'Telefon', 'Rol', 'Holat', 'Faol terminallar',
+    ])
+  })
+
+  it('respects business order while preserving the operational column and its control', () => {
+    const html = render({
+      data: { ...page, content: [cashier] },
+      columnOrder: ['status', 'fullName', 'role', 'phone'],
+    })
+    expect(cellTexts(html, 'th')).toEqual([
+      'Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Faol terminallar',
+    ])
+    expect(cellTexts(html, 'td')).toEqual([
+      'Noma’lum', 'Cashier A', 'Merchant user', '+998900000001', 'Biriktirishlarni ko‘rish',
+    ])
+    expect(html).toContain('aria-label="Cashier A: Biriktirishlarni ko‘rish"')
+  })
+
+  it('hides and restores a business column without affecting Faol terminallar', () => {
+    const columnOrder = ['status', 'fullName', 'role', 'phone'] as const
+    expect(cellTexts(render({
+      data: { ...page, content: [cashier] },
+      columnOrder,
+      visibleColumnIds: ['status', 'fullName', 'role'],
+    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Faol terminallar'])
+    expect(cellTexts(render({
+      data: { ...page, content: [cashier] },
+      columnOrder,
+      visibleColumnIds: columnOrder,
+    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Faol terminallar'])
+  })
+
+  it('keeps the table scroll owner and operational control reachable with one business column', () => {
+    const html = render({
+      data: { ...page, content: [cashier] },
+      visibleColumnIds: ['fullName'],
+    })
+    const scrollRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="Kassirlar jadvali"[^>]*>/)?.[0]
+    expect(scrollRegion).toContain('overflow-x-auto')
+    expect(cellTexts(html, 'th')).toEqual(['F.I.Sh.', 'Faol terminallar'])
+    expect(html).toContain('Biriktirishlarni ko‘rish')
   })
 })

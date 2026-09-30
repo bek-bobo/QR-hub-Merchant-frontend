@@ -1,27 +1,51 @@
 import type { ReactNode } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
-import { MetadataId } from '@/shared/presentation/MetadataId'
-import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
+import {
+  TERMINAL_DEFAULT_COLUMN_ORDER,
+  terminalColumns,
+  type TerminalColumn,
+  type TerminalColumnId,
+} from './columns'
 
 interface TerminalResultsProps {
   readonly blocked: boolean
   readonly pending: boolean
   readonly error: boolean
   readonly data?: Page<TerminalRow>
+  readonly columnOrder: readonly string[]
+  readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly headerActions?: ReactNode
 }
 
-export function TerminalResults({ blocked, pending, error, data, onRetry, onPageChange, headerActions }: TerminalResultsProps) {
+function resolveColumns(
+  order: readonly string[],
+  visibleColumnIds: readonly string[],
+): readonly TerminalColumn[] {
+  const normalized = normalizeColumnOrder({
+    defaultOrder: TERMINAL_DEFAULT_COLUMN_ORDER,
+    savedOrder: order,
+  })
+  const visible = new Set(visibleColumnIds)
+  const byId = new Map(terminalColumns.map((column) => [column.id, column] as const))
+  return normalized.filter((id) => visible.has(id)).flatMap((id) => {
+    const column = byId.get(id as TerminalColumnId)
+    return column ? [column] : []
+  })
+}
+
+export function TerminalResults({ blocked, pending, error, data, columnOrder,
+  visibleColumnIds, onRetry, onPageChange, headerActions }: TerminalResultsProps) {
+  const columns = resolveColumns(columnOrder, visibleColumnIds)
+
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Terminallar ro‘yxati</CardTitle>
@@ -36,13 +60,10 @@ export function TerminalResults({ blocked, pending, error, data, onRetry, onPage
                 : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Terminal jadvali">
           <Table className="min-w-[40rem]">
-            <TableHeader><TableRow><TableHead>Terminal ID</TableHead><TableHead>Nomi</TableHead><TableHead>Merchant</TableHead><TableHead>Bank hisobi</TableHead><TableHead>Holat</TableHead></TableRow></TableHeader>
-            <TableBody>{data.content.map((row, index) => {
-              const status = presentActiveStatus(row.statusCode)
-              return <TableRow key={`${row.id}-${index}`}>
-                <TableCell><MetadataId value={row.id} /></TableCell><TableCell className="font-medium text-foreground">{row.name}</TableCell><TableCell>{row.merchantName}</TableCell><TableCell>{row.bankAccountName}</TableCell><TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
-              </TableRow>
-            })}</TableBody>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}</TableRow></TableHeader>
+            <TableBody>{data.content.map((row, index) => <TableRow key={`${row.id}-${index}`}>
+              {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
+            </TableRow>)}</TableBody>
           </Table>
         </TableScrollRegion>
       </div>}

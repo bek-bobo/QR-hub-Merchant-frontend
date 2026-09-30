@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { CashierResults } from '@/features/cashiers/CashierResults'
+import { CASHIER_DEFAULT_COLUMN_ORDER } from '@/features/cashiers/columns'
 import { applyCashierDraft, cashierParentState, createDefaultCashierFilters } from '@/features/cashiers/page-state'
 import { createCashierCreateController, invalidateCurrentCashierLists } from '@/features/cashiers/create-cashier'
 import { createAssignTerminalsController, resolveCurrentAssignTarget } from '@/features/cashiers/assign-terminals'
@@ -214,7 +215,8 @@ export function Day5CashierPreview({ simulator }: { readonly simulator: Day5Simu
     </div>
     {actionNotice ? <p role="status" className="rounded-lg border p-3">{outcomeCopy(actionNotice)} {result.isError ? 'Cashier read xatosi alohida ko‘rsatiladi.' : ''}</p> : null}
     <CashierResults blocked={!parentReady || Boolean(applied.terminalId && !baseOptions.enabled)} pending={result.isPending} error={result.isError} data={result.data}
-      selected={currentSelected} onRetry={() => void result.refetch()} onPageChange={(next) => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setApplied((current) => changeManagementPage(current, next)); setSelected(null); setUnassign(null); setActionNotice(null) }}
+      selected={currentSelected} columnOrder={CASHIER_DEFAULT_COLUMN_ORDER} visibleColumnIds={CASHIER_DEFAULT_COLUMN_ORDER}
+      onRetry={() => void result.refetch()} onPageChange={(next) => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setApplied((current) => changeManagementPage(current, next)); setSelected(null); setUnassign(null); setActionNotice(null) }}
       onSelect={(row) => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = row; unassignRef.current = null; setSelected(row); setUnassign(null); setActionNotice(null) }} onClose={() => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setSelected(null); setUnassign(null); setActionNotice(null) }}
       onUnassign={currentSelected && simulator.has('cashier.unassignTerminal') ? (terminal) => { const target = { cashier: currentSelected, terminal }; unassignRef.current = target; setUnassign(target); setActionNotice(null) } : undefined}
       unassignSurface={currentSelected && unassign?.cashier === currentSelected && currentSelected.terminals.includes(unassign.terminal)

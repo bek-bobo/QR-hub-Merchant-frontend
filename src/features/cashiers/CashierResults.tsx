@@ -6,12 +6,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { presentCashierTerminalStatus } from './status-presentation'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
+import {
+  CASHIER_DEFAULT_COLUMN_ORDER,
+  cashierColumns,
+  type CashierColumn,
+  type CashierColumnId,
+} from './columns'
 
 interface CashierResultsProps {
   readonly blocked: boolean
@@ -19,6 +25,8 @@ interface CashierResultsProps {
   readonly error: boolean
   readonly data?: Page<CashierRow>
   readonly selected: CashierRow | null
+  readonly columnOrder: readonly string[]
+  readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly onSelect: (row: CashierRow) => void
@@ -29,7 +37,27 @@ interface CashierResultsProps {
   readonly unassignSurface?: ReactNode
 }
 
-export function CashierResults({ blocked, pending, error, data, selected, onRetry, onPageChange, onSelect, onClose, headerActions, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
+function resolveColumns(
+  order: readonly string[],
+  visibleColumnIds: readonly string[],
+): readonly CashierColumn[] {
+  const normalized = normalizeColumnOrder({
+    defaultOrder: CASHIER_DEFAULT_COLUMN_ORDER,
+    savedOrder: order,
+  })
+  const visible = new Set(visibleColumnIds)
+  const byId = new Map(cashierColumns.map((column) => [column.id, column] as const))
+  return normalized.filter((id) => visible.has(id)).flatMap((id) => {
+    const column = byId.get(id as CashierColumnId)
+    return column ? [column] : []
+  })
+}
+
+export function CashierResults({ blocked, pending, error, data, selected,
+  columnOrder, visibleColumnIds, onRetry, onPageChange, onSelect, onClose,
+  headerActions, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
+  const columns = resolveColumns(columnOrder, visibleColumnIds)
+
   return <div className="min-w-0 space-y-4">
     <Card className="min-w-0" aria-busy={pending}>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -45,11 +73,10 @@ export function CashierResults({ blocked, pending, error, data, selected, onRetr
                   : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Kassirlar jadvali">
           <Table className="min-w-[46rem]">
-            <TableHeader><TableRow><TableHead>F.I.Sh.</TableHead><TableHead>Telefon</TableHead><TableHead>Rol</TableHead><TableHead>Holat</TableHead><TableHead className="text-right">Faol terminallar</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="text-right">Faol terminallar</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
-              const status = presentActiveStatus(row.statusCode)
               return <TableRow key={`${row.id}-${index}`}>
-                <TableCell className="font-medium text-foreground">{row.fullname}</TableCell><TableCell className="tabular-nums">{row.phone}</TableCell><TableCell>{row.roleDisplay ?? '—'}</TableCell><TableCell><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge></TableCell>
+                {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
                 <TableCell className="text-right"><Button type="button" variant="outline" size="sm" aria-label={`${row.fullname}: Biriktirishlarni ko‘rish`} aria-expanded={selected?.id === row.id} onClick={() => onSelect(row)}>Biriktirishlarni ko‘rish</Button></TableCell>
               </TableRow>
             })}</TableBody>
