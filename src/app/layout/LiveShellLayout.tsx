@@ -1,5 +1,5 @@
 import { useReducer, useRef, type ReactNode, type RefObject } from 'react'
-import { XIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/sheet'
 import { ShellNavigation, type ShellNavigationItem } from './ShellNavigation'
 import { reduceMobileNavigationOpen } from './mobile-navigation-state'
+import { reduceSidebarCollapsed } from './sidebar-collapse-state'
 
 export interface LiveShellHeaderContext {
   readonly open: boolean
@@ -34,6 +35,7 @@ export function LiveShellLayout({
     reduceMobileNavigationOpen,
     false,
   )
+  const [collapsed, toggleCollapsed] = useReducer(reduceSidebarCollapsed, false)
   const navigationTriggerRef = useRef<HTMLButtonElement>(null)
 
   return (
@@ -41,15 +43,42 @@ export function LiveShellLayout({
       open={mobileNavigationOpen}
       onOpenChange={(open) => dispatch({ type: 'set', open })}
     >
-      <div className="min-h-dvh min-w-0 bg-workspace text-text-primary lg:grid lg:grid-cols-[15rem_minmax(0,1fr)]">
+      <div className={`min-h-dvh min-w-0 bg-workspace text-text-primary lg:grid motion-safe:transition-[grid-template-columns] motion-safe:duration-200 motion-reduce:transition-none ${
+        collapsed
+          ? 'lg:grid-cols-[4.5rem_minmax(0,1fr)]'
+          : 'lg:grid-cols-[15rem_minmax(0,1fr)]'
+      }`}>
         <aside className="hidden bg-sidebar text-sidebar-foreground lg:block lg:min-h-dvh">
-          <div className="border-b border-sidebar-border px-5 py-5">
-            <div className="text-lg font-semibold tracking-tight">QRHub Merchant</div>
-            <div className="mt-1 text-xs text-sidebar-foreground/70">
-              Merchant workspace
+          <div className={`flex min-h-24 border-b border-sidebar-border py-5 ${
+            collapsed ? 'items-center justify-center px-2' : 'items-start justify-between gap-3 px-5'
+          }`}>
+            <div className={collapsed ? 'sr-only' : undefined}>
+              <div className="text-lg font-semibold tracking-tight">QRHub Merchant</div>
+              <div className="mt-1 text-xs text-sidebar-foreground/70">
+                Merchant workspace
+              </div>
             </div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="shrink-0 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              aria-label={collapsed ? 'Yon panelni ochish' : 'Yon panelni yopish'}
+              aria-expanded={!collapsed}
+              onClick={toggleCollapsed}
+            >
+              {collapsed ? (
+                <ChevronRightIcon aria-hidden="true" />
+              ) : (
+                <ChevronLeftIcon aria-hidden="true" />
+              )}
+            </Button>
           </div>
-          <ShellNavigation items={navigationItems} label="Live navigatsiya" />
+          <ShellNavigation
+            items={navigationItems}
+            label="Live navigatsiya"
+            collapsed={collapsed}
+          />
         </aside>
         <div className="min-w-0">
           {header({

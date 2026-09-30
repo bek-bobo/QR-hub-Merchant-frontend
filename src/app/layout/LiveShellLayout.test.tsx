@@ -1,4 +1,5 @@
 import { renderToStaticMarkup } from 'react-dom/server'
+import { LayoutDashboardIcon, ScanLineIcon } from 'lucide-react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { PageHeader } from '@/shared/ui/PageHeader'
@@ -6,8 +7,8 @@ import { Header } from './Header'
 import { LiveShellLayout } from './LiveShellLayout'
 
 const navigationItems = [
-  { path: '/dashboard', label: 'Dashboard' },
-  { path: '/account', label: 'Hisob' },
+  { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboardIcon },
+  { path: '/dynamic-qrs', label: 'Dinamik QRlar', icon: ScanLineIcon },
 ] as const
 
 describe('LiveShellLayout', () => {
@@ -42,7 +43,10 @@ describe('LiveShellLayout', () => {
     expect(aside).toContain('hidden')
     expect(aside).toContain('lg:block')
     expect(navigation).toContain('href="/dashboard"')
-    expect(navigation).toContain('href="/account"')
+    expect(navigation).toContain('href="/dynamic-qrs"')
+    expect(navigation).not.toContain('href="/account"')
+    expect(aside).toContain('aria-label="Yon panelni yopish"')
+    expect(aside).toContain('aria-expanded="true"')
     expect(html).toContain('aria-label="Navigatsiyani ochish"')
     expect(html).toContain('aria-expanded="false"')
     expect(html).toContain('aria-controls="live-mobile-navigation"')

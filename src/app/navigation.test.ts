@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import type { AccessContextValue } from '@/shared/auth/access'
 import type { ReadApiRegistrations } from './read/createLiveReadApi'
-import { getVisibleLiveNavigationItems as getLiveNavigationItems } from './navigation'
+import {
+  getVisibleLiveNavigationItems as getLiveNavigationItems,
+  liveNavigationItems,
+} from './navigation'
 
 const configured: ReadApiRegistrations = {
   dashboard: { kind: 'configured' },
@@ -20,6 +23,21 @@ function authenticated(...permissions: string[]): AccessContextValue {
 }
 
 describe('live navigation policy', () => {
+  it('keeps route order and owns an icon for every navigation destination', () => {
+    expect(liveNavigationItems.map((item) => item.path)).toEqual([
+      '/dashboard',
+      '/dynamic-qrs',
+      '/static-qrs',
+      '/terminals',
+      '/bank-accounts',
+      '/cashiers',
+      '/cashiers/new',
+      '/devices',
+      '/account',
+    ])
+    expect(liveNavigationItems.every((item) => item.icon !== undefined)).toBe(true)
+  })
+
   it('keeps the account route out of primary navigation', () => {
     expect(getLiveNavigationItems(authenticated(
       'GET_DASHBOARD', 'GET_DYNAMIC_QRS', 'GET_STATIC_QRS', 'GET_ME',
