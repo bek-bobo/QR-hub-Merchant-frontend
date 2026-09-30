@@ -15,11 +15,13 @@ interface StaticQrResultsProps {
   readonly page: number
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onViewQr?: (row: StaticQrRow) => void
+  readonly onViewDetails?: (row: StaticQrRow) => void
   readonly headerActions?: ReactNode
 }
 
 export function StaticQrResults({ terminalConfirmed, pending, error, data,
-  page, onRetry, onPageChange, headerActions }: StaticQrResultsProps) {
+  page, onRetry, onPageChange, onViewQr, onViewDetails, headerActions }: StaticQrResultsProps) {
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Statik QR ro‘yxati</CardTitle>
@@ -34,7 +36,9 @@ export function StaticQrResults({ terminalConfirmed, pending, error, data,
               : data.content.length === 0 ? <EmptyState description="Statik QR topilmadi." />
                 : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Statik QR jadvali">
-          <StaticQrTable rows={data.content} />
+          <StaticQrTable rows={data.content}
+            onViewQr={onViewQr ?? (() => undefined)}
+            onViewDetails={onViewDetails ?? (() => undefined)} />
         </TableScrollRegion>
       </div>}
       {data && terminalConfirmed && !pending && !error ? <PaginationBar ariaLabel="Statik QR sahifalari" currentPage={page}

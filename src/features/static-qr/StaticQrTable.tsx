@@ -11,8 +11,15 @@ import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { StaticQrRow } from './contract'
+import { StaticQrActionsMenu } from './StaticQrActionsMenu'
 
-export function StaticQrTable({ rows }: { readonly rows: readonly StaticQrRow[] }) {
+interface StaticQrTableProps {
+  readonly rows: readonly StaticQrRow[]
+  readonly onViewQr: (row: StaticQrRow) => void
+  readonly onViewDetails: (row: StaticQrRow) => void
+}
+
+export function StaticQrTable({ rows, onViewQr, onViewDetails }: StaticQrTableProps) {
   return (
     <Table className="min-w-[38rem]">
       <TableHeader>
@@ -21,6 +28,7 @@ export function StaticQrTable({ rows }: { readonly rows: readonly StaticQrRow[] 
           <TableHead>Terminal</TableHead>
           <TableHead>Merchant</TableHead>
           <TableHead>Holat</TableHead>
+          <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -35,6 +43,9 @@ export function StaticQrTable({ rows }: { readonly rows: readonly StaticQrRow[] 
                 <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
                   {status.label}
                 </Badge>
+              </TableCell>
+              <TableCell className="sticky right-0 bg-surface text-right">
+                <StaticQrActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />
               </TableCell>
             </TableRow>
           )

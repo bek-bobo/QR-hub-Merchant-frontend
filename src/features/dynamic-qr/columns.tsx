@@ -6,11 +6,11 @@ import { formatMoney } from '@/shared/money/minor'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
+import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
 import { presentNullableCell } from './page-state'
 
-interface DynamicQrColumnDefinition {
-  readonly id: string
-  readonly label: string
+interface DynamicQrColumnDefinition<Id extends string = string>
+  extends TableColumnDefinition<Id> {
   readonly headerClassName?: string
   readonly cellClassName?: string
   readonly renderCell: (row: DynamicQrRow) => ReactNode
@@ -20,26 +20,41 @@ const dynamicQrColumnDefinitions = [
   {
     id: 'qrId',
     label: 'QR ID',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => <MetadataId value={row.pkey} />,
   },
   {
     id: 'createdAt',
     label: 'Yaratilgan vaqt',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => formatOffsetlessDateTime(row.createdAt),
   },
   {
     id: 'terminal',
     label: 'Terminal',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => presentNullableCell(row.terminalName),
   },
   {
     id: 'merchant',
     label: 'Merchant',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => presentNullableCell(row.merchantName),
   },
   {
     id: 'amount',
     label: 'Summa',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     headerClassName: 'text-right',
     cellClassName: 'text-right tabular-nums',
     renderCell: (row: DynamicQrRow) => formatMoney(row.amount),
@@ -47,6 +62,9 @@ const dynamicQrColumnDefinitions = [
   {
     id: 'status',
     label: 'Status',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => {
       const status = presentQrStatus(row.statusCode)
       return (
@@ -59,6 +77,9 @@ const dynamicQrColumnDefinitions = [
   {
     id: 'rrn',
     label: 'RRN',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
     renderCell: (row: DynamicQrRow) => presentNullableCell(row.rrn),
   },
 ] as const satisfies readonly DynamicQrColumnDefinition[]

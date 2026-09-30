@@ -8,7 +8,8 @@ import type { QrCopyOutcome } from './qr-presentation'
 interface QrPresentationProps {
   readonly qrId: string
   readonly terminalName: string
-  readonly amountLabel: string
+  readonly merchantName?: string
+  readonly amountLabel?: string
   readonly statusLabel?: string
   readonly link: LinkPresentation
   readonly unavailableMessage: string
@@ -19,6 +20,7 @@ interface QrPresentationProps {
 export function QrPresentation({
   qrId,
   terminalName,
+  merchantName,
   amountLabel,
   statusLabel,
   link,
@@ -48,10 +50,14 @@ export function QrPresentation({
           <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">Terminal</dt>
           <dd className="mt-1 font-medium text-text-primary">{terminalName}</dd>
         </div>
-        <div>
+        {merchantName ? <div>
+          <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">Merchant</dt>
+          <dd className="mt-1 font-medium text-text-primary">{merchantName}</dd>
+        </div> : null}
+        {amountLabel ? <div>
           <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">Summa</dt>
           <dd className="mt-1 text-lg font-semibold tabular-nums text-text-primary">{amountLabel}</dd>
-        </div>
+        </div> : null}
         {statusLabel ? <div>
           <dt className="text-xs font-medium uppercase tracking-wide text-text-secondary">Status</dt>
           <dd className="mt-1 font-medium text-text-primary">{statusLabel}</dd>

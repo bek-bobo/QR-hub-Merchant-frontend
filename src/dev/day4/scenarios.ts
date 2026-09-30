@@ -92,8 +92,16 @@ export function createDemoCancelPort(scenario: ActionScenario, count: () => void
 
 export const d4StaticTerminal: TerminalOption = Object.freeze({ id: 'D4-terminal-1', name: 'D4 terminal' })
 export const d4StaticRows: readonly StaticQrRow[] = Object.freeze([
-  Object.freeze({ id: 'D4-QR-DEMO-STATIC-001', terminalName: 'D4 terminal', merchantName: 'D4 merchant', statusCode: 0 }),
-  Object.freeze({ id: 'D4-QR-DEMO-STATIC-002', terminalName: 'D4 terminal', merchantName: 'D4 merchant', statusCode: 777 }),
+  Object.freeze({ id: 'D4-QR-DEMO-STATIC-001', terminalType: null, terminalId: null,
+    terminalName: 'D4 terminal', merchantId: null, merchantName: 'D4 merchant',
+    redirectUrl: null, minAmount: null, maxAmount: null, statusCode: 0, link: null,
+    districtId: null, districtName: null, regionId: null, regionName: null,
+    createdAt: null, updatedAt: null }),
+  Object.freeze({ id: 'D4-QR-DEMO-STATIC-002', terminalType: null, terminalId: null,
+    terminalName: 'D4 terminal', merchantId: null, merchantName: 'D4 merchant',
+    redirectUrl: null, minAmount: null, maxAmount: null, statusCode: 777, link: null,
+    districtId: null, districtName: null, regionId: null, regionName: null,
+    createdAt: null, updatedAt: null }),
 ])
 
 export function staticDemoPage(scenario: StaticScenario, page: number, size: PageSize): Page<StaticQrRow> {

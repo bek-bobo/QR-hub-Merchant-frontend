@@ -14,6 +14,9 @@ import { applyStaticTerminal, clearStaticTerminal,
   defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
 import { createStaticQrQueryOptions } from './query'
 import { StaticQrResults } from './StaticQrResults'
+import type { StaticQrRow } from './contract'
+import { StaticQrDisplayDialog } from './StaticQrDisplayDialog'
+import { StaticQrDetailsSheet } from './StaticQrDetailsSheet'
 
 interface StaticQrFiltersProps {
   readonly draftTerminal: string
@@ -53,6 +56,8 @@ export function StaticQrPage() {
   const { bridge, getSessionSnapshot } = useProtectedReadContext()
   const [draftTerminal, setDraftTerminal] = useState('')
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
+  const [selectedQrRow, setSelectedQrRow] = useState<StaticQrRow | null>(null)
+  const [selectedDetailsRow, setSelectedDetailsRow] = useState<StaticQrRow | null>(null)
   const base = validateWebBaseUrl(import.meta.env.VITE_WEB_API_BASE_URL,
     import.meta.env.DEV ? 'development' : 'production')
   const baseUrl = base.kind === 'valid' ? base.value : null
@@ -89,10 +94,21 @@ export function StaticQrPage() {
   if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
 
   return <div className="mx-auto min-w-0 max-w-7xl">
+    <StaticQrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
+      if (!open) setSelectedQrRow(null)
+    }} />
+    <StaticQrDetailsSheet row={selectedDetailsRow} onOpenChange={(open) => {
+      if (!open) setSelectedDetailsRow(null)
+    }} onViewQr={(row) => {
+      setSelectedDetailsRow(null)
+      setSelectedQrRow(row)
+    }} />
     <StaticQrResults terminalConfirmed={selectedValid} pending={list.isPending}
       error={list.isError} data={list.data} page={applied.page}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => ({ ...current, page }))}
+      onViewQr={setSelectedQrRow}
+      onViewDetails={setSelectedDetailsRow}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <FilterDrawer
           onApply={applyFilters}

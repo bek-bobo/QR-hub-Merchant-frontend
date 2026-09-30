@@ -7,8 +7,14 @@ import { StaticQrResults } from './StaticQrResults'
 
 const data: Page<StaticQrRow> = {
   content: [
-    { id: 'QR-1', terminalName: 'Terminal A', merchantName: 'Merchant A', statusCode: 0 },
-    { id: 'QR-2', terminalName: 'Terminal B', merchantName: 'Merchant B', statusCode: 777 },
+    { id: 'QR-1', terminalType: null, terminalId: null, terminalName: 'Terminal A',
+      merchantId: null, merchantName: 'Merchant A', redirectUrl: null, minAmount: null,
+      maxAmount: null, statusCode: 0, link: null, districtId: null, districtName: null,
+      regionId: null, regionName: null, createdAt: null, updatedAt: null },
+    { id: 'QR-2', terminalType: null, terminalId: null, terminalName: 'Terminal B',
+      merchantId: null, merchantName: 'Merchant B', redirectUrl: null, minAmount: null,
+      maxAmount: null, statusCode: 777, link: null, districtId: null, districtName: null,
+      regionId: null, regionName: null, createdAt: null, updatedAt: null },
   ],
   totalElements: 2, totalPages: 2, page: 0, size: 20,
 }

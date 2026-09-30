@@ -17,5 +17,9 @@ export async function copyExactPresentedLink(
 }
 
 export function presentDynamicQrRowLink(row: DynamicQrRow): LinkPresentation {
-  return validateCreateLink(row.link ?? '')
+  return presentQrLink(row.link)
+}
+
+export function presentQrLink(link: string | null): LinkPresentation {
+  return validateCreateLink(link ?? '')
 }

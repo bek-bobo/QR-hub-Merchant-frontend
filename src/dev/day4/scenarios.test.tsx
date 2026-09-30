@@ -194,7 +194,7 @@ describe('D4 static preview data', () => {
     expect(html).not.toContain('Havolani nusxalash')
     expect(html).not.toContain('<a ')
     expect(html).not.toContain('href=')
-    expect(d4StaticRows.every((row) => !('link' in row) && !('redirectUrl' in row))).toBe(true)
+    expect(d4StaticRows.every((row) => row.link === null && row.redirectUrl === null)).toBe(true)
   })
 
   it('pauses a lost applied terminal without widening, and separates error from empty', () => {
