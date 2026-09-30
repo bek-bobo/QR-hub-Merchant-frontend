@@ -3,6 +3,7 @@ import { createElement } from 'react'
 import { decodeStaticQrPage } from './contract'
 import { renderToString } from 'react-dom/server'
 import { StaticQrTable } from './StaticQrTable'
+import { STATIC_QR_DEFAULT_COLUMN_ORDER } from './columns'
 
 describe('static QR page contract', () => {
   it('keeps confirmed list fields and exact page metadata', () => {
@@ -50,6 +51,8 @@ describe('static QR page contract', () => {
     } })
     expect(decoded.content.map((row) => row.id)).toEqual(['QR-B', 'QR-A'])
     const html = renderToString(createElement(StaticQrTable, { rows: decoded.content,
+      columnOrder: STATIC_QR_DEFAULT_COLUMN_ORDER,
+      visibleColumnIds: STATIC_QR_DEFAULT_COLUMN_ORDER,
       onViewQr: () => undefined, onViewDetails: () => undefined }))
     expect(html.indexOf('QR-B')).toBeLessThan(html.indexOf('QR-A'))
     expect(decoded.content.map((row) => row.statusCode)).toEqual([50, 0])

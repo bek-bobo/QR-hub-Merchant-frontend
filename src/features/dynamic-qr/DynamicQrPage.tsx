@@ -22,14 +22,11 @@ import {
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
-import { useTableColumnOrder } from '@/shared/table-columns/useTableColumnOrder'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { DynamicQrAdvancedFilterFields } from './DynamicQrAdvancedFilterFields'
 import { DynamicQrQuickFilters } from './DynamicQrQuickFilters'
 import { DynamicQrTable } from './DynamicQrTable'
-import {
-  DYNAMIC_QR_DEFAULT_COLUMN_ORDER,
-  dynamicQrColumns,
-} from './columns'
+import { dynamicQrColumns } from './columns'
 import { ExportButton } from './ExportButton'
 import { CreateQrDialog } from './CreateQrDialog'
 import { QrDisplayDialog } from './QrDisplayDialog'
@@ -101,9 +98,9 @@ export function DynamicQrPage({
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<DynamicQrRow | null>(null)
   const queries = useDynamicQrReadQueries(applied)
   const { runtime, terminals, list, terminalFilterState, enabled } = queries
-  const columnOrder = useTableColumnOrder({
+  const columnPreferences = useTableColumnPreferences({
     tableKey: 'dynamicQr',
-    defaultOrder: DYNAMIC_QR_DEFAULT_COLUMN_ORDER,
+    columns: dynamicQrColumns,
   })
 
   function applyFilters(): boolean {
@@ -218,11 +215,15 @@ export function DynamicQrPage({
           <TableColumnPreferences
             tableLabel="Dinamik QR"
             items={dynamicQrColumns}
-            order={columnOrder.order}
+            order={columnPreferences.order}
+            hidden={columnPreferences.hidden}
             iconOnly
-            onMoveUp={columnOrder.moveUp}
-            onMoveDown={columnOrder.moveDown}
-            onReset={columnOrder.reset}
+            onMoveUp={columnPreferences.moveUp}
+            onMoveDown={columnPreferences.moveDown}
+            onMove={columnPreferences.move}
+            onToggleVisibility={columnPreferences.toggleVisibility}
+            canHide={columnPreferences.canHide}
+            onReset={columnPreferences.reset}
           />
           <RefreshIconButton
             updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
@@ -347,7 +348,8 @@ export function DynamicQrPage({
             ) : list.data ? (
               <DynamicQrTable
                 rows={list.data.content}
-                columnOrder={columnOrder.order}
+                columnOrder={columnPreferences.order}
+                visibleColumnIds={columnPreferences.visible}
                 onViewQr={setSelectedQrRow}
                 onViewDetails={setSelectedDetailsRow}
               />

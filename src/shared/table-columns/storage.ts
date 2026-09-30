@@ -188,7 +188,7 @@ export function writeTableColumnOrder(
   })
 }
 
-export function resetTableColumnOrder(
+export function resetTableColumnPreferences(
   storage: TableColumnStorage | undefined,
   tableKey: string,
 ): boolean {
@@ -209,4 +209,11 @@ export function resetTableColumnOrder(
   } catch {
     return false
   }
+}
+
+export function resetTableColumnOrder(
+  storage: TableColumnStorage | undefined,
+  tableKey: string,
+): boolean {
+  return resetTableColumnPreferences(storage, tableKey)
 }

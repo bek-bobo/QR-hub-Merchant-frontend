@@ -13,6 +13,8 @@ interface StaticQrResultsProps {
   readonly error: boolean
   readonly data?: Page<StaticQrRow>
   readonly page: number
+  readonly columnOrder: readonly string[]
+  readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly onViewQr?: (row: StaticQrRow) => void
@@ -21,7 +23,8 @@ interface StaticQrResultsProps {
 }
 
 export function StaticQrResults({ terminalConfirmed, pending, error, data,
-  page, onRetry, onPageChange, onViewQr, onViewDetails, headerActions }: StaticQrResultsProps) {
+  page, columnOrder, visibleColumnIds, onRetry, onPageChange,
+  onViewQr, onViewDetails, headerActions }: StaticQrResultsProps) {
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Statik QR ro‘yxati</CardTitle>
@@ -37,6 +40,8 @@ export function StaticQrResults({ terminalConfirmed, pending, error, data,
                 : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Statik QR jadvali">
           <StaticQrTable rows={data.content}
+            columnOrder={columnOrder}
+            visibleColumnIds={visibleColumnIds}
             onViewQr={onViewQr ?? (() => undefined)}
             onViewDetails={onViewDetails ?? (() => undefined)} />
         </TableScrollRegion>

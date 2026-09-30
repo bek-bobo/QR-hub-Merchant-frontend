@@ -10,6 +10,8 @@ import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { applyStaticTerminal, clearStaticTerminal,
   defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
 import { createStaticQrQueryOptions } from './query'
@@ -17,6 +19,7 @@ import { StaticQrResults } from './StaticQrResults'
 import type { StaticQrRow } from './contract'
 import { StaticQrDisplayDialog } from './StaticQrDisplayDialog'
 import { StaticQrDetailsSheet } from './StaticQrDetailsSheet'
+import { staticQrColumns } from './columns'
 
 interface StaticQrFiltersProps {
   readonly draftTerminal: string
@@ -58,6 +61,10 @@ export function StaticQrPage() {
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
   const [selectedQrRow, setSelectedQrRow] = useState<StaticQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<StaticQrRow | null>(null)
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: 'staticQr',
+    columns: staticQrColumns,
+  })
   const base = validateWebBaseUrl(import.meta.env.VITE_WEB_API_BASE_URL,
     import.meta.env.DEV ? 'development' : 'production')
   const baseUrl = base.kind === 'valid' ? base.value : null
@@ -105,6 +112,8 @@ export function StaticQrPage() {
     }} />
     <StaticQrResults terminalConfirmed={selectedValid} pending={list.isPending}
       error={list.isError} data={list.data} page={applied.page}
+      columnOrder={columnPreferences.order}
+      visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => ({ ...current, page }))}
       onViewQr={setSelectedQrRow}
@@ -125,6 +134,19 @@ export function StaticQrPage() {
             onDraftTerminalChange={setDraftTerminal}
           />
         </FilterDrawer>
+        <TableColumnPreferences
+          tableLabel="Statik QR"
+          items={staticQrColumns}
+          order={columnPreferences.order}
+          hidden={columnPreferences.hidden}
+          iconOnly
+          onMoveUp={columnPreferences.moveUp}
+          onMoveDown={columnPreferences.moveDown}
+          onMove={columnPreferences.move}
+          onToggleVisibility={columnPreferences.toggleVisibility}
+          canHide={columnPreferences.canHide}
+          onReset={columnPreferences.reset}
+        />
         <RefreshIconButton
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!selectedValid || list.isFetching}

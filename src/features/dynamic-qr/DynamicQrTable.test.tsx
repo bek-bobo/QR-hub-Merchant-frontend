@@ -38,6 +38,7 @@ describe('DynamicQrTable column preferences pilot', () => {
   it('keeps the production default header order', () => {
     const html = renderToStaticMarkup(
       <DynamicQrTableContent rows={[row]} columnOrder={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
+        visibleColumnIds={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
         onViewQr={onViewQr} onViewDetails={onViewDetails} />,
     )
     expect(cellTexts(html, 'th')).toEqual([
@@ -45,10 +46,11 @@ describe('DynamicQrTable column preferences pilot', () => {
     ])
   })
 
-  it('uses one resolved order for both headers and body cells', () => {
+  it('renders a drag-reordered state consistently in headers and body cells', () => {
     const order = ['rrn', 'status', 'amount', 'merchant', 'terminal', 'createdAt', 'qrId'] as const
     const html = renderToStaticMarkup(
       <DynamicQrTableContent rows={[row]} columnOrder={order}
+        visibleColumnIds={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
         onViewQr={onViewQr} onViewDetails={onViewDetails} />,
     )
 
@@ -65,6 +67,7 @@ describe('DynamicQrTable column preferences pilot', () => {
     const before = JSON.stringify(row)
     const html = renderToStaticMarkup(
       <DynamicQrTableContent rows={[row]} columnOrder={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
+        visibleColumnIds={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
         onViewQr={onViewQr} onViewDetails={onViewDetails} />,
     )
 
@@ -77,10 +80,26 @@ describe('DynamicQrTable column preferences pilot', () => {
   it('keeps QR viewing fixed after every reorderable business column', () => {
     const html = renderToStaticMarkup(
       <DynamicQrTableContent rows={[row]} columnOrder={['rrn', 'qrId']}
+        visibleColumnIds={DYNAMIC_QR_DEFAULT_COLUMN_ORDER}
         onViewQr={onViewQr} onViewDetails={onViewDetails} />,
     )
     const headers = cellTexts(html, 'th')
     expect(headers[headers.length - 1]).toBe('Amallar')
     expect(html).toContain('aria-label="Amallarni ochish"')
+  })
+
+  it('renders only visible business columns in their persisted order', () => {
+    const html = renderToStaticMarkup(
+      <DynamicQrTableContent
+        rows={[row]}
+        columnOrder={['rrn', 'status', 'amount', 'merchant', 'terminal', 'createdAt', 'qrId']}
+        visibleColumnIds={['createdAt', 'qrId', 'rrn']}
+        onViewQr={onViewQr}
+        onViewDetails={onViewDetails}
+      />,
+    )
+
+    expect(cellTexts(html, 'th')).toEqual(['RRN', 'Yaratilgan vaqt', 'QR ID', 'Amallar'])
+    expect(cellTexts(html, 'td')).toEqual(['RRN-1', '17.09.2026 10:20', 'qr-row-1', ''])
   })
 })

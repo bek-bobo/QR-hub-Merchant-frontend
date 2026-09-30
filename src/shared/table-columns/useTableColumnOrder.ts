@@ -1,17 +1,7 @@
-import { useCallback, useState } from 'react'
-import {
-  defaultColumnOrder,
-  moveColumnDown,
-  moveColumnUp,
-  normalizeColumnOrder,
-} from './order'
-import {
-  getBrowserTableColumnStorage,
-  readTableColumnOrder,
-  resetTableColumnOrder,
-  writeTableColumnOrder,
-  type TableColumnStorage,
-} from './storage'
+import { useState } from 'react'
+import { defaultColumnOrder } from './order'
+import type { TableColumnStorage } from './storage'
+import { useTableColumnPreferences } from './useTableColumnPreferences'
 
 interface UseTableColumnOrderOptions {
   readonly tableKey: string
@@ -20,46 +10,32 @@ interface UseTableColumnOrderOptions {
   readonly storage?: TableColumnStorage
 }
 
-function ordersMatch(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((id, index) => id === right[index])
-}
-
 export function useTableColumnOrder({
   tableKey,
   defaultOrder,
   fixedIds = [],
   storage,
 }: UseTableColumnOrderOptions) {
-  const [resolvedStorage] = useState<TableColumnStorage | undefined>(
-    () => storage ?? getBrowserTableColumnStorage(),
-  )
-  const [resolvedDefault] = useState(() => defaultColumnOrder(defaultOrder, fixedIds))
-  const [order, setOrder] = useState(() => {
-    return normalizeColumnOrder({
-      defaultOrder: resolvedDefault,
-      savedOrder: readTableColumnOrder(resolvedStorage, tableKey),
-    })
+  const [columns] = useState(() => {
+    return defaultColumnOrder(defaultOrder, fixedIds).map((id) => ({
+      id,
+      label: id,
+      defaultVisible: true,
+      hideable: true,
+      reorderable: true,
+    }))
+  })
+  const preferences = useTableColumnPreferences({
+    tableKey,
+    columns,
+    fixedIds,
+    storage,
   })
 
-  const applyExplicitOrder = useCallback((next: string[]) => {
-    if (ordersMatch(order, next)) return
-    setOrder(next)
-    writeTableColumnOrder(resolvedStorage, tableKey, next)
-  }, [order, resolvedStorage, tableKey])
-
-  const moveUp = useCallback((columnId: string) => {
-    applyExplicitOrder(moveColumnUp(order, columnId))
-  }, [applyExplicitOrder, order])
-
-  const moveDown = useCallback((columnId: string) => {
-    applyExplicitOrder(moveColumnDown(order, columnId))
-  }, [applyExplicitOrder, order])
-
-  const reset = useCallback(() => {
-    const next = [...resolvedDefault]
-    setOrder(next)
-    resetTableColumnOrder(resolvedStorage, tableKey)
-  }, [resolvedDefault, resolvedStorage, tableKey])
-
-  return { order, moveUp, moveDown, reset } as const
+  return {
+    order: preferences.order,
+    moveUp: preferences.moveUp,
+    moveDown: preferences.moveDown,
+    reset: preferences.reset,
+  } as const
 }

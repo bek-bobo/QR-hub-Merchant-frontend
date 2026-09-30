@@ -6,6 +6,7 @@ import { presentCreateResult, liveCreateLinkSchemes } from '@/features/dynamic-q
 import { CreateQrResult } from '@/features/dynamic-qr/CreateQrResult'
 import { createCancelQrController, productionCancelGate } from '@/features/dynamic-qr/cancel-qr'
 import { StaticQrResults } from '@/features/static-qr/StaticQrResults'
+import { STATIC_QR_DEFAULT_COLUMN_ORDER } from '@/features/static-qr/columns'
 import { getStaticTerminalState } from '@/features/static-qr/page-state'
 import { resolveSafeReturnTo } from '@/app/safe-return-to'
 import { liveFeatureRouteDefinitions } from '@/app/live-route-policy'
@@ -184,7 +185,10 @@ describe('D4 static preview data', () => {
   it('keeps arbitrary status raw and never exposes a canonical link', () => {
     const page = staticDemoPage('STATIC_UNKNOWN_STATUS', 0, 10)
     const html = renderToString(createElement(StaticQrResults, { terminalConfirmed: true,
-      pending: false, error: false, data: page, page: 0, onRetry: () => undefined,
+      pending: false, error: false, data: page, page: 0,
+      columnOrder: STATIC_QR_DEFAULT_COLUMN_ORDER,
+      visibleColumnIds: STATIC_QR_DEFAULT_COLUMN_ORDER,
+      onRetry: () => undefined,
       onPageChange: () => undefined }))
     expect(page.content[0]?.statusCode).toBe(777)
     expect(html).toContain('>Noma’lum<')
@@ -203,7 +207,10 @@ describe('D4 static preview data', () => {
       .toBe('unconfirmed')
     const render = (props: Partial<Parameters<typeof StaticQrResults>[0]>) => renderToString(
       createElement(StaticQrResults, { terminalConfirmed: true, pending: false, error: false,
-        data: staticDemoPage('STATIC_NORMAL', 0, 10), page: 0, onRetry: () => undefined,
+        data: staticDemoPage('STATIC_NORMAL', 0, 10), page: 0,
+        columnOrder: STATIC_QR_DEFAULT_COLUMN_ORDER,
+        visibleColumnIds: STATIC_QR_DEFAULT_COLUMN_ORDER,
+        onRetry: () => undefined,
         onPageChange: () => undefined, ...props }))
     expect(render({ terminalConfirmed: false })).not.toContain('D4-QR-DEMO-STATIC-001')
     expect(render({ error: true, data: undefined })).not.toContain('Statik QR topilmadi')

@@ -9,6 +9,7 @@ import { CreateQrResult } from '@/features/dynamic-qr/CreateQrResult'
 import { presentCreateResult } from '@/features/dynamic-qr/create-result'
 import { handoffXlsxDownload } from '@/features/dynamic-qr/export-download'
 import { StaticQrResults } from '@/features/static-qr/StaticQrResults'
+import { STATIC_QR_DEFAULT_COLUMN_ORDER } from '@/features/static-qr/columns'
 import { applyStaticTerminal, clearStaticTerminal,
   getStaticTerminalState, type StaticQrFilters } from '@/features/static-qr/page-state'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
@@ -193,7 +194,10 @@ function StaticScenarioView({ scenario }: { readonly scenario: StaticScenario })
     </div>
     {!lookupAvailable ? <p role="status" className="text-sm">Terminal lookup mavjud emas; qo‘llangan filtr avtomatik tozalanmaydi.</p> : null}
     <StaticQrResults terminalConfirmed={confirmed} pending={false} error={scenario === 'STATIC_ERROR'}
-      data={data} page={filters.page} onRetry={() => undefined}
+      data={data} page={filters.page}
+      columnOrder={STATIC_QR_DEFAULT_COLUMN_ORDER}
+      visibleColumnIds={STATIC_QR_DEFAULT_COLUMN_ORDER}
+      onRetry={() => undefined}
       onPageChange={(page) => setFilters((current) => ({ ...current, page }))} />
   </CardContent></Card>
 }

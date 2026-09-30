@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from './contract'
+import { STATIC_QR_DEFAULT_COLUMN_ORDER } from './columns'
 import { StaticQrResults } from './StaticQrResults'
 
 const data: Page<StaticQrRow> = {
@@ -22,6 +23,8 @@ const data: Page<StaticQrRow> = {
 function resultProps(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) {
   return {
     terminalConfirmed: true, pending: false, error: false, data, page: 0,
+    columnOrder: STATIC_QR_DEFAULT_COLUMN_ORDER,
+    visibleColumnIds: STATIC_QR_DEFAULT_COLUMN_ORDER,
     onRetry: () => undefined, onPageChange: () => undefined, ...overrides,
   }
 }

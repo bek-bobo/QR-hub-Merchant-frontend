@@ -107,3 +107,18 @@ export function moveColumnUp(order: readonly string[], columnId: string): string
 export function moveColumnDown(order: readonly string[], columnId: string): string[] {
   return moveColumn(order, columnId, 1)
 }
+
+export function moveColumnToTarget(
+  order: readonly string[],
+  sourceId: string,
+  targetId: string,
+): string[] {
+  const sourceIndex = order.indexOf(sourceId)
+  const targetIndex = order.indexOf(targetId)
+  if (sourceId === targetId || sourceIndex < 0 || targetIndex < 0) return [...order]
+
+  const next = [...order]
+  const [column] = next.splice(sourceIndex, 1)
+  next.splice(targetIndex, 0, column)
+  return next
+}
