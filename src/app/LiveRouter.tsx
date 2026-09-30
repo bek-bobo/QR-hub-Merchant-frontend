@@ -17,7 +17,7 @@ import {
   type LiveFeatureRoute as LiveFeatureRouteName,
 } from '@/app/live-route-policy'
 import { buildLiveLoginLandingContext, resolveLoginLanding } from '@/app/login-landing'
-import { getLiveNavigationItems } from '@/app/navigation'
+import { getVisibleLiveNavigationItems } from '@/app/navigation'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { resolveLiveRootRoute } from '@/app/root-route'
 import { AccountPage } from '@/features/account/AccountPage'
@@ -60,7 +60,7 @@ function LiveShell({
   const access = useAccessContext()
   const runtime = useReadRuntime()
   const { actions, pending, profile } = useAuth()
-  const visibleItems = getLiveNavigationItems(access, runtime.readiness)
+  const visibleItems = getVisibleLiveNavigationItems(access, runtime.readiness)
   const identityLabel =
     profile?.fullname?.trim() ||
     (profile?.phone ? `+${profile.phone}` : 'Merchant foydalanuvchi')

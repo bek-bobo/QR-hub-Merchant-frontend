@@ -1,9 +1,8 @@
-import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { copyExactCreateLink, type CreateResultModel } from './create-result'
-import { PaymentQrCode } from './PaymentQrCode'
+import { QrPresentation } from './QrPresentation'
 
 interface CreateQrResultProps {
   readonly result: CreateResultModel
@@ -11,6 +10,7 @@ interface CreateQrResultProps {
   readonly canCreate: () => boolean
   readonly onClose: () => void
   readonly onNewIntent: () => void
+  readonly showHeading?: boolean
 }
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
@@ -18,48 +18,52 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
     left.accessRevision === right.accessRevision
 }
 
-export function CreateQrResult({ result, currentScope, canCreate, onClose, onNewIntent }: CreateQrResultProps) {
-  const [copyStatus, setCopyStatus] = useState<string | null>(null)
+export function CreateQrResult({ result, currentScope, canCreate, onClose, onNewIntent, showHeading = true }: CreateQrResultProps) {
   if (!sameScope(result.scope, currentScope()) || !canCreate()) return null
 
   async function copyLink() {
-    const outcome = await copyExactCreateLink({
+    return copyExactCreateLink({
       result, currentScope, canCreate,
       writeText: async (text) => {
         if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
         await navigator.clipboard.writeText(text)
       },
     })
-    if (outcome === 'stale') return
-    setCopyStatus(outcome === 'copied' ? 'Havola nusxalandi.' : 'Havolani nusxalab bo‘lmadi.')
   }
 
-  return <section role={result.kind === 'confirmed' ? 'status' : 'alert'}
-    className="space-y-3 rounded-lg border bg-surface p-4">
+  return <section role={result.kind === 'confirmed' ? 'status' : 'alert'} className="space-y-4">
     {result.kind === 'confirmed' ? <>
-      <h3 className="text-lg font-semibold">QR yaratildi</h3>
-      <dl className="grid gap-2 text-sm">
-        <div><dt className="text-text-secondary">QR ID</dt><dd className="break-all">{result.pkey}</dd></div>
-        <div><dt className="text-text-secondary">Terminal</dt><dd>{result.terminalName}</dd></div>
-        <div><dt className="text-text-secondary">Summa</dt><dd>{formatMoney({ minorUnits: result.amountMinor, currency: result.currencyCode, scale: 2 })}</dd></div>
-      </dl>
-      {result.link.kind === 'available' ? <>
-        <PaymentQrCode validatedLink={result.link} />
-        <p className="break-all text-sm">{result.link.original}</p>
-        <Button type="button" variant="outline" onClick={() => void copyLink()}>Havolani nusxalash</Button>
-      </> : <p role="status" className="text-sm text-text-secondary">QR yaratildi, lekin havolani xavfsiz ko‘rsatib bo‘lmadi.</p>}
+      {showHeading ? <div>
+        <h3 className="text-xl font-semibold text-text-primary">QR ko‘rsatish</h3>
+        <p className="mt-1 text-sm text-text-secondary">Dinamik QR muvaffaqiyatli yaratildi.</p>
+      </div> : null}
+      <QrPresentation
+        qrId={result.pkey}
+        terminalName={result.terminalName}
+        amountLabel={formatMoney({ minorUnits: result.amountMinor, currency: result.currencyCode, scale: 2 })}
+        link={result.link}
+        unavailableMessage="QR yaratildi, lekin havolani xavfsiz ko‘rsatib bo‘lmadi."
+        onCopy={copyLink}
+        footer={<>
+          <Button type="button" variant="outline" onClick={onClose}>Yopish</Button>
+          <Button type="button" onClick={onNewIntent}>Yangi QR</Button>
+        </>}
+      />
     </> : result.kind === 'unknown' ? <>
-      <h3 className="text-lg font-semibold">Natija tasdiqlanmadi</h3>
-      <p className="text-sm">Qayta yuborishdan oldin holatni tekshiring.</p>
-      <p className="text-sm text-text-secondary">Yangi urinish alohida QR yaratishi mumkin.</p>
+      <div className="rounded-xl border bg-muted/40 p-4">
+        {showHeading ? <h3 className="text-lg font-semibold">Natija tasdiqlanmadi</h3> : null}
+        <p className="mt-2 text-sm">Qayta yuborishdan oldin holatni tekshiring.</p>
+        <p className="mt-1 text-sm text-text-secondary">Yangi urinish alohida QR yaratishi mumkin.</p>
+      </div>
     </> : <>
-      <h3 className="text-lg font-semibold">QR yaratilmadi</h3>
-      <p className="text-sm">{result.reason}</p>
+      <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
+        {showHeading ? <h3 className="text-lg font-semibold">QR yaratilmadi</h3> : null}
+        <p className="mt-2 text-sm">{result.reason}</p>
+      </div>
     </>}
-    {copyStatus ? <p role="status" className="text-sm">{copyStatus}</p> : null}
-    <div className="flex flex-wrap gap-2">
+    {result.kind !== 'confirmed' ? <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
       <Button type="button" variant="outline" onClick={onClose}>Yopish</Button>
       <Button type="button" variant="secondary" onClick={onNewIntent}>Yangi QR</Button>
-    </div>
+    </div> : null}
   </section>
 }

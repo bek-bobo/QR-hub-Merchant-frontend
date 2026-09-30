@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Link } from 'react-router'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
 import { HandCoinsIcon, RefreshCwIcon, WalletCardsIcon } from 'lucide-react'
@@ -10,10 +9,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import type {
   DynamicQrFilters,
+  DynamicQrRow,
 } from '@/shared/contracts/merchant-read'
 import {
   EmptyState,
@@ -24,30 +22,29 @@ import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useTableColumnOrder } from '@/shared/table-columns/useTableColumnOrder'
-import { applyQrFilters, type DynamicQrFilterDraft } from './filters'
+import { DynamicQrAdvancedFilterFields } from './DynamicQrAdvancedFilterFields'
+import { DynamicQrQuickFilters } from './DynamicQrQuickFilters'
 import { DynamicQrTable } from './DynamicQrTable'
 import {
   DYNAMIC_QR_DEFAULT_COLUMN_ORDER,
   dynamicQrColumns,
 } from './columns'
 import { ExportButton } from './ExportButton'
+import { CreateQrDialog } from './CreateQrDialog'
+import { QrDisplayDialog } from './QrDisplayDialog'
 import {
   changeDynamicQrPage,
   createDefaultDynamicQrFilters,
   parseDashboardDynamicQrState,
-  parseQrStatusInput,
 } from './page-state'
 import { useDynamicQrReadQueries } from './queries'
 import { formatInstantTime } from '@/shared/presentation/date-time'
-
-const statusOptions = [
-  { value: '', label: 'Barchasi' },
-  { value: '0', label: 'Yangi' },
-  { value: '10', label: 'Jarayonda' },
-  { value: '50', label: 'Muvaffaqiyatli' },
-  { value: '5', label: 'Muddati o‘tgan' },
-  { value: '20', label: 'Bekor qilingan' },
-] as const
+import {
+  applyDynamicQrAdvancedFilters,
+  applyDynamicQrDateQuickFilter,
+  applyDynamicQrSearchQuickFilter,
+  type DynamicQrAdvancedFilterDraft,
+} from './quick-filters'
 
 interface DynamicQrPageProps {
   readonly initialState?: unknown
@@ -87,9 +84,18 @@ export function DynamicQrPage({
   const [initialFilters] = useState(() =>
     initialFiltersFromState(initialState, initialInstant ?? new Date()),
   )
-  const [draft, setDraft] = useState<DynamicQrFilterDraft>(initialFilters)
+  const [advancedDraft, setAdvancedDraft] = useState<DynamicQrAdvancedFilterDraft>(() => ({
+    terminalId: initialFilters.terminalId,
+    status: initialFilters.status,
+  }))
+  const [dateDraft, setDateDraft] = useState(() => ({
+    fromDate: initialFilters.fromDate,
+    toDate: initialFilters.toDate,
+  }))
+  const [searchDraft, setSearchDraft] = useState(initialFilters.search)
   const [applied, setApplied] = useState<DynamicQrFilters>(initialFilters)
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [createOpen, setCreateOpen] = useState(false)
+  const [selectedQrRow, setSelectedQrRow] = useState<DynamicQrRow | null>(null)
   const queries = useDynamicQrReadQueries(applied)
   const { runtime, terminals, list, terminalFilterState, enabled } = queries
   const columnOrder = useTableColumnOrder({
@@ -98,23 +104,38 @@ export function DynamicQrPage({
   })
 
   function applyFilters(): boolean {
-    try {
-      const next = applyQrFilters(draft)
-      setDraft(next)
-      setApplied(next)
-      setValidationMessage(null)
-      return true
-    } catch {
-      setValidationMessage('Sana oralig‘ini to‘g‘ri kiriting.')
-      return false
+    const nextDraft = {
+      terminalId: advancedDraft.terminalId?.trim() || undefined,
+      status: advancedDraft.status,
     }
+    setAdvancedDraft(nextDraft)
+    setApplied((current) => applyDynamicQrAdvancedFilters(current, nextDraft))
+    return true
   }
 
   function clearFilters() {
     const next = createDefaultDynamicQrFilters(initialInstant ?? new Date())
-    setDraft(next)
+    setAdvancedDraft({ terminalId: next.terminalId, status: next.status })
+    setDateDraft({ fromDate: next.fromDate, toDate: next.toDate })
+    setSearchDraft(next.search)
     setApplied(next)
-    setValidationMessage(null)
+  }
+
+  function applyQuickDateRange(range: Pick<DynamicQrFilters, 'fromDate' | 'toDate'>) {
+    setDateDraft(range)
+    setApplied((current) => applyDynamicQrDateQuickFilter(current, range) ?? current)
+  }
+
+  function restoreQuickDateRange() {
+    const defaults = createDefaultDynamicQrFilters(initialInstant ?? new Date())
+    const range = { fromDate: defaults.fromDate, toDate: defaults.toDate }
+    setDateDraft(range)
+    setApplied((current) => applyDynamicQrDateQuickFilter(current, range) ?? current)
+  }
+
+  function applyQuickSearch(search: string) {
+    setSearchDraft(search.trim())
+    setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
   }
 
   function goToPage(page: number) {
@@ -129,84 +150,18 @@ export function DynamicQrPage({
         onReset={clearFilters}
         triggerSize="sm"
       >
-        <div className="grid gap-4">
-          <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-            Boshlanish sanasi
-            <Input
-              type="date"
-              value={draft.fromDate}
-              aria-invalid={Boolean(validationMessage)}
-              onChange={(event) =>
-                setDraft({ ...draft, fromDate: event.target.value })
-              }
-            />
-          </label>
-          <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-            Tugash sanasi
-            <Input
-              type="date"
-              value={draft.toDate}
-              aria-invalid={Boolean(validationMessage)}
-              onChange={(event) =>
-                setDraft({ ...draft, toDate: event.target.value })
-              }
-            />
-          </label>
-          <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-            Terminal
-            <Select
-              value={draft.terminalId ?? ''}
-              disabled={!enabled.terminals || terminals.isPending}
-              onChange={(event) =>
-                setDraft({
-                  ...draft,
-                  terminalId: event.target.value || undefined,
-                })
-              }
-            >
-              <option value="">Barcha terminallar</option>
-              {terminals.data?.map((terminal) => (
-                <option key={terminal.id} value={terminal.id}>
-                  {terminal.name}
-                </option>
-              ))}
-            </Select>
-          </label>
-          <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-            Status
-            <Select
-              value={draft.status === undefined ? '' : String(draft.status)}
-              onChange={(event) =>
-                setDraft({
-                  ...draft,
-                  status: parseQrStatusInput(event.target.value),
-                })
-              }
-            >
-              {statusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </Select>
-          </label>
-        </div>
-        <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-          Qidiruv
-          <Input
-            type="search"
-            value={draft.search}
-            placeholder="Terminal nomi bo‘yicha"
-            onChange={(event) =>
-              setDraft({ ...draft, search: event.target.value })
-            }
-          />
-        </label>
-        {validationMessage ? (
-          <p role="alert" className="text-sm text-destructive">
-            {validationMessage}
-          </p>
-        ) : null}
+        <DynamicQrAdvancedFilterFields
+          terminalId={advancedDraft.terminalId}
+          status={advancedDraft.status}
+          terminals={terminals.data}
+          terminalsDisabled={!enabled.terminals || terminals.isPending}
+          onTerminalChange={(terminalId) =>
+            setAdvancedDraft((current) => ({ ...current, terminalId }))
+          }
+          onStatusChange={(status) =>
+            setAdvancedDraft((current) => ({ ...current, status }))
+          }
+        />
         {!enabled.terminals ? (
           <p className="text-sm text-text-secondary">
             {applied.terminalId
@@ -230,48 +185,71 @@ export function DynamicQrPage({
     )
   }
 
+  function renderQuickFilters() {
+    return (
+      <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <DynamicQrQuickFilters
+          range={dateDraft}
+          searchDraft={searchDraft}
+          onRangeDraftChange={setDateDraft}
+          onRangeApply={applyQuickDateRange}
+          onRangeReset={restoreQuickDateRange}
+          onSearchDraftChange={setSearchDraft}
+          onSearchApply={applyQuickSearch}
+        />
+        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+          <ExportButton applied={applied} terminalValid={terminalFilterState === 'valid'} compact />
+          {renderFilterDrawer()}
+        </div>
+      </div>
+    )
+  }
+
   function renderTableHeaderActions() {
     return (
-      <div className="flex min-w-0 flex-col gap-2 sm:items-end">
-        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-          {can(access, 'dynamicQr.create', false) ? (
-            <Button asChild size="sm">
-              <Link to="/dynamic-qrs/new">Yangi QR yaratish</Link>
-            </Button>
+      <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+        {can(access, 'dynamicQr.create', false) ? (
+          <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>Yangi QR yaratish</Button>
+        ) : null}
+        <div className="flex min-w-0 items-center gap-2">
+          {list.dataUpdatedAt > 0 ? (
+            <span className="whitespace-nowrap text-xs text-text-secondary">
+              Yangilangan: {formatInstantTime(list.dataUpdatedAt)}
+            </span>
           ) : null}
-          <ExportButton
-            applied={applied}
-            terminalValid={terminalFilterState === 'valid'}
-            compact
-          />
-          {renderFilterDrawer()}
           <TableColumnPreferences
             tableLabel="Dinamik QR"
             items={dynamicQrColumns}
             order={columnOrder.order}
+            iconOnly
             onMoveUp={columnOrder.moveUp}
             onMoveDown={columnOrder.moveDown}
             onReset={columnOrder.reset}
           />
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            disabled={!enabled.list || list.isFetching}
-            onClick={() => void list.refetch()}
-          >
-            <RefreshCwIcon
-              aria-hidden="true"
-              className={list.isFetching ? 'animate-spin' : ''}
-            />
-            Yangilash
-          </Button>
+          <div className="group relative inline-flex">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              aria-label="Yangilash"
+              aria-describedby="dynamic-qr-refresh-tooltip"
+              disabled={!enabled.list || list.isFetching}
+              onClick={() => void list.refetch()}
+            >
+              <RefreshCwIcon
+                aria-hidden="true"
+                className={list.isFetching ? 'animate-spin' : ''}
+              />
+            </Button>
+            <span
+              id="dynamic-qr-refresh-tooltip"
+              role="tooltip"
+              className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+            >
+              Yangilangan vaqt
+            </span>
+          </div>
         </div>
-        {list.dataUpdatedAt > 0 ? (
-          <span className="text-xs text-text-secondary">
-            Yangilangan: {formatInstantTime(list.dataUpdatedAt)}
-          </span>
-        ) : null}
       </div>
     )
   }
@@ -297,6 +275,10 @@ export function DynamicQrPage({
 
   return (
     <div className="min-w-0 space-y-4">
+      <CreateQrDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <QrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
+        if (!open) setSelectedQrRow(null)
+      }} />
       <Card className="min-w-0 overflow-hidden">
         <CardContent className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
           <section className="min-w-0 rounded-xl border border-brand/15 bg-brand-soft/60 p-4">
@@ -332,8 +314,9 @@ export function DynamicQrPage({
             <CardTitle>Dinamik QR ro‘yxati</CardTitle>
             {renderTableHeaderActions()}
           </CardHeader>
-          <CardContent className="text-sm text-text-secondary">
-            Tanlangan terminal filtri tekshirilmoqda.
+          <CardContent className="space-y-4 text-sm text-text-secondary">
+            {renderQuickFilters()}
+            <p>Tanlangan terminal filtri tekshirilmoqda.</p>
           </CardContent>
         </Card>
       ) : terminalFilterState === 'invalid' ? (
@@ -343,6 +326,7 @@ export function DynamicQrPage({
             {renderTableHeaderActions()}
           </CardHeader>
           <CardContent className="space-y-3">
+            {renderQuickFilters()}
             <div>
               <p className="font-medium text-text-primary">
                 Terminal filtri endi mavjud emas
@@ -361,6 +345,7 @@ export function DynamicQrPage({
             {renderTableHeaderActions()}
           </CardHeader>
           <CardContent className="min-w-0 space-y-4">
+            {renderQuickFilters()}
             {list.isPending ? (
               <ListSkeleton />
             ) : list.isError && !list.data ? (
@@ -376,6 +361,7 @@ export function DynamicQrPage({
               <DynamicQrTable
                 rows={list.data.content}
                 columnOrder={columnOrder.order}
+                onViewQr={setSelectedQrRow}
               />
             ) : null}
 

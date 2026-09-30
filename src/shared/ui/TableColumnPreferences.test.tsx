@@ -29,6 +29,26 @@ describe('TableColumnPreferences', () => {
     expect(html).toContain('>Jadval ustunlari</button>')
   })
 
+  it('renders an opt-in icon-only trigger with an accessible hover and focus tooltip', () => {
+    const html = renderToStaticMarkup(
+      <TableColumnPreferences
+        tableLabel="Dinamik QR"
+        items={items}
+        order={items.map((item) => item.id)}
+        iconOnly
+        onMoveUp={() => undefined}
+        onMoveDown={() => undefined}
+        onReset={() => undefined}
+      />,
+    )
+
+    const trigger = html.match(/<button\b[^>]*aria-label="Jadval ustunlari"[^>]*>[\s\S]*?<\/button>/)?.[0]
+    expect(trigger).toBeDefined()
+    expect(trigger).not.toContain('>Jadval ustunlari<')
+    expect(html).toContain('role="tooltip"')
+    expect(html).toContain('>Jadval ustunlari</span>')
+  })
+
   it('renders understandable positions, move labels and boundaries', () => {
     const html = renderToStaticMarkup(
       <TableColumnPreferenceList

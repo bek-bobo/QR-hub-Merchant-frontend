@@ -34,10 +34,14 @@ describe('create result and link security policy', () => {
     expect(validateCreateLink(link, ['https:'])).toEqual({ kind: 'unavailable' })
   })
 
-  it('keeps the live link unavailable because backend source confirms no accepted scheme', () => {
-    expect(validateCreateLink(original)).toEqual({ kind: 'unavailable' })
+  it('keeps non-HTTPS links unavailable under the live policy', () => {
+    expect(validateCreateLink('http://example.test/pay')).toEqual({ kind: 'unavailable' })
+  })
+
+  it('accepts the exact canonical HTTPS create-response link under the live policy', () => {
+    expect(validateCreateLink(original)).toEqual({ kind: 'available', original })
     const result = presentCreateResult(confirmed)
-    expect(result).toMatchObject({ kind: 'confirmed', pkey: 'opaque-pkey', link: { kind: 'unavailable' } })
+    expect(result).toMatchObject({ kind: 'confirmed', pkey: 'opaque-pkey', link: { kind: 'available', original } })
   })
 
   it('renders confirmed QR creation data without claiming payment success or building a link from pkey', () => {
@@ -58,13 +62,13 @@ describe('create result and link security policy', () => {
     expect(result).toMatchObject({ kind: 'confirmed', pkey: 'opaque-pkey', link: { kind: 'unavailable' } })
   })
 
-  it('keeps the unconfirmed live link out of rendered text and link attributes', () => {
+  it('renders the exact canonical live link without constructing a URL from pkey', () => {
     const result = presentCreateResult(confirmed)!
     const html = renderToString(<CreateQrResult result={result} currentScope={() => scope}
       canCreate={() => true} onClose={() => undefined} onNewIntent={() => undefined} />)
-    expect(html).not.toContain(original)
+    expect(html).toContain('signature=a%2Bb')
     expect(html).not.toContain('href=')
-    expect(html).toContain('havolani xavfsiz ko‘rsatib bo‘lmadi')
+    expect(html).not.toContain('opaque-pkey/pay')
   })
 
   it('copies only the exact validated original after an explicit call and resolves success afterwards', async () => {
@@ -113,7 +117,9 @@ describe('create result and link security policy', () => {
   })
 
   it('never attempts copy for unavailable link', async () => {
-    const result = presentCreateResult(confirmed)!
+    const result = presentCreateResult({ ...confirmed, outcome: { kind: 'confirmed', data: {
+      pkey: 'opaque-pkey', link: 'http://example.test/pay',
+    } } })!
     let writes = 0
     expect(await copyExactCreateLink({ result, currentScope: () => scope, canCreate: () => true,
       writeText: async () => { writes++ } })).toBe('unavailable')

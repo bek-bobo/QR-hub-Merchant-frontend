@@ -31,6 +31,7 @@ function row(
   const terminal = d3TerminalOptions.find((item) => item.id === terminalId)!
   return Object.freeze({
     pkey: `D3-QR-DEMO-${String(sequence).padStart(3, '0')}`,
+    link: null,
     createdAt,
     terminalId,
     terminalName: terminal.name,

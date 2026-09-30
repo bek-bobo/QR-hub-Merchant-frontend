@@ -70,7 +70,7 @@ export function createDemoPort(scenario: ActionScenario, count: () => void): Cre
 const d4CancelAmount: Money = Object.freeze({ minorUnits: '100000', currency: 'UZS', scale: 2 })
 
 export const d4CancelRow: DynamicQrRow = Object.freeze({
-  pkey: 'D4-QR-DEMO-CANCEL-001', createdAt: '2026-09-15T07:00:00',
+  pkey: 'D4-QR-DEMO-CANCEL-001', link: null, createdAt: '2026-09-15T07:00:00',
   terminalName: 'D4 terminal', merchantName: 'D4 merchant', statusCode: 0, rrn: null,
   amount: d4CancelAmount,
 })

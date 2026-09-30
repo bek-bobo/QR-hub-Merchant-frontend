@@ -1,5 +1,6 @@
 import { createRef } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
+import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
 import { ThemeContext } from '@/shared/theme/ThemeContext'
 import { Header } from './Header'
@@ -55,22 +56,29 @@ describe('Header', () => {
     expect(html).toContain('truncate')
   })
 
-  it('renders compact account controls with identity, role, avatar, and icon logout', () => {
+  it('uses the avatar as the accessible account entry point and keeps identity in its tooltip', () => {
     const html = renderToStaticMarkup(
-      <ThemeContext.Provider
-        value={{ mode: 'dark', resolvedTheme: 'dark', setMode: vi.fn() }}
-      >
-        <Header
-          identityLabel="Behzod Yashinov"
-          identitySecondary="MERCHANT"
-          compactAccountControls
-          onLogout={vi.fn()}
-        />
-      </ThemeContext.Provider>,
+      <MemoryRouter>
+        <ThemeContext.Provider
+          value={{ mode: 'dark', resolvedTheme: 'dark', setMode: vi.fn() }}
+        >
+          <Header
+            identityLabel="Behzod Yashinov"
+            identitySecondary="MERCHANT"
+            compactAccountControls
+            onLogout={vi.fn()}
+          />
+        </ThemeContext.Provider>
+      </MemoryRouter>,
     )
 
-    expect(html).toContain('Behzod Yashinov')
-    expect(html).toContain('MERCHANT')
+    expect(html.match(/Behzod Yashinov/g)).toHaveLength(1)
+    expect(html.match(/MERCHANT/g)).toHaveLength(1)
+    expect(html).toContain('role="tooltip"')
+    expect(html).toContain('aria-describedby="account-avatar-tooltip"')
+    expect(html).toContain('aria-label="Hisobni ochish"')
+    expect(html).toContain('href="/account"')
+    expect(html).toContain('>B</span>')
     expect(html).toContain('aria-label="Ko‘rinish: Tungi. Keyingi rejimga o‘tish"')
     expect(html).toContain('aria-label="Chiqish"')
     expect(html).not.toContain('<select')

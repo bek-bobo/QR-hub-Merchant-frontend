@@ -21,11 +21,11 @@ describe('DashboardPageHeader', () => {
     expect(html).toContain('>Filtrlar</button>')
     expect(html).toContain('Oxirgi yangilanish: 17:44:58')
     expect(html).toContain('>Yangilash</button>')
+    expect(html.indexOf('Oxirgi yangilanish: 17:44:58')).toBeLessThan(
+      html.indexOf('>Filtrlar</button>'),
+    )
     expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(
       html.indexOf('>Yangilash</button>'),
-    )
-    expect(html.indexOf('>Yangilash</button>')).toBeLessThan(
-      html.indexOf('Oxirgi yangilanish: 17:44:58'),
     )
   })
 

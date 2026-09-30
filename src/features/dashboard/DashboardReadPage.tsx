@@ -21,7 +21,6 @@ import {
 } from '@/components/ui/table'
 import type {
   DashboardFilters,
-  DashboardView,
   Page,
   DynamicQrRow,
 } from '@/shared/contracts/merchant-read'
@@ -39,10 +38,10 @@ import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import { DashboardPageHeader } from './DashboardPageHeader'
 import { MetricCards } from './MetricCards'
+import { StatusDonut } from './StatusDonut'
 import {
   applyDashboardFilters,
   presentQrStatus,
-  reconcileDashboard,
   resetDashboardFilters,
 } from './presenters'
 import { useDashboardReadQueries } from './queries'
@@ -61,58 +60,6 @@ function DashboardSkeleton() {
       </div>
       <div className="h-72 animate-pulse rounded-xl bg-card ring-1 ring-foreground/10" />
     </div>
-  )
-}
-
-function StatusSummary({ pie, metrics }: Pick<DashboardView, 'pie' | 'metrics'>) {
-  const reconciliation = reconcileDashboard({ metrics, pie })
-  const items = [
-    { label: 'Muvaffaqiyatli', value: pie.success, tone: 'success' },
-    { label: 'Jarayonda', value: pie.processing, tone: 'warning' },
-    { label: 'Muvaffaqiyatsiz', value: pie.failed, tone: 'error' },
-  ] as const
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Statuslar</CardTitle>
-        <CardDescription>Dashboard endpointi qaytargan taqsimot</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <dl className="space-y-4">
-          {items.map((item) => (
-            <div
-              key={item.label}
-              className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4"
-            >
-              <dt className="flex items-center gap-2 text-sm text-text-secondary">
-                <span aria-hidden="true" className={`size-2 rounded-full ${statusToneClasses[item.tone].indicator}`} />
-                {item.label}
-              </dt>
-              <dd className="text-right">
-                <p className="font-semibold text-text-primary">
-                  {item.value.count.toLocaleString('uz-UZ')}
-                  {reconciliation.countMatches ? ` · ${item.value.percent.toLocaleString('uz-UZ')}%` : ''}
-                </p>
-                <p className="mt-1 text-xs text-text-secondary">
-                  {formatMoney(item.value.amount)}
-                </p>
-              </dd>
-            </div>
-          ))}
-        </dl>
-        {!reconciliation.countMatches ? (
-          <p role="note" className="mt-4 text-sm text-text-secondary">
-            Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.
-          </p>
-        ) : null}
-        {!reconciliation.amountMatches ? (
-          <p role="note" className="mt-2 text-sm text-text-secondary">
-            Kategoriyalar summasi jami summaga teng emas.
-          </p>
-        ) : null}
-      </CardContent>
-    </Card>
   )
 }
 
@@ -381,9 +328,9 @@ export function DashboardReadPage({
             </p>
           ) : null}
           <MetricCards metrics={dashboard.data.metrics} />
-          <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+          <div className="min-w-0 space-y-6">
             <TrendChart view={dashboard.data} />
-            <StatusSummary pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
+            <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>
         </>
       ) : null}

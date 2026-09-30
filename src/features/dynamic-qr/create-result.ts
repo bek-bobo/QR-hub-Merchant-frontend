@@ -6,8 +6,8 @@ export type LinkPresentation =
   | { readonly kind: 'available'; readonly original: string }
   | { readonly kind: 'unavailable' }
 
-/** The web service returns Core's String without a confirmed URL shape. */
-export const liveCreateLinkSchemes: readonly AcceptedLinkScheme[] = Object.freeze([])
+/** Product-approved live presentation accepts the canonical HTTPS link returned by create. */
+export const liveCreateLinkSchemes: readonly AcceptedLinkScheme[] = Object.freeze(['https:'])
 
 export function validateCreateLink(
   original: string,

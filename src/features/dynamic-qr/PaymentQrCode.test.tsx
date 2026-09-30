@@ -79,10 +79,12 @@ describe('payment QR presentation boundary', () => {
     expect(qrCalls).toHaveLength(0)
   })
 
-  it('keeps the live link policy closed even for an HTTPS fixture', () => {
+  it('uses the approved live HTTPS policy without mutating the canonical link', () => {
     const html = renderResult(presentCreateResult(confirmed)!)
-    expect(html).toContain('QR yaratildi')
-    expect(qrCalls).toHaveLength(0)
+    expect(html).toContain('QR ko‘rsatish')
+    expect(html).toContain('signature=a%2Bb')
+    expect(qrCalls).toHaveLength(1)
+    expect(qrCalls[0].value).toBe(original)
   })
 
   it('never renders QR for an unknown outcome', () => {

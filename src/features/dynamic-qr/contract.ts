@@ -36,6 +36,7 @@ function decodeRow(value: unknown): DynamicQrRow {
 
   return Object.freeze({
     pkey: requiredString(source.pkey),
+    link: typeof source.link === 'string' && source.link.length > 0 ? source.link : null,
     createdAt: isoLocalDateTime(source.createdAt),
     terminalName: requiredString(source.terminalName),
     merchantName: requiredString(source.merchantName),

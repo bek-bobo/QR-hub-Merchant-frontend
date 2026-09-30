@@ -113,3 +113,12 @@ export function getLiveNavigationItems(
         registrations[item.registration].kind === 'configured'),
   )
 }
+
+export function getVisibleLiveNavigationItems(
+  access: AccessContextValue,
+  registrations: ReadApiRegistrations,
+): readonly LiveNavigationItem[] {
+  return getLiveNavigationItems(access, registrations).filter(
+    (item) => item.path !== '/account',
+  )
+}

@@ -343,6 +343,7 @@ function buildDashboard(
 function publicRow(row: (typeof d3DynamicQrRows)[number]): DynamicQrRow {
   return Object.freeze({
     pkey: row.pkey,
+    link: row.link,
     createdAt: row.createdAt,
     terminalName: row.terminalName,
     merchantName: row.merchantName,

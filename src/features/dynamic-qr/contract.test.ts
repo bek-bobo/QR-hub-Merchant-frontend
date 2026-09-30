@@ -8,6 +8,7 @@ function response(statusCode: number, overrides: Record<string, unknown> = {}) {
       content: [
         {
           pkey: '0123456789abcdef0123456789abcdef',
+          link: 'https://qrhub.uz/ExactPath?type=02&case=MiXeD',
           terminalName: 'Terminal A',
           merchantName: 'Merchant A',
           amount: 100000,
@@ -58,6 +59,11 @@ describe('dynamic QR read contract', () => {
       scale: 2,
     })
     expect(decoded.content[0]?.rrn).toBeNull()
+    expect(decoded.content[0]?.link).toBe('https://qrhub.uz/ExactPath?type=02&case=MiXeD')
+  })
+
+  it.each([undefined, null, '', 42])('keeps an unavailable row link from breaking list decoding: %s', (link) => {
+    expect(decodeDynamicQrPageResponse(response(50, { link })).content[0]?.link).toBeNull()
   })
 
   it('preserves an unknown future integer status neutrally', () => {

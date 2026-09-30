@@ -19,6 +19,11 @@ export function DashboardPageHeader({
 }: DashboardPageHeaderProps) {
   return (
     <div className="flex min-w-0 flex-col gap-2 sm:items-end">
+      {updatedAt ? (
+        <span className="text-xs text-text-secondary">
+          Oxirgi yangilanish: {updatedAt}
+        </span>
+      ) : null}
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         {children}
         <Button
@@ -32,11 +37,6 @@ export function DashboardPageHeader({
           Yangilash
         </Button>
       </div>
-      {updatedAt ? (
-        <span className="text-xs text-text-secondary">
-          Oxirgi yangilanish: {updatedAt}
-        </span>
-      ) : null}
     </div>
   )
 }

@@ -42,7 +42,7 @@ describe('DEV-only D4 scenario registry', () => {
     expect(resolveSafeReturnTo('/dev/day4/actions')).toBe('/account')
     expect(resolveSafeReturnTo('/dev/day4/static-qrs')).toBe('/account')
     expect(resolveRuntimeMode('demo', false)).toBe('live')
-    expect(liveCreateLinkSchemes).toEqual([])
+    expect(liveCreateLinkSchemes).toEqual(['https:'])
     expect(productionCancelGate.port()).toBeNull()
     expect(productionCancelGate.eligibleRow(d4CancelRow)).toBe(false)
   })
@@ -77,18 +77,20 @@ describe('D4 create fake composition', () => {
     expect(demo.dispatches()).toBe(1)
   })
 
-  it('keeps confirmed creation while blocking default link/QR presentation', async () => {
-    const demo = create('CREATE_CONFIRMED_LINK_BLOCKED')
+  it('keeps confirmed creation and allows the approved HTTPS link under the live policy', async () => {
+    const demo = create('CREATE_CONFIRMED_SAFE_LINK')
     await demo.submit()
-    const blocked = presentCreateResult(demo.controller.getState())
-    expect(blocked?.kind).toBe('confirmed')
-    if (blocked?.kind !== 'confirmed') throw new Error('Missing confirmed result')
-    expect(blocked.link.kind).toBe('unavailable')
-    const html = renderToString(createElement(CreateQrResult, { result: blocked,
+    const confirmed = presentCreateResult(demo.controller.getState())
+    expect(confirmed?.kind).toBe('confirmed')
+    if (confirmed?.kind !== 'confirmed') throw new Error('Missing confirmed result')
+    expect(confirmed.link).toEqual({ kind: 'available', original: d4CreateLink })
+    const html = renderToString(createElement(CreateQrResult, { result: confirmed,
       currentScope: () => d4Scope, canCreate: () => true, onClose: () => undefined,
       onNewIntent: () => undefined }))
-    expect(html).not.toContain('<svg')
-    expect(html).not.toContain('Havolani nusxalash')
+    expect(html).toContain('<svg')
+    expect(html).toContain(d4CreateLink.replaceAll('&', '&amp;'))
+    expect(html).toContain('Havolani nusxalash')
+    expect(demo.dispatches()).toBe(1)
   })
 
   it('keeps unknown and denied results free of confirmed data or dispatch', async () => {

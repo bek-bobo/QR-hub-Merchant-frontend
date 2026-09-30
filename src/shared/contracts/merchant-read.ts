@@ -46,6 +46,7 @@ export type TerminalOption = Readonly<{ id: string; name: string }>
 
 export type DynamicQrRow = Readonly<{
   pkey: string
+  link: string | null
   createdAt: string
   terminalName: string
   merchantName: string

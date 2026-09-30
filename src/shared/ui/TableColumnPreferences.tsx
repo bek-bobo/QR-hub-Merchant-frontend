@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useId, useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -107,6 +107,7 @@ interface TableColumnPreferencesProps {
   readonly tableLabel: string
   readonly items: readonly TableColumnPreferenceItem[]
   readonly order: readonly string[]
+  readonly iconOnly?: boolean
   readonly onMoveUp: (columnId: string) => void
   readonly onMoveDown: (columnId: string) => void
   readonly onReset: () => void
@@ -116,11 +117,13 @@ export function TableColumnPreferences({
   tableLabel,
   items,
   order,
+  iconOnly = false,
   onMoveUp,
   onMoveDown,
   onReset,
 }: TableColumnPreferencesProps) {
   const [announcement, setAnnouncement] = useState('')
+  const tooltipId = useId()
   const itemById = new Map(items.map((item) => [item.id, item] as const))
 
   function announceMove(columnId: string, offset: -1 | 1) {
@@ -148,12 +151,29 @@ export function TableColumnPreferences({
 
   return (
     <Sheet>
-      <SheetTrigger asChild>
-        <Button type="button" variant="outline" size="sm">
-          <Columns3Icon aria-hidden="true" />
-          Jadval ustunlari
-        </Button>
-      </SheetTrigger>
+      <div className={iconOnly ? 'group relative inline-flex' : undefined}>
+        <SheetTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size={iconOnly ? 'icon-sm' : 'sm'}
+            aria-label={iconOnly ? 'Jadval ustunlari' : undefined}
+            aria-describedby={iconOnly ? tooltipId : undefined}
+          >
+            <Columns3Icon aria-hidden="true" />
+            {iconOnly ? null : 'Jadval ustunlari'}
+          </Button>
+        </SheetTrigger>
+        {iconOnly ? (
+          <span
+            id={tooltipId}
+            role="tooltip"
+            className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+          >
+            Jadval ustunlari
+          </span>
+        ) : null}
+      </div>
 
       <SheetContent
         side="right"

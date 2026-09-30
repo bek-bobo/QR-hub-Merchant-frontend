@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { AccessContextValue } from '@/shared/auth/access'
 import type { ReadApiRegistrations } from './read/createLiveReadApi'
-import { getLiveNavigationItems } from './navigation'
+import { getVisibleLiveNavigationItems as getLiveNavigationItems } from './navigation'
 
 const configured: ReadApiRegistrations = {
   dashboard: { kind: 'configured' },
@@ -20,22 +20,22 @@ function authenticated(...permissions: string[]): AccessContextValue {
 }
 
 describe('live navigation policy', () => {
-  it('shows exactly the four primary destinations in approved order', () => {
+  it('keeps the account route out of primary navigation', () => {
     expect(getLiveNavigationItems(authenticated(
       'GET_DASHBOARD', 'GET_DYNAMIC_QRS', 'GET_STATIC_QRS', 'GET_ME',
       'CREATE_DYNAMIC_QR', 'EXPORT_DYNAMIC_QRS',
     ), configured).map((item) => item.path)).toEqual([
-      '/dashboard', '/dynamic-qrs', '/static-qrs', '/account',
+      '/dashboard', '/dynamic-qrs', '/static-qrs',
     ])
   })
 
-  it('shows only exact granted and configured feature links plus account', () => {
+  it('shows only exact granted and configured feature links', () => {
     expect(
       getLiveNavigationItems(
         authenticated('GET_ME', 'GET_DASHBOARD', 'GET_DYNAMIC_QRS'),
         configured,
       ).map((item) => item.path),
-    ).toEqual(['/dashboard', '/dynamic-qrs', '/account'])
+    ).toEqual(['/dashboard', '/dynamic-qrs'])
   })
   it('matches the terminal route grant and registration, without dropdown permissions', () => {
     const ready = { ...configured, terminalList: { kind: 'configured' as const } }
@@ -72,7 +72,7 @@ describe('live navigation policy', () => {
         ...configured,
         dashboard: { kind: 'unavailable', reason: 'Not configured.' },
       }).map((item) => item.path),
-    ).toEqual(['/account'])
+    ).toEqual([])
   })
 
   it('hides a feature link when its capability is missing', () => {
@@ -80,7 +80,7 @@ describe('live navigation policy', () => {
       getLiveNavigationItems(authenticated('GET_ME'), configured).map(
         (item) => item.path,
       ),
-    ).toEqual(['/account'])
+    ).toEqual([])
   })
 
   it('keeps core links visible when terminal lookup is unavailable', () => {
@@ -104,7 +104,6 @@ describe('live navigation policy', () => {
     ['GET_DASHBOARD', '/dashboard'],
     ['GET_DYNAMIC_QRS', '/dynamic-qrs'],
     ['GET_STATIC_QRS', '/static-qrs'],
-    ['GET_ME', '/account'],
   ])('omits %s primary navigation without its exact grant', (missing, path) => {
     const permissions = [
       'GET_DASHBOARD', 'GET_DYNAMIC_QRS', 'GET_STATIC_QRS', 'GET_ME',
@@ -113,10 +112,10 @@ describe('live navigation policy', () => {
       .map((item) => item.path)).not.toContain(path)
   })
 
-  it('hides dynamic QR when its web registration is unavailable but keeps account', () => {
+  it('hides dynamic QR when its web registration is unavailable', () => {
     expect(getLiveNavigationItems(authenticated('GET_DYNAMIC_QRS', 'GET_ME'), {
       ...configured, dynamicQr: { kind: 'unavailable', reason: 'Not configured.' },
-    }).map((item) => item.path)).toEqual(['/account'])
+    }).map((item) => item.path)).toEqual([])
   })
 
   it('shows static navigation only for its exact grant and configured web base', () => {
