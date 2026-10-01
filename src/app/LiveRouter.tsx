@@ -20,17 +20,17 @@ import { buildLiveLoginLandingContext, resolveLoginLanding } from '@/app/login-l
 import { getVisibleLiveNavigationItems } from '@/app/navigation'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { resolveLiveRootRoute } from '@/app/root-route'
-import { AccountPage } from '@/features/account/AccountPage'
 import { LoginPage } from '@/features/auth/LoginPage'
-import { DashboardReadPage } from '@/features/dashboard/DashboardReadPage'
-import { DynamicQrPage } from '@/features/dynamic-qr/DynamicQrPage'
-import { CreateQrPage } from '@/features/dynamic-qr/CreateQrPage'
-import { ExportQrPage } from '@/features/dynamic-qr/ExportQrPage'
-import { StaticQrPage } from '@/features/static-qr/StaticQrPage'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { useAuth } from '@/shared/auth/useAuth'
 import { LoadingState } from '@/shared/ui/AsyncState'
 
+const AccountPage = lazy(() => import('@/features/account/AccountPage').then((module) => ({ default: module.AccountPage })))
+const DashboardReadPage = lazy(() => import('@/features/dashboard/DashboardReadPage').then((module) => ({ default: module.DashboardReadPage })))
+const DynamicQrPage = lazy(() => import('@/features/dynamic-qr/DynamicQrPage').then((module) => ({ default: module.DynamicQrPage })))
+const CreateQrPage = lazy(() => import('@/features/dynamic-qr/CreateQrPage').then((module) => ({ default: module.CreateQrPage })))
+const ExportQrPage = lazy(() => import('@/features/dynamic-qr/ExportQrPage').then((module) => ({ default: module.ExportQrPage })))
+const StaticQrPage = lazy(() => import('@/features/static-qr/StaticQrPage').then((module) => ({ default: module.StaticQrPage })))
 const TerminalPage = lazy(() => import('@/features/terminals/TerminalPage').then((module) => ({ default: module.TerminalPage })))
 const BankAccountPage = lazy(() => import('@/features/bank-accounts/BankAccountPage').then((module) => ({ default: module.BankAccountPage })))
 const CashierPage = lazy(() => import('@/features/cashiers/CashierPage').then((module) => ({ default: module.CashierPage })))
@@ -147,7 +147,7 @@ function AccountRoute() {
 
   return (
     <LiveShell pageTitle="Hisob">
-      <AccountPage />
+      <Suspense fallback={<LoadingState title="Hisob sahifasi yuklanmoqda" />}><AccountPage /></Suspense>
     </LiveShell>
   )
 }
@@ -261,7 +261,7 @@ function LiveFeatureRoute({
 function DashboardRoute() {
   return (
     <LiveFeatureRoute feature="dashboard" pageTitle="Dashboard">
-      <DashboardReadPage />
+      <Suspense fallback={<LoadingState title="Dashboard sahifasi yuklanmoqda" />}><DashboardReadPage /></Suspense>
     </LiveFeatureRoute>
   )
 }
@@ -274,13 +274,13 @@ function DynamicQrRoute() {
       feature="dynamicQr"
       pageTitle="Dinamik QRlar"
     >
-      <DynamicQrPage initialState={location.state} />
+      <Suspense fallback={<LoadingState title="Dinamik QRlar sahifasi yuklanmoqda" />}><DynamicQrPage initialState={location.state} /></Suspense>
     </LiveFeatureRoute>
   )
 }
 
 function StaticQrRoute() {
-  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar"><StaticQrPage /></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar"><Suspense fallback={<LoadingState title="Statik QRlar sahifasi yuklanmoqda" />}><StaticQrPage /></Suspense></LiveFeatureRoute>
 }
 
 function TerminalRoute() {
@@ -318,11 +318,11 @@ function CreateQrRoute() {
     access,
     registrations: runtime.readiness,
   })) return <Navigate to="/403" replace />
-  return <LiveShell><CreateQrPage /></LiveShell>
+  return <LiveShell><Suspense fallback={<LoadingState title="QR yaratish sahifasi yuklanmoqda" />}><CreateQrPage /></Suspense></LiveShell>
 }
 
 function ExportQrRoute() {
-  return <LiveFeatureRoute feature="exportQr"><ExportQrPage /></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="exportQr"><Suspense fallback={<LoadingState title="XLSX eksport sahifasi yuklanmoqda" />}><ExportQrPage /></Suspense></LiveFeatureRoute>
 }
 
 function ForbiddenRoute() {

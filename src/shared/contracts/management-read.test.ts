@@ -5,6 +5,37 @@ import { toTerminalListQuery, toBankAccountListQuery, toCashierListQuery, toMerc
 const page = (row: unknown) => ({ success: true, data: { content: [row], totalElements: 1, totalPages: 1, page: 0, size: 10 } })
 
 describe('management read boundaries', () => {
+  it('preserves confirmed terminal details and exact strings without mutating the DTO', () => {
+    const row = Object.freeze({ pkey: 'T-Exact', name: ' Terminal A ', status: 0,
+      merchantId: 2, merchantName: 'M', bankAccountId: 3, bankAccountName: 'B',
+      terminalType: 'WEB', mccCode: '005411', regionId: 7, regionName: 'Region',
+      districtId: '008', districtName: 'District', address: ' Address ',
+      staticQrId: 'QR-Metadata', staticQrLink: 'https://pay.example/QR?x=%2f&Case=YES',
+      phones: Object.freeze(['998901234567', '+998931234567']),
+      createdAt: '2026-10-01T10:15:20', updatedAt: null })
+    const decoded = decodeTerminalPage(page(row)).content[0]
+    expect(decoded).toMatchObject({ id: 'T-Exact', pkey: 'T-Exact', name: ' Terminal A ',
+      statusCode: 0, terminalType: 'WEB', mccCode: '005411', regionId: '7', districtId: '008',
+      regionName: 'Region', districtName: 'District', address: ' Address ', staticQrId: 'QR-Metadata',
+      staticQrLink: row.staticQrLink, phones: row.phones, createdAt: row.createdAt, updatedAt: null })
+    expect(row.regionId).toBe(7)
+    expect(decoded?.phones).not.toBe(row.phones)
+    expect(Object.isFrozen(decoded?.phones)).toBe(true)
+  })
+
+  it('degrades malformed optional terminal details without rejecting valid required fields', () => {
+    const row = { pkey: 'T', name: 'A', status: 0, merchantId: 2, merchantName: 'M',
+      bankAccountId: 3, bankAccountName: 'B', terminalType: {}, address: [],
+      regionId: Number.MAX_SAFE_INTEGER + 1, regionName: false, districtId: {}, districtName: 3,
+      mccCode: {}, staticQrId: [], staticQrLink: {},
+      phones: ['998901234567', null, {}, 123, '', '  '], createdAt: 'NaN', updatedAt: false }
+    expect(decodeTerminalPage(page(row)).content[0]).toMatchObject({
+      terminalType: null, address: null, regionId: null, regionName: null,
+      districtId: null, districtName: null, mccCode: null, staticQrId: null, staticQrLink: null,
+      phones: ['998901234567'], createdAt: null, updatedAt: null,
+    })
+    expect(decodeTerminalPage(page({ ...row, phones: null })).content[0]?.phones).toEqual([])
+  })
   it('keeps terminal order, duplicate IDs and nullable details without inventing QR behavior', () => {
     const row = { pkey: 'terminal-a', name: 'A', status: 7, merchantId: 2, merchantName: 'M', bankAccountId: 3, bankAccountName: 'B', terminalType: null, address: null }
     const result = decodeTerminalPage({ success: true, data: { content: [row, row], totalElements: 2, totalPages: 1, page: 0, size: 10 } })

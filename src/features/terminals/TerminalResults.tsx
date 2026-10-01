@@ -7,6 +7,7 @@ import type { TerminalRow } from '@/shared/contracts/management-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
+import { TerminalActionsMenu } from './TerminalActionsMenu'
 import {
   TERMINAL_DEFAULT_COLUMN_ORDER,
   terminalColumns,
@@ -24,6 +25,8 @@ interface TerminalResultsProps {
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly headerActions?: ReactNode
+  readonly onViewQr: (row: TerminalRow) => void
+  readonly onViewDetails: (row: TerminalRow) => void
 }
 
 function resolveColumns(
@@ -43,7 +46,7 @@ function resolveColumns(
 }
 
 export function TerminalResults({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, headerActions }: TerminalResultsProps) {
+  visibleColumnIds, onRetry, onPageChange, headerActions, onViewQr, onViewDetails }: TerminalResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
 
   return <Card className="min-w-0" aria-busy={pending}>
@@ -60,9 +63,14 @@ export function TerminalResults({ blocked, pending, error, data, columnOrder,
                 : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Terminal jadvali">
           <Table className="min-w-[40rem]">
-            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}</TableRow></TableHeader>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}
+              <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
+            </TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => <TableRow key={`${row.id}-${index}`}>
               {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
+              <TableCell className="sticky right-0 bg-surface text-right">
+                <TerminalActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />
+              </TableCell>
             </TableRow>)}</TableBody>
           </Table>
         </TableScrollRegion>

@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { CreateQrPage } from './CreateQrPage'
+import { CreateQrContent } from './CreateQrContent'
 import type { CreateResultModel } from './create-result'
 
 interface CreateQrDialogProps {
@@ -47,7 +47,7 @@ export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
           </Button>
         </DialogPrimitive.Close>
         <div className="px-4 py-4 sm:px-6 sm:py-5">
-          <CreateQrPage embedded resetOnMount onPendingChange={setPending}
+          <CreateQrContent embedded resetOnMount onPendingChange={setPending}
             onResultModeChange={setResultKind} onClose={() => changeOpen(false)} />
         </div>
       </DialogPrimitive.Content>

@@ -218,11 +218,9 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
         {snapshot.phase === 'phone' && (
           <form className="space-y-4" onSubmit={submitPhone} noValidate>
             <div className="space-y-2.5">
-              <label className="text-sm font-medium text-text-primary" htmlFor="login-phone">
-                Telefon raqami
-              </label>
               <UzbekPhoneInput
                 id="login-phone"
+                aria-label="Telefon raqami"
                 autoComplete="tel"
                 placeholder="XX XXX XX XX"
                 value={phone}
@@ -246,11 +244,9 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
         {(snapshot.phase === 'otp' || snapshot.phase === 'reset-otp') && (
           <form className="space-y-4" onSubmit={submitOtp} noValidate>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text-primary" htmlFor="login-otp">
-                Tasdiqlash kodi
-              </label>
               <Input
                 id="login-otp"
+                aria-label="Tasdiqlash kodi"
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
@@ -295,11 +291,9 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
         {snapshot.phase === 'pin' && (
           <form className="space-y-4" onSubmit={submitPin} noValidate>
             <div className="space-y-2.5">
-              <label className="text-sm font-medium text-text-primary" htmlFor="login-pin">
-                PIN
-              </label>
               <Input
                 id="login-pin"
+                aria-label="PIN"
                 type="password"
                 inputMode="numeric"
                 autoComplete="current-password"
@@ -338,7 +332,7 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
 
         {snapshot.phase === 'set-pin' && (
           <form className="space-y-4" onSubmit={submitNewPin} noValidate>
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-text-primary" htmlFor="new-pin">
                 Yangi PIN
               </label>
@@ -354,7 +348,7 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
                 disabled={snapshot.pending}
               />
             </div>
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-text-primary" htmlFor="confirm-pin">
                 PINni tasdiqlang
               </label>

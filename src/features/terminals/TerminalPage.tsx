@@ -10,10 +10,12 @@ import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumn
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, changeMerchantDraft, clearManagementFilters, type LookupState, type TerminalListFilters } from '@/shared/contracts/management-filters'
-import type { ManagementOption } from '@/shared/contracts/management-read'
+import type { ManagementOption, TerminalRow } from '@/shared/contracts/management-read'
 import { applyTerminalDraft, createDefaultTerminalFilters, terminalParentState, type ParentLookupState } from './page-state'
 import { terminalColumns } from './columns'
 import { TerminalResults } from './TerminalResults'
+import { TerminalQrDialog } from './TerminalQrDialog'
+import { TerminalDetailsSheet } from './TerminalDetailsSheet'
 
 function lookupState(enabled: boolean, error: boolean, data: readonly ManagementOption[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -23,6 +25,8 @@ function lookupState(enabled: boolean, error: boolean, data: readonly Management
 
 export function TerminalPage() {
   const runtime = useReadRuntime()
+  const [qrRow, setQrRow] = useState<TerminalRow | null>(null)
+  const [detailsRow, setDetailsRow] = useState<TerminalRow | null>(null)
   const [draft, setDraft] = useState<TerminalListFilters>(createDefaultTerminalFilters)
   const [applied, setApplied] = useState<TerminalListFilters>(createDefaultTerminalFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
@@ -97,6 +101,8 @@ export function TerminalPage() {
     <TerminalResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data}
       columnOrder={columnPreferences.order}
       visibleColumnIds={columnPreferences.visible}
+      onViewQr={setQrRow}
+      onViewDetails={setDetailsRow}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
@@ -140,5 +146,8 @@ export function TerminalPage() {
           onClick={() => void list.refetch()}
         />
       </div>} />
+    <TerminalQrDialog row={qrRow} onOpenChange={(open) => { if (!open) setQrRow(null) }} />
+    <TerminalDetailsSheet row={detailsRow} onOpenChange={(open) => { if (!open) setDetailsRow(null) }}
+      onViewQr={(row) => { setDetailsRow(null); setQrRow(row) }} />
   </div>
 }

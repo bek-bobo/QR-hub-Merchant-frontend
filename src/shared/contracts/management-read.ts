@@ -1,8 +1,15 @@
 import { safeContractError } from '@/shared/api/errors'
-import { contractObject, requiredString, safeInteger, successEnvelopeData, type Page } from './merchant-read'
+import { contractObject, isoLocalDateTime, requiredString, safeInteger, successEnvelopeData, type Page } from './merchant-read'
 
 export type ManagementStatus = number
-export type TerminalRow = Readonly<{ id: string; name: string; statusCode: ManagementStatus; merchantId: string; merchantName: string; bankAccountId: string; bankAccountName: string; terminalType: string | null; address: string | null; regionName: string | null; districtName: string | null }>
+export type TerminalRow = Readonly<{
+  id: string; pkey: string; name: string; statusCode: ManagementStatus
+  merchantId: string; merchantName: string; bankAccountId: string; bankAccountName: string
+  terminalType: string | null; mccCode: string | null; address: string | null
+  regionId: string | null; regionName: string | null; districtId: string | null; districtName: string | null
+  staticQrId: string | null; staticQrLink: string | null; phones: readonly string[]
+  createdAt: string | null; updatedAt: string | null
+}>
 export type BankAccountRow = Readonly<{ id: string; name: string; bankName: string; accountNumber: string; tin: string | null; mfo: string | null; contractNumber: string | null; merchantId: string; merchantName: string; statusCode: ManagementStatus }>
 export type CashierTerminal = Readonly<{ id: string; name: string; statusCode: ManagementStatus }>
 export type CashierRow = Readonly<{ id: string; fullname: string; phone: string; statusCode: ManagementStatus; roleDisplay: string | null; terminals: readonly CashierTerminal[] }>
@@ -27,10 +34,37 @@ function page<T>(payload: unknown, decode: (value: unknown) => T): Page<T> {
   })
 }
 
+function terminalDetailText(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value : null
+}
+
+function terminalDetailId(value: unknown): string | null {
+  if (typeof value === 'string') return terminalDetailText(value)
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0 ? String(value) : null
+}
+
+function terminalDetailDate(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  try { return isoLocalDateTime(value) } catch { return null }
+}
+
 export function decodeTerminalPage(payload: unknown): Page<TerminalRow> {
   return page(payload, (value) => {
     const row = contractObject(value)
-    return Object.freeze({ id: requiredString(row.pkey), name: requiredString(row.name), statusCode: status(row.status), merchantId: longId(row.merchantId), merchantName: requiredString(row.merchantName), bankAccountId: longId(row.bankAccountId), bankAccountName: requiredString(row.bankAccountName), terminalType: optionalText(row.terminalType), address: optionalText(row.address), regionName: optionalText(row.regionName), districtName: optionalText(row.districtName) })
+    const pkey = requiredString(row.pkey)
+    return Object.freeze({
+      id: pkey, pkey, name: requiredString(row.name), statusCode: status(row.status),
+      merchantId: longId(row.merchantId), merchantName: requiredString(row.merchantName),
+      bankAccountId: longId(row.bankAccountId), bankAccountName: requiredString(row.bankAccountName),
+      terminalType: terminalDetailText(row.terminalType), mccCode: terminalDetailId(row.mccCode),
+      address: terminalDetailText(row.address), regionName: terminalDetailText(row.regionName),
+      districtName: terminalDetailText(row.districtName), regionId: terminalDetailId(row.regionId),
+      districtId: terminalDetailId(row.districtId), staticQrId: terminalDetailId(row.staticQrId),
+      staticQrLink: terminalDetailText(row.staticQrLink),
+      phones: Object.freeze(Array.isArray(row.phones)
+        ? row.phones.filter((phone): phone is string => terminalDetailText(phone) !== null) : []),
+      createdAt: terminalDetailDate(row.createdAt), updatedAt: terminalDetailDate(row.updatedAt),
+    })
   })
 }
 

@@ -1,0 +1,52 @@
+import type { ReactNode } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { describe, expect, it, vi } from 'vitest'
+import type { CreateQrContentProps } from './CreateQrContent'
+import contentSource from './CreateQrContent.tsx?raw'
+import dialogSource from './CreateQrDialog.tsx?raw'
+import pageSource from './CreateQrPage.tsx?raw'
+import { CreateQrDialog } from './CreateQrDialog'
+import { CreateQrPage } from './CreateQrPage'
+
+const capture = vi.hoisted(() => ({ props: null as CreateQrContentProps | null }))
+vi.mock('./CreateQrContent', () => ({ CreateQrContent: (props: CreateQrContentProps) => {
+  capture.props = props
+  return <p>shared-create-content</p>
+} }))
+vi.mock('radix-ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('radix-ui')>()
+  const part = ({ children }: { children: ReactNode }) => <div>{children}</div>
+  return { ...actual, Dialog: {
+    ...actual.Dialog,
+    Root: part, Portal: part, Overlay: part, Content: part,
+    Title: part, Description: part, Close: part,
+  } }
+})
+
+describe('shared Create QR composition', () => {
+  it('renders the route through the shared implementation', () => {
+    expect(renderToStaticMarkup(<CreateQrPage />)).toContain('shared-create-content')
+    expect(capture.props?.embedded).toBeUndefined()
+    expect(capture.props?.resetOnMount).toBeUndefined()
+  })
+
+  it('preserves embedded modal props and its close callback', () => {
+    const changeOpen = vi.fn()
+    expect(renderToStaticMarkup(<CreateQrDialog open onOpenChange={changeOpen} />)).toContain('shared-create-content')
+    expect(capture.props?.embedded).toBe(true)
+    expect(capture.props?.resetOnMount).toBe(true)
+    expect(capture.props?.onPendingChange).toBeTypeOf('function')
+    expect(capture.props?.onResultModeChange).toBeTypeOf('function')
+    capture.props?.onClose?.()
+    expect(changeOpen).toHaveBeenCalledWith(false)
+  })
+
+  it('has one shared create implementation and no dialog import of the route page', () => {
+    expect(dialogSource).not.toContain("from './CreateQrPage'")
+    expect(dialogSource).toContain("from './CreateQrContent'")
+    expect(pageSource).toContain('<CreateQrContent {...props} />')
+    expect(pageSource).not.toContain('createCreateQrController')
+    expect(dialogSource).not.toContain('createCreateQrController')
+    expect(contentSource).toContain('createCreateQrController({')
+  })
+})

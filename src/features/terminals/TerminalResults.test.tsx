@@ -6,9 +6,9 @@ import type { TerminalRow } from '@/shared/contracts/management-read'
 import { TERMINAL_DEFAULT_COLUMN_ORDER } from './columns'
 import { TerminalResults } from './TerminalResults'
 
-const row: TerminalRow = { id: 't-1', name: 'Terminal A', merchantId: '2', merchantName: 'Merchant A', bankAccountId: '3', bankAccountName: 'Bank A', statusCode: 777, terminalType: null, address: null, regionName: null, districtName: null }
+const row: TerminalRow = { id: 't-1', pkey: 't-1', name: 'Terminal A', merchantId: '2', merchantName: 'Merchant A', bankAccountId: '3', bankAccountName: 'Bank A', statusCode: 777, terminalType: null, address: null, regionName: null, districtName: null, mccCode: null, regionId: null, districtId: null, staticQrId: null, staticQrLink: null, phones: [], createdAt: null, updatedAt: null }
 const data: Page<TerminalRow> = { content: [row, row], totalElements: 47, totalPages: 5, page: 0, size: 20 }
-const render = (overrides: Partial<Parameters<typeof TerminalResults>[0]> = {}) => renderToString(createElement(TerminalResults, { data, pending: false, error: false, blocked: false, columnOrder: TERMINAL_DEFAULT_COLUMN_ORDER, visibleColumnIds: TERMINAL_DEFAULT_COLUMN_ORDER, onRetry: () => undefined, onPageChange: () => undefined, ...overrides }))
+const render = (overrides: Partial<Parameters<typeof TerminalResults>[0]> = {}) => renderToString(createElement(TerminalResults, { data, pending: false, error: false, blocked: false, columnOrder: TERMINAL_DEFAULT_COLUMN_ORDER, visibleColumnIds: TERMINAL_DEFAULT_COLUMN_ORDER, onRetry: () => undefined, onPageChange: () => undefined, onViewQr: () => undefined, onViewDetails: () => undefined, ...overrides }))
 
 function cellTexts(html: string, tag: 'th' | 'td'): string[] {
   return Array.from(html.matchAll(new RegExp(`<${tag}[^>]*>(.*?)</${tag}>`, 'g')))
@@ -39,10 +39,12 @@ describe('terminal results', () => {
     expect(render({ error: true, data: undefined })).toContain('Qayta urinish')
     expect(render({ data: { ...data, content: [], totalElements: 0, totalPages: 0 } })).toContain('Terminal topilmadi')
   })
-  it('renders every default business column without an operational column', () => {
+  it('renders every default business column with fixed final actions', () => {
     expect(cellTexts(render({ data: { ...data, content: [row] } }), 'th')).toEqual([
-      'Terminal ID', 'Nomi', 'Merchant', 'Bank hisobi', 'Holat',
+      'Terminal ID', 'Nomi', 'Merchant', 'Bank hisobi', 'Holat', 'Amallar',
     ])
+    expect(render()).toContain('aria-label="Amallarni ochish"')
+    expect(render()).toContain('sticky right-0')
   })
   it('respects custom order for both headers and body cells', () => {
     const html = render({
@@ -50,10 +52,10 @@ describe('terminal results', () => {
       columnOrder: ['merchant', 'name', 'terminalId', 'status', 'bankAccount'],
     })
     expect(cellTexts(html, 'th')).toEqual([
-      'Merchant', 'Nomi', 'Terminal ID', 'Holat', 'Bank hisobi',
+      'Merchant', 'Nomi', 'Terminal ID', 'Holat', 'Bank hisobi', 'Amallar',
     ])
     expect(cellTexts(html, 'td')).toEqual([
-      'Merchant A', 'Terminal A', 't-1', 'Noma’lum', 'Bank A',
+      'Merchant A', 'Terminal A', 't-1', 'Noma’lum', 'Bank A', '',
     ])
   })
   it('hides a column and restores it at its saved order position', () => {
@@ -62,11 +64,11 @@ describe('terminal results', () => {
       data: { ...data, content: [row] },
       columnOrder,
       visibleColumnIds: ['merchant', 'name', 'terminalId', 'status'],
-    }), 'th')).toEqual(['Merchant', 'Nomi', 'Terminal ID', 'Holat'])
+    }), 'th')).toEqual(['Merchant', 'Nomi', 'Terminal ID', 'Holat', 'Amallar'])
     expect(cellTexts(render({
       data: { ...data, content: [row] },
       columnOrder,
       visibleColumnIds: columnOrder,
-    }), 'th')).toEqual(['Merchant', 'Nomi', 'Terminal ID', 'Bank hisobi', 'Holat'])
+    }), 'th')).toEqual(['Merchant', 'Nomi', 'Terminal ID', 'Bank hisobi', 'Holat', 'Amallar'])
   })
 })

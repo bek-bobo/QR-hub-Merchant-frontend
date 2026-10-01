@@ -67,11 +67,13 @@ const merchants: readonly ManagementOption[] = [
 function makeTerminal(index: number): TerminalRow {
   const merchantId = index <= 6 ? '1' : '2'
   const bankAccountId = String(200 + index)
-  return { id: index.toString(16).padStart(32, '0'), name: `D5-MGMT-DEMO Terminal ${index}`,
+  return { id: index.toString(16).padStart(32, '0'), pkey: index.toString(16).padStart(32, '0'), name: `D5-MGMT-DEMO Terminal ${index}`,
     statusCode: index === 12 ? 777 : 0, merchantId,
     merchantName: merchants[Number(merchantId) - 1].name, bankAccountId,
     bankAccountName: `D5-MGMT-DEMO Account ${index}`,
-    terminalType: null, address: null, regionName: null, districtName: null }
+    terminalType: null, address: null, regionName: null, districtName: null,
+    mccCode: null, regionId: null, districtId: null, staticQrId: null,
+    staticQrLink: null, phones: [], createdAt: null, updatedAt: null }
 }
 
 function makeBank(index: number): BankAccountRow {
