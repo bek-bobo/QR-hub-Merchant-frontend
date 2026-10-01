@@ -17,6 +17,7 @@ import { createBrowserAuthDeviceLease } from '@/shared/auth/device-lease'
 import { LoginController } from '@/shared/auth/login-controller'
 import { resolveLogoutMessage } from '@/shared/auth/logout-message'
 import { SessionController, type ProtectedOperation, type SessionCache } from '@/shared/auth/session-controller'
+import { createBrowserTokenPersistence } from '@/shared/auth/token-persistence'
 import {
   AuthContext,
   type AuthActions,
@@ -67,6 +68,8 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
       cache: createSessionCache(queryClient),
       now: () => Date.now(),
       generateScopeId: () => crypto.randomUUID(),
+      persistence: createBrowserTokenPersistence(),
+      restoreLease: lease,
     })
     const login = new LoginController({
       api,
@@ -78,6 +81,7 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
     return { lease, login, session }
   })
   const [cleanupGuard] = useState(() => createDeferredCleanupGuard())
+  const restoreStarted = useRef(false)
   const protectedReadContext = useMemo(
     () => ({
       bridge: createProtectedReadBridge(controllers.session),
@@ -107,6 +111,12 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
 
   useEffect(() => {
     const revision = cleanupGuard.beginLifecycle()
+    if (!restoreStarted.current) {
+      restoreStarted.current = true
+      void controllers.session.restoreSession().then((result) => {
+        if (result.status === 'lease-unavailable') controllers.login.reportRestoreLeaseFailure(result.message)
+      })
+    }
 
     return () => {
       queueMicrotask(() => {
@@ -142,6 +152,12 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
       restart: () => {
         setLogoutMessage(null)
         controllers.login.restart()
+        const phase = controllers.session.getSnapshot().phase
+        if (phase === 'anonymous' || phase === 'bootstrap-error') {
+          void controllers.session.restoreSession().then((result) => {
+            if (result.status === 'lease-unavailable') controllers.login.reportRestoreLeaseFailure(result.message)
+          })
+        }
       },
       getOtpRemainingMs: () => controllers.login.getOtpRemainingMs(),
       refreshProfile: () => {

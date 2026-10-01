@@ -133,7 +133,7 @@ describe('read runtime', () => {
     queryClient.setQueryData(readKeys.p5List(scope, { search: '', page: 0, size: 10 }), { content: [] })
     queryClient.setQueryData(['live', 'auth-preview'], 'preserve')
 
-    await cleanupReadQueries(queryClient)
+    await cleanupReadQueries(queryClient, scope)
 
     expect(queryClient.getQueryData(readKeys.dashboard(scope, filters)))
       .toBeUndefined()

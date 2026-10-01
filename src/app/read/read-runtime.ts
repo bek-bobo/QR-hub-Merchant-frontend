@@ -227,9 +227,16 @@ export function createReadRuntime(
   }
 }
 
-export async function cleanupReadQueries(queryClient: QueryClient): Promise<void> {
+export async function cleanupReadQueries(
+  queryClient: QueryClient,
+  previousScope: ReadScope | null,
+): Promise<void> {
+  if (!previousScope) return
+
+  const previousScopeKey = readKeys.scope(previousScope)
   const predicate = (query: { readonly queryKey: readonly unknown[] }) =>
-    isReadQueryKey(query.queryKey)
+    isReadQueryKey(query.queryKey) &&
+    previousScopeKey.every((value, index) => query.queryKey[index] === value)
   await queryClient.cancelQueries({ predicate })
   queryClient.removeQueries({ predicate })
 }

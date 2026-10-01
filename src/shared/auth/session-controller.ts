@@ -4,6 +4,8 @@ import {
 } from '@/shared/api/errors'
 import type { AuthApi } from '@/shared/api/auth-api'
 import type { Profile, TokenPair } from '@/shared/auth/model'
+import type { AuthDeviceLeaseResult } from './device-lease'
+import type { TokenPersistence } from './token-persistence'
 
 export const defaultRefreshThresholdMs = 30_000
 
@@ -34,6 +36,8 @@ export interface SessionControllerDependencies {
   readonly generateScopeId: () => string
   readonly isRefreshableAuthFailure?: RefreshFailureClassifier
   readonly refreshThresholdMs?: number
+  readonly persistence?: TokenPersistence
+  readonly restoreLease?: AdoptedAuthOwnerLease & { acquire(): Promise<AuthDeviceLeaseResult> }
 }
 
 export type SessionSnapshot =
@@ -63,6 +67,10 @@ export type FreshSessionResult =
   | { readonly status: 'anonymous' }
   | { readonly status: 'terminal'; readonly reason: 'refresh-failed' }
   | { readonly status: 'stale' }
+
+export type RestoreSessionResult = EstablishSessionResult
+  | { readonly status: 'anonymous' }
+  | { readonly status: 'lease-unavailable'; readonly message: string }
 
 export type ProtectedOperationResult<T> =
   | { readonly status: 'success'; readonly data: T }
@@ -203,6 +211,8 @@ export class SessionController {
   private ownedLease: AdoptedAuthOwnerLease | null = null
   private terminatingLease: AdoptedAuthOwnerLease | null = null
   private disposed = false
+  private persistenceOwned = false
+  private restoreFlight: Promise<RestoreSessionResult> | null = null
 
   constructor(dependencies: SessionControllerDependencies) {
     if (
@@ -214,6 +224,9 @@ export class SessionController {
     }
 
     this.dependencies = dependencies
+    if (dependencies.persistence && dependencies.restoreLease) {
+      this.snapshot = Object.freeze({ phase: 'bootstrapping' })
+    }
   }
 
   getSnapshot = (): SessionSnapshot => this.snapshot
@@ -227,6 +240,60 @@ export class SessionController {
     return () => this.listeners.delete(listener)
   }
 
+  restoreSession(): Promise<RestoreSessionResult> {
+    if (this.restoreFlight) return this.restoreFlight
+    const flight = this.runRestore()
+    this.restoreFlight = flight
+    const clearFlight = () => { if (this.restoreFlight === flight) this.restoreFlight = null }
+    void flight.then(clearFlight, clearFlight)
+    return flight
+  }
+
+  private async runRestore(): Promise<RestoreSessionResult> {
+    const { persistence, restoreLease } = this.dependencies
+    if (this.disposed || this.tokenState || this.ownedLease || this.terminatingLease) return { status: 'stale' }
+    const epoch = this.authEpoch
+    this.setSnapshot(Object.freeze({ phase: 'bootstrapping' }))
+    const saved = persistence?.read()
+    if (!persistence || !restoreLease || !saved || saved.kind === 'empty' || saved.kind === 'unavailable') {
+      this.setSnapshot(anonymousSnapshot)
+      return { status: 'anonymous' }
+    }
+
+    let acquisition: AuthDeviceLeaseResult
+    try { acquisition = await restoreLease.acquire() } catch {
+      if (this.isCurrentEpoch(epoch)) this.setSnapshot(Object.freeze({ phase: 'bootstrap-error' }))
+      return { status: 'bootstrap-error' }
+    }
+    if (!this.isCurrentEpoch(epoch)) {
+      if (acquisition.status === 'acquired' && this.ownedLease !== restoreLease && this.terminatingLease !== restoreLease) {
+        if (!this.disposed && !this.tokenState) {
+          // A reset/logout may have cancelled bootstrap while acquisition was pending.
+          // Clear only after ownership is actually obtained, never in a losing tab.
+          this.persistenceOwned = true
+          this.clearPersistence()
+        }
+        this.releaseLease(restoreLease)
+      }
+      return { status: 'stale' }
+    }
+    if (acquisition.status !== 'acquired') {
+      this.setSnapshot(anonymousSnapshot)
+      return { status: 'lease-unavailable', message: acquisition.message }
+    }
+
+    // Re-read under ownership: another owner may have rotated or cleared tokens while acquiring.
+    this.persistenceOwned = true
+    const current = persistence.read()
+    if (current.kind !== 'valid') {
+      this.clearPersistence()
+      this.releaseLease(restoreLease)
+      this.setSnapshot(anonymousSnapshot)
+      return { status: 'anonymous' }
+    }
+    return this.establishSession(current.pair, restoreLease, current.accessDeadlineMs)
+  }
+
   /**
    * Transfers an already-acquired auth-owner lease into the private session.
    * Before this call, login-flow failures remain responsible for releasing it.
@@ -234,6 +301,7 @@ export class SessionController {
   async establishSession(
     tokenPair: TokenPair,
     ownedLease: AdoptedAuthOwnerLease,
+    restoredAccessDeadlineMs?: number,
   ): Promise<EstablishSessionResult> {
     if (this.disposed) {
       this.releaseLease(ownedLease)
@@ -248,6 +316,7 @@ export class SessionController {
     const previousTerminatingLease = this.terminatingLease
     this.terminatingLease = null
     const epoch = this.invalidateForReplacement()
+    this.persistenceOwned = true
     if (previousLease && previousLease !== ownedLease) {
       this.releaseLease(previousLease)
     }
@@ -260,8 +329,9 @@ export class SessionController {
     }
 
     const cacheCleanup = this.cleanCache()
-    const nextTokenState = this.createTokenState(tokenPair)
+    const nextTokenState = this.createTokenState(tokenPair, restoredAccessDeadlineMs)
     if (!nextTokenState) {
+      this.clearPersistence()
       this.releaseLease(ownedLease)
       this.setSnapshot(Object.freeze({ phase: 'bootstrap-error' }))
       await cacheCleanup
@@ -270,6 +340,7 @@ export class SessionController {
 
     this.ownedLease = ownedLease
     this.tokenState = nextTokenState
+    this.persistTokenState(nextTokenState)
     this.setSnapshot(Object.freeze({ phase: 'bootstrapping' }))
     await cacheCleanup
 
@@ -277,18 +348,21 @@ export class SessionController {
       return { status: 'stale' }
     }
 
-    const operation = this.createOperationController()
-
     try {
-      const profile = copyProfile(
-        await this.dependencies.api.getMe(nextTokenState.pair.accessToken, {
-          signal: operation.signal,
-        }),
-      )
-
-      if (!this.isCurrentTokenState(epoch, nextTokenState)) {
+      const result = await this.readWithSession(({ accessToken, signal }) =>
+        this.dependencies.api.getMe(accessToken, { signal }), true)
+      if (!this.isCurrentEpoch(epoch)) {
         return { status: 'stale' }
       }
+      if (result.status !== 'success') {
+        if (result.status === 'access-denied') {
+          await this.failBootstrap(epoch, 'access-denied')
+          return { status: 'access-denied' }
+        }
+        await this.failBootstrap(epoch, 'bootstrap-error')
+        return { status: 'bootstrap-error' }
+      }
+      const profile = copyProfile(result.data)
 
       const sessionScopeId = this.createScopeId()
       if (!profile || !sessionScopeId) {
@@ -324,16 +398,18 @@ export class SessionController {
 
       await this.failBootstrap(epoch, 'bootstrap-error')
       return { status: 'bootstrap-error' }
-    } finally {
-      this.releaseOperationController(operation)
     }
   }
 
-  async ensureFreshSession(force = false): Promise<FreshSessionResult> {
+  ensureFreshSession(force = false): Promise<FreshSessionResult> {
+    return this.ensureFreshTokens(force)
+  }
+
+  private async ensureFreshTokens(force = false, bootstrap = false): Promise<FreshSessionResult> {
     const tokenState = this.tokenState
     const epoch = this.authEpoch
 
-    if (!this.hasActiveAuthenticatedSession(tokenState)) {
+    if (!this.hasActiveAuthenticatedSession(tokenState, bootstrap)) {
       return { status: 'anonymous' }
     }
 
@@ -350,7 +426,7 @@ export class SessionController {
       return currentFlight.promise
     }
 
-    const promise = this.runRefresh(epoch, tokenState, this.ownedLease)
+    const promise = this.runRefresh(epoch, tokenState, this.ownedLease, bootstrap)
     const flight: RefreshFlight = {
       epoch,
       revision: tokenState.revision,
@@ -370,12 +446,17 @@ export class SessionController {
   async protectedRead<T>(
     operation: ProtectedOperation<T>,
   ): Promise<ProtectedOperationResult<T>> {
-    const freshness = await this.ensureFreshSession()
+    return this.readWithSession(operation)
+  }
+
+  private async readWithSession<T>(operation: ProtectedOperation<T>, bootstrap = false): Promise<ProtectedOperationResult<T>> {
+    const initialRevision = this.tokenState?.revision
+    const freshness = await this.ensureFreshTokens(false, bootstrap)
     if (freshness.status !== 'fresh') {
       return this.mapFreshnessFailure(freshness)
     }
 
-    const initial = await this.runProtectedOperation(operation)
+    const initial = await this.runProtectedOperation(operation, bootstrap)
     if (initial.kind === 'success') {
       return this.commitProtectedResult(initial)
     }
@@ -393,18 +474,23 @@ export class SessionController {
     }
 
     const currentTokenState = this.tokenState
-    if (!this.hasActiveAuthenticatedSession(currentTokenState)) {
+    if (!this.hasActiveAuthenticatedSession(currentTokenState, bootstrap)) {
       return { status: 'session-ended' }
     }
 
     if (currentTokenState.revision === initial.revision) {
-      const refreshed = await this.ensureFreshSession(true)
+      if (bootstrap && initialRevision !== initial.revision) {
+        // Bootstrap already refreshed before GET_ME; do not rotate a second time.
+        await this.terminateCurrentSession(initial.epoch)
+        return { status: 'session-ended' }
+      }
+      const refreshed = await this.ensureFreshTokens(true, bootstrap)
       if (refreshed.status !== 'fresh') {
         return this.mapFreshnessFailure(refreshed)
       }
     }
 
-    const replay = await this.runProtectedOperation(operation)
+    const replay = await this.runProtectedOperation(operation, bootstrap)
     if (replay.kind === 'success') {
       return this.commitProtectedResult(replay)
     }
@@ -577,7 +663,9 @@ export class SessionController {
     this.ownedLease = null
     this.terminatingLease = null
     this.logoutFlight = null
-    this.invalidateLocalState(anonymousSnapshot)
+    // Provider teardown releases memory/ownership; it is not an explicit logout.
+    // Keep durable credentials so a new application lifecycle can validate them.
+    this.invalidateLocalState(anonymousSnapshot, false)
     this.releaseLease(lease)
     if (terminatingLease !== lease) {
       this.releaseLease(terminatingLease)
@@ -598,7 +686,7 @@ export class SessionController {
     return this.authEpoch
   }
 
-  private createTokenState(pair: TokenPair): TokenState | null {
+  private createTokenState(pair: TokenPair, restoredAccessDeadlineMs?: number): TokenState | null {
     const copiedPair = copyTokenPair(pair)
     if (!copiedPair) {
       return null
@@ -612,7 +700,7 @@ export class SessionController {
     }
 
     const accessDeadlineMs =
-      now + copiedPair.accessTokenTtlMinutes * 60_000
+      restoredAccessDeadlineMs ?? now + copiedPair.accessTokenTtlMinutes * 60_000
     if (!Number.isFinite(now) || !Number.isFinite(accessDeadlineMs)) {
       return null
     }
@@ -656,6 +744,7 @@ export class SessionController {
     epoch: number,
     tokenState: TokenState,
     lease: AdoptedAuthOwnerLease | null,
+    bootstrap = false,
   ): Promise<FreshSessionResult> {
     if (!lease) {
       return { status: 'anonymous' }
@@ -669,7 +758,7 @@ export class SessionController {
         { signal: operation.signal },
       )
 
-      if (!this.isCurrentSession(epoch, tokenState, lease)) {
+      if (!this.isCurrentSession(epoch, tokenState, lease, bootstrap)) {
         return { status: 'stale' }
       }
 
@@ -680,9 +769,10 @@ export class SessionController {
       }
 
       this.tokenState = refreshedTokenState
+      this.persistTokenState(refreshedTokenState)
       return { status: 'fresh' }
     } catch {
-      if (!this.isCurrentSession(epoch, tokenState, lease)) {
+      if (!this.isCurrentSession(epoch, tokenState, lease, bootstrap)) {
         return { status: 'stale' }
       }
 
@@ -695,10 +785,11 @@ export class SessionController {
 
   private async runProtectedOperation<T>(
     operation: ProtectedOperation<T>,
+    bootstrap = false,
   ): Promise<OperationAttempt<T>> {
     const tokenState = this.tokenState
     const epoch = this.authEpoch
-    if (!this.hasActiveAuthenticatedSession(tokenState)) {
+    if (!this.hasActiveAuthenticatedSession(tokenState, bootstrap)) {
       return {
         kind: 'failure',
         error: normalizeUnknownError(undefined),
@@ -826,7 +917,8 @@ export class SessionController {
     await this.cleanCache()
   }
 
-  private invalidateLocalState(snapshot: SessionSnapshot): void {
+  private invalidateLocalState(snapshot: SessionSnapshot, clearPersisted = true): void {
+    if (clearPersisted) this.clearPersistence()
     this.authEpoch += 1
     this.abortActiveOperations()
     this.refreshFlight = null
@@ -838,10 +930,11 @@ export class SessionController {
 
   private hasActiveAuthenticatedSession(
     tokenState: TokenState | null,
+    bootstrap = false,
   ): tokenState is TokenState {
     return (
       !this.disposed &&
-      this.snapshot.phase === 'authenticated' &&
+      (this.snapshot.phase === 'authenticated' || (bootstrap && this.snapshot.phase === 'bootstrapping')) &&
       tokenState !== null &&
       this.ownedLease !== null
     )
@@ -859,11 +952,12 @@ export class SessionController {
     epoch: number,
     tokenState: TokenState,
     lease: AdoptedAuthOwnerLease,
+    bootstrap = false,
   ): boolean {
     return (
       this.isCurrentTokenState(epoch, tokenState) &&
       this.ownedLease === lease &&
-      this.snapshot.phase === 'authenticated'
+      (this.snapshot.phase === 'authenticated' || (bootstrap && this.snapshot.phase === 'bootstrapping'))
     )
   }
 
@@ -927,6 +1021,18 @@ export class SessionController {
     } catch {
       // Lease cleanup must not expose adapter failures or retain credentials.
     }
+  }
+
+  private persistTokenState(state: TokenState): void {
+    try { this.dependencies.persistence?.write(state.pair, state.accessDeadlineMs) } catch {
+      // An adapter failure must never break a valid in-memory session.
+    }
+  }
+
+  private clearPersistence(): void {
+    if (!this.persistenceOwned) return
+    this.persistenceOwned = false
+    try { this.dependencies.persistence?.clear() } catch { /* Best effort. */ }
   }
 
   private isEmptyAnonymousState(): boolean {

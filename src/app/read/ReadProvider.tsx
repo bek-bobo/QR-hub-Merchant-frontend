@@ -101,7 +101,7 @@ export function ReadProvider({
     const previous = previousScope.current
     previousScope.current = scope
     if (previous && !sameScope(previous, scope)) {
-      void cleanupReadQueries(queryClient)
+      void cleanupReadQueries(queryClient, previous)
     }
   }, [queryClient, scope])
 

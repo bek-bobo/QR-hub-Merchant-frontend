@@ -1,8 +1,63 @@
 # Auth Session Decision
 
-**Status:** Accepted for frontend implementation planning  
+**Status:** Updated by AUTH.2 — owner-approved browser token persistence  
 **Scope:** QRHub Merchant frontend architecture  
-**Decision date:** 2026-09-14
+**Decision date:** 2026-10-01 (original decision: 2026-09-14)
+
+## Current implemented model — AUTH.2
+
+The owner approved an admin-like browser token persistence model. This section
+supersedes the RAM-only persistence/reload rules in the historical decision below.
+The merchant keeps its OTP/PIN protocol, SessionController, Bearer endpoints and
+`credentials: 'omit'`; no admin password/TOTP protocol or Axios client was copied.
+
+- Access token: localStorage key `qrhub.auth.access-token.v1`.
+- Refresh token: localStorage key `qrhub.auth.refresh-token.v1`.
+- Minimum TTL/deadline metadata: `qrhub.auth.token-metadata.v1`, schema version 1.
+  The saved absolute access deadline prevents reload from granting a new TTL.
+- SessionController uses a private memory copy during runtime. Tokens never appear
+  in public snapshots, query keys or query cache. Profile, roles, permissions,
+  GET_ME responses, PIN, OTP, login session keys and temporary stages are not persisted.
+- Final login tokens and successful refresh rotations update persistence. Metadata
+  is removed first and written last as the pair's commit marker. Browser storage
+  has no multi-key transaction; interrupted/failed writes are cleared best effort.
+  Storage failures do not fail an otherwise valid in-memory login.
+- Application startup is bootstrapping before route decisions. Stored credentials
+  require the existing exclusive device/auth-owner lease, then GET_ME through the
+  session's protected-read machinery. Only a validated profile authenticates.
+  A restored 401 can use the existing single-flight refresh and one read replay.
+  Mutations still never replay after dispatch. No stale profile is trusted.
+- Explicit logout, reset, terminal auth/refresh failure and invalid restored state
+  clear persisted credentials as well as memory and scoped query cache and release
+  ownership. Remote logout failure does not retain the local session. Transient
+  GET_ME failure retains the existing bootstrap-error semantics and clears the
+  failed bootstrap's credentials. Provider teardown releases memory/cache/lease
+  while preserving durable tokens for the next lifecycle's GET_ME validation.
+- One authenticated browser owner remains allowed per origin. A second tab that
+  cannot acquire the lease displays the existing another-window message, performs
+  no GET_ME and neither hydrates nor deletes the first owner's credentials.
+  After ownership is released, an explicit retry or later startup can restore.
+  No cross-tab token broadcasting or authenticated concurrency is implemented.
+- Reload and full browser restart attempt restore on the currently requested
+  protected route. Existing permission/registration checks, safe-return allowlist
+  and /403 behavior remain authoritative. Invalid refresh returns to login.
+
+## Known security limitation and future hardening
+
+localStorage is not secure storage and is not equivalent to HttpOnly cookie
+security. Any same-origin JavaScript execution/XSS can read and exfiltrate both
+persisted access and refresh credentials. This is the same architectural weakness
+identified in the admin reference. Persistence also leaves credentials available
+after the page or browser closes until they are cleared or rejected by the server.
+
+Preferred future hardening: an **HttpOnly + Secure renewable session/refresh
+cookie with a memory-only access token**. This requires a separately confirmed
+backend/browser contract; AUTH.2 does not introduce cookies, CSRF changes,
+`withCredentials`, or new endpoints.
+
+AUTH.2 source/tests were reviewed without running validation commands. The owner
+must run lint, typecheck, tests and build and verify reload/restart, logout and
+exclusive-tab ownership in the browser.
 
 ## Context
 
@@ -12,7 +67,7 @@ storage as proof of identity. This record is a frontend architecture decision,
 not a statement that the backend mandates these storage or tab-coordination
 choices.
 
-## Decision
+## Historical decision (2026-09-14; persistence rules superseded above)
 
 - Use a direct SPA-to-API integration with `Authorization: Bearer <accessToken>`.
 - Keep the access token and refresh token in JavaScript RAM only.
@@ -35,7 +90,7 @@ choices.
 - Treat every `VITE_*` value as public build-time/browser-visible
   configuration, never as a secret.
 
-## Security consequences
+## Historical security consequences
 
 RAM-only credentials reduce persistence after reload and avoid intentionally
 placing bearer credentials in browser storage. Single-tab ownership reduces
@@ -51,7 +106,7 @@ serialization, runtime authority strings, deployed URLs, CORS policy, or error
 responses. Their current evidence status is recorded in
 `docs/contracts/AUTH_CONTRACT_STATUS.md`.
 
-## Implementation mapping
+## Historical implementation mapping
 
 - Device identifier and auth-tab ownership are implemented in
   `src/shared/auth/device-lease.ts`.

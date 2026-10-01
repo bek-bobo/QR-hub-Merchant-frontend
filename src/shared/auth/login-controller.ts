@@ -150,6 +150,10 @@ export class LoginController {
     }
   }
 
+  reportRestoreLeaseFailure(message: string): void {
+    if (!this.disposed && this.snapshot.phase === 'phone') this.setUnavailable(message)
+  }
+
   async startLogin(phoneInput: string): Promise<void> {
     const api = this.dependencies.api
     if (!api) {
