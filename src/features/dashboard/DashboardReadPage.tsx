@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -11,37 +10,28 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { DynamicQrDetailsSheet } from '@/features/dynamic-qr/DynamicQrDetailsSheet'
+import { QrDisplayDialog } from '@/features/dynamic-qr/QrDisplayDialog'
 import type {
   DashboardFilters,
-  Page,
   DynamicQrRow,
 } from '@/shared/contracts/merchant-read'
 import { getTashkentDatePreset, type DatePresetDays } from '@/shared/filters/date-range'
-import { formatMoney } from '@/shared/money/minor'
-import { formatInstantTime, formatOffsetlessDateTime } from '@/shared/presentation/date-time'
-import { MetadataId } from '@/shared/presentation/MetadataId'
-import { statusToneClasses } from '@/shared/presentation/status-tone'
+import { formatInstantTime } from '@/shared/presentation/date-time'
+import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import {
-  EmptyState,
   ErrorState,
   NoAccessState,
 } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
-import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
+import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
+import { DashboardRecentQrTable } from './DashboardRecentQrTable'
+import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardPageHeader } from './DashboardPageHeader'
 import { MetricCards } from './MetricCards'
 import { StatusDonut } from './StatusDonut'
 import {
   applyDashboardFilters,
-  presentQrStatus,
   resetDashboardFilters,
 } from './presenters'
 import { useDashboardReadQueries } from './queries'
@@ -70,79 +60,59 @@ interface RecentQrPanelProps {
   readonly dynamicQrPath: string
 }
 
-function RecentQrTable({ page }: { readonly page: Page<DynamicQrRow> }) {
-  if (page.content.length === 0) {
-    return <EmptyState description="Tanlangan davrda dinamik QR topilmadi." />
-  }
-
-  return (
-    <TableScrollRegion ariaLabel="So‘nggi dinamik QRlar">
-      <Table className="min-w-[46rem]">
-        <TableHeader>
-          <TableRow>
-            <TableHead>QR ID</TableHead>
-            <TableHead>Vaqt</TableHead>
-            <TableHead>Terminal</TableHead>
-            <TableHead className="text-right">Summa</TableHead>
-            <TableHead>Status</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {page.content.map((row) => {
-            const status = presentQrStatus(row.statusCode)
-            return (
-              <TableRow key={row.pkey}>
-                <TableCell>
-                  {row.pkey ? <MetadataId value={row.pkey} /> : '—'}
-                </TableCell>
-                <TableCell>{formatOffsetlessDateTime(row.createdAt)}</TableCell>
-                <TableCell>{row.terminalName || '—'}</TableCell>
-                <TableCell className="text-right tabular-nums">{formatMoney(row.amount)}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-                    {status.label}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
-    </TableScrollRegion>
-  )
-}
-
-function RecentQrPanel({
+export function RecentQrPanel({
   query,
   enabled,
   filters,
   dynamicQrPath,
 }: RecentQrPanelProps) {
+  const columnPreferences = useTableColumnPreferences({
+    tableKey: DASHBOARD_RECENT_QR_TABLE_KEY,
+    columns: dashboardRecentQrColumns,
+  })
+  const [qrRow, setQrRow] = useState<DynamicQrRow | null>(null)
+  const [detailsRow, setDetailsRow] = useState<DynamicQrRow | null>(null)
+
   if (!enabled) {
     return null
   }
 
   return (
     <Card className="min-w-0">
-      <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-        <div>
+      <CardHeader className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 basis-64">
           <CardTitle>So‘nggi dinamik QRlar</CardTitle>
           <CardDescription>Joriy qo‘llangan dashboard filtrlari bo‘yicha</CardDescription>
         </div>
-        <Button asChild variant="outline" size="sm">
-          <Link
-            to={dynamicQrPath}
-            state={{
-              fromDate: filters.fromDate,
-              toDate: filters.toDate,
-              ...(filters.terminalId
-                ? { terminalId: filters.terminalId }
-                : {}),
-            }}
-          >
-            Barchasini ko‘rish
-          </Link>
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <TableColumnPreferences
+            tableLabel="So‘nggi dinamik QRlar"
+            items={dashboardRecentQrColumns}
+            order={columnPreferences.order}
+            hidden={columnPreferences.hidden}
+            iconOnly
+            onMoveUp={columnPreferences.moveUp}
+            onMoveDown={columnPreferences.moveDown}
+            onMove={columnPreferences.move}
+            onToggleVisibility={columnPreferences.toggleVisibility}
+            canHide={columnPreferences.canHide}
+            onReset={columnPreferences.reset}
+          />
+          <Button asChild variant="outline" size="sm">
+            <Link
+              to={dynamicQrPath}
+              state={{
+                fromDate: filters.fromDate,
+                toDate: filters.toDate,
+                ...(filters.terminalId
+                  ? { terminalId: filters.terminalId }
+                  : {}),
+              }}
+            >
+              Barchasini ko‘rish
+            </Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {query.isPending ? (
@@ -150,12 +120,18 @@ function RecentQrPanel({
         ) : query.isError && !query.data ? (
           <ErrorState onRetry={() => void query.refetch()} />
         ) : query.data ? (
-          <RecentQrTable page={query.data} />
+          <DashboardRecentQrTable rows={query.data.content}
+            columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
+            onViewQr={setQrRow} onViewDetails={setDetailsRow} />
         ) : null}
         {query.isRefetchError && query.data ? (
           <p role="alert" className="mt-3 text-sm text-destructive">Yangilanmadi</p>
         ) : null}
       </CardContent>
+      <DynamicQrDetailsSheet row={detailsRow}
+        onOpenChange={(open) => { if (!open) setDetailsRow(null) }}
+        onViewQr={(row) => { setDetailsRow(null); setQrRow(row) }} />
+      <QrDisplayDialog row={qrRow} onOpenChange={(open) => { if (!open) setQrRow(null) }} />
     </Card>
   )
 }
