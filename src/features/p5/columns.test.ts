@@ -53,6 +53,7 @@ describe('P5 business-column metadata and preferences', () => {
     })))
     expect(p5Columns.some((column) => column.label === 'Tanlash')).toBe(false)
     expect(p5Columns.some((column) => column.label === 'PIN reset')).toBe(false)
+    expect(p5Columns.some((column) => column.label === 'Amallar')).toBe(false)
   })
 
   it('persists independent order and visibility under p5Devices and restores them on remount', () => {
@@ -100,6 +101,8 @@ describe('P5 business-column metadata and preferences', () => {
     const beforeOperationalAction = runtime.getSnapshot()
     expect(runtime.toggleVisibility('select')).toEqual(beforeOperationalAction)
     expect(runtime.toggleVisibility('pinReset')).toEqual(beforeOperationalAction)
+    expect(runtime.toggleVisibility('actions')).toEqual(beforeOperationalAction)
+    expect(runtime.move('actions', 'deviceId')).toEqual(beforeOperationalAction)
     expect(runtime.move('select', 'deviceId')).toEqual(beforeOperationalAction)
     expect(runtime.move('deviceId', 'pinReset')).toEqual(beforeOperationalAction)
   })

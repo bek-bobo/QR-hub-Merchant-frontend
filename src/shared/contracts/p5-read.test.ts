@@ -25,6 +25,16 @@ describe('P5 read contract', () => {
     expect(decodeP5Page(page(row)).content[0]).toEqual(row)
   })
 
+  it('preserves exact static QR and terminal detail fields without mutating the DTO', () => {
+    const input = Object.freeze({ ...row, terminalType: 'P5 / exact', staticQrId: '00Qr-ID',
+      staticQrLink: 'https://pay.example/Exact%2fPath?Case=Yes&next=%2Fkeep#Fragment', staticQrStatus: 0 })
+    const decoded = decodeP5Page(page(input)).content[0]
+    expect(decoded).toEqual(input)
+    expect(decoded).not.toBe(input)
+    expect(Object.isFrozen(decoded)).toBe(true)
+    expect(decoded?.description).toBeNull()
+  })
+
   it('preserves unknown integer statuses without treating them as an enum', () => {
     expect(decodeP5Page(page({ ...row, deviceStatus: 777, staticQrStatus: -12 })).content[0])
       .toMatchObject({ deviceStatus: 777, staticQrStatus: -12 })
