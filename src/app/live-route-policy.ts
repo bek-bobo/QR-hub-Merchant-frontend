@@ -2,7 +2,7 @@ import { can, type AccessContextValue, type Capability } from '@/shared/auth/acc
 import type { SessionSnapshot } from '@/shared/auth/session-controller'
 import type { ReadApiRegistrations } from './read/createLiveReadApi'
 
-export type LiveFeatureRoute = 'dashboard' | 'dynamicQr' | 'exportQr' | 'staticQr' | 'terminals' | 'bankAccounts' | 'cashiers' | 'cashierCreate' | 'devices'
+export type LiveFeatureRoute = 'dashboard' | 'dynamicQr' | 'exportQr' | 'staticQr' | 'terminals' | 'bankAccounts' | 'cashiers' | 'devices'
 export type LiveFeatureRouteDecision =
   | 'login'
   | 'pending'
@@ -46,12 +46,6 @@ export const liveFeatureRouteDefinitions = {
   cashiers: {
     path: '/cashiers',
     capability: 'cashier.read',
-    registration: 'cashierList',
-  },
-  cashierCreate: {
-    path: '/cashiers/new',
-    capability: 'cashier.create',
-    // Registration reflects the shared web base only; no cashier.read grant is checked.
     registration: 'cashierList',
   },
   devices: {
@@ -106,6 +100,10 @@ export function isLiveRouteAccessible(
 
   if (path === '/account') {
     return can(input.access, 'profile.read', false)
+  }
+
+  if (path === '/cashiers/new') {
+    return isLiveRouteAccessible('/cashiers', input)
   }
 
   if (path === '/dynamic-qrs/new') {

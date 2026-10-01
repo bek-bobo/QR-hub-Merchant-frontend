@@ -165,10 +165,10 @@ describe('live post-login context', () => {
     expect(resolveLoginLanding(writeOnly)).not.toBe('/cashiers')
   })
 
-  it('returns directly to cashier create for a create-only user', () => {
+  it('does not land on the retired cashier create page', () => {
     const registrations = { ...configured, cashierList: { kind: 'configured' as const } }
     const createOnly = buildLiveLoginLandingContext({ state: { returnTo: '/cashiers/new' }, access: authenticated('CREATE_CASHIER'), registrations })
-    expect(resolveLoginLanding(createOnly)).toBe('/cashiers/new')
+    expect(resolveLoginLanding(createOnly)).not.toBe('/cashiers/new')
     const readOnly = buildLiveLoginLandingContext({ state: { returnTo: '/cashiers/new' }, access: authenticated('GET_CASHIERS'), registrations })
     expect(resolveLoginLanding(readOnly)).not.toBe('/cashiers/new')
   })

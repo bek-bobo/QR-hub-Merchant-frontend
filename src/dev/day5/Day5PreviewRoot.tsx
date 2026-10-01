@@ -9,7 +9,7 @@ import { BankAccountPage } from '@/features/bank-accounts/BankAccountPage'
 import { Button } from '@/components/ui/button'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import { NoAccessState } from '@/shared/ui/AsyncState'
-import { Day5CashierPreview, Day5CreatePreview } from './actions'
+import { Day5CashierPreview } from './actions'
 import { createDay5ReadRuntime, createDay5Simulator, day5ScenarioNames, D5_FIXED_INSTANT, type Day5Scenario, type Day5Simulator } from './simulator'
 
 // D5-MGMT-DEMO-ONLY. Loaded only by the DEV/demo dynamic route in AppRouter.
@@ -56,7 +56,6 @@ function PreviewExperience({ scenario, revision, onScenarioChange }: {
     { feature: 'terminals', path: '/dev/day5/terminals', label: 'Terminallar' },
     { feature: 'bankAccounts', path: '/dev/day5/bank-accounts', label: 'Bank hisoblari' },
     { feature: 'cashiers', path: '/dev/day5/cashiers', label: 'Kassirlar' },
-    { feature: 'cashierCreate', path: '/dev/day5/cashiers/new', label: 'Yangi kassir' },
   ] as const
   function changeScenario(next: Day5Scenario) {
     queryClient.clear()
@@ -102,7 +101,6 @@ function PreviewExperience({ scenario, revision, onScenarioChange }: {
           <Route path="terminals" element={<DemoGate simulator={simulator} feature="terminals"><TerminalPage /></DemoGate>} />
           <Route path="bank-accounts" element={<DemoGate simulator={simulator} feature="bankAccounts"><BankAccountPage /></DemoGate>} />
           <Route path="cashiers" element={<DemoGate simulator={simulator} feature="cashiers"><Day5CashierPreview key={`${snapshot.scope.sessionScopeId}:${snapshot.scope.accessRevision}`} simulator={simulator} /></DemoGate>} />
-          <Route path="cashiers/new" element={<DemoGate simulator={simulator} feature="cashierCreate"><Day5CreatePreview key={`${snapshot.scope.sessionScopeId}:${snapshot.scope.accessRevision}`} simulator={simulator} /></DemoGate>} />
         </Routes>
       </main>
     </div>

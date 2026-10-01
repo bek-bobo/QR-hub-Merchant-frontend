@@ -7,7 +7,7 @@ import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read
 import { buildAssignTerminalsRequest, createAssignTerminalsController, decodeAssignTerminalsSuccess, resolveCurrentAssignTarget } from './assign-terminals'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
-const cashier: CashierRow = { id: '41', fullname: 'Cashier', phone: '998901234567', roleDisplay: 'User', statusCode: 777,
+const cashier: CashierRow = { createdAt: null, updatedAt: null, id: '41', fullname: 'Cashier', phone: '998901234567', roleDisplay: 'User', statusCode: 777,
   terminals: [{ id: 'active', name: 'Already active', statusCode: 0 }] }
 const options: readonly TerminalOption[] = [{ id: 'active', name: 'Already active' }, { id: 'new', name: 'New or inactive' }]
 const success = { success: true, data: null }

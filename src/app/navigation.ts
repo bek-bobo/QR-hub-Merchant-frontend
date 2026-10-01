@@ -5,7 +5,6 @@ import {
   QrCodeIcon,
   ScanLineIcon,
   SmartphoneIcon,
-  UserPlusIcon,
   UserRoundIcon,
   UsersIcon,
   type LucideIcon,
@@ -109,9 +108,6 @@ export const liveNavigationItems = [
   },
   {
     label: 'Kassirlar', path: '/cashiers', icon: UsersIcon, capability: 'cashier.read', availability: 'ready', registration: 'cashierList',
-  },
-  {
-    label: 'Yangi kassir', path: '/cashiers/new', icon: UserPlusIcon, capability: 'cashier.create', availability: 'ready', registration: 'cashierList',
   },
   {
     label: 'P5 qurilmalari', path: '/devices', icon: SmartphoneIcon, capability: 'p5.read', availability: 'ready', registration: 'p5List',

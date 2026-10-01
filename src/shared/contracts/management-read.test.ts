@@ -5,6 +5,23 @@ import { toTerminalListQuery, toBankAccountListQuery, toCashierListQuery, toMerc
 const page = (row: unknown) => ({ success: true, data: { content: [row], totalElements: 1, totalPages: 1, page: 0, size: 10 } })
 
 describe('management read boundaries', () => {
+  it('preserves cashier terminal order, exact IDs/names/statuses, and optional dates', () => {
+    const terminals = [{ terminalId: 'ID-Case-01', terminalName: ' Terminal Z ', status: 1 },
+      { terminalId: 'ID-Case-02', terminalName: 'Terminal A', status: 0 },
+      { terminalId: 'ID-Case-01', terminalName: 'Duplicate', status: 777 }]
+    const cashier = { id: 41, fullname: 'Cashier', phone: '998901234567', status: 0,
+      role: 'User', terminals, createdAt: '2026-10-01T10:15:20', updatedAt: null }
+    const decoded = decodeCashierPage(page(cashier)).content[0]
+    expect(decoded).toMatchObject({ id: '41', fullname: 'Cashier', phone: cashier.phone,
+      statusCode: 0, roleDisplay: 'User', createdAt: cashier.createdAt, updatedAt: null })
+    expect(decoded?.terminals).toEqual(terminals.map((terminal) => ({
+      id: terminal.terminalId, name: terminal.terminalName, statusCode: terminal.status,
+    })))
+    expect(Object.isFrozen(decoded?.terminals)).toBe(true)
+    expect(decodeCashierPage(page({ ...cashier, terminals: [] })).content[0]?.terminals).toEqual([])
+    expect(decodeCashierPage(page({ ...cashier, createdAt: undefined, updatedAt: 'invalid' })).content[0])
+      .toMatchObject({ createdAt: null, updatedAt: null })
+  })
   it('preserves confirmed terminal details and exact strings without mutating the DTO', () => {
     const row = Object.freeze({ pkey: 'T-Exact', name: ' Terminal A ', status: 0,
       merchantId: 2, merchantName: 'M', bankAccountId: 3, bankAccountName: 'B',

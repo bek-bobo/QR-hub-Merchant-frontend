@@ -3,10 +3,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
+import { UserPlusIcon } from 'lucide-react'
+import { CreateCashierDialog } from '@/features/cashiers/CreateCashierDialog'
+import { CashierCreateAdapterContext, type CashierCreateAdapter } from '@/features/cashiers/cashier-create-adapter'
 import { CashierResults } from '@/features/cashiers/CashierResults'
 import { CASHIER_DEFAULT_COLUMN_ORDER } from '@/features/cashiers/columns'
 import { applyCashierDraft, cashierParentState, createDefaultCashierFilters } from '@/features/cashiers/page-state'
-import { createCashierCreateController, invalidateCurrentCashierLists } from '@/features/cashiers/create-cashier'
+import { invalidateCurrentCashierLists } from '@/features/cashiers/create-cashier'
 import { createAssignTerminalsController, resolveCurrentAssignTarget } from '@/features/cashiers/assign-terminals'
 import { createUnassignTerminalController, resolveCurrentUnassignTarget, type UnassignTarget } from '@/features/cashiers/unassign-terminal'
 import type { CashierRow } from '@/shared/contracts/management-read'
@@ -25,43 +28,29 @@ function outcomeCopy(kind: string): string {
   return 'Amal yuborilmagan.'
 }
 
-export function Day5CreatePreview({ simulator }: { readonly simulator: Day5Simulator }) {
+function Day5CreateDialog({ simulator, onClose, onCloseAutoFocus }: {
+  readonly simulator: Day5Simulator
+  readonly onClose: () => void
+  readonly onCloseAutoFocus: NonNullable<Parameters<typeof CreateCashierDialog>[0]['onCloseAutoFocus']>
+}) {
   const runtime = useReadRuntime()
   const queryClient = useQueryClient()
   const lookupOptions = runtime.queries.terminalLookupOptions()
-  const lookup = useQuery(lookupOptions)
-  const [fullname, setFullname] = useState('D5-MGMT-DEMO New Cashier')
-  const [phone, setPhone] = useState(simulator.getSnapshot().scenario === 'DUPLICATE_PHONE' ? '998901000001' : '998901000099')
-  const [ids, setIds] = useState<string[]>([])
-  const currentOptions = (): readonly TerminalOption[] | null => {
-    const state = queryClient.getQueryState<readonly TerminalOption[]>(lookupOptions.queryKey)
-    return simulator.has('terminal.lookup') && state?.status === 'success' && !state.isInvalidated ? state.data ?? null : null
-  }
-  const [controller] = useState(() => createCashierCreateController({
-    currentScope: simulator.getCurrentScope, canCreate: () => simulator.has('cashier.create'),
-    currentTerminalOptions: currentOptions, port: () => simulator.actionAvailable ? simulator.ports.create : null,
+  const adapter: CashierCreateAdapter = {
+    currentScope: simulator.getCurrentScope,
+    canCreate: () => simulator.has('cashier.create'),
+    canReadList: () => simulator.has('cashier.read'),
+    currentTerminalOptions: () => {
+      const state = queryClient.getQueryState<readonly TerminalOption[]>(lookupOptions.queryKey)
+      return simulator.getCurrentScope() === runtime.scope && simulator.has('terminal.lookup') &&
+        state?.status === 'success' && !state.isInvalidated ? state.data ?? null : null
+    },
+    port: () => simulator.actionAvailable ? simulator.ports.create : null,
     invalidateConfirmed: async (scope) => invalidateCurrentCashierLists(queryClient, scope, simulator.has('cashier.read')),
-  }))
-  const state = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState)
-  const [message, setMessage] = useState<string | null>(null)
-  function submit() {
-    void controller.submit({ fullname, phone, terminalIds: ids }).then((result) => {
-      if (result.kind === 'not-sent') setMessage(result.reason)
-    })
   }
-  return <div className="mx-auto max-w-2xl space-y-4">
-    <header><h2 className="text-2xl font-semibold">Sintetik kassir yaratish</h2><p className="text-sm text-text-secondary">Real create controller va fake port; telefon faqat RAM’da.</p></header>
-    <label className="block space-y-1 text-sm">F.I.Sh.<Input value={fullname} onChange={(event) => setFullname(event.target.value)} /></label>
-    <label className="block space-y-1 text-sm">Telefon<Input value={phone} onChange={(event) => setPhone(event.target.value)} /></label>
-    <fieldset className="space-y-2"><legend className="text-sm font-medium">Joriy terminal lookup</legend>
-      {lookup.data?.map((option) => <label key={option.id} className="flex items-center gap-2 text-sm"><input type="checkbox" checked={ids.includes(option.id)} onChange={(event) => setIds((current) => event.target.checked ? [...current, option.id] : current.filter((id) => id !== option.id))} />{option.name}</label>)}
-    </fieldset>
-    {!simulator.has('terminal.lookup') || lookup.isError ? <p role="status">Terminal lookup mavjud emas; create DELETE/POST 0.</p> : null}
-    <div className="flex flex-wrap gap-2"><Button type="button" disabled={state.outcome.kind === 'pending'} onClick={submit}>Sintetik kassir yaratish</Button>
-      {state.outcome.kind === 'unknown' || state.outcome.kind === 'rejected' || state.outcome.kind === 'confirmed' ? <Button type="button" variant="outline" onClick={() => { if (controller.beginNewIntent()) { setFullname(''); setPhone(''); setIds([]); setMessage(null) } }}>Yangi intent</Button> : null}</div>
-    {message ? <p role="alert">{message}</p> : null}
-    <p role="status">{outcomeCopy(state.outcome.kind)}</p>
-  </div>
+  return <CashierCreateAdapterContext value={adapter}>
+    <CreateCashierDialog onClose={onClose} onCloseAutoFocus={onCloseAutoFocus} />
+  </CashierCreateAdapterContext>
 }
 
 function AssignPreview({ simulator, row, data, resultKey, dataUpdatedAt, onOutcome, isSelected }: {
@@ -153,6 +142,9 @@ function UnassignPreview({ simulator, target, data, resultKey, dataUpdatedAt, is
 
 export function Day5CashierPreview({ simulator }: { readonly simulator: Day5Simulator }) {
   const runtime = useReadRuntime()
+  const [createOpen, setCreateOpen] = useState(false)
+  const createTrigger = useRef<HTMLButtonElement | null>(null)
+  const canCreate = simulator.has('cashier.create')
   const [draft, setDraft] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [applied, setApplied] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [filterMessage, setFilterMessage] = useState<string | null>(null)
@@ -215,6 +207,7 @@ export function Day5CashierPreview({ simulator }: { readonly simulator: Day5Simu
     </div>
     {actionNotice ? <p role="status" className="rounded-lg border p-3">{outcomeCopy(actionNotice)} {result.isError ? 'Cashier read xatosi alohida ko‘rsatiladi.' : ''}</p> : null}
     <CashierResults blocked={!parentReady || Boolean(applied.terminalId && !baseOptions.enabled)} pending={result.isPending} error={result.isError} data={result.data}
+      headerActions={canCreate ? <Button ref={createTrigger} type="button" onClick={() => setCreateOpen(true)}><UserPlusIcon aria-hidden="true" />Yangi kassir</Button> : null}
       selected={currentSelected} columnOrder={CASHIER_DEFAULT_COLUMN_ORDER} visibleColumnIds={CASHIER_DEFAULT_COLUMN_ORDER}
       onRetry={() => void result.refetch()} onPageChange={(next) => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setApplied((current) => changeManagementPage(current, next)); setSelected(null); setUnassign(null); setActionNotice(null) }}
       onSelect={(row) => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = row; unassignRef.current = null; setSelected(row); setUnassign(null); setActionNotice(null) }} onClose={() => { selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setSelected(null); setUnassign(null); setActionNotice(null) }}
@@ -227,5 +220,7 @@ export function Day5CashierPreview({ simulator }: { readonly simulator: Day5Simu
         ? <AssignPreview key={`${options.queryKey.join(':')}:${result.dataUpdatedAt}:${currentSelected.id}`}
           simulator={simulator} row={currentSelected} data={result.data} resultKey={options.queryKey} dataUpdatedAt={result.dataUpdatedAt}
           isSelected={() => selectedRef.current === currentSelected && selectedEpochRef.current === selectedEpoch} onOutcome={setActionNotice} /> : null} />
+    {createOpen && canCreate ? <Day5CreateDialog simulator={simulator} onClose={() => setCreateOpen(false)}
+      onCloseAutoFocus={(event) => { event.preventDefault(); createTrigger.current?.focus() }} /> : null}
   </div>
 }

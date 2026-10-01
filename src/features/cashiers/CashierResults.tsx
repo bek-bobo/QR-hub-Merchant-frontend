@@ -1,15 +1,13 @@
-import type { ReactNode } from 'react'
-import { Badge } from '@/components/ui/badge'
+import { useRef, type ReactNode } from 'react'
+import { MonitorIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
-import { MetadataId } from '@/shared/presentation/MetadataId'
-import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
-import { presentCashierTerminalStatus } from './status-presentation'
+import { CashierTerminalsDialog } from './CashierTerminalsDialog'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
@@ -57,6 +55,7 @@ export function CashierResults({ blocked, pending, error, data, selected,
   columnOrder, visibleColumnIds, onRetry, onPageChange, onSelect, onClose,
   headerActions, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const selectionTrigger = useRef<HTMLButtonElement | null>(null)
 
   return <div className="min-w-0 space-y-4">
     <Card className="min-w-0" aria-busy={pending}>
@@ -77,7 +76,12 @@ export function CashierResults({ blocked, pending, error, data, selected,
             <TableBody>{data.content.map((row, index) => {
               return <TableRow key={`${row.id}-${index}`}>
                 {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
-                <TableCell className="text-right"><Button type="button" variant="outline" size="sm" aria-label={`${row.fullname}: Biriktirishlarni ko‘rish`} aria-expanded={selected?.id === row.id} onClick={() => onSelect(row)}>Biriktirishlarni ko‘rish</Button></TableCell>
+                <TableCell className="text-right"><Button type="button" variant="outline" size="sm"
+                  className="whitespace-nowrap" aria-label={`${row.fullname} uchun biriktirilgan terminallarni ko‘rish`}
+                  aria-haspopup="dialog" aria-expanded={selected?.id === row.id}
+                  onClick={(event) => { selectionTrigger.current = event.currentTarget; onSelect(row) }}>
+                  <MonitorIcon className="size-4" aria-hidden="true" />Terminallar · {row.terminals.length}
+                </Button></TableCell>
               </TableRow>
             })}</TableBody>
           </Table>
@@ -88,17 +92,13 @@ export function CashierResults({ blocked, pending, error, data, selected,
           onPageChange={onPageChange} /> : null}
       </CardContent>
     </Card>
-    {selected ? <Card className="min-w-0"><CardContent className="space-y-3 p-4">
-      <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="font-semibold">{selected.fullname} — faol terminal biriktirishlari</h3><Button type="button" variant="outline" size="sm" onClick={onClose}>Yopish</Button></div>
-      <section aria-label="Faol terminal biriktirishlari">
-        {selected.terminals.length === 0 ? <p className="text-sm text-text-secondary">Terminal biriktirilmagan.</p>
-          : <ul className="max-h-64 space-y-2 overflow-y-auto text-sm">{selected.terminals.map((terminal, index) => {
-            const status = presentCashierTerminalStatus(terminal.statusCode)
-            return <li key={`${terminal.id}-${index}`} className="flex min-w-0 flex-wrap items-center gap-2 rounded-lg border p-2"><span className="font-medium text-foreground">{terminal.name}</span><MetadataId value={terminal.id} variant="secondary" className="max-w-64" /><Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge>{onUnassign ? <Button type="button" variant="outline" size="sm" aria-label={`${terminal.name} (${terminal.id}) terminalini ajratish`} onClick={() => onUnassign(terminal)}>Ajratish</Button> : null}</li>
-          })}</ul>}
-      </section>
-      {unassignSurface}
-      {assignSurface}
-    </CardContent></Card> : null}
+    {selected ? <CashierTerminalsDialog key={selected.id} cashier={selected} onClose={onClose}
+      assignSurface={assignSurface} onUnassign={onUnassign} unassignSurface={unassignSurface}
+      onCloseAutoFocus={(event) => {
+        if (selectionTrigger.current?.isConnected) {
+          event.preventDefault()
+          selectionTrigger.current.focus()
+        }
+      }} /> : null}
   </div>
 }

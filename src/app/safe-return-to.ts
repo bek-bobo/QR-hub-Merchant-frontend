@@ -8,7 +8,6 @@ const safeLiveReturnTargets = new Set([
   '/terminals',
   '/bank-accounts',
   '/cashiers',
-  '/cashiers/new',
   '/dynamic-qrs/new',
   '/dynamic-qrs/export',
   '/devices',

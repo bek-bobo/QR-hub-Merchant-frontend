@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { resolveSafeReturnTo, resolveSafeReturnToState } from './safe-return-to'
 
 describe('safe live return target', () => {
-  it.each(['/account', '/dashboard', '/dynamic-qrs', '/dynamic-qrs/new', '/dynamic-qrs/export', '/static-qrs', '/terminals', '/bank-accounts', '/cashiers', '/cashiers/new', '/devices'])(
+  it.each(['/account', '/dashboard', '/dynamic-qrs', '/dynamic-qrs/new', '/dynamic-qrs/export', '/static-qrs', '/terminals', '/bank-accounts', '/cashiers', '/devices'])(
     'accepts the allowlisted path %s',
     (path) => {
       expect(resolveSafeReturnTo(path)).toBe(path)
@@ -10,6 +10,7 @@ describe('safe live return target', () => {
   )
 
   it.each([
+    '/cashiers/new',
     'https://example.com',
     '//example.com',
     'javascript:alert(1)',

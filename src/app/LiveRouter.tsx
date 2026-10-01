@@ -34,7 +34,6 @@ const StaticQrPage = lazy(() => import('@/features/static-qr/StaticQrPage').then
 const TerminalPage = lazy(() => import('@/features/terminals/TerminalPage').then((module) => ({ default: module.TerminalPage })))
 const BankAccountPage = lazy(() => import('@/features/bank-accounts/BankAccountPage').then((module) => ({ default: module.BankAccountPage })))
 const CashierPage = lazy(() => import('@/features/cashiers/CashierPage').then((module) => ({ default: module.CashierPage })))
-const CreateCashierPage = lazy(() => import('@/features/cashiers/CreateCashierPage').then((module) => ({ default: module.CreateCashierPage })))
 const P5Page = lazy(() => import('@/features/p5/P5Page').then((module) => ({ default: module.P5Page })))
 
 function FullPageLoading() {
@@ -185,10 +184,6 @@ const featurePresentation = {
     unavailableTitle: 'Kassirlar ro‘yxati hozircha sozlanmagan',
     unavailableDescription: 'Kassirlar ro‘yxati ushbu muhitda hozircha mavjud emas.',
   },
-  cashierCreate: {
-    unavailableTitle: 'Kassir yaratish hozircha sozlanmagan',
-    unavailableDescription: 'Kassir yaratish transporti ushbu muhitda mavjud emas.',
-  },
   devices: {
     unavailableTitle: 'P5 qurilmalari ro‘yxati hozircha sozlanmagan',
     unavailableDescription: 'P5 qurilmalari ro‘yxati ushbu muhitda hozircha mavjud emas.',
@@ -296,9 +291,7 @@ function CashierRoute() {
 }
 
 function CreateCashierRoute() {
-  const runtime = useReadRuntime()
-  const scopeKey = `${runtime.scope.source}:${runtime.scope.sessionScopeId}:${runtime.scope.accessRevision}`
-  return <LiveFeatureRoute feature="cashierCreate" pageTitle="Kassir yaratish"><Suspense fallback={<LoadingState title="Kassir yaratish sahifasi yuklanmoqda" />}><CreateCashierPage key={scopeKey} /></Suspense></LiveFeatureRoute>
+  return <Navigate to="/cashiers" replace />
 }
 
 function DevicesRoute() {
@@ -414,7 +407,7 @@ export function LiveRouter() {
         <Route path={liveFeatureRouteDefinitions.terminals.path} element={<TerminalRoute />} />
         <Route path={liveFeatureRouteDefinitions.bankAccounts.path} element={<BankAccountRoute />} />
         <Route path={liveFeatureRouteDefinitions.cashiers.path} element={<CashierRoute />} />
-        <Route path={liveFeatureRouteDefinitions.cashierCreate.path} element={<CreateCashierRoute />} />
+        <Route path="/cashiers/new" element={<CreateCashierRoute />} />
         <Route path={liveFeatureRouteDefinitions.devices.path} element={<DevicesRoute />} />
         <Route path="/dynamic-qrs/new" element={<CreateQrRoute />} />
         <Route path="/dynamic-qrs/export" element={<ExportQrRoute />} />

@@ -10,7 +10,7 @@ const signal = new AbortController().signal
 
 describe('D5-MGMT-DEMO-ONLY scenario boundary', () => {
   it('keeps exact production routes while rejecting DEV return targets', () => {
-    expect(resolveSafeReturnTo('/cashiers/new')).toBe('/cashiers/new')
+    expect(resolveSafeReturnTo('/cashiers/new')).toBe('/account')
     expect(resolveSafeReturnTo('/dev/day5/cashiers')).toBe('/account')
     expect(resolveSafeReturnTo('/dev/day5/terminals')).toBe('/account')
     expect(resolveSafeReturnTo('/dev/day5/bank-accounts')).toBe('/account')

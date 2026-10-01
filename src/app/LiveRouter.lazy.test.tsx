@@ -73,6 +73,11 @@ beforeEach(() => {
 })
 
 describe('production lazy route boundaries', () => {
+  it('redirects the legacy cashier create URL without rendering a standalone page', async () => {
+    state.path = '/cashiers/new'
+    expect(await renderRoute()).toContain('data-redirect="/cashiers"')
+    expect(routerSource).not.toContain('CreateCashierPage')
+  })
   it('keeps the authenticated shell visible while the Dashboard import is pending', () => {
     const html = renderToStaticMarkup(<LiveRouter />)
     expect(html).toContain('Dashboard sahifasi yuklanmoqda')

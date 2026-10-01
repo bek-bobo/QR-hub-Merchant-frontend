@@ -7,7 +7,7 @@ import { buildUnassignQuery, createUnassignTerminalController, decodeUnassignSuc
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
 const terminal: CashierTerminal = { id: 'terminal-active', name: 'Active', statusCode: 0 }
-const cashier: CashierRow = { id: '41', fullname: 'Cashier A', phone: '998901234567', roleDisplay: 'User', statusCode: 777, terminals: [terminal] }
+const cashier: CashierRow = { createdAt: null, updatedAt: null, id: '41', fullname: 'Cashier A', phone: '998901234567', roleDisplay: 'User', statusCode: 777, terminals: [terminal] }
 const data: Page<CashierRow> = { content: [cashier], totalElements: 1, totalPages: 1, page: 0, size: 10 }
 const target = { cashier, terminal }
 const success = { success: true, data: null }

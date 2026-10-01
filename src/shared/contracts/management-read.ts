@@ -12,7 +12,7 @@ export type TerminalRow = Readonly<{
 }>
 export type BankAccountRow = Readonly<{ id: string; name: string; bankName: string; accountNumber: string; tin: string | null; mfo: string | null; contractNumber: string | null; merchantId: string; merchantName: string; statusCode: ManagementStatus }>
 export type CashierTerminal = Readonly<{ id: string; name: string; statusCode: ManagementStatus }>
-export type CashierRow = Readonly<{ id: string; fullname: string; phone: string; statusCode: ManagementStatus; roleDisplay: string | null; terminals: readonly CashierTerminal[] }>
+export type CashierRow = Readonly<{ id: string; fullname: string; phone: string; statusCode: ManagementStatus; roleDisplay: string | null; terminals: readonly CashierTerminal[]; createdAt: string | null; updatedAt: string | null }>
 export type ManagementOption = Readonly<{ id: string; name: string }>
 
 function longId(value: unknown): string { return String(safeInteger(value, 0)) }
@@ -84,7 +84,7 @@ export function decodeCashierPage(payload: unknown): Page<CashierRow> {
       const terminal = contractObject(value)
       return Object.freeze({ id: requiredString(terminal.terminalId), name: requiredString(terminal.terminalName), statusCode: status(terminal.status) })
     })
-    return Object.freeze({ id: longId(row.id), fullname: requiredString(row.fullname), phone: requiredString(row.phone), statusCode: status(row.status), roleDisplay: optionalText(row.role), terminals: Object.freeze(terminals) })
+    return Object.freeze({ id: longId(row.id), fullname: requiredString(row.fullname), phone: requiredString(row.phone), statusCode: status(row.status), roleDisplay: optionalText(row.role), terminals: Object.freeze(terminals), createdAt: terminalDetailDate(row.createdAt), updatedAt: terminalDetailDate(row.updatedAt) })
   })
 }
 

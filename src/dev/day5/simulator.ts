@@ -94,7 +94,7 @@ function makeCashier(index: number, terminals: readonly TerminalRow[]): DemoCash
   const active = members.map((terminal) => ({ id: terminal.id, name: terminal.name, statusCode: 0 }))
   return { row: { id: String(100 + index), fullname: `D5-MGMT-DEMO Cashier ${index}`,
     phone: `9989010000${String(index).padStart(2, '0')}`, roleDisplay: 'Synthetic display only',
-    statusCode: index === 12 ? 777 : 0, terminals: active }, merchantId,
+    statusCode: index === 12 ? 777 : 0, terminals: active, createdAt: null, updatedAt: null }, merchantId,
     historicalTerminalIds: members.map((terminal) => terminal.id) }
 }
 
@@ -181,7 +181,7 @@ export function createDay5Simulator(scenario: Day5Scenario, revision = 1) {
       const next = String(200 + cashiers.length + 1)
       const members = request.terminalIds.map((id) => terminalRows.find((row) => row.id === id)).filter((row): row is TerminalRow => row !== undefined)
       cashiers = [{ row: { id: next, fullname: request.fullname, phone: request.phone,
-        statusCode: 0, roleDisplay: 'Synthetic display only', terminals: members.map((row) => ({ id: row.id, name: row.name, statusCode: 0 })) },
+        statusCode: 0, roleDisplay: 'Synthetic display only', terminals: members.map((row) => ({ id: row.id, name: row.name, statusCode: 0 })), createdAt: null, updatedAt: null },
         merchantId: members[0]?.merchantId ?? '1', historicalTerminalIds: request.terminalIds }, ...cashiers]
       emit()
       return afterMutation()

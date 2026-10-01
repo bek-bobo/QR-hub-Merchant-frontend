@@ -1,12 +1,20 @@
-import { createElement } from 'react'
+import { createElement, type ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { decodeCashierPage, type CashierRow } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
 import { CASHIER_DEFAULT_COLUMN_ORDER } from './columns'
 import { CashierResults } from './CashierResults'
 
-const cashier: CashierRow = { id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [{ id: 'term-active', name: 'Active Terminal', statusCode: 0 }, { id: 'term-second', name: 'Second Terminal', statusCode: 0 }] }
+vi.mock('radix-ui', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('radix-ui')>()
+  const part = ({ children }: { children?: ReactNode }) => <div>{children}</div>
+  return { ...actual, Dialog: { ...actual.Dialog,
+    Root: part, Portal: part, Overlay: part, Content: part, Title: part, Description: part, Close: part,
+  } }
+})
+
+const cashier: CashierRow = { createdAt: null, updatedAt: null, id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [{ id: 'term-active', name: 'Active Terminal', statusCode: 0 }, { id: 'term-second', name: 'Second Terminal', statusCode: 0 }] }
 const page: Page<CashierRow> = { content: [cashier, { ...cashier, id: '12', fullname: 'Cashier B', terminals: [] }], totalElements: 47, totalPages: 5, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof CashierResults>[0]> = {}) => renderToString(createElement(CashierResults, { data: page, selected: null, blocked: false, pending: false, error: false, columnOrder: CASHIER_DEFAULT_COLUMN_ORDER, visibleColumnIds: CASHIER_DEFAULT_COLUMN_ORDER, onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined, onClose: () => undefined, ...overrides }))
 
@@ -21,7 +29,7 @@ describe('cashier results', () => {
     const text = html.replace(/<!-- -->/g, '')
     expect(html.indexOf('Cashier A')).toBeLessThan(html.indexOf('Cashier B'))
     expect(html).toContain('Cashier B')
-    expect(html).toContain('Terminal biriktirilmagan')
+    expect(html).toContain('Bu kassirga terminal biriktirilmagan.')
     expect(html).not.toContain('term-inactive-filter')
     expect(text).not.toContain('Jami: 47')
     expect(html).toContain('aria-current="page"')
@@ -39,7 +47,7 @@ describe('cashier results', () => {
     expect(decoded.content[0].terminals).toEqual([])
     const html = render({ data: decoded, selected: decoded.content[0] })
     expect(html).toContain('Cashier B')
-    expect(html).toContain('Terminal biriktirilmagan')
+    expect(html).toContain('Bu kassirga terminal biriktirilmagan.')
     expect(html).not.toContain('term-inactive-filter')
   })
 
@@ -102,9 +110,9 @@ describe('cashier results', () => {
       'Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Faol terminallar',
     ])
     expect(cellTexts(html, 'td')).toEqual([
-      'Noma’lum', 'Cashier A', 'Merchant user', '+998900000001', 'Biriktirishlarni ko‘rish',
+      'Noma’lum', 'Cashier A', 'Merchant user', '+998900000001', `Terminallar · ${cashier.terminals.length}`,
     ])
-    expect(html).toContain('aria-label="Cashier A: Biriktirishlarni ko‘rish"')
+    expect(html).toContain('aria-label="Cashier A uchun biriktirilgan terminallarni ko‘rish"')
   })
 
   it('hides and restores a business column without affecting Faol terminallar', () => {
@@ -129,6 +137,6 @@ describe('cashier results', () => {
     const scrollRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="Kassirlar jadvali"[^>]*>/)?.[0]
     expect(scrollRegion).toContain('overflow-x-auto')
     expect(cellTexts(html, 'th')).toEqual(['F.I.Sh.', 'Faol terminallar'])
-    expect(html).toContain('Biriktirishlarni ko‘rish')
+    expect(html).toContain('Terminallar · ')
   })
 })

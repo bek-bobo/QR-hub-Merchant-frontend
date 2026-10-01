@@ -5,7 +5,7 @@ import { changeManagementPage, changeMerchantDraft, clearManagementFilters, toCa
 import { applyCashierDraft, cashierParentState, cashierSelectionKey, createCashierTarget, createDefaultCashierFilters, resolveCashierTarget } from './page-state'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
-const cashier: CashierRow = { id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [] }
+const cashier: CashierRow = { createdAt: null, updatedAt: null, id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [] }
 
 describe('cashier filter state', () => {
   it('serializes only the supported server subset and resets page on apply and clear', () => {

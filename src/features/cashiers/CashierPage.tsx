@@ -1,5 +1,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { UserPlusIcon } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
@@ -20,6 +22,7 @@ import { AssignTerminalsPanel } from './AssignTerminalsPanel'
 import { UnassignTerminalPanel } from './UnassignTerminalPanel'
 import type { UnassignTarget } from './unassign-terminal'
 import { cashierColumns } from './columns'
+import { CreateCashierDialog } from './CreateCashierDialog'
 
 function terminalLookupState(enabled: boolean, error: boolean, data: readonly TerminalOption[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -72,6 +75,13 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
 
 export function CashierPage() {
   const runtime = useReadRuntime()
+  const access = useAccessContext()
+  const canCreate = can(access, 'cashier.create', false)
+  const [createScope, setCreateScope] = useState<ReadScope | null>(null)
+  const createTrigger = useRef<HTMLButtonElement | null>(null)
+  const createOpen = canCreate && createScope !== null &&
+    createScope.source === runtime.scope.source && createScope.sessionScopeId === runtime.scope.sessionScopeId &&
+    createScope.accessRevision === runtime.scope.accessRevision
   const [draft, setDraft] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [applied, setApplied] = useState<CashierListFilters>(createDefaultCashierFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
@@ -134,6 +144,10 @@ export function CashierPage() {
 
   function renderHeaderActions() {
     return <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+      {canCreate ? <Button ref={createTrigger} type="button" size="sm" aria-label="Yangi kassir yaratish" aria-haspopup="dialog"
+        aria-expanded={createOpen} onClick={() => setCreateScope(runtime.getCurrentScope())}>
+        <UserPlusIcon aria-hidden="true" />Yangi kassir
+      </Button> : null}
       <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
         {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
           <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => changeMerchantDraft(current, event.target.value || undefined))}>
@@ -187,5 +201,9 @@ export function CashierPage() {
         columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
         onSelect={() => undefined} onClose={() => undefined} headerActions={renderHeaderActions()} />}
+    {createOpen ? <CreateCashierDialog key={JSON.stringify(createScope)} onClose={() => setCreateScope(null)}
+      onCloseAutoFocus={(event) => {
+        if (createTrigger.current?.isConnected) { event.preventDefault(); createTrigger.current.focus() }
+      }} /> : null}
   </div>
 }

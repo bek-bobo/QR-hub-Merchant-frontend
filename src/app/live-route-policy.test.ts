@@ -96,14 +96,13 @@ describe('live feature route policy', () => {
     expect(decideLiveFeatureRoute('cashiers', { sessionPhase: 'authenticated', access: authenticated('GET_DROPDOWN_MERCHANTS', 'GET_DROPDOWN_TERMINALS'), registrations })).toBe('forbidden')
     expect(decideLiveFeatureRoute('cashiers', { sessionPhase: 'authenticated', access: authenticated('GET_CASHIERS'), registrations: configured })).toBe('unavailable')
   })
-  it('allows cashier create directly with its exact grant, independent of cashier read and lookup grants', () => {
+  it('applies cashier-list access to the legacy create URL destination', () => {
     const registrations = { ...configured, cashierList: { kind: 'configured' as const } }
     const createOnly = authenticated('CREATE_CASHIER', 'GET_DROPDOWN_TERMINALS')
-    expect(decideLiveFeatureRoute('cashierCreate', { sessionPhase: 'authenticated', access: createOnly, registrations })).toBe('allowed')
-    expect(isLiveRouteAccessible('/cashiers/new', { access: createOnly, registrations })).toBe(true)
+    expect(isLiveRouteAccessible('/cashiers/new', { access: createOnly, registrations })).toBe(false)
+    expect(isLiveRouteAccessible('/cashiers/new', { access: authenticated('GET_CASHIERS'), registrations })).toBe(true)
     expect(isLiveRouteAccessible('/cashiers', { access: createOnly, registrations })).toBe(false)
-    expect(decideLiveFeatureRoute('cashierCreate', { sessionPhase: 'authenticated', access: authenticated('GET_CASHIERS'), registrations })).toBe('forbidden')
-    expect(decideLiveFeatureRoute('cashierCreate', { sessionPhase: 'authenticated', access: createOnly, registrations: configured })).toBe('unavailable')
+    expect(isLiveRouteAccessible('/cashiers/new', { access: authenticated('GET_CASHIERS'), registrations: configured })).toBe(false)
   })
   it('gates devices by only GET_P5 and the P5 list registration', () => {
     const registrations = { ...configured, p5List: { kind: 'configured' as const } }

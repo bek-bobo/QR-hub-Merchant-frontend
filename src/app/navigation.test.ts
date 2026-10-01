@@ -31,7 +31,6 @@ describe('live navigation policy', () => {
       '/terminals',
       '/bank-accounts',
       '/cashiers',
-      '/cashiers/new',
       '/devices',
       '/account',
     ])
@@ -72,7 +71,7 @@ describe('live navigation policy', () => {
     const ready = { ...configured, cashierList: { kind: 'configured' as const }, terminalList: { kind: 'configured' as const }, bankAccountList: { kind: 'configured' as const } }
     expect(getLiveNavigationItems(authenticated('GET_CASHIERS'), ready).map((item) => item.path)).toEqual(['/cashiers'])
     expect(getLiveNavigationItems(authenticated('GET_CASHIERS'), configured).map((item) => item.path)).toEqual([])
-    expect(getLiveNavigationItems(authenticated('ASSIGN_TERMINALS', 'UNASSIGN_TERMINAL', 'CREATE_CASHIER'), ready).map((item) => item.path)).toEqual(['/cashiers/new'])
+    expect(getLiveNavigationItems(authenticated('ASSIGN_TERMINALS', 'UNASSIGN_TERMINAL', 'CREATE_CASHIER'), ready).map((item) => item.path)).toEqual([])
     expect(getLiveNavigationItems(authenticated('GET_TERMINAL', 'GET_BANK_ACCOUNTS', 'GET_CASHIERS'), ready).map((item) => item.path)).toEqual(['/terminals', '/bank-accounts', '/cashiers'])
     expect(getLiveNavigationItems(authenticated('CREATE_CASHIER'), configured).map((item) => item.path)).toEqual([])
   })

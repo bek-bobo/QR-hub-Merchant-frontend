@@ -1,8 +1,6 @@
-import { useMemo, useState, useSyncExternalStore, type FormEvent } from 'react'
-import { Link } from 'react-router'
+import { useContext, useEffect, useMemo, useState, useSyncExternalStore, type FormEvent } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormField } from '@/components/forms/FormField'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
@@ -14,25 +12,30 @@ import { readKeys } from '@/shared/api/read-keys'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { endpoints } from '@/shared/contracts/endpoints'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
-import { formatUzbekPhoneDisplay, toUzbekPhoneWire } from '@/shared/presentation/phone'
+import { toUzbekPhoneWire } from '@/shared/presentation/phone'
 import { UzbekPhoneInput } from '@/shared/ui/UzbekPhoneInput'
 import { buildCashierCreateRequest, createCashierCreateController, invalidateCurrentCashierLists, type CashierCreateDraft, type CashierCreatePort } from './create-cashier'
+import { CashierCreateAdapterContext, type CashierCreateAdapter } from './cashier-create-adapter'
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
   return left.source === right.source && left.sessionScopeId === right.sessionScopeId && left.accessRevision === right.accessRevision
 }
 
-export function CreateCashierPage() {
+interface CreateCashierCallbacks {
+  readonly onConfirmed: () => void
+  readonly onPendingChange: (pending: boolean) => void
+}
+
+export function CreateCashierContent(props: CreateCashierCallbacks) {
+  const adapter = useContext(CashierCreateAdapterContext)
+  return adapter ? <CashierCreateForm {...props} adapter={adapter} /> : <LiveCreateCashierContent {...props} />
+}
+
+function LiveCreateCashierContent(props: CreateCashierCallbacks) {
   const runtime = useReadRuntime()
   const { getCurrentScope } = runtime
   const queryClient = useQueryClient()
   const { getSessionSnapshot, protectedMutation } = useProtectedReadContext()
-  const [fullname, setFullname] = useState('')
-  const [phone, setPhone] = useState('')
-  const [selectedTerminalId, setSelectedTerminalId] = useState('')
-  const [message, setMessage] = useState<string | null>(null)
-  const lookupOptions = runtime.queries.terminalLookupOptions()
-  const terminals = useQuery(lookupOptions)
   const base = validateWebBaseUrl(import.meta.env.VITE_WEB_API_BASE_URL, import.meta.env.DEV ? 'development' : 'production')
   const baseUrl = base.kind === 'valid' ? base.value : null
   const transport = useMemo(() => baseUrl ? createHttpTransport({ service: 'web', baseUrl }) : null, [baseUrl])
@@ -65,11 +68,15 @@ export function CreateCashierPage() {
     const state = queryClient.getQueryState<readonly TerminalOption[]>(key)
     return state?.status === 'success' && !state.isInvalidated ? state.data ?? null : null
   }
-  const [controller] = useState(() => runtime.actionRegistry.getOrCreate(`cashier.create:${runtime.scope.source}:${runtime.scope.sessionScopeId}:${runtime.scope.accessRevision}`, () => createCashierCreateController({
+  const adapter: CashierCreateAdapter = {
     currentScope: runtime.getCurrentScope,
     canCreate: () => {
       const snapshot = getSessionSnapshot()
       return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes('CREATE_CASHIER')
+    },
+    canReadList: () => {
+      const snapshot = getSessionSnapshot()
+      return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes('GET_CASHIERS')
     },
     currentTerminalOptions: currentOptions,
     port: () => port,
@@ -79,11 +86,31 @@ export function CreateCashierPage() {
         !sameScope(scope, runtime.getCurrentScope())) return
       await invalidateCurrentCashierLists(queryClient, scope, true)
     },
-  })))
+  }
+  return <CashierCreateForm {...props} adapter={adapter} />
+}
+
+function CashierCreateForm({ adapter, onConfirmed, onPendingChange }: CreateCashierCallbacks & {
+  readonly adapter: CashierCreateAdapter
+}) {
+  const runtime = useReadRuntime()
+  const [fullname, setFullname] = useState('')
+  const [phone, setPhone] = useState('')
+  const [selectedTerminalId, setSelectedTerminalId] = useState('')
+  const [message, setMessage] = useState<string | null>(null)
+  const lookupOptions = runtime.queries.terminalLookupOptions()
+  const terminals = useQuery(lookupOptions)
+  const currentOptions = adapter.currentTerminalOptions
+  const [controller] = useState(() => {
+    const current = runtime.actionRegistry.getOrCreate(`cashier.create:${runtime.scope.source}:${runtime.scope.sessionScopeId}:${runtime.scope.accessRevision}`,
+      () => createCashierCreateController(adapter))
+    // Unresolved outcomes survive reopening; only confirmed work starts fresh.
+    if (current.getState().outcome.kind === 'confirmed') current.beginNewIntent()
+    return current
+  })
   const state = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState)
-  const session = getSessionSnapshot()
-  const canReadList = session.phase === 'authenticated' && session.profile.permissions.includes('GET_CASHIERS')
-  const canCreate = session.phase === 'authenticated' && session.profile.permissions.includes('CREATE_CASHIER')
+  const canReadList = adapter.canReadList()
+  const canCreate = adapter.canCreate()
   const visibleIntent = state.intent && sameScope(state.intent.scope, runtime.scope) ? state.intent : null
   const outcome = visibleIntent ? state.outcome : { kind: 'idle' as const }
   const phoneWire = toUzbekPhoneWire(phone)
@@ -100,12 +127,16 @@ export function CreateCashierPage() {
           : !currentOptions() ? 'Terminal tanlovi qayta tasdiqlanishi kerak.' : null
   const canSubmit = Boolean(validRequest) && !lookupReason && canCreate && outcome.kind === 'idle'
 
-  function submit(event: FormEvent<HTMLFormElement>) {
+  useEffect(() => { onPendingChange(outcome.kind === 'pending') }, [onPendingChange, outcome.kind])
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    void controller.submit(draft).then((result) => {
-      if (!sameScope(runtime.scope, runtime.getCurrentScope())) return
-      if (result.kind === 'not-sent') setMessage(result.reason)
-    })
+    onPendingChange(true)
+    const result = await controller.submit(draft)
+    onPendingChange(false)
+    if (!sameScope(runtime.scope, runtime.getCurrentScope())) return
+    if (result.kind === 'not-sent') setMessage(result.reason)
+    if (result.kind === 'confirmed') onConfirmed()
   }
 
   function freshIntent() {
@@ -116,8 +147,7 @@ export function CreateCashierPage() {
     setMessage(null)
   }
 
-  return <div className="mx-auto max-w-2xl space-y-5">
-    <Card><CardHeader><CardTitle>Yangi kassir</CardTitle></CardHeader><CardContent>
+  return <div className="min-w-0 space-y-5">
       <form className="space-y-4" onSubmit={submit}>
         <label className="block space-y-1 text-sm">F.I.Sh.<Input value={fullname} onChange={(event) => setFullname(event.target.value)} autoComplete="name" /></label>
         <FormField
@@ -151,14 +181,7 @@ export function CreateCashierPage() {
         {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
         <Button type="submit" disabled={!canSubmit}>Kassir yaratish</Button>
       </form>
-    </CardContent></Card>
     {outcome.kind === 'pending' ? <p role="status">Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.</p> : null}
-    {outcome.kind === 'confirmed' && visibleIntent ? <section role="status" className="space-y-2 rounded-lg border p-4">
-      <h3 className="font-semibold">Kassir yaratildi</h3><p>{visibleIntent.request.fullname}</p><p>{formatUzbekPhoneDisplay(visibleIntent.request.phone)}</p>
-      <p>{visibleIntent.request.terminalIds.length} ta terminal tanlangan.</p>
-      {canReadList ? <Link to="/cashiers">Kassirlar ro‘yxati</Link> : null}
-      <Button type="button" onClick={freshIntent}>Yangi kassir</Button>
-    </section> : null}
     {outcome.kind === 'unknown' ? <section role="alert" className="space-y-2 rounded-lg border p-4"><h3 className="font-semibold">Holat noma’lum</h3>
       <p>{canReadList ? 'Kassir yaratilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassirlar ro‘yxatini tekshiring.' : 'Kassir yaratilgan bo‘lishi mumkin. Takroriy yuborish yangi kassir yaratishi mumkin.'}</p>
       <Button type="button" onClick={freshIntent}>Yangi intent</Button>
