@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -32,9 +31,6 @@ export function TrendChart({ view }: TrendChartProps) {
     <Card className="min-w-0">
       <CardHeader>
         <CardTitle>Jami summa dinamikasi</CardTitle>
-        <CardDescription>
-          Backend qaytargan davrlar ketma-ketligi; bo‘sh davrlar qo‘shilmaydi.
-        </CardDescription>
       </CardHeader>
       <CardContent className="min-w-0 space-y-5">
         {points.length === 0 ? (

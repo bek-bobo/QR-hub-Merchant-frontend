@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -38,7 +37,6 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
     <Card className="min-w-0">
       <CardHeader>
         <CardTitle>Statuslar taqsimoti</CardTitle>
-        <CardDescription>Dashboard endpointi qaytargan taqsimot</CardDescription>
       </CardHeader>
       <CardContent className="flex min-w-0 flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
         <div className="w-full max-w-64 shrink-0">

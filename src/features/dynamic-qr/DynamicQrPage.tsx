@@ -145,7 +145,6 @@ export function DynamicQrPage({
   function renderFilterDrawer() {
     return (
       <FilterDrawer
-        description="O‘zgarishlar faqat “Qo‘llash” bosilganda so‘rovga qo‘shiladi."
         onApply={applyFilters}
         onReset={clearFilters}
         triggerSize="sm"

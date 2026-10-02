@@ -12,7 +12,6 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -306,10 +305,6 @@ export function TableColumnPreferences({
       >
         <SheetHeader className="relative shrink-0 border-b px-4 py-4 pr-14 text-left">
           <SheetTitle>{tableLabel} jadvali ustunlari</SheetTitle>
-          <SheetDescription>
-            Ustunlarni ko‘rsating yoki yashiring. Tartibni tutqich yoki strelkalar bilan
-            o‘zgartiring.
-          </SheetDescription>
           <SheetClose asChild>
             <Button
               type="button"

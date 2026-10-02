@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -82,7 +81,6 @@ export function RecentQrPanel({
       <CardHeader className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1 basis-64">
           <CardTitle>So‘nggi dinamik QRlar</CardTitle>
-          <CardDescription>Joriy qo‘llangan dashboard filtrlari bo‘yicha</CardDescription>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           <TableColumnPreferences

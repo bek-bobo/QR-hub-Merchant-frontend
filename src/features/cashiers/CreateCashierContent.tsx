@@ -177,7 +177,7 @@ function CashierCreateForm({ adapter, onConfirmed, onPendingChange }: CreateCash
           </Select>
         </label>
         {lookupReason ? <p role="status" className="text-sm text-text-secondary">{lookupReason}</p> : null}
-        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary">F.I.Sh., telefon va bitta joriy terminalni tanlang.</p> : null}
+        {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary"></p> : null}
         {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
         <Button type="submit" disabled={!canSubmit}>Kassir yaratish</Button>
       </form>
