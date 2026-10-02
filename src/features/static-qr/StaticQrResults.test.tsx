@@ -34,6 +34,15 @@ function render(overrides: Partial<Parameters<typeof StaticQrResults>[0]> = {}) 
 }
 
 describe('static QR result presentation', () => {
+  it('places neutral search and toolbar before the existing table with its actions and pagination', () => {
+    const html = render({ quickFilters: createElement('input', { placeholder: 'QR ID bo‘yicha' }),
+      headerActions: createElement('button', {}, 'Filtrlar') })
+    expect(html.indexOf('placeholder="QR ID bo‘yicha"')).toBeLessThan(html.indexOf('>Filtrlar</button>'))
+    expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(html.indexOf('aria-label="Statik QR jadvali"'))
+    expect(html).toContain('aria-label="Amallarni ochish"')
+    expect(html).toContain('aria-label="Statik QR sahifalari"')
+    expect(html).toContain('flex-wrap')
+  })
   it('shows human-readable active and unknown statuses without raw codes or actions', () => {
     const html = render()
     expect(html).toContain('scope="col"')
@@ -60,7 +69,7 @@ describe('static QR result presentation', () => {
 
   it('hides prior data and pagination when the applied terminal is unconfirmed', () => {
     const html = render({ terminalConfirmed: false })
-    expect(html).toContain('Tanlangan terminal endi tasdiqlanmadi')
+    expect(html).toContain('Qo‘llangan filtr tasdiqlanmadi')
     expect(html).not.toContain('QR-1')
     expect(html).not.toContain('Statik QR sahifalari')
   })

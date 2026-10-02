@@ -15,6 +15,8 @@ const configured: ReadApiRegistrations = {
   cashierList: { kind: 'unavailable', reason: 'Not configured.' },
   merchantLookup: { kind: 'unavailable', reason: 'Not configured.' },
   bankAccountLookup: { kind: 'unavailable', reason: 'Not configured.' },
+  regionLookup: { kind: 'unavailable', reason: 'Not configured.' },
+  districtLookup: { kind: 'unavailable', reason: 'Not configured.' },
   p5List: { kind: 'unavailable', reason: 'Not configured.' },
 }
 

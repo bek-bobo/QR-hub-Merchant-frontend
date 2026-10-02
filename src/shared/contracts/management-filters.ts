@@ -2,7 +2,8 @@ import { safeContractError } from '@/shared/api/errors'
 import type { PageSize } from './merchant-read'
 
 export interface ManagementFilters { readonly merchantId?: string; readonly bankAccountId?: string; readonly terminalId?: string; readonly search: string; readonly page: number; readonly size: PageSize }
-export type TerminalListFilters = Pick<ManagementFilters, 'merchantId' | 'bankAccountId' | 'search' | 'page' | 'size'>
+export type TerminalListFilters = Pick<ManagementFilters, 'merchantId' | 'bankAccountId' | 'search' | 'page' | 'size'> & { readonly regionId?: string; readonly districtId?: string }
+export type StaticQrListFilters = Pick<ManagementFilters, 'merchantId' | 'terminalId' | 'search' | 'page' | 'size'> & { readonly regionId?: string; readonly districtId?: string }
 export type BankAccountListFilters = Pick<ManagementFilters, 'merchantId' | 'search' | 'page' | 'size'>
 export type CashierListFilters = Pick<ManagementFilters, 'merchantId' | 'terminalId' | 'search' | 'page' | 'size'>
 
@@ -26,6 +27,29 @@ export function toTerminalListQuery(filters: TerminalListFilters): Readonly<Reco
   const bankAccountId = optionalLongId(filters.bankAccountId)
   if (merchantId) query.merchantId = merchantId
   if (bankAccountId) query.bankAccountId = bankAccountId
+  const regionId = optionalLongId(filters.regionId)
+  const districtId = optionalLongId(filters.districtId)
+  if (districtId && !regionId) throw safeContractError()
+  if (regionId) query.regionId = regionId
+  if (districtId) query.districtId = districtId
+  return Object.freeze(query)
+}
+export function toDistrictLookupQuery(regionId: string | undefined): Readonly<Record<string, string>> {
+  const id = optionalLongId(regionId)
+  if (!id) throw safeContractError()
+  return Object.freeze({ regionId: id })
+}
+export function toStaticQrListQuery(filters: StaticQrListFilters): Readonly<Record<string, string>> {
+  const query = base(filters)
+  const merchantId = optionalLongId(filters.merchantId)
+  const terminalId = optionalText(filters.terminalId)
+  const regionId = optionalLongId(filters.regionId)
+  const districtId = optionalLongId(filters.districtId)
+  if (districtId && !regionId) throw safeContractError()
+  if (merchantId) query.merchantId = merchantId
+  if (terminalId) query.terminalId = terminalId
+  if (regionId) query.regionId = regionId
+  if (districtId) query.districtId = districtId
   return Object.freeze(query)
 }
 export function toBankAccountListQuery(filters: BankAccountListFilters): Readonly<Record<string, string>> {

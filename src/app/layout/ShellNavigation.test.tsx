@@ -11,6 +11,7 @@ describe('ShellNavigation', () => {
     const items = getVisibleLiveNavigationItems({ kind: 'authenticated', permissions: new Set(['GET_CASHIERS', 'CREATE_CASHIER']) }, {
       dashboard: ready, dynamicQr: ready, terminalLookup: ready, terminalList: ready,
       bankAccountList: ready, cashierList: ready, merchantLookup: ready, bankAccountLookup: ready, p5List: ready,
+      regionLookup: ready, districtLookup: ready,
     })
     const html = renderToStaticMarkup(<MemoryRouter><ShellNavigation items={items} label={label} /></MemoryRouter>)
     expect(html).toContain('href="/cashiers"')

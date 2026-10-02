@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
@@ -10,13 +8,16 @@ import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumn
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, clearManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
-import { applyBankAccountDraft, bankAccountParentState, createDefaultBankAccountFilters, type MerchantLookupState } from './page-state'
+import { applyBankAccountMerchantDraft, applyBankAccountQuickSearch, bankAccountParentState, createDefaultBankAccountFilters, type BankAccountMerchantDraft, type MerchantLookupState } from './page-state'
+import { BankAccountMerchantFilter, BankAccountQuickSearch } from './BankAccountFilterControls'
+import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
 import { bankAccountColumns } from './columns'
 import { BankAccountResults } from './BankAccountResults'
 
 export function BankAccountPage() {
   const runtime = useReadRuntime()
-  const [draft, setDraft] = useState<BankAccountListFilters>(createDefaultBankAccountFilters)
+  const [merchantDraft, setMerchantDraft] = useState<BankAccountMerchantDraft>({})
+  const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<BankAccountListFilters>(createDefaultBankAccountFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const columnPreferences = useTableColumnPreferences({
@@ -27,6 +28,8 @@ export function BankAccountPage() {
   const merchantBase = runtime.queries.merchantLookupOptions()
   const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.bankAccountList }
   const merchants = useQuery(merchantOptions)
+  const merchantPresentation = resolveLookupSelectState({ enabled: merchantOptions.enabled,
+    pending: merchants.isPending, error: merchants.isError, ids: merchants.data?.map((option) => option.id) })
   const merchantLookupState: MerchantLookupState = !merchantOptions.enabled
     ? { kind: runtime.capabilities.merchantLookup ? 'unavailable' : 'denied' }
     : merchants.isError ? { kind: 'error' }
@@ -44,8 +47,8 @@ export function BankAccountPage() {
 
   function applyFilters(): boolean {
     try {
-      const next = applyBankAccountDraft(draft, merchantLookupState.kind === 'ready' ? merchantLookupState.ids : undefined)
-      setDraft(next)
+      const next = applyBankAccountMerchantDraft(applied, merchantDraft, merchantLookupState.kind === 'ready' ? merchantLookupState.ids : undefined)
+      setMerchantDraft({ merchantId: next.merchantId })
       setApplied(next)
       setValidationMessage(null)
       return true
@@ -57,9 +60,15 @@ export function BankAccountPage() {
 
   function resetFilters() {
     const next = clearManagementFilters(applied)
-    setDraft(next)
+    setMerchantDraft({})
+    setSearchDraft('')
     setApplied(next)
     setValidationMessage(null)
+  }
+
+  function applySearch(search: string) {
+    setSearchDraft(search.trim())
+    setApplied((current) => applyBankAccountQuickSearch(current, search))
   }
 
   if (!runtime.capabilities.bankAccountList) return <NoAccessState description="Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas." />
@@ -71,18 +80,11 @@ export function BankAccountPage() {
       visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      quickFilters={<BankAccountQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={applySearch} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
-          {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
-            <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => ({ ...current, merchantId: event.target.value || undefined }))}>
-              <option value="">Barcha merchantlar</option>
-              {merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-            </Select>
-          </label> : null}
-          <label className="block min-w-0 space-y-1 text-sm">Hisob nomi, bank nomi, hisob raqami yoki STIR
-            <Input value={draft.search} onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} placeholder="Nomi, bank, hisob raqami yoki STIR" />
-          </label>
-          {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
+          <BankAccountMerchantFilter merchantId={merchantDraft.merchantId} merchants={merchants.data}
+            state={merchantPresentation} onChange={(merchantId) => setMerchantDraft({ merchantId })} />
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences

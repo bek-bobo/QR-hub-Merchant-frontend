@@ -27,17 +27,8 @@ export interface ReadRuntimeContextValue {
   readonly api: MerchantReadApi
   readonly scope: ReadScope
   readonly getCurrentScope: () => ReadScope
-  readonly readiness: {
+  readonly readiness: ReadApiRegistrations & {
     readonly auth: ReadRegistration
-    readonly dashboard: ReadApiRegistrations['dashboard']
-    readonly dynamicQr: ReadApiRegistrations['dynamicQr']
-    readonly terminalLookup: ReadApiRegistrations['terminalLookup']
-    readonly terminalList: ReadApiRegistrations['terminalList']
-    readonly bankAccountList: ReadApiRegistrations['bankAccountList']
-    readonly cashierList: ReadApiRegistrations['cashierList']
-    readonly merchantLookup: ReadApiRegistrations['merchantLookup']
-    readonly bankAccountLookup: ReadApiRegistrations['bankAccountLookup']
-    readonly p5List: ReadApiRegistrations['p5List']
     readonly p5Reset: ReadRegistration
   }
   readonly capabilities: ReadCapabilityState
@@ -46,7 +37,19 @@ export interface ReadRuntimeContextValue {
   >
   readonly queries: Pick<
     ReadRuntime,
-    'dashboardOptions' | 'dynamicQrOptions' | 'terminalOptions' | 'terminalListOptions' | 'bankAccountListOptions' | 'cashierListOptions' | 'merchantLookupOptions' | 'bankAccountLookupOptions' | 'terminalLookupOptions' | 'p5ListOptions'
+      |'dashboardOptions'
+      | 'dynamicQrOptions'
+      | 'dynamicQrStatsOptions'
+      | 'terminalOptions'
+      | 'terminalListOptions'
+      | 'bankAccountListOptions'
+      | 'cashierListOptions'
+      | 'merchantLookupOptions'
+      | 'bankAccountLookupOptions'
+      | 'regionLookupOptions'
+      | 'districtLookupOptions'
+      | 'terminalLookupOptions'
+      | 'p5ListOptions'
   >
 }
 

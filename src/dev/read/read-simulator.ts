@@ -437,6 +437,8 @@ export function createReadSimulator(
     cashierList: unavailableD5Registration,
     merchantLookup: unavailableD5Registration,
     bankAccountLookup: unavailableD5Registration,
+    regionLookup: unavailableD5Registration,
+    districtLookup: unavailableD5Registration,
     p5List: unavailableD5Registration,
   })
   const permissions = Object.freeze([...definition.permissions])
@@ -499,6 +501,16 @@ export function createReadSimulator(
       await beforeRead('dynamicQr', signal)
       return buildDynamicQrPage(filters, definition.behavior)
     },
+    async dynamicQrStats(filters, signal) {
+      await beforeRead('dynamicQr', signal)
+      const rows = definition.behavior === 'empty' ? [] : matchingRows(filters)
+      const totalAmount = sumAmount(rows)
+      // Demo-only 1.5% fee, truncated to tiyin; unrelated to production fee rules.
+      return Object.freeze({
+        totalAmount,
+        totalServiceFeeAmount: money(BigInt(totalAmount.minorUnits) * 150n / 10_000n),
+      })
+    },
     async terminals(signal) {
       await beforeRead('terminalLookup', signal)
       return d3TerminalOptions
@@ -509,6 +521,8 @@ export function createReadSimulator(
     cashierList: async () => { throw new Error('D5 management is not part of D3 preview.') },
     merchantLookup: async () => { throw new Error('D5 management is not part of D3 preview.') },
     bankAccountLookup: async () => { throw new Error('D5 management is not part of D3 preview.') },
+    regionLookup: async () => { throw new Error('Geography is not part of D3 preview.') },
+    districtLookup: async () => { throw new Error('Geography is not part of D3 preview.') },
     p5List: async () => { throw new Error('D6 P5 is not part of D3 preview.') },
   }
 

@@ -16,6 +16,7 @@ const allGrants = [
   'GET_TERMINAL', 'GET_BANK_ACCOUNTS', 'GET_CASHIERS', 'CREATE_CASHIER',
   'ASSIGN_TERMINALS', 'UNASSIGN_TERMINAL', 'GET_DROPDOWN_MERCHANTS',
   'GET_DROPDOWN_BANK_ACCOUNTS', 'GET_DROPDOWN_TERMINALS',
+  'GET_DROPDOWN_REGIONS', 'GET_DROPDOWN_DISTRICTS',
 ] as const
 
 export const day5ScenarioNames = [
@@ -28,12 +29,13 @@ export const day5ScenarioNames = [
 ] as const
 export type Day5Scenario = (typeof day5ScenarioNames)[number]
 export type Day5Operation = 'terminalList' | 'bankAccountList' | 'cashierList' |
-  'merchantLookup' | 'bankAccountLookup' | 'terminalLookup' | 'create' | 'assign' | 'unassign'
+  'merchantLookup' | 'bankAccountLookup' | 'terminalLookup' | 'regionLookup' | 'districtLookup' | 'create' | 'assign' | 'unassign'
 export type Day5Counters = Readonly<Record<Day5Operation, number>>
 
 const emptyCounters = (): Record<Day5Operation, number> => ({
   terminalList: 0, bankAccountList: 0, cashierList: 0,
   merchantLookup: 0, bankAccountLookup: 0, terminalLookup: 0,
+  regionLookup: 0, districtLookup: 0,
   create: 0, assign: 0, unassign: 0,
 })
 
@@ -56,6 +58,7 @@ const registrations: ReadApiRegistrations = {
   dashboard: unavailable, dynamicQr: unavailable,
   terminalLookup: configured, terminalList: configured, bankAccountList: configured,
   cashierList: configured, merchantLookup: configured, bankAccountLookup: configured,
+  regionLookup: configured, districtLookup: configured,
   p5List: unavailable,
 }
 
@@ -63,6 +66,9 @@ const merchants: readonly ManagementOption[] = [
   { id: '1', name: 'D5-MGMT-DEMO Merchant A' },
   { id: '2', name: 'D5-MGMT-DEMO Merchant B' },
 ]
+
+const regions: readonly ManagementOption[] = [{ id: '1', name: 'D5-MGMT-DEMO Viloyat A' }, { id: '2', name: 'D5-MGMT-DEMO Viloyat B' }]
+const districts = [{ id: '11', name: 'D5-MGMT-DEMO Tuman A', regionId: '1' }, { id: '21', name: 'D5-MGMT-DEMO Tuman B', regionId: '2' }]
 
 function makeTerminal(index: number): TerminalRow {
   const merchantId = index <= 6 ? '1' : '2'
@@ -72,7 +78,7 @@ function makeTerminal(index: number): TerminalRow {
     merchantName: merchants[Number(merchantId) - 1].name, bankAccountId,
     bankAccountName: `D5-MGMT-DEMO Account ${index}`,
     terminalType: null, address: null, regionName: null, districtName: null,
-    mccCode: null, regionId: null, districtId: null, staticQrId: null,
+    mccCode: null, regionId: index <= 6 ? '1' : '2', districtId: index <= 6 ? '11' : '21', staticQrId: null,
     staticQrLink: null, phones: [], createdAt: null, updatedAt: null }
 }
 
@@ -139,16 +145,18 @@ export function createDay5Simulator(scenario: Day5Scenario, revision = 1) {
     if (signal.aborted) throw new DOMException('Synthetic read aborted.', 'AbortError')
     if (scenario === 'ERROR' || (failReadsAfterMutation && operation === 'cashierList')) throw new Error('Synthetic read failure.')
     if (scenario === 'BAD_REQUIRED') throw new Error('Synthetic required-field contract failure.')
-    if (lookupLost && (operation === 'merchantLookup' || operation === 'bankAccountLookup' || operation === 'terminalLookup')) throw new Error('Synthetic lookup lost.')
+    if (lookupLost && (operation === 'merchantLookup' || operation === 'bankAccountLookup' || operation === 'terminalLookup' || operation === 'regionLookup' || operation === 'districtLookup')) throw new Error('Synthetic lookup lost.')
   }
   const api: LiveReadApi = {
     registrations,
     dashboard: async () => { throw new Error('D5 preview has no dashboard port.') },
     dynamicQrs: async () => { throw new Error('D5 preview has no QR port.') },
+    dynamicQrStats: async () => {throw new Error('D5 preview has no dynamic QR stats port.')},
     async terminals(signal) { beforeRead('terminalLookup', signal); return terminalRows.map((row) => ({ id: row.id, name: row.name })) },
     async terminalsForMerchant(merchantId, signal) { beforeRead('terminalLookup', signal); return terminalRows.filter((row) => !merchantId || row.merchantId === merchantId).map((row) => ({ id: row.id, name: row.name })) },
     async terminalList(filters, signal) { beforeRead('terminalList', signal); const search = filters.search.trim(); return page(terminalRows.filter((row) =>
       (!filters.merchantId || row.merchantId === filters.merchantId) && (!filters.bankAccountId || row.bankAccountId === filters.bankAccountId) &&
+      (!filters.regionId || row.regionId === filters.regionId) && (!filters.districtId || row.districtId === filters.districtId) &&
       (!search || includes(row.name, search) || includes(row.id, search))), filters.page, filters.size) },
     async bankAccountList(filters, signal) { beforeRead('bankAccountList', signal); const search = filters.search.trim(); return page(bankRows.filter((row) =>
       (!filters.merchantId || row.merchantId === filters.merchantId) && (!search || [row.name, row.bankName, row.accountNumber, row.tin ?? ''].some((value) => includes(value, search)))), filters.page, filters.size) },
@@ -157,6 +165,8 @@ export function createDay5Simulator(scenario: Day5Scenario, revision = 1) {
       (!search || includes(entry.row.fullname, search) || includes(entry.row.phone, search))).map((entry) => entry.row), filters.page, filters.size) },
     async merchantLookup(signal) { beforeRead('merchantLookup', signal); return merchants },
     async bankAccountLookup(merchantId, signal) { beforeRead('bankAccountLookup', signal); return bankRows.filter((row) => !merchantId || row.merchantId === merchantId).map((row) => ({ id: row.id, name: row.name })) },
+    async regionLookup(signal) { beforeRead('regionLookup', signal); return scenario === 'EMPTY' ? [] : regions },
+    async districtLookup(regionId, signal) { beforeRead('districtLookup', signal); return scenario === 'EMPTY' ? [] : districts.filter((row) => row.regionId === regionId).map(({ id, name }) => ({ id, name })) },
     p5List: async () => { throw new Error('D6 P5 is not part of Day 05 DEV preview.') },
   }
 

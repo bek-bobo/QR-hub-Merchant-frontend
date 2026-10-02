@@ -16,6 +16,17 @@ function cellTexts(html: string, tag: 'th' | 'td'): string[] {
 }
 
 describe('terminal results', () => {
+  it('places neutral quick filters and toolbar before the existing table and preserves pagination/actions', () => {
+    const html = render({ quickFilters: createElement('input', { placeholder: 'Terminal nomi yoki ID' }),
+      headerActions: createElement('button', {}, 'Filtrlar') })
+    expect(html.indexOf('placeholder="Terminal nomi yoki ID"')).toBeLessThan(html.indexOf('>Filtrlar</button>'))
+    expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(html.indexOf('aria-label="Terminal jadvali"'))
+    expect(html).toContain('aria-label="Amallarni ochish"')
+    expect(html).toContain('aria-label="Terminal sahifalari"')
+    expect(html).toContain('flex-wrap')
+    expect(html).toContain('min-w-[40rem]')
+    expect(html).not.toContain('bg-red-')
+  })
   it('preserves duplicate rows while hiding the visible total and presenting unknown status neutrally', () => {
     const html = render()
     const normalizedHtml = html.replace(/<!-- -->/g, '')

@@ -58,6 +58,30 @@ describe('D3 read simulator fixtures', () => {
 })
 
 describe('D3 dynamic QR simulation', () => {
+  it('returns date/terminal stats independent of list filters and pagination', async () => {
+    const simulator = createReadSimulator('NORMAL')
+    const signal = new AbortController().signal
+    const filters = { ...defaultFilters, terminalId: 'T-01', fromDate: '2026-09-15', search: 'missing', status: 5 as const, page: 99 }
+    const stats = await simulator.api.dynamicQrStats(filters, signal)
+    expect(stats).toEqual({
+      totalAmount: { minorUnits: '15900000', currency: 'UZS', scale: 2 },
+      totalServiceFeeAmount: { minorUnits: '238500', currency: 'UZS', scale: 2 },
+    })
+    const empty = await createReadSimulator('EMPTY').api.dynamicQrStats(defaultFilters, signal)
+    expect(empty.totalAmount.minorUnits).toBe('0')
+    expect(empty.totalServiceFeeAmount.minorUnits).toBe('0')
+  })
+
+  it('preserves stats simulator errors and aborts', async () => {
+    await expect(createReadSimulator('ERROR').api.dynamicQrStats(defaultFilters, new AbortController().signal)).rejects.toThrow('Controlled D3')
+    const controller = new AbortController()
+    controller.abort()
+    await expect(createReadSimulator('NORMAL').api.dynamicQrStats(defaultFilters, controller.signal)).rejects.toMatchObject({ name: 'AbortError' })
+    const delayed = new AbortController()
+    const pending = createReadSimulator('DELAYED').api.dynamicQrStats(defaultFilters, delayed.signal)
+    delayed.abort()
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+  })
   it('paginates size ten as 10, 10, and 3 with correct totals', async () => {
     const simulator = createReadSimulator('NORMAL')
     const signal = new AbortController().signal

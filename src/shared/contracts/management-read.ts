@@ -98,3 +98,6 @@ function decodeOptions(payload: unknown): readonly ManagementOption[] {
 }
 export const decodeMerchantOptions = decodeOptions
 export const decodeBankAccountOptions = decodeOptions
+// DropdownDTO(String id, String name), shared by /dropdown/regions and /dropdown/districts.
+export const decodeRegionOptions = decodeOptions
+export const decodeDistrictOptions = decodeOptions

@@ -32,6 +32,9 @@ describe('dynamic QR page state', () => {
       size: 20,
     })
     expect(toDynamicQrQuery(defaults)).toMatchObject({ page: '0', size: '20' })
+    for (const field of ['merchantId', 'bankAccountId', 'terminalId', 'status', 'distributionStatus', 'search']) {
+      expect(toDynamicQrQuery(defaults)).not.toHaveProperty(field)
+    }
   })
 
   it('revalidates dashboard router state and ignores extra filters', () => {
@@ -84,6 +87,7 @@ describe('dynamic QR page state', () => {
   it('maps all status to undefined without coercing an empty string', () => {
     expect(parseQrStatusInput('')).toBeUndefined()
     expect(parseQrStatusInput('0')).toBe(0)
-    expect(() => parseQrStatusInput('25')).toThrow()
+    expect(parseQrStatusInput('25')).toBe(25)
+    expect(() => parseQrStatusInput('777')).toThrow()
   })
 })

@@ -37,13 +37,16 @@ import {
   parseDashboardDynamicQrState,
 } from './page-state'
 import { useDynamicQrReadQueries } from './queries'
+import { advancedFilterFieldProps } from './filter-lookups'
 import { formatInstantTime } from '@/shared/presentation/date-time'
 import {
   applyDynamicQrAdvancedFilters,
   applyDynamicQrDateQuickFilter,
   applyDynamicQrSearchQuickFilter,
+  advancedDraftFromFilters,
   type DynamicQrAdvancedFilterDraft,
 } from './quick-filters'
+import { formatMoney } from '@/shared/money/minor'
 
 interface DynamicQrPageProps {
   readonly initialState?: unknown
@@ -83,10 +86,8 @@ export function DynamicQrPage({
   const [initialFilters] = useState(() =>
     initialFiltersFromState(initialState, initialInstant ?? new Date()),
   )
-  const [advancedDraft, setAdvancedDraft] = useState<DynamicQrAdvancedFilterDraft>(() => ({
-    terminalId: initialFilters.terminalId,
-    status: initialFilters.status,
-  }))
+  const [advancedDraft, setAdvancedDraft] = useState<DynamicQrAdvancedFilterDraft>(() => advancedDraftFromFilters(initialFilters))
+  const [filterMessage, setFilterMessage] = useState<string | null>(null)
   const [dateDraft, setDateDraft] = useState(() => ({
     fromDate: initialFilters.fromDate,
     toDate: initialFilters.toDate,
@@ -96,26 +97,30 @@ export function DynamicQrPage({
   const [createOpen, setCreateOpen] = useState(false)
   const [selectedQrRow, setSelectedQrRow] = useState<DynamicQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<DynamicQrRow | null>(null)
-  const queries = useDynamicQrReadQueries(applied)
-  const { runtime, terminals, list, terminalFilterState, enabled } = queries
+  const queries = useDynamicQrReadQueries(applied, advancedDraft)
+  const { runtime, list, stats, statsFeatureEnabled, filterState, enabled, lookups } = queries
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'dynamicQr',
     columns: dynamicQrColumns,
   })
 
   function applyFilters(): boolean {
-    const nextDraft = {
-      terminalId: advancedDraft.terminalId?.trim() || undefined,
-      status: advancedDraft.status,
+    try {
+      const next = applyDynamicQrAdvancedFilters(applied, advancedDraft, lookups.draftEvidence)
+      setAdvancedDraft(advancedDraftFromFilters(next))
+      setApplied(next)
+      setFilterMessage(null)
+      return true
+    } catch {
+      setFilterMessage('Tanlangan filtrlarni tasdiqlab bo‘lmadi.')
+      return false
     }
-    setAdvancedDraft(nextDraft)
-    setApplied((current) => applyDynamicQrAdvancedFilters(current, nextDraft))
-    return true
   }
 
   function clearFilters() {
     const next = createDefaultDynamicQrFilters(initialInstant ?? new Date())
-    setAdvancedDraft({ terminalId: next.terminalId, status: next.status })
+    setAdvancedDraft(advancedDraftFromFilters(next))
+    setFilterMessage(null)
     setDateDraft({ fromDate: next.fromDate, toDate: next.toDate })
     setSearchDraft(next.search)
     setApplied(next)
@@ -149,37 +154,10 @@ export function DynamicQrPage({
         onReset={clearFilters}
         triggerSize="sm"
       >
-        <DynamicQrAdvancedFilterFields
-          terminalId={advancedDraft.terminalId}
-          status={advancedDraft.status}
-          terminals={terminals.data}
-          terminalsDisabled={!enabled.terminals || terminals.isPending}
-          onTerminalChange={(terminalId) =>
-            setAdvancedDraft((current) => ({ ...current, terminalId }))
-          }
-          onStatusChange={(status) =>
-            setAdvancedDraft((current) => ({ ...current, status }))
-          }
-        />
-        {!enabled.terminals ? (
-          <p className="text-sm text-text-secondary">
-            {applied.terminalId
-              ? 'Tanlangan terminalni tekshirib bo‘lmadi; filtrni tozalash talab qilinadi.'
-              : 'Terminal filtri mavjud emas; ro‘yxat terminalId yubormasdan ishlaydi.'}
-          </p>
-        ) : terminals.isError ? (
-          <div className="flex flex-wrap items-center gap-3 text-sm text-destructive">
-            Terminal ro‘yxatini yuklab bo‘lmadi.
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => void terminals.refetch()}
-            >
-              Qayta urinish
-            </Button>
-          </div>
-        ) : null}
+        <DynamicQrAdvancedFilterFields {...advancedFilterFieldProps(lookups, advancedDraft, setAdvancedDraft)} />
+        {lookups.merchants.isError || lookups.draftBanks.isError || lookups.draftTerminals.isError
+          ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>Qayta urinish</Button> : null}
+        {filterMessage ? <p role="alert" className="text-sm text-destructive">{filterMessage}</p> : null}
       </FilterDrawer>
     )
   }
@@ -197,7 +175,7 @@ export function DynamicQrPage({
           onSearchApply={applyQuickSearch}
         />
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <ExportButton applied={applied} terminalValid={terminalFilterState === 'valid'} compact />
+          <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact />
           {renderFilterDrawer()}
         </div>
       </div>
@@ -228,7 +206,10 @@ export function DynamicQrPage({
             updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
             disabled={!enabled.list || list.isFetching}
             loading={list.isFetching}
-            onClick={() => void list.refetch()}
+            onClick={() => {
+              void list.refetch()
+              if (enabled.stats) void stats.refetch()
+            }}
           />
         </div>
       </div>
@@ -268,6 +249,7 @@ export function DynamicQrPage({
       }} />
       <Card className="min-w-0 overflow-hidden">
         <CardContent className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
+          <p className="text-xs text-text-secondary sm:col-span-2">Jami summa va xizmat haqi sana oralig‘i va terminal bo‘yicha.</p>
           <section className="min-w-0 rounded-xl border border-brand/15 bg-brand-soft/60 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-medium text-text-secondary">Jami summa</p>
@@ -275,9 +257,8 @@ export function DynamicQrPage({
                 <WalletCardsIcon className="size-4" aria-hidden="true" />
               </span>
             </div>
-            <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">—</p>
-            <p className="mt-1 text-xs text-text-secondary">
-              Joriy API javobida agregat mavjud emas
+            <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
+                {enabled.stats && stats.data ? formatMoney(stats.data.totalAmount) : '—'}
             </p>
           </section>
           <section className="min-w-0 rounded-xl border border-border bg-muted/40 p-4">
@@ -287,15 +268,26 @@ export function DynamicQrPage({
                 <HandCoinsIcon className="size-4" aria-hidden="true" />
               </span>
             </div>
-            <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">—</p>
-            <p className="mt-1 text-xs text-text-secondary">
-              Joriy API javobida agregat mavjud emas
-            </p>
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
+                  {enabled.stats && stats.data
+                      ? formatMoney(stats.data.totalServiceFeeAmount)
+                      : '—'}
+              </p>
           </section>
+          {!statsFeatureEnabled ? (
+            <p role="status" className="text-xs text-text-secondary sm:col-span-2">
+              Statistika hozircha mavjud emas
+            </p>
+          ) : null}
+          {enabled.stats && stats.isError ? (
+            <p role="status" className="text-xs text-text-secondary sm:col-span-2">
+              Jami summa va xizmat haqini yuklab bo‘lmadi.
+            </p>
+          ) : null}
         </CardContent>
       </Card>
 
-      {terminalFilterState === 'checking' ? (
+      {filterState === 'checking' ? (
         <Card className="min-w-0">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Dinamik QR ro‘yxati</CardTitle>
@@ -303,10 +295,10 @@ export function DynamicQrPage({
           </CardHeader>
           <CardContent className="space-y-4 text-sm text-text-secondary">
             {renderQuickFilters()}
-            <p>Tanlangan terminal filtri tekshirilmoqda.</p>
+            <p>Tanlangan filtrlar tekshirilmoqda.</p>
           </CardContent>
         </Card>
-      ) : terminalFilterState === 'invalid' ? (
+      ) : filterState === 'invalid' ? (
         <Card className="min-w-0">
           <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle>Dinamik QR ro‘yxati</CardTitle>
@@ -316,7 +308,7 @@ export function DynamicQrPage({
             {renderQuickFilters()}
             <div>
               <p className="font-medium text-text-primary">
-                Terminal filtri endi mavjud emas
+                Tanlangan filtr endi mavjud emas
               </p>
               <p className="mt-1 text-sm text-text-secondary">
                 Xavfsizlik sababli so‘rov barcha terminallarga avtomatik kengaytirilmadi.

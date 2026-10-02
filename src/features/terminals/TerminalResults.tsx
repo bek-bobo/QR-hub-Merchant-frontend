@@ -25,6 +25,7 @@ interface TerminalResultsProps {
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly headerActions?: ReactNode
+  readonly quickFilters?: ReactNode
   readonly onViewQr: (row: TerminalRow) => void
   readonly onViewDetails: (row: TerminalRow) => void
 }
@@ -46,16 +47,20 @@ function resolveColumns(
 }
 
 export function TerminalResults({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, headerActions, onViewQr, onViewDetails }: TerminalResultsProps) {
+  visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters, onViewQr, onViewDetails }: TerminalResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
 
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Terminallar ro‘yxati</CardTitle>
-      {headerActions}
+      {!quickFilters ? headerActions : null}
     </CardHeader>
     <CardContent className="min-w-0 space-y-4">
-      {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki bank hisobini qayta tanlab qo‘llang yoki filtrni tozalang." />
+      {quickFilters ? <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        {quickFilters}
+        {headerActions}
+      </div> : null}
+      {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant, bank hisobi, viloyat yoki tumanni qayta tanlab qo‘llang yoki filtrni tozalang." />
         : pending ? <LoadingState title="Terminallar yuklanmoqda" />
           : error ? <ErrorState onRetry={onRetry} />
             : !data ? <ErrorState title="Terminal ro‘yxatini ko‘rsatib bo‘lmadi" />

@@ -30,6 +30,7 @@ interface CashierResultsProps {
   readonly onSelect: (row: CashierRow) => void
   readonly onClose: () => void
   readonly headerActions?: ReactNode
+  readonly quickFilters?: ReactNode
   readonly assignSurface?: ReactNode
   readonly onUnassign?: (terminal: CashierTerminal) => void
   readonly unassignSurface?: ReactNode
@@ -53,7 +54,7 @@ function resolveColumns(
 
 export function CashierResults({ blocked, pending, error, data, selected,
   columnOrder, visibleColumnIds, onRetry, onPageChange, onSelect, onClose,
-  headerActions, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
+  headerActions, quickFilters, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
   const selectionTrigger = useRef<HTMLButtonElement | null>(null)
 
@@ -61,9 +62,13 @@ export function CashierResults({ blocked, pending, error, data, selected,
     <Card className="min-w-0" aria-busy={pending}>
       <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <CardTitle>Kassirlar ro‘yxati</CardTitle>
-        {headerActions}
+        {quickFilters ? null : headerActions}
       </CardHeader>
       <CardContent className="min-w-0 space-y-4">
+        {quickFilters ? <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          {quickFilters}
+          {headerActions}
+        </div> : null}
         {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
           : pending ? <LoadingState title="Kassirlar yuklanmoqda" />
             : error ? <ErrorState onRetry={onRetry} />

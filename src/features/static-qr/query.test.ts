@@ -7,9 +7,10 @@ import type { HttpTransport } from '@/shared/api/http'
 import type { ProtectedReadBridge } from '@/shared/api/protected-read'
 import type { ProtectedReadContextValue } from '@/shared/api/ProtectedReadContext'
 import { createStaticQrQueryOptions } from './query'
+import type { StaticQrFilters } from './page-state'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
-const filters = { page: 0, size: 20 as const }
+const filters = { search: '', page: 0, size: 20 as const }
 const page = { content: [], totalElements: 0, totalPages: 0, page: 0, size: 20 }
 
 function deferred<T>() {
@@ -31,6 +32,7 @@ function setup(overrides: {
   currentScope?: () => ReadScope
   getSessionSnapshot?: ProtectedReadContextValue['getSessionSnapshot']
   bridge?: ProtectedReadBridge
+  filters?: StaticQrFilters
 } = {}) {
   let calls = 0
   let received: unknown = null
@@ -40,7 +42,7 @@ function setup(overrides: {
     return page as never
   } }
   const options = createStaticQrQueryOptions({
-    scope, currentScope: overrides.currentScope ?? (() => scope), filters,
+    scope, currentScope: overrides.currentScope ?? (() => scope), filters: overrides.filters ?? filters,
     staticReadAllowed: overrides.permission ?? true,
     authReady: overrides.authReady ?? true,
     terminalConfirmed: overrides.terminalConfirmed ?? true,
@@ -52,6 +54,17 @@ function setup(overrides: {
 }
 
 describe('static QR safe read boundary', () => {
+  it('forwards supported applied filters through the unchanged protected endpoint and blocks unconfirmed reads', async () => {
+    const applied = { ...filters, merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: '  QR-1  ', page: 2 }
+    const read = setup({ filters: applied })
+    await read.options.queryFn({ signal: new AbortController().signal })
+    expect(read.received()).toMatchObject({ endpoint: endpoints.staticQrs,
+      query: { merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'QR-1', page: '2', size: '20' } })
+    expect(read.options.queryKey).toEqual(readKeys.staticQrs(scope, applied.terminalId, applied.page, applied.size, applied))
+    const blocked = setup({ filters: applied, terminalConfirmed: false })
+    await expect(blocked.options.queryFn({ signal: new AbortController().signal })).rejects.toThrow()
+    expect(blocked.calls()).toBe(0)
+  })
   it('keeps exact endpoint and independent static authority', () => {
     expect(endpoints.staticQrs).toMatchObject({ service: 'web', method: 'GET', path: '/static-qrs/get-all', body: 'none' })
     const access = { kind: 'authenticated' as const, permissions: new Set(['GET_STATIC_QRS']) }

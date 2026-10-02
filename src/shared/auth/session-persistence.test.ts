@@ -246,6 +246,7 @@ describe('persistent SessionController lifecycle', () => {
       terminalLookup: { kind: 'unavailable', reason: 'unused' }, terminalList: { kind: 'unavailable', reason: 'unused' },
       bankAccountList: { kind: 'unavailable', reason: 'unused' }, cashierList: { kind: 'unavailable', reason: 'unused' },
       merchantLookup: { kind: 'unavailable', reason: 'unused' }, bankAccountLookup: { kind: 'unavailable', reason: 'unused' },
+      regionLookup: { kind: 'unavailable', reason: 'unused' }, districtLookup: { kind: 'unavailable', reason: 'unused' },
       p5List: { kind: 'unavailable', reason: 'unused' },
     }
     const session = mount()

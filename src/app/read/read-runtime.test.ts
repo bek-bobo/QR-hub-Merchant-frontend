@@ -27,10 +27,13 @@ function configuredLiveReadApi(handler = vi.fn().mockResolvedValue(dashboard)) {
       cashierList: { kind: 'configured' },
       merchantLookup: { kind: 'configured' },
       bankAccountLookup: { kind: 'configured' },
+      regionLookup: { kind: 'configured' },
+      districtLookup: { kind: 'configured' },
       p5List: { kind: 'configured' },
     },
     dashboard: handler,
     dynamicQrs: vi.fn(),
+    dynamicQrStats: vi.fn(),
     terminals: vi.fn(),
     terminalsForMerchant: vi.fn(),
     terminalList: vi.fn(),
@@ -38,12 +41,103 @@ function configuredLiveReadApi(handler = vi.fn().mockResolvedValue(dashboard)) {
     cashierList: vi.fn(),
     merchantLookup: vi.fn(),
     bankAccountLookup: vi.fn(),
+    regionLookup: vi.fn(),
+    districtLookup: vi.fn(),
     p5List: vi.fn().mockResolvedValue({ content: [], totalElements: 0, totalPages: 0, page: 0, size: 10 }),
   }
   return { api, handler }
 }
 
 describe('read runtime', () => {
+  it('uses exact geography permissions, prevents parentless district requests, and leaves unfiltered terminals independent', async () => {
+    const scope: ReadScope = { source: 'live', sessionScopeId: 'geo', accessRevision: 1 }
+    let access: AccessContextValue = { kind: 'authenticated', permissions: new Set(['GET_TERMINAL']) }
+    const { api } = configuredLiveReadApi()
+    const runtime = createReadRuntime(api, () => ({ scope, access }))
+    const signal = new AbortController().signal
+    expect(runtime.regionLookupOptions().enabled).toBe(false)
+    expect(runtime.districtLookupOptions('3').enabled).toBe(false)
+    expect(runtime.terminalListOptions({ search: '', page: 0, size: 20 }).enabled).toBe(true)
+    await expect(runtime.regionLookupOptions().queryFn({ signal })).rejects.toMatchObject({ name: 'ReadAccessError' })
+    expect(api.regionLookup).not.toHaveBeenCalled()
+    access = { kind: 'authenticated', permissions: new Set(['GET_DROPDOWN_REGIONS', 'GET_DROPDOWN_DISTRICTS']) }
+    expect(runtime.regionLookupOptions().enabled).toBe(true)
+    expect(runtime.districtLookupOptions('3').enabled).toBe(true)
+    expect(runtime.districtLookupOptions().enabled).toBe(false)
+    await expect(runtime.districtLookupOptions().queryFn({ signal })).rejects.toBeInstanceOf(ReadConfigurationError)
+    expect(api.districtLookup).not.toHaveBeenCalled()
+    await runtime.regionLookupOptions().queryFn({ signal })
+    await runtime.districtLookupOptions(' 3 ').queryFn({ signal })
+    expect(api.regionLookup).toHaveBeenCalledWith(signal)
+    expect(api.districtLookup).toHaveBeenCalledWith('3', signal)
+    expect(runtime.districtLookupOptions('3').queryKey).not.toEqual(runtime.districtLookupOptions('4').queryKey)
+  })
+
+  it('requires confirmed applied region and matching district before entering the Terminal list port', async () => {
+    const scope: ReadScope = { source: 'live', sessionScopeId: 'geo', accessRevision: 1 }
+    const access: AccessContextValue = { kind: 'authenticated', permissions: new Set(['GET_TERMINAL']) }
+    const { api } = configuredLiveReadApi()
+    const runtime = createReadRuntime(api, () => ({ scope, access }))
+    const filters = { regionId: '3', districtId: '4', search: '', page: 0, size: 20 } as const
+    const valid = { region: { lookupState: 'ready' as const, optionIds: ['3'] },
+      district: { lookupParentId: '3', lookupState: 'ready' as const, optionIds: ['4'] } }
+    expect(runtime.terminalListOptions(filters, undefined, valid).enabled).toBe(true)
+    const cases = [undefined, { ...valid, region: { ...valid.region, optionIds: [] } },
+      { ...valid, district: { ...valid.district, lookupParentId: '9' } },
+      { ...valid, district: { ...valid.district, optionIds: [] } },
+      { ...valid, district: { ...valid.district, lookupState: 'error' as const } }]
+    for (const geography of cases) {
+      const blocked = runtime.terminalListOptions(filters, undefined, geography)
+      expect(blocked.enabled).toBe(false)
+      await expect(blocked.queryFn({ signal: new AbortController().signal })).rejects.toBeInstanceOf(ReadConfigurationError)
+    }
+    expect(api.terminalList).not.toHaveBeenCalled()
+    expect(runtime.terminalListOptions({ ...filters, regionId: undefined }, undefined, valid).enabled).toBe(false)
+  })
+
+  it('removes both geography lookup caches when the previous read scope is cleaned up', async () => {
+    const scope: ReadScope = { source: 'live', sessionScopeId: 'geo', accessRevision: 1 }
+    const client = new QueryClient()
+    const keys = [readKeys.regionLookup(scope), readKeys.districtLookup(scope, '3'), readKeys.districtLookup(scope, '4')]
+    keys.forEach((key) => client.setQueryData(key, []))
+    const current = readKeys.regionLookup({ ...scope, sessionScopeId: 'new' })
+    client.setQueryData(current, [])
+    await cleanupReadQueries(client, scope)
+    keys.forEach((key) => expect(client.getQueryData(key)).toBeUndefined())
+    expect(client.getQueryData(current)).toEqual([])
+    client.clear()
+  })
+  it('gates stats with dynamic QR permission and forwards the request policy and signal', async () => {
+    const scope: ReadScope = { source: 'live', sessionScopeId: 'a', accessRevision: 1 }
+    let access: AccessContextValue = { kind: 'authenticated', permissions: new Set(['GET_DYNAMIC_QRS']) }
+    const { api } = configuredLiveReadApi()
+    const handler = vi.fn().mockResolvedValue({})
+    api.dynamicQrStats = handler
+    const runtime = createReadRuntime(api, () => ({ scope, access }))
+    const options = runtime.dynamicQrStatsOptions(filters)
+    expect(options).toMatchObject({ enabled: true, retry: false, staleTime: 30_000, refetchOnWindowFocus: false, refetchOnReconnect: false })
+    expect(options.queryKey).toEqual(readKeys.dynamicQrStats(scope, filters))
+    const signal = new AbortController().signal
+    await options.queryFn({ signal })
+    expect(handler).toHaveBeenCalledWith(filters, signal)
+    access = { kind: 'authenticated', permissions: new Set() }
+    expect(runtime.dynamicQrStatsOptions(filters).enabled).toBe(false)
+    await expect(options.queryFn({ signal })).rejects.toMatchObject({ name: 'ReadAccessError' })
+    expect(handler).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects stats that resolve after the scope changes', async () => {
+    let scope: ReadScope = { source: 'live', sessionScopeId: 'a', accessRevision: 1 }
+    const access: AccessContextValue = { kind: 'authenticated', permissions: new Set(['GET_DYNAMIC_QRS']) }
+    const { api } = configuredLiveReadApi()
+    let resolve!: () => void
+    api.dynamicQrStats = () => new Promise((done) => { resolve = () => done({} as Awaited<ReturnType<LiveReadApi['dynamicQrStats']>>) })
+    const runtime = createReadRuntime(api, () => ({ scope, access }))
+    const pending = runtime.dynamicQrStatsOptions(filters).queryFn({ signal: new AbortController().signal })
+    scope = { ...scope, accessRevision: 2 }
+    resolve()
+    await expect(pending).rejects.toBeInstanceOf(StaleReadScopeError)
+  })
   it('uses the focused no-retry query policy', () => {
     const scope: ReadScope = {
       source: 'live',

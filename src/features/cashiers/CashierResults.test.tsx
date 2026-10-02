@@ -24,6 +24,20 @@ function cellTexts(html: string, tag: 'th' | 'td'): string[] {
 }
 
 describe('cashier results', () => {
+  it('keeps inline search and primary toolbar actions ahead of the unchanged table and during loading', () => {
+    const controls = {
+      quickFilters: createElement('input', { type: 'search', placeholder: 'F.I.Sh. yoki telefon' }),
+      headerActions: createElement('button', { type: 'button' }, 'Yangi kassir'),
+    }
+    const html = render(controls)
+    expect(html.indexOf('type="search"')).toBeLessThan(html.indexOf('Yangi kassir'))
+    expect(html.indexOf('Yangi kassir')).toBeLessThan(html.indexOf('aria-label="Kassirlar jadvali"'))
+    expect(html).toContain('Cashier A')
+    expect(html).toContain('Terminallar ·')
+    const pending = render({ ...controls, pending: true, data: undefined })
+    expect(pending).toContain('placeholder="F.I.Sh. yoki telefon"')
+    expect(pending).toContain('Yangi kassir')
+  })
   it('preserves server rows even when filtered terminal is absent from active memberships', () => {
     const html = render({ selected: page.content[1] })
     const text = html.replace(/<!-- -->/g, '')

@@ -17,3 +17,19 @@ export function applyBankAccountDraft(draft: BankAccountListFilters, merchantIds
   if (draft.merchantId && !merchantIds?.includes(draft.merchantId)) throw safeContractError()
   return applyManagementFilters(draft)
 }
+
+export type BankAccountMerchantDraft = Pick<BankAccountListFilters, 'merchantId'>
+
+export function applyBankAccountMerchantDraft(
+  applied: BankAccountListFilters,
+  draft: BankAccountMerchantDraft,
+  merchantIds?: readonly string[],
+): BankAccountListFilters {
+  return applyBankAccountDraft({ ...applied, merchantId: draft.merchantId }, merchantIds)
+}
+
+export function applyBankAccountQuickSearch(applied: BankAccountListFilters, search: string): BankAccountListFilters {
+  const normalized = search.trim()
+  if (applied.search === normalized && applied.page === 0) return applied
+  return { ...applied, search: normalized, page: 0 }
+}

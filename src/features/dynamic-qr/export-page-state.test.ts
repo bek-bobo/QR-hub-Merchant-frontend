@@ -15,6 +15,20 @@ const lostLookupCases: readonly TerminalLookupState[] = [
 ]
 
 describe('standalone export filter application', () => {
+  it('applies supported structured selections only after all selected lookups confirm them', () => {
+    const draft = { ...initial, merchantId: '1', bankAccountId: '2', terminalId: 'terminal-a',
+      status: 25 as const, distributionStatus: 20 as const }
+    const structured = {
+      merchants: { enabled: true, pending: false, error: false, ids: ['1'] },
+      banks: { enabled: true, pending: false, error: false, ids: ['2'], merchantId: '1' },
+      terminals: { enabled: true, pending: false, error: false, ids: ['terminal-a'], merchantId: '1' },
+    }
+    const result = applyExportDraft(draft, available, structured)
+    expect(result).toMatchObject({ kind: 'applied', filters: { merchantId: '1', bankAccountId: '2', status: 25, distributionStatus: 20 } })
+    expect(applyExportDraft(draft, available, { ...structured, banks: { ...structured.banks, error: true } }))
+      .toEqual({ kind: 'structured-unconfirmed' })
+    expect(initial).not.toHaveProperty('merchantId')
+  })
   it('allows export without terminal lookup when no terminal was selected', () => {
     const result = applyExportDraft({ ...initial, search: '  Terminal A  ', status: 0 }, unavailable)
     expect(result).toMatchObject({ kind: 'applied', filters: { search: 'Terminal A', status: 0 } })
@@ -50,8 +64,9 @@ describe('standalone export filter application', () => {
     expect(draft.search).toBe('Changed')
   })
 
-  it('keeps status 25 outside the selectable filter parser', () => {
+  it('accepts rejected transaction status without changing unknown-code handling', () => {
     expect(parseQrStatusInput('0')).toBe(0)
-    expect(() => parseQrStatusInput('25')).toThrow()
+    expect(parseQrStatusInput('25')).toBe(25)
+    expect(() => parseQrStatusInput('777')).toThrow()
   })
 })

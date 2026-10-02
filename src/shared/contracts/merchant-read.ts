@@ -2,7 +2,9 @@ import { safeContractError } from '@/shared/api/errors'
 
 export type ReadSource = 'live' | 'demo'
 export type ReadFeature = 'dashboard' | 'dynamicQr' | 'terminalLookup'
-export type QrStatusFilter = 0 | 5 | 10 | 20 | 50
+// Known selectable codes; the backend accepts an Integer, not a closed enum.
+export type QrStatusFilter = 0 | 5 | 10 | 20 | 25 | 50
+export type DistributionStatusFilter = 0 | 5 | 10 | 20 | 50
 export type QrStatusKind =
   | 'new'
   | 'expired'
@@ -36,7 +38,10 @@ export type DashboardFilters = DateRange &
 
 export type DynamicQrFilters = DashboardFilters &
   Readonly<{
+    merchantId?: string
+    bankAccountId?: string
     status?: QrStatusFilter
+    distributionStatus?: DistributionStatusFilter
     search: string
     page: number
     size: PageSize
@@ -197,3 +202,8 @@ export function isoLocalDateTime(value: unknown): string {
 
   return value
 }
+
+export type DynamicQrStats = Readonly<{
+  totalAmount: Money
+  totalServiceFeeAmount: Money
+}>

@@ -88,6 +88,8 @@ const registrations: ReadApiRegistrations = {
   cashierList: unavailable,
   merchantLookup: configured,
   bankAccountLookup: unavailable,
+  regionLookup: unavailable,
+  districtLookup: unavailable,
   p5List: configured,
 }
 
@@ -228,6 +230,7 @@ export function createDay6Simulator(scenario: Day6Scenario, revision = 1) {
     registrations,
     dashboard: async () => { throw new Error('Day 06 preview has no dashboard port.') },
     dynamicQrs: async () => { throw new Error('Day 06 preview has no dynamic QR port.') },
+    dynamicQrStats: async () => { throw new Error('Day 06 preview has no dynamic QR stats port.') },
     async terminals(signal) {
       count('terminalLookup')
       assertSignal(signal)
@@ -252,6 +255,8 @@ export function createDay6Simulator(scenario: Day6Scenario, revision = 1) {
       return parentChanged ? merchants.slice(1) : merchants
     },
     bankAccountLookup: async () => { throw new Error('Day 06 preview has no bank-account lookup port.') },
+    regionLookup: async () => { throw new Error('Day 06 preview has no region lookup port.') },
+    districtLookup: async () => { throw new Error('Day 06 preview has no district lookup port.') },
     async p5List(filters: P5Filters, signal: AbortSignal) {
       count('p5List')
       assertSignal(signal)

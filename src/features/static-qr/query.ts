@@ -31,7 +31,7 @@ export function createStaticQrQueryOptions(deps: StaticQrQueryDependencies) {
   const enabled = Boolean(transport) && deps.authReady && scope.source === 'live' &&
     deps.staticReadAllowed && deps.terminalConfirmed
   return {
-    queryKey: readKeys.staticQrs(scope, filters.terminalId, filters.page, filters.size),
+    queryKey: readKeys.staticQrs(scope, filters.terminalId, filters.page, filters.size, filters),
     queryFn: async ({ signal }: { readonly signal: AbortSignal }) => {
       const before = getSessionSnapshot()
       if (!enabled || !transport || signal.aborted || !sameScope(scope, deps.currentScope()) ||

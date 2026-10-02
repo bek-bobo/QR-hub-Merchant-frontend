@@ -1,11 +1,9 @@
-import { useState, useSyncExternalStore, type Dispatch, type SetStateAction } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ReadRegistration } from '@/app/read/createLiveReadApi'
-import { changeP5MerchantDraft, changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
+import { changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
 import type { LookupState } from '@/shared/contracts/management-filters'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import type { Page } from '@/shared/contracts/merchant-read'
@@ -15,7 +13,12 @@ import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import {
-  applyP5Draft,
+  applyP5AdvancedDraft,
+  applyP5QuickSearch,
+  createP5AdvancedDraft,
+  reconcileP5AdvancedDraft,
+  isP5StatusDraftValid,
+  type P5AdvancedDraft,
   createDefaultP5Filters,
   createP5Target,
   p5ParentState,
@@ -28,6 +31,8 @@ import { P5Results } from './P5Results'
 import { P5ResetDialog } from './P5ResetDialog'
 import { createP5ResetController, invalidateCurrentP5Lists, p5ResetIntentKey, type P5ResetPort } from './p5-reset'
 import { p5Columns } from './columns'
+import { P5AdvancedFilterFields, P5QuickSearch } from './P5FilterControls'
+import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
 
 function terminalLookupState(enabled: boolean, error: boolean, data: readonly unknown[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -35,58 +40,8 @@ function terminalLookupState(enabled: boolean, error: boolean, data: readonly un
   return data ? 'ready' : 'loading'
 }
 
-function merchantFilterMessage(state: Exclude<MerchantLookupState, { readonly kind: 'ready'; readonly ids: readonly string[] }>, hasAppliedMerchant: boolean): string {
-  const availability = state.kind === 'denied'
-    ? 'uchun ruxsat yo‘q'
-    : state.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'
-  const consequence = hasAppliedMerchant
-    ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.'
-    : 'filtrsiz ro‘yxat ishlaydi.'
-  return `Merchant filtri ${availability}; ${consequence}`
-}
-
-interface P5FiltersProps {
-  readonly draft: P5FilterValues
-  readonly applied: P5FilterValues
-  readonly merchantLookupState: MerchantLookupState
-  readonly merchants: readonly { readonly id: string; readonly name: string }[] | undefined
-  readonly draftTerminalState: LookupState
-  readonly draftTerminals: readonly { readonly id: string; readonly name: string }[] | undefined
-  readonly validationMessage: string | null
-  readonly onDraftChange: Dispatch<SetStateAction<P5FilterValues>>
-}
-
-export function P5Filters({
-  draft,
-  applied,
-  merchantLookupState,
-  merchants,
-  draftTerminalState,
-  draftTerminals,
-  validationMessage,
-  onDraftChange,
-}: P5FiltersProps) {
-  return <>
-    {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
-      <Select value={draft.merchantId ?? ''} onChange={(event) => onDraftChange((current) => changeP5MerchantDraft(current, event.target.value || undefined))}>
-        <option value="">Barcha merchantlar</option>{merchants?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-      </Select>
-    </label> : null}
-    {draft.merchantId && draftTerminalState === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Terminal
-      <Select value={draft.terminalId ?? ''} onChange={(event) => onDraftChange((current) => ({ ...current, terminalId: event.target.value || undefined }))}>
-        <option value="">Barcha terminallar</option>{draftTerminals?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-      </Select>
-    </label> : null}
-    <label className="block min-w-0 space-y-1 text-sm">Status kodi
-      <Input type="number" step={1} min={-2147483648} max={2147483647} value={draft.status ?? ''} aria-describedby={validationMessage ? 'p5-filter-error' : undefined} onChange={(event) => onDraftChange((current) => ({ ...current, status: event.target.value === '' ? undefined : Number(event.target.value) }))} placeholder="Masalan: 0" />
-    </label>
-    <label className="block min-w-0 space-y-1 text-sm">Qurilma ID yoki terminal nomi
-      <Input value={draft.search} onChange={(event) => onDraftChange((current) => ({ ...current, search: event.target.value }))} placeholder="Qurilma ID yoki terminal" />
-    </label>
-    {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">{merchantFilterMessage(merchantLookupState, Boolean(applied.merchantId))}</p> : null}
-    {!draft.merchantId || draftTerminalState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak; filtrsiz ro‘yxat ishlaydi.</p> : null}
-    {validationMessage ? <p id="p5-filter-error" role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
-  </>
+export function P5Filters(props: Parameters<typeof P5AdvancedFilterFields>[0]) {
+  return <P5AdvancedFilterFields {...props} />
 }
 
 type P5ResetController = ReturnType<typeof createP5ResetController>
@@ -146,7 +101,8 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable,
 
 export function P5Page({ resetPort = null, resetRegistration }: { readonly resetPort?: P5ResetPort | null; readonly resetRegistration?: ReadRegistration } = {}) {
   const runtime = useReadRuntime()
-  const [draft, setDraft] = useState<P5FilterValues>(createDefaultP5Filters)
+  const [draft, setDraft] = useState<P5AdvancedDraft>(() => createP5AdvancedDraft())
+  const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<P5FilterValues>(createDefaultP5Filters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const columnPreferences = useTableColumnPreferences({
@@ -170,6 +126,13 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
   }
   const draftTerminals = useQuery(draftTerminalOptions)
   const draftTerminalState = terminalLookupState(draftTerminalOptions.enabled, draftTerminals.isError, draftTerminals.data, runtime.capabilities.terminalLookup)
+  const draftTerminalGate = { lookupParentId: draft.merchantId, lookupState: draftTerminalState,
+    optionIds: draftTerminals.data?.map((option) => option.id) }
+  const reconciledDraft = reconcileP5AdvancedDraft(draft, merchantLookupState, draftTerminalGate)
+  const merchantPresentation = resolveLookupSelectState({ enabled: merchantOptions.enabled,
+    pending: merchants.isPending, error: merchants.isError, ids: merchants.data?.map((option) => option.id) })
+  const terminalPresentation = resolveLookupSelectState({ enabled: draftTerminalOptions.enabled,
+    pending: draftTerminals.isPending, error: draftTerminals.isError, ids: draftTerminalGate.optionIds })
 
   const appliedParentReady = p5ParentState(applied.merchantId, merchantLookupState) === 'ready'
   const appliedTerminalBase = runtime.queries.terminalLookupOptions(applied.merchantId)
@@ -198,15 +161,11 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
 
   function applyFilters(): boolean {
     try {
-      const next = applyP5Draft(draft, {
+      const next = applyP5AdvancedDraft(applied, draft, {
         merchantIds: merchantLookupState.kind === 'ready' ? merchantLookupState.ids : undefined,
-        terminal: {
-          lookupParentId: draft.merchantId,
-          lookupState: draftTerminalState,
-          optionIds: draftTerminals.data?.map((option) => option.id),
-        },
+        terminal: draftTerminalGate,
       })
-      setDraft(next)
+      setDraft(createP5AdvancedDraft(next))
       setApplied(next)
       setValidationMessage(null)
       return true
@@ -218,7 +177,8 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
 
   function resetFilters() {
     const next = createDefaultP5Filters()
-    setDraft(next)
+    setDraft(createP5AdvancedDraft(next))
+    setSearchDraft('')
     setApplied(next)
     setValidationMessage(null)
   }
@@ -231,18 +191,22 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
     : undefined
 
   return <div className="mx-auto min-w-0 max-w-7xl space-y-4">
-    <div className="flex min-w-0 flex-col gap-2 sm:items-end">
+    <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <P5QuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={(search) => {
+        setSearchDraft(search.trim())
+        setApplied((current) => applyP5QuickSearch(current, search))
+      }} />
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" applyDisabled={!isP5StatusDraftValid(draft.statusDraft)}>
           <P5Filters
-            draft={draft}
-            applied={applied}
-            merchantLookupState={merchantLookupState}
+            draft={reconciledDraft}
+            merchantState={merchantPresentation}
             merchants={merchants.data}
-            draftTerminalState={draftTerminalState}
-            draftTerminals={draftTerminals.data}
+            terminalState={terminalPresentation}
+            terminals={draftTerminals.data}
             validationMessage={validationMessage}
-            onDraftChange={setDraft}
+            onChange={setDraft}
+            onReconcileDraft={reconciledDraft !== draft ? () => setDraft(reconciledDraft) : undefined}
           />
         </FilterDrawer>
         <TableColumnPreferences

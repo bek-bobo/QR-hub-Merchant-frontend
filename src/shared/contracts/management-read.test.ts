@@ -87,7 +87,7 @@ describe('management read boundaries', () => {
 describe('management filters', () => {
   it('emits only each endpoint whitelist', () => {
     const extra = { status: 0, regionId: '3', sort: 'name', fromDate: 'y' }
-    expect(toTerminalListQuery({ ...extra, merchantId: '2', bankAccountId: '3', search: '  A ', page: 0, size: 10 })).toEqual({ merchantId: '2', bankAccountId: '3', search: 'A', page: '0', size: '10' })
+    expect(toTerminalListQuery({ ...extra, merchantId: '2', bankAccountId: '3', search: '  A ', page: 0, size: 10 })).toEqual({ merchantId: '2', bankAccountId: '3', regionId: '3', search: 'A', page: '0', size: '10' })
     expect(toBankAccountListQuery({ ...extra, search: ' ', page: 1, size: 25 })).toEqual({ page: '1', size: '25' })
     expect(toCashierListQuery({ ...extra, terminalId: ' terminal-a ', search: ' C ', page: 2, size: 50 })).toEqual({ terminalId: 'terminal-a', search: 'C', page: '2', size: '50' })
   })

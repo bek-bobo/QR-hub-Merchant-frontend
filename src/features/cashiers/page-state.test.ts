@@ -2,12 +2,59 @@ import { describe, expect, it } from 'vitest'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import type { Page, ReadScope } from '@/shared/contracts/merchant-read'
 import { changeManagementPage, changeMerchantDraft, clearManagementFilters, toCashierListQuery } from '@/shared/contracts/management-filters'
-import { applyCashierDraft, cashierParentState, cashierSelectionKey, createCashierTarget, createDefaultCashierFilters, resolveCashierTarget } from './page-state'
+import { applyCashierDraft, applyCashierAdvancedDraft, applyCashierQuickSearch, changeCashierMerchantDraft, reconcileCashierAdvancedDraft, cashierParentState, cashierSelectionKey, createCashierTarget, createDefaultCashierFilters, resolveCashierTarget } from './page-state'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
 const cashier: CashierRow = { createdAt: null, updatedAt: null, id: '11', fullname: 'Cashier A', phone: '+998900000001', statusCode: 777, roleDisplay: 'Merchant user', terminals: [] }
 
 describe('cashier filter state', () => {
+  const applied = { ...createDefaultCashierFilters(), merchantId: '2', terminalId: 't1', search: 'old', page: 3 }
+  const lookups = { merchantIds: ['2', '3'], terminal: { lookupParentId: '3', lookupState: 'ready', optionIds: ['t2'] } } as const
+
+  it('applies advanced filters together, preserves quick search and resets page', () => {
+    expect(applyCashierAdvancedDraft(applied, { merchantId: '3', terminalId: 't2' }, lookups))
+      .toEqual({ ...applied, merchantId: '3', terminalId: 't2', page: 0 })
+    expect(applied).toMatchObject({ merchantId: '2', terminalId: 't1', search: 'old', page: 3 })
+    expect(() => applyCashierAdvancedDraft(applied, { merchantId: '3', terminalId: 'missing' }, lookups)).toThrow()
+    expect(() => applyCashierAdvancedDraft(applied, { merchantId: 'missing' }, lookups)).toThrow()
+    expect(() => applyCashierAdvancedDraft(applied, { terminalId: 't2' }, lookups)).toThrow()
+    expect(() => applyCashierAdvancedDraft(applied, { merchantId: '3', terminalId: 't2' }, {})).toThrow()
+  })
+
+  it('applies and clears trimmed search with merchant/terminal preserved and no redundant update', () => {
+    const next = applyCashierQuickSearch(applied, '  Cashier A ')
+    expect(toCashierListQuery(next)).toEqual({ merchantId: '2', terminalId: 't1', search: 'Cashier A', page: '0', size: '20' })
+    expect(applyCashierQuickSearch(next, ' Cashier A ')).toBe(next)
+    expect(toCashierListQuery(applyCashierQuickSearch(next, ' '))).toEqual({ merchantId: '2', terminalId: 't1', page: '0', size: '20' })
+    expect(toCashierListQuery(clearManagementFilters(next))).toEqual({ page: '0', size: '20' })
+  })
+
+  it('clears dependent terminal drafts on merchant change without mutating applied filters', () => {
+    expect(changeCashierMerchantDraft({ merchantId: '2', terminalId: 't1' }, '3')).toEqual({ merchantId: '3', terminalId: undefined })
+    expect(applied).toMatchObject({ merchantId: '2', terminalId: 't1', page: 3 })
+  })
+
+  it('reconciles successful empty or refreshed terminal domains and never sends a stale terminal', () => {
+    const draft = { merchantId: '3', terminalId: 't1' }
+    const terminal = { lookupParentId: '3', lookupState: 'ready', optionIds: [] } as const
+    const reconciled = reconcileCashierAdvancedDraft(draft, { kind: 'ready', ids: ['3'] }, terminal)
+    expect(reconciled.terminalId).toBeUndefined()
+    expect(toCashierListQuery(applyCashierAdvancedDraft(applied, reconciled, { merchantIds: ['3'], terminal })))
+      .toEqual({ merchantId: '3', search: 'old', page: '0', size: '20' })
+    expect(applied.terminalId).toBe('t1')
+    expect(draft.terminalId).toBe('t1')
+    expect(reconcileCashierAdvancedDraft(draft, { kind: 'ready', ids: [] }, terminal))
+      .toMatchObject({ merchantId: undefined, terminalId: undefined })
+  })
+
+  it('does not reconcile from errors, pending lookups or a result belonging to another parent', () => {
+    const draft = { merchantId: '3', terminalId: 't1' }
+    for (const terminal of [
+      { lookupParentId: '3', lookupState: 'error', optionIds: [] },
+      { lookupParentId: '3', lookupState: 'loading', optionIds: [] },
+      { lookupParentId: '2', lookupState: 'ready', optionIds: [] },
+    ] as const) expect(reconcileCashierAdvancedDraft(draft, { kind: 'ready', ids: ['3'] }, terminal)).toBe(draft)
+  })
   it('serializes only the supported server subset and resets page on apply and clear', () => {
     const applied = applyCashierDraft({ ...createDefaultCashierFilters(), merchantId: '2', terminalId: 'term-3', search: '  Cashier A ', page: 4 }, {
       merchantIds: ['2'], terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['term-3'] },

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { P5Filters, P5Page } from './P5Page'
-import { createDefaultP5Filters } from './page-state'
+import { createP5AdvancedDraft } from './page-state'
 
 vi.mock('@tanstack/react-query', () => ({ useQuery: vi.fn(), useQueryClient: vi.fn() }))
 vi.mock('@/app/read/useReadRuntime', () => ({ useReadRuntime: vi.fn() }))
@@ -41,6 +41,9 @@ describe('P5 page optional lookups', () => {
     expect(html.match(/<h1\b/g)).toBeNull()
     expect(html).not.toContain('Qidiruv faqat qurilma ID va terminal nomi bo‘yicha ishlaydi.')
     expect(html).toContain('>Filtrlar</button>')
+    expect(html).toContain('placeholder="Qurilma ID yoki terminal nomi"')
+    expect(html).toContain('type="text"')
+    expect(html).not.toContain('type="search"')
     expect(html.match(/aria-label="Jadval ustunlarini sozlash"/g)).toHaveLength(1)
     expect(html).toContain('>Ustunlar</span>')
     expect(html.indexOf('>Filtrlar</button>')).toBeLessThan(
@@ -57,21 +60,21 @@ describe('P5 page optional lookups', () => {
     expect(html).toContain('P5 qurilmasi topilmadi')
     expect(vi.mocked(useQuery).mock.calls[3]?.[0]).toMatchObject({ enabled: true })
 
-    const draft = createDefaultP5Filters()
+    const draft = createP5AdvancedDraft()
     const filtersHtml = renderToString(<P5Filters
       draft={draft}
-      applied={draft}
-      merchantLookupState={{ kind: 'denied' }}
+      merchantState="unavailable"
       merchants={undefined}
-      draftTerminalState="denied"
-      draftTerminals={undefined}
+      terminalState="unavailable"
+      terminals={undefined}
       validationMessage={null}
-      onDraftChange={() => undefined}
+      onChange={() => undefined}
     />)
     expect(filtersHtml).not.toContain('aria-describedby="p5-search-help"')
-    expect(filtersHtml).toContain('Qurilma ID yoki terminal nomi')
-    expect(filtersHtml).toContain('Merchant filtri uchun ruxsat yo‘q; filtrsiz ro‘yxat ishlaydi.')
-    expect(filtersHtml).toContain('Terminal filtri uchun merchant va terminal lookup ruxsatlari kerak')
+    expect(filtersHtml).not.toContain('Qurilma ID yoki terminal nomi')
+    expect(filtersHtml).not.toContain('<input')
+    expect(filtersHtml).toContain('Merchantlarni yuklab bo‘lmadi')
+    expect(filtersHtml).toContain('Avval merchantni tanlang')
   })
 
   it('keeps the search field without the removed page helper paragraph', () => {

@@ -43,7 +43,8 @@ export function DynamicQrQuickFilters({
           className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-secondary"
         />
         <Input
-          type="search"
+          type="text"
+          enterKeyHint="search"
           value={searchDraft}
           className="h-9 pl-9 pr-9"
           aria-label="Terminal nomi bo‘yicha qidirish"

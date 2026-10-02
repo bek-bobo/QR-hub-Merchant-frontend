@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { classifyQrStatusCode, decodeDynamicQrPageResponse } from './contract'
+import { classifyQrStatusCode, decodeDynamicQrPageResponse, decodeDynamicQrStatsResponse } from './contract'
 
 function response(statusCode: number, overrides: Record<string, unknown> = {}) {
   return {
@@ -38,6 +38,26 @@ function response(statusCode: number, overrides: Record<string, unknown> = {}) {
 }
 
 describe('dynamic QR read contract', () => {
+  it.each([0, 1875000, Number.MAX_SAFE_INTEGER])('decodes both stats totals as exact tiyin: %s', (totalServiceFeeAmount) => {
+    const decoded = decodeDynamicQrStatsResponse({ success: true, data: { totalAmount: 125000000, totalServiceFeeAmount } })
+    expect(decoded).toEqual({
+      totalAmount: { minorUnits: '125000000', currency: 'UZS', scale: 2 },
+      totalServiceFeeAmount: { minorUnits: String(totalServiceFeeAmount), currency: 'UZS', scale: 2 },
+    })
+    expect(Object.isFrozen(decoded)).toBe(true)
+    expect(Object.isFrozen(decoded.totalServiceFeeAmount)).toBe(true)
+  })
+
+  it.each([undefined, null, '1875000', -1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])('rejects malformed fee totals instead of falling back to zero: %s', (totalServiceFeeAmount) => {
+    expect(() => decodeDynamicQrStatsResponse({ success: true, data: { totalAmount: 125000000, totalServiceFeeAmount } })).toThrow()
+  })
+  it.each([null, {}, { success: false, data: {} }, { success: true }, { success: true, data: [] }])('rejects a malformed stats success envelope: %s', (payload) => {
+    expect(() => decodeDynamicQrStatsResponse(payload)).toThrow()
+  })
+
+  it.each([undefined, null, '125000000', -1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])('rejects malformed total amount: %s', (totalAmount) => {
+    expect(() => decodeDynamicQrStatsResponse({ success: true, data: { totalAmount, totalServiceFeeAmount: 1875000 } })).toThrow()
+  })
   it('maps only source-confirmed status meanings', () => {
     expect([
       classifyQrStatusCode(0),

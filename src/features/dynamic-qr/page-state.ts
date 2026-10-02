@@ -46,6 +46,8 @@ export function parseQrStatusInput(
       return 10
     case '20':
       return 20
+    case '25':
+      return 25
     case '50':
       return 50
     default:
@@ -103,7 +105,7 @@ export function parseDashboardDynamicQrState(
 }
 
 export function getTerminalFilterState(
-  filters: DynamicQrFilters,
+  filters: Pick<DynamicQrFilters, 'terminalId'>,
   lookup: TerminalLookupState,
 ): TerminalFilterState {
   if (!filters.terminalId) {

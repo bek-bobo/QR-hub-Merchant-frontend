@@ -8,7 +8,7 @@ export function shouldInvalidateAfterCreate(
 ): boolean {
   if (queryKey[0] !== scope.source || queryKey[1] !== scope.sessionScopeId ||
     queryKey[2] !== scope.accessRevision) return false
-  return canReadDynamicQrs && queryKey[3] === 'dynamic-qrs'
+  return canReadDynamicQrs && (queryKey[3] === 'dynamic-qrs' || queryKey[3] === 'dynamic-qr-stats')
 }
 
 export async function invalidateConfirmedCreateReads(

@@ -6,7 +6,11 @@ const scope = { source: 'live' as const, sessionScopeId: 'a', accessRevision: 1 
 const filters = { fromDate: '2026-09-01', toDate: '2026-09-17', search: '', page: 0, size: 10 as const }
 
 describe('confirmed create invalidation selection', () => {
-  it('selects only authorized current-scope dynamic list variants', () => {
+  it('selects only authorized current-scope dynamic list and stats variants', () => {
+    expect(shouldInvalidateAfterCreate(readKeys.dynamicQrStats(scope, filters), scope, true)).toBe(true)
+    expect(shouldInvalidateAfterCreate(readKeys.dynamicQrStats(scope, { ...filters, terminalId: 'T-01' }), scope, true)).toBe(true)
+    expect(shouldInvalidateAfterCreate(readKeys.dynamicQrStats(scope, filters), scope, false)).toBe(false)
+    expect(shouldInvalidateAfterCreate(readKeys.dynamicQrStats({ ...scope, accessRevision: 2 }, filters), scope, true)).toBe(false)
     expect(shouldInvalidateAfterCreate(readKeys.dynamicQrs(scope, filters), scope, true)).toBe(true)
     expect(shouldInvalidateAfterCreate(readKeys.dynamicQrs(scope, { ...filters, page: 1 }), scope, true)).toBe(true)
     expect(shouldInvalidateAfterCreate(readKeys.dynamicQrs(scope, filters), scope, false)).toBe(false)

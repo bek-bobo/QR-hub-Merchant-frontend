@@ -20,6 +20,36 @@ export function applyCashierDraft(draft: CashierListFilters, input: { readonly m
   return applyManagementFilters(draft, { terminal: input.terminal })
 }
 
+export type CashierAdvancedDraft = Pick<CashierListFilters, 'merchantId' | 'terminalId'>
+
+export function changeCashierMerchantDraft(draft: CashierAdvancedDraft, merchantId?: string): CashierAdvancedDraft {
+  return { ...draft, merchantId, terminalId: undefined }
+}
+
+export function reconcileCashierAdvancedDraft(draft: CashierAdvancedDraft, merchant: MerchantLookupState,
+  terminal: DependentLookupGateInput): CashierAdvancedDraft {
+  if (draft.merchantId && merchant.kind === 'ready' && !merchant.ids.includes(draft.merchantId)) {
+    return changeCashierMerchantDraft(draft, undefined)
+  }
+  if (draft.terminalId && terminal.lookupState === 'ready' && terminal.lookupParentId === draft.merchantId &&
+    terminal.optionIds && !terminal.optionIds.includes(draft.terminalId)) {
+    return { ...draft, terminalId: undefined }
+  }
+  return draft
+}
+
+export function applyCashierAdvancedDraft(applied: CashierListFilters, draft: CashierAdvancedDraft,
+  input: Parameters<typeof applyCashierDraft>[1]): CashierListFilters {
+  if (draft.terminalId && !draft.merchantId) throw safeContractError()
+  return applyCashierDraft({ ...applied, merchantId: draft.merchantId, terminalId: draft.terminalId }, input)
+}
+
+export function applyCashierQuickSearch(applied: CashierListFilters, search: string): CashierListFilters {
+  const normalized = search.trim()
+  if (applied.search === normalized && applied.page === 0) return applied
+  return { ...applied, search: normalized, page: 0 }
+}
+
 export interface CashierTarget {
   readonly scope: ReadScope
   readonly cashierId: string

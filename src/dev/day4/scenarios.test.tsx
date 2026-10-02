@@ -202,7 +202,7 @@ describe('D4 static preview data', () => {
   })
 
   it('pauses a lost applied terminal without widening, and separates error from empty', () => {
-    const applied = { terminalId: d4StaticTerminal.id, page: 0, size: 10 as const }
+    const applied = { terminalId: d4StaticTerminal.id, search: '', page: 0, size: 10 as const }
     expect(getStaticTerminalState(applied, { enabled: false, pending: false, error: false }))
       .toBe('unconfirmed')
     const render = (props: Partial<Parameters<typeof StaticQrResults>[0]>) => renderToString(

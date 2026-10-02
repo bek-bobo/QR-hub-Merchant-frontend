@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
@@ -9,25 +7,22 @@ import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
-import { changeManagementPage, changeMerchantDraft, clearManagementFilters, type LookupState, type TerminalListFilters } from '@/shared/contracts/management-filters'
-import type { ManagementOption, TerminalRow } from '@/shared/contracts/management-read'
-import { applyTerminalDraft, createDefaultTerminalFilters, terminalParentState, type ParentLookupState } from './page-state'
+import { changeManagementPage, type TerminalListFilters } from '@/shared/contracts/management-filters'
+import type { TerminalRow } from '@/shared/contracts/management-read'
+import { applyTerminalAdvancedDraft, applyTerminalQuickSearch, createDefaultTerminalFilters, resetTerminalFilters, type TerminalAdvancedDraft } from './page-state'
+import { TerminalAdvancedFilterFields, TerminalQuickSearch } from './TerminalFilterControls'
+import { useTerminalFilterLookups } from './filter-lookups'
 import { terminalColumns } from './columns'
 import { TerminalResults } from './TerminalResults'
 import { TerminalQrDialog } from './TerminalQrDialog'
 import { TerminalDetailsSheet } from './TerminalDetailsSheet'
 
-function lookupState(enabled: boolean, error: boolean, data: readonly ManagementOption[] | undefined, granted: boolean): LookupState {
-  if (!enabled) return granted ? 'unavailable' : 'denied'
-  if (error) return 'error'
-  return data ? 'ready' : 'loading'
-}
-
 export function TerminalPage() {
   const runtime = useReadRuntime()
   const [qrRow, setQrRow] = useState<TerminalRow | null>(null)
   const [detailsRow, setDetailsRow] = useState<TerminalRow | null>(null)
-  const [draft, setDraft] = useState<TerminalListFilters>(createDefaultTerminalFilters)
+  const [draft, setDraft] = useState<TerminalAdvancedDraft>({})
+  const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<TerminalListFilters>(createDefaultTerminalFilters)
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const columnPreferences = useTableColumnPreferences({
@@ -35,61 +30,33 @@ export function TerminalPage() {
     columns: terminalColumns,
   })
 
-  const merchantBase = runtime.queries.merchantLookupOptions()
-  const merchantOptions = { ...merchantBase, enabled: merchantBase.enabled && runtime.capabilities.terminalList }
-  const merchants = useQuery(merchantOptions)
-  const merchantLookupState: ParentLookupState = !merchantOptions.enabled
-    ? { kind: runtime.capabilities.merchantLookup ? 'unavailable' : 'denied' }
-    : merchants.isError ? { kind: 'error' }
-      : merchants.data ? { kind: 'ready', ids: merchants.data.map((option) => option.id) }
-        : { kind: 'loading' }
-
-  const draftBankBase = runtime.queries.bankAccountLookupOptions(draft.merchantId)
-  const draftBankOptions = { ...draftBankBase, enabled: draftBankBase.enabled && runtime.capabilities.terminalList && terminalParentState(draft.merchantId, merchantLookupState) === 'ready' }
-  const draftBanks = useQuery(draftBankOptions)
-  const draftBankState = lookupState(draftBankOptions.enabled, draftBanks.isError, draftBanks.data, runtime.capabilities.bankAccountLookup)
-
-  const appliedParentReady = terminalParentState(applied.merchantId, merchantLookupState) === 'ready'
-  const appliedBankBase = runtime.queries.bankAccountLookupOptions(applied.merchantId)
-  const appliedBankOptions = { ...appliedBankBase, enabled: appliedBankBase.enabled && runtime.capabilities.terminalList && Boolean(applied.bankAccountId) && appliedParentReady }
-  const appliedBanks = useQuery(appliedBankOptions)
-  const appliedBankState = lookupState(appliedBankOptions.enabled, appliedBanks.isError, appliedBanks.data, runtime.capabilities.bankAccountLookup)
-  const listBase = runtime.queries.terminalListOptions(applied, {
-    lookupParentId: applied.merchantId,
-    lookupState: appliedBankState,
-    optionIds: appliedBanks.data?.map((option) => option.id),
-  })
+  const lookups = useTerminalFilterLookups(draft, applied)
+  const listBase = runtime.queries.terminalListOptions(applied, lookups.bankGate, lookups.geographyGate)
   const listOptions = {
     ...listBase,
-    queryKey: appliedParentReady ? listBase.queryKey : [...listBase.queryKey, 'merchant-unconfirmed'],
-    enabled: listBase.enabled && appliedParentReady,
+    queryKey: lookups.appliedReady ? listBase.queryKey : [...listBase.queryKey, 'selection-unconfirmed'],
+    enabled: listBase.enabled && lookups.appliedReady,
   }
   const list = useQuery(listOptions)
-  const blocked = !appliedParentReady || (Boolean(applied.bankAccountId) && !listBase.enabled)
+  const blocked = !lookups.appliedReady
 
   function applyFilters(): boolean {
     try {
-      const next = applyTerminalDraft(draft, {
-        merchantIds: merchantLookupState.kind === 'ready' ? merchantLookupState.ids : undefined,
-        bank: {
-          lookupParentId: draft.merchantId,
-          lookupState: draftBankState,
-          optionIds: draftBanks.data?.map((option) => option.id),
-        },
-      })
-      setDraft(next)
+      const next = applyTerminalAdvancedDraft(applied, lookups.reconciledDraft, lookups.validation)
+      setDraft(lookups.reconciledDraft)
       setApplied(next)
       setValidationMessage(null)
       return true
     } catch {
-      setValidationMessage('Tanlangan merchant yoki bank hisobi tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      setValidationMessage('Tanlangan merchant, bank hisobi, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
       return false
     }
   }
 
   function resetFilters() {
-    const next = clearManagementFilters(applied)
-    setDraft(next)
+    const next = resetTerminalFilters(applied)
+    setDraft({})
+    setSearchDraft('')
     setApplied(next)
     setValidationMessage(null)
   }
@@ -105,25 +72,12 @@ export function TerminalPage() {
       onViewDetails={setDetailsRow}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      quickFilters={<TerminalQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
+        onApply={(search) => setApplied((current) => applyTerminalQuickSearch(current, search))} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
-          {merchantLookupState.kind === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Merchant
-            <Select value={draft.merchantId ?? ''} onChange={(event) => setDraft((current) => changeMerchantDraft(current, event.target.value || undefined))}>
-              <option value="">Barcha merchantlar</option>
-              {merchants.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-            </Select>
-          </label> : null}
-          {draftBankState === 'ready' ? <label className="block min-w-0 space-y-1 text-sm">Bank hisobi
-            <Select value={draft.bankAccountId ?? ''} onChange={(event) => setDraft((current) => ({ ...current, bankAccountId: event.target.value || undefined }))}>
-              <option value="">Barcha bank hisoblari</option>
-              {draftBanks.data?.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
-            </Select>
-          </label> : null}
-          <label className="block min-w-0 space-y-1 text-sm">Terminal nomi yoki ID
-            <Input value={draft.search} onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} placeholder="Terminal nomi yoki pkey" />
-          </label>
-          {merchantLookupState.kind !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Merchant filtri {merchantLookupState.kind === 'denied' ? 'uchun ruxsat yo‘q' : merchantLookupState.kind === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}; {applied.merchantId ? 'qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.' : 'filtrsiz ro‘yxat ishlaydi.'}</p> : null}
-          {draftBankState !== 'ready' ? <p role="status" className="text-sm text-text-secondary sm:col-span-2">Bank hisobi filtri {draftBankState === 'denied' ? 'uchun ruxsat yo‘q' : draftBankState === 'loading' ? 'yuklanmoqda' : 'hozir mavjud emas'}.</p> : null}
+          <TerminalAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
+            onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences

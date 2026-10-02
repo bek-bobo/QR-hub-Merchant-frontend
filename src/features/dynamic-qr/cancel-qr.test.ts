@@ -187,27 +187,30 @@ describe('cancel QR fake boundary', () => {
     expect(sends).toBe(2)
   })
 
-  it('selects only current permitted dynamic list and dashboard keys after confirmation', async () => {
+  it('selects only current permitted dynamic list, stats and dashboard keys after confirmation', async () => {
     const filters = { fromDate: '2026-09-01', toDate: '2026-09-17', search: '', page: 0, size: 10 as const }
     const list = readKeys.dynamicQrs(scope, filters)
+    const stats = readKeys.dynamicQrStats(scope, filters)
     const dashboard = readKeys.dashboard(scope, filters)
     const staticQr = readKeys.staticQrs(scope, undefined, 0, 10)
     const otherScope = readKeys.dynamicQrs({ ...scope, accessRevision: 2 }, filters)
-    expect([list, dashboard, staticQr, otherScope].filter((key) =>
+    expect([list, stats, dashboard, staticQr, otherScope].filter((key) =>
       shouldInvalidateAfterCancel(key, scope, { dynamicQrRead: true, dashboardRead: true })))
-      .toEqual([list, dashboard])
+      .toEqual([list, stats, dashboard])
+    expect(shouldInvalidateAfterCancel(stats, scope, { dynamicQrRead: false, dashboardRead: true })).toBe(false)
+    expect(shouldInvalidateAfterCancel(readKeys.dynamicQrStats({ ...scope, accessRevision: 2 }, filters), scope, { dynamicQrRead: true, dashboardRead: true })).toBe(false)
     expect(shouldInvalidateAfterCancel(dashboard, scope, { dynamicQrRead: true, dashboardRead: false })).toBe(false)
     const selected: (readonly unknown[])[] = []
     const port: CancelQrPort = { cancel: async () => accepted }
     const controller = createCancelQrController({ currentScope: () => scope, canCancel: () => true,
       eligibleRow: () => true, port: () => port,
       invalidateConfirmed: async (captured) => {
-        selected.push(...[list, dashboard, staticQr, otherScope].filter((key) =>
+        selected.push(...[list, stats, dashboard, staticQr, otherScope].filter((key) =>
           shouldInvalidateAfterCancel(key, captured, { dynamicQrRead: true, dashboardRead: false })))
       },
     })
     controller.request(row)
     expect((await controller.confirm()).kind).toBe('confirmed')
-    expect(selected).toEqual([list])
+    expect(selected).toEqual([list, stats])
   })
 })

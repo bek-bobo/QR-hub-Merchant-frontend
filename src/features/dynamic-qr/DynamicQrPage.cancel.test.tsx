@@ -1,15 +1,36 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderToString } from 'react-dom/server'
 import { MemoryRouter } from 'react-router'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import { DynamicQrPage } from './DynamicQrPage'
+import { d3DynamicQrRows } from '@/dev/read/read.fixture'
+import type { DynamicQrStats } from '@/shared/contracts/merchant-read'
+
+const queryState = vi.hoisted(() => ({
+  stats: { data: undefined as undefined | DynamicQrStats, isError: false },
+  listReady: false,
+  statsEnabled: true,
+  statsFeatureEnabled: true,
+}))
 
 vi.mock('./queries', () => ({
   useDynamicQrReadQueries: () => ({
     runtime: { readiness: { dynamicQr: { kind: 'configured' } }, capabilities: { dynamicQr: true } },
     terminals: { isPending: false, isError: false, data: [] },
-    list: { data: null, dataUpdatedAt: 1_700_000_000_000, isPending: true, isFetching: false, isError: false },
-    terminalFilterState: 'valid', enabled: { terminals: false, list: true },
+    list: { data: queryState.listReady ? { content: [d3DynamicQrRows[0]], page: 0, size: 10, totalPages: 1, totalElements: 1 } : null, dataUpdatedAt: 1_700_000_000_000, isPending: !queryState.listReady, isFetching: false, isError: false },
+    stats: queryState.stats,
+    statsFeatureEnabled: queryState.statsFeatureEnabled,
+    terminalFilterState: 'valid', filterState: 'valid', enabled: { terminals: false, list: true, stats: queryState.statsEnabled },
+    lookups: {
+      merchants: { data: [], isPending: false, isError: false },
+      draftBanks: { data: [], isPending: false, isError: false },
+      draftTerminals: { data: [], isPending: false, isError: false },
+      draftEvidence: {
+        merchants: { enabled: false, pending: false, error: false },
+        banks: { enabled: false, pending: false, error: false },
+        terminals: { enabled: false, pending: false, error: false },
+      },
+    },
   }),
 }))
 vi.mock('./ExportButton', () => ({ ExportButton: () => null }))
@@ -21,6 +42,12 @@ function pageWith(permissions: string[]) {
 }
 
 describe('production cancel list gate', () => {
+  beforeEach(() => {
+    queryState.stats = { data: undefined, isError: false }
+    queryState.listReady = false
+    queryState.statsEnabled = true
+    queryState.statsFeatureEnabled = true
+  })
   it('keeps cancel unavailable without rendering the removed notice', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CANCEL_PAYMENT'])
     expect(html).not.toContain('Bekor qilish hozircha mavjud emas')
@@ -72,11 +99,50 @@ describe('production cancel list gate', () => {
     expect(html.indexOf('Yangilangan:')).toBeGreaterThan(html.indexOf('aria-label="Yangilash"'))
   })
 
-  it('renders honest summary placeholders when aggregate fields are unavailable', () => {
+  it('renders loading placeholders without obsolete aggregate helper text', () => {
     const html = pageWith(['GET_DYNAMIC_QRS'])
 
     expect(html).toContain('Jami summa')
     expect(html).toContain('Xizmat haqi')
-    expect(html.match(/Joriy API javobida agregat mavjud emas/g)).toHaveLength(2)
+    expect(html).not.toContain('Joriy API javobida agregat mavjud emas')
+    expect(html.match(/text-2xl[^>]*>—<\/p>/g)).toHaveLength(2)
+  })
+
+  it('keeps the list table usable when only stats fail', () => {
+    queryState.stats.isError = true
+    queryState.listReady = true
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+    expect(html).toContain('Jami summa va xizmat haqini yuklab bo‘lmadi.')
+    expect(html).toContain('<table')
+    expect(html).toContain('Asosiy terminal')
+  })
+
+  it('keeps disabled stats neutral and the list usable even with cached stats errors', () => {
+    queryState.statsFeatureEnabled = false
+    queryState.statsEnabled = false
+    queryState.stats.isError = true
+    queryState.listReady = true
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+    expect(html).toContain('Statistika hozircha mavjud emas')
+    expect(html.match(/text-2xl[^>]*>—<\/p>/g)).toHaveLength(2)
+    expect(html).not.toContain('Jami summa va xizmat haqini yuklab bo‘lmadi.')
+    expect(html).not.toContain('role="alert"')
+    expect(html).toContain('<table')
+    expect(html).toContain('Asosiy terminal')
+    expect(html).toContain('Terminal nomi bo‘yicha')
+    expect(html).toContain('Filtrlar')
+  })
+
+  it('renders both returned totals in the large primary text', () => {
+    queryState.stats.data = { totalAmount: { minorUnits: '125000000', currency: 'UZS', scale: 2 }, totalServiceFeeAmount: { minorUnits: '1875000', currency: 'UZS', scale: 2 } }
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+    expect(html).toMatch(/text-2xl[^>]*>1 250 000\.00 UZS<\/p>/)
+    expect(html).toMatch(/text-2xl[^>]*>18 750\.00 UZS<\/p>/)
+  })
+
+  it('hides cached totals when stats execution is disabled', () => {
+    queryState.stats.data = { totalAmount: { minorUnits: '125000000', currency: 'UZS', scale: 2 }, totalServiceFeeAmount: { minorUnits: '0', currency: 'UZS', scale: 2 } }
+    queryState.statsEnabled = false
+    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('1 250 000.00 UZS')
   })
 })

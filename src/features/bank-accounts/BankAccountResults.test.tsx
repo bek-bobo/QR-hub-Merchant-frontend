@@ -16,6 +16,20 @@ function cellTexts(html: string, tag: 'th' | 'td'): string[] {
 }
 
 describe('bank-account results', () => {
+  it('keeps quick search and toolbar actions above the existing table and available during loading', () => {
+    const controls = {
+      quickFilters: createElement('input', { type: 'search', placeholder: 'quick-search' }),
+      headerActions: createElement('button', { type: 'button' }, 'toolbar-actions'),
+    }
+    const html = render(controls)
+    expect(html.indexOf('placeholder="quick-search"')).toBeLessThan(html.indexOf('toolbar-actions'))
+    expect(html.indexOf('toolbar-actions')).toBeLessThan(html.indexOf('aria-label="Bank hisoblari jadvali"'))
+    expect(html).toContain('00000000000000000001')
+    const pending = render({ ...controls, pending: true, data: undefined })
+    expect(pending).toContain('placeholder="quick-search"')
+    expect(pending).toContain('toolbar-actions')
+    expect(pending).toContain('yuklanmoqda')
+  })
   it('preserves source order, exact account text, and neutral fallback while hiding the visible total', () => {
     const html = render()
     const text = html.replace(/<!-- -->/g, '')

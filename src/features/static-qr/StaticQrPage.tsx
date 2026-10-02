@@ -5,15 +5,16 @@ import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
-import { Select } from '@/components/ui/select'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
-import { applyStaticTerminal, clearStaticTerminal,
-  defaultStaticFilters, getStaticTerminalState, type StaticQrFilters } from './page-state'
+import { applyStaticQrAdvancedDraft, applyStaticQrQuickSearch, clearStaticTerminal,
+  defaultStaticFilters, type StaticQrAdvancedDraft, type StaticQrFilters } from './page-state'
+import { StaticQrAdvancedFilterFields, StaticQrQuickSearch } from './StaticQrFilterControls'
+import { useStaticQrFilterLookups } from './filter-lookups'
 import { createStaticQrQueryOptions } from './query'
 import { StaticQrResults } from './StaticQrResults'
 import type { StaticQrRow } from './contract'
@@ -21,43 +22,13 @@ import { StaticQrDisplayDialog } from './StaticQrDisplayDialog'
 import { StaticQrDetailsSheet } from './StaticQrDetailsSheet'
 import { staticQrColumns } from './columns'
 
-interface StaticQrFiltersProps {
-  readonly draftTerminal: string
-  readonly applied: StaticQrFilters
-  readonly terminals: readonly { readonly id: string; readonly name: string }[] | undefined
-  readonly lookupUsable: boolean
-  readonly onDraftTerminalChange: (terminalId: string) => void
-}
-
-export function StaticQrFilters({
-  draftTerminal,
-  applied,
-  terminals,
-  lookupUsable,
-  onDraftTerminalChange,
-}: StaticQrFiltersProps) {
-  return <>
-    <label className="block min-w-0 space-y-1 text-sm">Terminal
-      <Select value={draftTerminal}
-        disabled={!lookupUsable}
-        onChange={(event) => onDraftTerminalChange(event.target.value)}>
-        <option value="">Barcha terminallar</option>
-        {terminals?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-      </Select>
-    </label>
-    {!lookupUsable ? <p role="status" className="text-sm text-text-secondary">
-      {applied.terminalId
-        ? 'Terminal filtri hozir mavjud emas; qo‘llangan filtr tasdiqlanmaguncha ro‘yxat to‘xtatiladi.'
-        : 'Terminal filtri hozir mavjud emas; ro‘yxat filtrsiz ishlaydi.'}
-    </p> : null}
-  </>
-}
-
 export function StaticQrPage() {
   const runtime = useReadRuntime()
   const access = useAccessContext()
   const { bridge, getSessionSnapshot } = useProtectedReadContext()
-  const [draftTerminal, setDraftTerminal] = useState('')
+  const [draft, setDraft] = useState<StaticQrAdvancedDraft>({})
+  const [searchDraft, setSearchDraft] = useState('')
+  const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
   const [selectedQrRow, setSelectedQrRow] = useState<StaticQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<StaticQrRow | null>(null)
@@ -71,29 +42,33 @@ export function StaticQrPage() {
   const transport = useMemo(() => baseUrl
     ? createHttpTransport({ service: 'web', baseUrl }) : null,
     [baseUrl])
-  const lookupOptions = runtime.queries.terminalOptions()
-  const terminals = useQuery(lookupOptions)
-  const lookup = { enabled: lookupOptions.enabled, pending: terminals.isPending,
-    error: terminals.isError, terminals: terminals.data }
-  const lookupUsable = lookup.enabled && !lookup.pending && !lookup.error && Boolean(lookup.terminals)
-  const selectedValid = getStaticTerminalState(applied, lookup) === 'valid'
   const staticReadAllowed = can(access, 'staticQr.read', false)
-  const list = useQuery(createStaticQrQueryOptions({
+  const lookups = useStaticQrFilterLookups(draft, applied, staticReadAllowed)
+  const selectedValid = lookups.appliedConfirmed
+  const listOptions = createStaticQrQueryOptions({
     scope: runtime.scope, currentScope: runtime.getCurrentScope, filters: applied,
     staticReadAllowed, authReady: runtime.readiness.auth.kind === 'configured',
     terminalConfirmed: selectedValid, transport, bridge, getSessionSnapshot,
-  }))
+  })
+  const list = useQuery(listOptions)
 
   function applyFilters(): boolean {
-    const next = applyStaticTerminal(applied, draftTerminal, lookup)
-    if (!next) return false
+    const next = applyStaticQrAdvancedDraft(applied, lookups.reconciledDraft, lookups.validation)
+    if (!next) {
+      setValidationMessage('Tanlangan merchant, terminal, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      return false
+    }
+    setDraft(lookups.reconciledDraft)
     setApplied(next)
+    setValidationMessage(null)
     return true
   }
 
   function resetFilters() {
-    setDraftTerminal('')
+    setDraft({})
+    setSearchDraft('')
     setApplied((current) => clearStaticTerminal(current))
+    setValidationMessage(null)
   }
 
   if (!staticReadAllowed) return <NoAccessState description="Statik QR ro‘yxatini ko‘rish huquqi mavjud emas." />
@@ -118,21 +93,17 @@ export function StaticQrPage() {
       onPageChange={(page) => setApplied((current) => ({ ...current, page }))}
       onViewQr={setSelectedQrRow}
       onViewDetails={setSelectedDetailsRow}
+      quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
+        onApply={(search) => setApplied((current) => applyStaticQrQuickSearch(current, search))} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <FilterDrawer
           onApply={applyFilters}
           onReset={resetFilters}
-          applyDisabled={Boolean(draftTerminal) &&
-            getStaticTerminalState({ ...applied, terminalId: draftTerminal }, lookup) !== 'valid'}
           triggerSize="sm"
         >
-          <StaticQrFilters
-            draftTerminal={draftTerminal}
-            applied={applied}
-            terminals={terminals.data}
-            lookupUsable={lookupUsable}
-            onDraftTerminalChange={setDraftTerminal}
-          />
+          <StaticQrAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
+            onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
+          {validationMessage ? <p role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences
           tableLabel="Statik QR"
@@ -149,7 +120,7 @@ export function StaticQrPage() {
         />
         <RefreshIconButton
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
-          disabled={!selectedValid || list.isFetching}
+          disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}
         />

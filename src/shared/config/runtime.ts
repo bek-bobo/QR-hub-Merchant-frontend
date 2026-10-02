@@ -8,6 +8,23 @@ import {
 
 export type RuntimeMode = 'demo' | 'live'
 
+export interface RuntimeFeatureConfig {
+  readonly dynamicQrStatsEnabled: boolean
+}
+
+export function resolveRuntimeFeatureConfig(values: {
+  readonly dynamicQrStatsEnabled?: string
+}): RuntimeFeatureConfig {
+  // Optional capabilities require an explicit opt-in, like demo mode.
+  return { dynamicQrStatsEnabled: values.dynamicQrStatsEnabled === 'true' }
+}
+
+export function getRuntimeFeatureConfig(): RuntimeFeatureConfig {
+  return resolveRuntimeFeatureConfig({
+    dynamicQrStatsEnabled: import.meta.env.VITE_DYNAMIC_QR_STATS_ENABLED,
+  })
+}
+
 export function resolveRuntimeMode(
   requested: string | undefined,
   development: boolean,

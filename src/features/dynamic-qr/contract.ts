@@ -1,17 +1,17 @@
 import { safeContractError } from '@/shared/api/errors'
 import {
-  contractObject,
-  isoLocalDateTime,
-  nullableString,
-  requiredString,
-  safeInteger,
-  successEnvelopeData,
-  uzsTiyin,
-  type DynamicQrRow,
-  type Page,
-  type QrStatusKind,
+    contractObject,
+    isoLocalDateTime,
+    nullableString,
+    requiredString,
+    safeInteger,
+    successEnvelopeData,
+    uzsTiyin,
+    type DynamicQrRow,
+    type DynamicQrStats,
+    type Page,
+    type QrStatusKind,
 } from '@/shared/contracts/merchant-read'
-
 export function classifyQrStatusCode(statusCode: number): QrStatusKind {
   switch (statusCode) {
     case 0:
@@ -94,4 +94,15 @@ export function decodeDynamicQrPageResponse(payload: unknown): Page<DynamicQrRow
     page: safeInteger(data.page),
     size: safeInteger(data.size, 1),
   })
+}
+
+export function decodeDynamicQrStatsResponse(
+    payload: unknown,
+): DynamicQrStats {
+    const data = contractObject(successEnvelopeData(payload))
+
+    return Object.freeze({
+        totalAmount: uzsTiyin(data.totalAmount),
+        totalServiceFeeAmount: uzsTiyin(data.totalServiceFeeAmount),
+    })
 }

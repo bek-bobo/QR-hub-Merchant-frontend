@@ -85,6 +85,8 @@ describe('capability boundary', () => {
     ['staticQr.read', 'GET_STATIC_QRS'],
     ['currency.lookup', 'GET_CURRENCY_CODE'],
     ['terminal.lookup', 'GET_DROPDOWN_TERMINALS'],
+    ['region.lookup', 'GET_DROPDOWN_REGIONS'],
+    ['district.lookup', 'GET_DROPDOWN_DISTRICTS'],
     ['p5.read', 'GET_P5'],
     ['p5.resetPin', 'RESET_P5_PIN'],
   ] as const)('requires the exact verified %s authority', (capability, authority) => {

@@ -24,6 +24,7 @@ interface BankAccountResultsProps {
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly headerActions?: ReactNode
+  readonly quickFilters?: ReactNode
 }
 
 function resolveColumns(
@@ -43,15 +44,19 @@ function resolveColumns(
 }
 
 export function BankAccountResults({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, headerActions }: BankAccountResultsProps) {
+  visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters }: BankAccountResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
 
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Bank hisoblari ro‘yxati</CardTitle>
-      {headerActions}
+      {quickFilters ? null : headerActions}
     </CardHeader>
     <CardContent className="min-w-0 space-y-4">
+      {quickFilters ? <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+        {quickFilters}
+        {headerActions}
+      </div> : null}
       {blocked ? <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
         : pending ? <LoadingState title="Bank hisoblari yuklanmoqda" />
           : error ? <ErrorState onRetry={onRetry} />

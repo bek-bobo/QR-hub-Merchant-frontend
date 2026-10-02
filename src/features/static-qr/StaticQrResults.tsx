@@ -20,19 +20,24 @@ interface StaticQrResultsProps {
   readonly onViewQr?: (row: StaticQrRow) => void
   readonly onViewDetails?: (row: StaticQrRow) => void
   readonly headerActions?: ReactNode
+  readonly quickFilters?: ReactNode
 }
 
 export function StaticQrResults({ terminalConfirmed, pending, error, data,
   page, columnOrder, visibleColumnIds, onRetry, onPageChange,
-  onViewQr, onViewDetails, headerActions }: StaticQrResultsProps) {
+  onViewQr, onViewDetails, headerActions, quickFilters }: StaticQrResultsProps) {
   return <Card className="min-w-0" aria-busy={pending}>
     <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <CardTitle>Statik QR ro‘yxati</CardTitle>
-      {headerActions}
+      {!quickFilters ? headerActions : null}
     </CardHeader>
     <CardContent className="min-w-0 space-y-4">
-      {!terminalConfirmed ? <ErrorState title="Tanlangan terminal endi tasdiqlanmadi"
-        description="Filtrni tozalang yoki terminalni qayta tanlab qo‘llang." />
+      {quickFilters ? <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+        {quickFilters}
+        {headerActions}
+      </div> : null}
+      {!terminalConfirmed ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi"
+        description="Filtrni tozalang yoki merchant, terminal, viloyat yoki tumanni qayta tanlab qo‘llang." />
         : pending ? <LoadingState title="Statik QRlar yuklanmoqda" />
           : error ? <ErrorState onRetry={onRetry} />
             : !data ? <ErrorState title="Statik QR ro‘yxatini ko‘rsatib bo‘lmadi" />

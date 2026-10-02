@@ -163,7 +163,7 @@ function StaticPreview() {
 
 function StaticScenarioView({ scenario }: { readonly scenario: StaticScenario }) {
   const [filters, setFilters] = useState<StaticQrFilters>(() => scenario === 'STATIC_TERMINAL_LOST'
-    ? { terminalId: d4StaticTerminal.id, page: 0, size: 10 } : { page: 0, size: 10 })
+    ? { terminalId: d4StaticTerminal.id, search: '', page: 0, size: 10 } : { search: '', page: 0, size: 10 })
   const [draft, setDraft] = useState(filters.terminalId ?? '')
   const [lookupAvailable, setLookupAvailable] = useState(scenario !== 'STATIC_LOOKUP_DENIED')
   const lookup = { enabled: lookupAvailable, pending: false, error: false,

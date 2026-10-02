@@ -10,6 +10,50 @@ export function createDefaultP5Filters(): P5Filters {
   return { search: '', page: 0, size: DEFAULT_PAGE_SIZE }
 }
 
+export type P5StatusDraft = { readonly mode: 'all' | '0' | '1' | 'custom'; readonly code: string }
+export type P5AdvancedDraft = Pick<P5Filters, 'merchantId' | 'terminalId'> & { readonly statusDraft: P5StatusDraft }
+
+export function createP5AdvancedDraft(filters: P5Filters = createDefaultP5Filters()): P5AdvancedDraft {
+  const mode = filters.status === undefined ? 'all' : filters.status === 0 ? '0' : filters.status === 1 ? '1' : 'custom'
+  return { merchantId: filters.merchantId, terminalId: filters.terminalId,
+    statusDraft: { mode, code: mode === 'custom' ? String(filters.status) : '' } }
+}
+
+export function resolveP5StatusDraft(draft: P5StatusDraft): number | undefined {
+  if (draft.mode === 'all') return undefined
+  if (draft.mode === '0' || draft.mode === '1') return Number(draft.mode)
+  const value = Number(draft.code.trim())
+  if (!draft.code.trim() || !Number.isSafeInteger(value) || value < -2147483648 || value > 2147483647) throw safeContractError()
+  return value
+}
+
+export function isP5StatusDraftValid(draft: P5StatusDraft): boolean {
+  try { resolveP5StatusDraft(draft); return true } catch { return false }
+}
+
+export function changeP5AdvancedMerchant(draft: P5AdvancedDraft, merchantId?: string): P5AdvancedDraft {
+  return { ...draft, merchantId, terminalId: undefined }
+}
+
+export function reconcileP5AdvancedDraft(draft: P5AdvancedDraft, merchant: MerchantLookupState,
+  terminal: DependentLookupGateInput): P5AdvancedDraft {
+  if (draft.merchantId && merchant.kind === 'ready' && !merchant.ids.includes(draft.merchantId)) return changeP5AdvancedMerchant(draft, undefined)
+  if (draft.terminalId && terminal.lookupState === 'ready' && terminal.lookupParentId === draft.merchantId &&
+    terminal.optionIds && !terminal.optionIds.includes(draft.terminalId)) return { ...draft, terminalId: undefined }
+  return draft
+}
+
+export function applyP5AdvancedDraft(applied: P5Filters, draft: P5AdvancedDraft,
+  input: Parameters<typeof applyP5Draft>[1]): P5Filters {
+  return applyP5Draft({ ...applied, merchantId: draft.merchantId, terminalId: draft.terminalId,
+    status: resolveP5StatusDraft(draft.statusDraft) }, input)
+}
+
+export function applyP5QuickSearch(applied: P5Filters, search: string): P5Filters {
+  const normalized = search.trim()
+  return applied.search === normalized && applied.page === 0 ? applied : { ...applied, search: normalized, page: 0 }
+}
+
 export type MerchantLookupState =
   | { readonly kind: 'ready'; readonly ids: readonly string[] }
   | { readonly kind: 'denied' | 'unavailable' | 'loading' | 'error' }
