@@ -19,6 +19,12 @@ type StatusDonutProps = Pick<DashboardView, 'pie' | 'metrics'>
 
 export function StatusDonut({ pie, metrics }: StatusDonutProps) {
   const reconciliation = reconcileDashboard({ metrics, pie })
+  // This share includes ALL transactions, independently of donut reconciliation.
+  const successShare = metrics.total.count === 0
+    ? '—'
+    : `${(metrics.success.count / metrics.total.count * 100).toLocaleString('uz-UZ', {
+      maximumFractionDigits: 2,
+    })}%`
   const items = [
     { label: 'Muvaffaqiyatli', value: pie.success, tone: 'success' },
     { label: 'Jarayonda', value: pie.processing, tone: 'warning' },
@@ -37,8 +43,17 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
     <Card className="min-w-0">
       <CardHeader>
         <CardTitle>Statuslar taqsimoti</CardTitle>
+        <dl className="mt-3 min-w-0">
+          <dt className="text-sm text-text-secondary">Muvaffaqiyat ulushi</dt>
+          <dd className="mt-1 text-xl font-semibold text-text-primary [overflow-wrap:anywhere]">{successShare}</dd>
+        </dl>
+        <p className="mt-1 text-xs text-text-secondary">
+          {metrics.total.count === 0
+            ? 'Tanlangan davrda tranzaksiyalar mavjud emas.'
+            : 'Jami tranzaksiyalar soniga nisbatan'}
+        </p>
       </CardHeader>
-      <CardContent className="flex min-w-0 flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center">
+      <CardContent className="flex min-w-0 flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center xl:flex-col">
         <div className="w-full max-w-64 shrink-0">
           <svg
             viewBox="0 0 120 120"
@@ -94,16 +109,16 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
             {items.map((item) => (
               <div
                 key={item.label}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 rounded-lg border p-3"
+                className="grid min-w-0 grid-cols-1 items-start gap-1 rounded-lg border p-3"
               >
                 <dt className="flex min-w-0 items-center gap-2 text-sm text-text-secondary">
                   <span
                     aria-hidden="true"
                     className={`size-2 shrink-0 rounded-full ${statusToneClasses[item.tone].indicator}`}
                   />
-                  <span className="truncate">{item.label}</span>
+                  <span className="min-w-0 break-words">{item.label}</span>
                 </dt>
-                <dd className="text-right">
+                <dd className="min-w-0 text-left [overflow-wrap:anywhere]">
                   <p className="font-semibold text-text-primary">
                     {item.value.count.toLocaleString('uz-UZ')}
                     {reconciliation.countMatches

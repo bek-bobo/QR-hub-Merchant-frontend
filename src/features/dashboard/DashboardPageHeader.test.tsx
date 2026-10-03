@@ -10,6 +10,7 @@ describe('DashboardPageHeader', () => {
         refreshDisabled={false}
         refreshing={false}
         onRefresh={() => undefined}
+        quickFilters={<button type="button">Sana oralig‘i</button>}
       >
         <button type="button">Filtrlar</button>
       </DashboardPageHeader>,
@@ -19,6 +20,8 @@ describe('DashboardPageHeader', () => {
     expect(html).not.toContain('Tranzaksiyalar')
     expect(html).not.toContain('Qo‘llangan davr bo‘yicha backend ko‘rsatkichlari.')
     expect(html).toContain('>Filtrlar</button>')
+    expect(html.indexOf('>Sana oralig‘i</button>')).toBeLessThan(html.indexOf('>Filtrlar</button>'))
+    expect(html).toContain('flex-wrap')
     expect(html).toContain('Oxirgi yangilanish: 17:44:58')
     expect(html).toContain('>Yangilash</button>')
     expect(html.indexOf('Oxirgi yangilanish: 17:44:58')).toBeLessThan(

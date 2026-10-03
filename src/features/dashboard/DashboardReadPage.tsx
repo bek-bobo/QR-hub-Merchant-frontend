@@ -1,14 +1,13 @@
-import { useState } from 'react'
+import { useReducer, useState } from 'react'
 import { Link } from 'react-router'
 import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
 import { DynamicQrDetailsSheet } from '@/features/dynamic-qr/DynamicQrDetailsSheet'
 import { QrDisplayDialog } from '@/features/dynamic-qr/QrDisplayDialog'
 import type {
@@ -27,12 +26,12 @@ import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { DashboardRecentQrTable } from './DashboardRecentQrTable'
 import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardPageHeader } from './DashboardPageHeader'
+import { DashboardQuickDateFilter } from './DashboardQuickDateFilter'
+import { DashboardTerminalFilter } from './DashboardTerminalFilter'
+import { createDashboardFilterState, dashboardFilterReducer } from './filter-state'
 import { MetricCards } from './MetricCards'
 import { StatusDonut } from './StatusDonut'
-import {
-  applyDashboardFilters,
-  resetDashboardFilters,
-} from './presenters'
+import { resetDashboardFilters } from './presenters'
 import { useDashboardReadQueries } from './queries'
 import { TrendChart } from './TrendChart'
 
@@ -59,6 +58,24 @@ interface RecentQrPanelProps {
   readonly dynamicQrPath: string
 }
 
+function RecentQrSkeleton() {
+  return (
+    <div role="status" className="min-w-0 space-y-3">
+      <p className="text-sm text-text-secondary">So‘nggi dinamik QRlar yuklanmoqda…</p>
+      <div aria-hidden="true" className="overflow-hidden rounded-lg border motion-safe:animate-pulse">
+        <div className="h-10 border-b bg-muted/50" />
+        {Array.from({ length: 5 }, (_, index) => (
+          <div key={index} className="grid grid-cols-3 gap-4 border-b p-3 last:border-b-0">
+            <div className="h-4 rounded bg-muted" />
+            <div className="h-4 rounded bg-muted" />
+            <div className="h-4 rounded bg-muted" />
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export function RecentQrPanel({
   query,
   enabled,
@@ -78,11 +95,12 @@ export function RecentQrPanel({
 
   return (
     <Card className="min-w-0">
-      <CardHeader className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1 basis-64">
+      <CardHeader className="flex flex-wrap items-start justify-between gap-3 border-b">
+        <div className="min-w-0 flex-1 basis-64 space-y-1">
           <CardTitle>So‘nggi dinamik QRlar</CardTitle>
+          <CardDescription>Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.</CardDescription>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex max-w-full flex-wrap items-center gap-2">
           <TableColumnPreferences
             tableLabel="So‘nggi dinamik QRlar"
             items={dashboardRecentQrColumns}
@@ -112,18 +130,27 @@ export function RecentQrPanel({
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
-        {query.isPending ? (
-          <div className="h-40 animate-pulse rounded-lg bg-muted" role="status" />
-        ) : query.isError && !query.data ? (
-          <ErrorState onRetry={() => void query.refetch()} />
-        ) : query.data ? (
-          <DashboardRecentQrTable rows={query.data.content}
-            columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
-            onViewQr={setQrRow} onViewDetails={setDetailsRow} />
-        ) : null}
-        {query.isRefetchError && query.data ? (
-          <p role="alert" className="mt-3 text-sm text-destructive">Yangilanmadi</p>
+      <CardContent className="min-w-0">
+        {query.data ? (
+          <>
+            {query.isFetching ? (
+              <p className="mb-3 text-xs text-text-secondary">So‘nggi dinamik QRlar yangilanmoqda…</p>
+            ) : null}
+            <DashboardRecentQrTable rows={query.data.content}
+              columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
+              onViewQr={setQrRow} onViewDetails={setDetailsRow} />
+            {query.isRefetchError && !query.isFetching ? (
+              <p role="alert" className="mt-3 text-sm text-destructive">
+                So‘nggi dinamik QRlar yangilanmadi. Avval yuklangan ma’lumotlar ko‘rsatilmoqda.
+              </p>
+            ) : null}
+          </>
+        ) : query.isPending ? (
+          <RecentQrSkeleton />
+        ) : query.isError ? (
+          <ErrorState title="So‘nggi dinamik QRlarni yuklab bo‘lmadi"
+            description="Birozdan so‘ng qayta urinib ko‘ring."
+            onRetry={() => void query.refetch()} />
         ) : null}
       </CardContent>
       <DynamicQrDetailsSheet row={detailsRow}
@@ -147,42 +174,22 @@ export function DashboardReadPage({
   initialInstant,
   dynamicQrPath = '/dynamic-qrs',
 }: DashboardReadPageProps = {}) {
-  const [initialFilters] = useState(() =>
-    resetDashboardFilters(initialInstant ?? new Date()),
+  const [filters, dispatch] = useReducer(
+    dashboardFilterReducer,
+    initialInstant,
+    (instant) => createDashboardFilterState(resetDashboardFilters(instant ?? new Date())),
   )
-  const [draft, setDraft] = useState<DashboardFilters>(initialFilters)
-  const [applied, setApplied] = useState<DashboardFilters>(initialFilters)
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const { applied, dateDraft, terminalDraft, validationMessage } = filters
   const queries = useDashboardReadQueries(applied)
   const { dashboard, terminals, recent, enabled, runtime } = queries
   const refreshing = dashboard.isFetching || (enabled.recent && recent.isFetching)
 
   function selectPreset(days: DatePresetDays) {
-    setDraft((current) => ({
-      ...current,
-      ...getTashkentDatePreset(days, initialInstant ?? new Date()),
-    }))
-    setValidationMessage(null)
-  }
-
-  function applyFilters(): boolean {
-    try {
-      const next = applyDashboardFilters(draft)
-      setApplied(next)
-      setDraft(next)
-      setValidationMessage(null)
-      return true
-    } catch {
-      setValidationMessage('Sana oralig‘ini to‘g‘ri kiriting.')
-      return false
-    }
+    dispatch({ type: 'date-draft', range: getTashkentDatePreset(days, initialInstant ?? new Date()) })
   }
 
   function clearFilters() {
-    const next = resetDashboardFilters(initialInstant ?? new Date())
-    setDraft(next)
-    setApplied(next)
-    setValidationMessage(null)
+    dispatch({ type: 'reset', filters: resetDashboardFilters(initialInstant ?? new Date()) })
   }
 
   async function refreshMountedQueries() {
@@ -220,73 +227,21 @@ export function DashboardReadPage({
         refreshDisabled={!enabled.dashboard || refreshing}
         refreshing={refreshing}
         onRefresh={() => void refreshMountedQueries()}
+        quickFilters={<DashboardQuickDateFilter range={dateDraft} validationMessage={validationMessage}
+          onDraftChange={(range) => dispatch({ type: 'date-draft', range })}
+          onApply={() => dispatch({ type: 'apply-dates' })}
+          onPreset={selectPreset} onReset={clearFilters} />}
       >
         <FilterDrawer
-        description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
-        onApply={applyFilters}
-        onReset={clearFilters}
-        triggerSize="sm"
-      >
-          <div className="flex flex-wrap gap-2" aria-label="Davr presetlari">
-            {([1, 7, 30] as const).map((days) => (
-              <Button key={days} type="button" variant="outline" size="sm" onClick={() => selectPreset(days)}>
-                {days} kun
-              </Button>
-            ))}
-          </div>
-          <div className="grid gap-4">
-            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-              Boshlanish sanasi
-              <Input
-                type="date"
-                value={draft.fromDate}
-                aria-invalid={Boolean(validationMessage)}
-                onChange={(event) => setDraft({ ...draft, fromDate: event.target.value })}
-              />
-            </label>
-            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-              Tugash sanasi
-              <Input
-                type="date"
-                value={draft.toDate}
-                aria-invalid={Boolean(validationMessage)}
-                onChange={(event) => setDraft({ ...draft, toDate: event.target.value })}
-              />
-            </label>
-            <label className="block space-y-1.5 text-sm font-medium text-text-primary">
-              Terminal
-              <Select
-                value={draft.terminalId ?? ''}
-                disabled={!enabled.terminals || terminals.isPending}
-                onChange={(event) =>
-                  setDraft({
-                    ...draft,
-                    terminalId: event.target.value || undefined,
-                  })
-                }
-              >
-                <option value="">Barcha terminallar</option>
-                {terminals.data?.map((terminal) => (
-                  <option key={terminal.id} value={terminal.id}>{terminal.name}</option>
-                ))}
-              </Select>
-            </label>
-          </div>
-          {validationMessage ? (
-            <p role="alert" className="text-sm text-destructive">{validationMessage}</p>
-          ) : null}
-          {!enabled.terminals ? (
-            <p className="text-sm text-text-secondary">
-              Terminal filtri mavjud emas; dashboard barcha biriktirilgan terminallar bo‘yicha ishlaydi.
-            </p>
-          ) : terminals.isError ? (
-            <div className="flex flex-wrap items-center gap-3 text-sm text-destructive">
-              Terminal ro‘yxatini yuklab bo‘lmadi.
-              <Button type="button" variant="outline" size="sm" onClick={() => void terminals.refetch()}>
-                Qayta urinish
-              </Button>
-            </div>
-          ) : null}
+          description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
+          onApply={() => { dispatch({ type: 'apply-terminal' }); return true }}
+          onReset={clearFilters}
+          triggerSize="sm"
+        >
+          <DashboardTerminalFilter value={terminalDraft} options={terminals.data}
+            enabled={enabled.terminals} pending={terminals.isPending} error={terminals.isError}
+            onChange={(terminalId) => dispatch({ type: 'terminal-draft', terminalId })}
+            onRetry={() => void terminals.refetch()} />
         </FilterDrawer>
       </DashboardPageHeader>
 
@@ -302,7 +257,7 @@ export function DashboardReadPage({
             </p>
           ) : null}
           <MetricCards metrics={dashboard.data.metrics} />
-          <div className="min-w-0 space-y-6">
+          <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
             <TrendChart view={dashboard.data} />
             <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>

@@ -11,12 +11,13 @@ import {
   CardDescription,
   CardHeader,
 } from '@/components/ui/card'
-import type { DashboardView, Metric } from '@/shared/contracts/merchant-read'
+import type { DashboardView, Metric, Outcome } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
-import { formatGrowth } from './presenters'
+import { MetricGrowthIndicator } from './MetricGrowthIndicator'
 
 interface MetricDefinition {
+  readonly outcome: Outcome
   readonly label: string
   readonly metric: Metric
   readonly icon: LucideIcon
@@ -24,13 +25,14 @@ interface MetricDefinition {
 }
 
 function MetricCard({
+  outcome,
   label,
   metric,
   icon: Icon,
   iconClassName,
 }: MetricDefinition) {
   return (
-    <Card>
+    <Card className="min-w-0">
       <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
         <CardDescription>{label}</CardDescription>
         <span className={`rounded-lg p-2 ${iconClassName}`}>
@@ -38,26 +40,19 @@ function MetricCard({
         </span>
       </CardHeader>
       <CardContent>
-        <p className="text-2xl font-semibold tracking-tight text-text-primary">
+        <p className="text-2xl font-semibold tracking-tight text-text-primary [overflow-wrap:anywhere]">
           {formatMoney(metric.amount)}
         </p>
         <p className="mt-1 text-sm text-text-secondary">
           {metric.count.toLocaleString('uz-UZ')} ta tranzaksiya
         </p>
-        <dl className="mt-4 grid grid-cols-2 gap-3 border-t pt-3 text-xs">
-          <div>
-            <dt className="text-text-secondary">Soni o‘sishi</dt>
-            <dd className="mt-1 font-medium text-text-primary">
-              {formatGrowth(metric.countGrowthPct)}
-            </dd>
-          </div>
-          <div>
-            <dt className="text-text-secondary">Summa o‘sishi</dt>
-            <dd className="mt-1 font-medium text-text-primary">
-              {formatGrowth(metric.amountGrowthPct)}
-            </dd>
-          </div>
-        </dl>
+        <div className="mt-4 border-t pt-3 text-xs">
+          <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,7rem),1fr))] gap-3">
+            <MetricGrowthIndicator label="Soni o‘zgarishi" value={metric.countGrowthPct} outcome={outcome} />
+            <MetricGrowthIndicator label="Summa o‘zgarishi" value={metric.amountGrowthPct} outcome={outcome} />
+          </dl>
+          <p className="mt-2 text-text-secondary">Oldingi davrga nisbatan</p>
+        </div>
       </CardContent>
     </Card>
   )
@@ -66,24 +61,28 @@ function MetricCard({
 export function MetricCards({ metrics }: Pick<DashboardView, 'metrics'>) {
   const definitions: readonly MetricDefinition[] = [
     {
+      outcome: 'total',
       label: 'Jami',
       metric: metrics.total,
       icon: QrCodeIcon,
       iconClassName: 'bg-brand-soft text-brand',
     },
     {
+      outcome: 'success',
       label: 'Muvaffaqiyatli',
       metric: metrics.success,
       icon: CircleCheckIcon,
       iconClassName: statusToneClasses.success.icon,
     },
     {
+      outcome: 'processing',
       label: 'Jarayonda',
       metric: metrics.processing,
       icon: Clock3Icon,
       iconClassName: statusToneClasses.warning.icon,
     },
     {
+      outcome: 'failed',
       label: 'Muvaffaqiyatsiz',
       metric: metrics.failed,
       icon: TriangleAlertIcon,

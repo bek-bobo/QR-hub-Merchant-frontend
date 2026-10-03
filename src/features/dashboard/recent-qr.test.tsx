@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
 import { MemoryRouter } from 'react-router'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { DynamicQrActionsMenu } from '@/features/dynamic-qr/DynamicQrActionsMenu'
 import { decodeDynamicQrPageResponse } from '@/features/dynamic-qr/contract'
 import { DynamicQrDetailsContent } from '@/features/dynamic-qr/DynamicQrDetailsSheet'
@@ -14,6 +14,16 @@ import { TableColumnPreferenceList } from '@/shared/ui/TableColumnPreferences'
 import { RecentQrPanel } from './DashboardReadPage'
 import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardRecentQrTable } from './DashboardRecentQrTable'
+
+const navigation = vi.hoisted(() => ({ state: undefined as unknown }))
+
+vi.mock('react-router', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('react-router')>()
+  return { ...actual, Link: (props: ComponentProps<typeof actual.Link>) => {
+    navigation.state = props.state
+    return <actual.Link {...props} />
+  } }
+})
 
 const dto = {
   pkey: 'dashboard-qr-exact', terminalName: 'Terminal A', merchantName: 'Merchant A',
@@ -35,6 +45,7 @@ type RecentQrSuccessQuery = Extract<
   ComponentProps<typeof RecentQrPanel>['query'],
   { status: 'success'; isPlaceholderData: false }
 >
+type RecentQrQuery = ComponentProps<typeof RecentQrPanel>['query']
 
 function successfulRecentQrQuery(data: RecentQrSuccessQuery['data']): RecentQrSuccessQuery {
   const result: RecentQrSuccessQuery = {
@@ -65,6 +76,33 @@ function successfulRecentQrQuery(data: RecentQrSuccessQuery['data']): RecentQrSu
     fetchStatus: 'idle',
   }
   return result
+}
+
+function recentQrPage(empty = false): RecentQrSuccessQuery['data'] {
+  return { content: empty ? [] : [decode()], totalElements: empty ? 0 : 1,
+    totalPages: empty ? 0 : 1, page: 0, size: 10 }
+}
+
+function pendingRecentQrQuery(): Extract<RecentQrQuery, { status: 'pending' }> {
+  return { ...successfulRecentQrQuery(recentQrPage()), data: undefined, dataUpdatedAt: 0,
+    isPending: true, isSuccess: false, isLoading: true, isInitialLoading: true,
+    isFetching: true, isFetched: false, isFetchedAfterMount: false,
+    status: 'pending', fetchStatus: 'fetching' }
+}
+
+function failedRecentQrQuery(retained: boolean): Extract<RecentQrQuery, { status: 'error' }> {
+  const error = new Error('Recent QR request failed')
+  const base = { ...successfulRecentQrQuery(recentQrPage()), error, errorUpdatedAt: 2,
+    isError: true as const, isSuccess: false as const, status: 'error' as const }
+  return retained
+    ? { ...base, isLoadingError: false, isRefetchError: true }
+    : { ...base, data: undefined, dataUpdatedAt: 0, isLoadingError: true, isRefetchError: false }
+}
+
+function panel(query: RecentQrQuery) {
+  return renderToStaticMarkup(<MemoryRouter><RecentQrPanel query={query} enabled
+    filters={{ fromDate: '2026-09-30', toDate: '2026-10-01', terminalId: 'terminal-1' }}
+    dynamicQrPath="/dynamic-qrs" /></MemoryRouter>)
 }
 
 function runtime() {
@@ -100,6 +138,104 @@ function findElement(node: ReactNode, predicate: (element: ReactElement<Record<s
   }
   return undefined
 }
+
+describe('Dashboard recent QR async presentation', () => {
+  it.each([undefined, 'terminal-1'])('preserves view-all dates and optional terminal %s', (terminalId) => {
+    const filters = { fromDate: '2026-09-30', toDate: '2026-10-01',
+      ...(terminalId ? { terminalId } : {}) }
+    renderToStaticMarkup(<MemoryRouter><RecentQrPanel
+      query={successfulRecentQrQuery(recentQrPage())} enabled
+      filters={filters} dynamicQrPath="/dynamic-qrs" /></MemoryRouter>)
+    expect(navigation.state).toEqual(filters)
+  })
+
+  it('shows an accessible section-specific skeleton only before data arrives', () => {
+    const html = panel(pendingRecentQrQuery())
+    expect(html).toContain('role="status"')
+    expect(html).toContain('So‘nggi dinamik QRlar yuklanmoqda…')
+    expect(html).toContain('aria-hidden="true"')
+    expect(html).not.toContain('<table')
+    expect(html).not.toContain('dashboard-qr-exact')
+    expect(html).not.toContain('role="alert"')
+    expect(html).not.toContain('Qayta urinish')
+  })
+
+  it('contains initial failure and the existing retry inside the Recent QR card', () => {
+    const html = panel(failedRecentQrQuery(false))
+    expect(html).toContain('data-slot="card"')
+    expect(html).toContain('So‘nggi dinamik QRlarni yuklab bo‘lmadi')
+    expect(html).toContain('role="alert"')
+    expect(html).toContain('Qayta urinish')
+    expect(html).not.toContain('<table')
+    expect(html).not.toContain('yuklanmoqda…')
+    expect(html).not.toContain('Tanlangan davrda dinamik QR topilmadi.')
+  })
+
+  it('shows successful empty data neutrally without a retry or placeholder rows', () => {
+    const html = panel(successfulRecentQrQuery(recentQrPage(true)))
+    expect(html).toContain('Tanlangan davrda dinamik QR topilmadi.')
+    expect(html).not.toContain('role="alert"')
+    expect(html).not.toContain('Qayta urinish')
+    expect(html).not.toContain('<table')
+    expect(html).not.toContain('yuklanmoqda…')
+  })
+
+  it('keeps rows and actions visible during a background request without announcing refresh', () => {
+    const html = panel({ ...successfulRecentQrQuery(recentQrPage()),
+      isFetching: true, isRefetching: true, fetchStatus: 'fetching' })
+    expect(html).toContain('dashboard-qr-exact')
+    expect(html).toContain('aria-label="Amallarni ochish"')
+    expect(html).toContain('So‘nggi dinamik QRlar yangilanmoqda…')
+    expect(html).not.toContain('role="status"')
+    expect(html).not.toContain('role="alert"')
+    expect(html).not.toContain('yuklanmoqda…')
+  })
+
+  it('keeps retained rows on refresh failure with a single inline notice', () => {
+    const html = panel(failedRecentQrQuery(true))
+    expect(html).toContain('dashboard-qr-exact')
+    expect(html).toContain('Avval yuklangan ma’lumotlar ko‘rsatilmoqda.')
+    expect(html.match(/role="alert"/g)).toHaveLength(1)
+    expect(html).not.toContain('yuklab bo‘lmadi')
+    expect(html).not.toContain('yuklanmoqda…')
+    expect(html).not.toContain('Qayta urinish')
+  })
+
+  it('shows refresh progress rather than the previous error while retrying retained data', () => {
+    const html = panel({ ...failedRecentQrQuery(true), isFetching: true,
+      isRefetching: true, fetchStatus: 'fetching' })
+    expect(html).toContain('dashboard-qr-exact')
+    expect(html).toContain('yangilanmoqda…')
+    expect(html).not.toContain('role="alert"')
+    expect(html).not.toContain('yangilanmadi.')
+  })
+
+  it('preserves retained empty results during refresh and after refresh failure', () => {
+    const query = successfulRecentQrQuery(recentQrPage(true))
+    const refreshing = panel({ ...query, isFetching: true, isRefetching: true, fetchStatus: 'fetching' })
+    const failed = panel({ ...failedRecentQrQuery(true), data: query.data, isLoadingError: false, isRefetchError: true })
+    for (const html of [refreshing, failed]) {
+      expect(html).toContain('Tanlangan davrda dinamik QR topilmadi.')
+      expect(html).not.toContain('yuklanmoqda…')
+      expect(html).not.toContain('<table')
+    }
+    expect(failed).toContain('Avval yuklangan ma’lumotlar ko‘rsatilmoqda.')
+  })
+
+  it('renders normal data with all columns, neutral cells, and badge-only status treatment', () => {
+    const html = panel(successfulRecentQrQuery(recentQrPage()))
+    expect(headers(html)).toEqual(['QR ID', 'Vaqt', 'Terminal', 'Summa', 'Status', 'Amallar'])
+    for (const value of ['dashboard-qr-exact', 'Terminal A', '5 000.00 UZS', '30.09.2026 11:26']) {
+      expect(html).toContain(value)
+    }
+    const statusClasses = [...html.matchAll(/class="([^"]*\b(?:bg|text|border)-status-[^"]*)"/g)]
+    expect(statusClasses.length).toBeGreaterThan(0)
+    expect(html).not.toMatch(/<(?:tr|td)\b[^>]*class="[^"]*(?:bg|text|border)-status-/)
+    expect(html).not.toContain('role="alert"')
+    expect(html).not.toContain('yangilanmoqda…')
+    expect(html).not.toContain('yuklanmoqda…')
+  })
+})
 
 describe('Dashboard recent QR preferences and actions', () => {
   it('adds the compact settings trigger beside the unchanged navigation', () => {
