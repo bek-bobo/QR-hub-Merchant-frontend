@@ -15,7 +15,7 @@ export type QrStatusKind =
   | 'unknown'
 export type PageSize = 10 | 20 | 25 | 50
 export type Outcome = 'total' | 'success' | 'processing' | 'failed'
-export type ChartGroupBy = 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
+export type ChartGroupBy = 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
 
 export type Money = Readonly<{
   minorUnits: string
@@ -81,6 +81,8 @@ export type Page<T> = Readonly<{
 
 export type DashboardBucket = Readonly<{
   label: string
+  /** Calendar dates or hourly ISO date-times, preserved exactly as received. */
+  periodKind: 'calendar' | 'hour'
   periodStart: string
   periodEnd: string
   values: Readonly<Record<Outcome, CountAmount>>

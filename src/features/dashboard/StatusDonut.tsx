@@ -1,3 +1,7 @@
+import { StatusPiePlotRenderer } from './LazyPlotRenderers'
+import { PlotViewportBoundary } from './PlotViewportBoundary'
+import { createDonutPlotConfig } from './donut-presentation'
+import { useMerchantPlotTheme } from './plot-theme'
 import {
   Card,
   CardContent,
@@ -9,15 +13,10 @@ import { formatMoney } from '@/shared/money/minor'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { reconcileDashboard } from './presenters'
 
-const segmentStyles = {
-  success: 'stroke-status-success-indicator',
-  warning: 'stroke-status-warning-indicator',
-  error: 'stroke-status-error-indicator',
-} as const
-
 type StatusDonutProps = Pick<DashboardView, 'pie' | 'metrics'>
 
 export function StatusDonut({ pie, metrics }: StatusDonutProps) {
+  const theme = useMerchantPlotTheme()
   const reconciliation = reconcileDashboard({ metrics, pie })
   // This share includes ALL transactions, independently of donut reconciliation.
   const successShare = metrics.total.count === 0
@@ -37,7 +36,6 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
         .map((item) => `${item.label}: ${item.value.percent.toLocaleString('uz-UZ')}%`)
         .join(', ')
     : 'Status taqsimoti mavjud emas'
-  let offset = 0
 
   return (
     <Card className="min-w-0">
@@ -54,54 +52,26 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
         </p>
       </CardHeader>
       <CardContent className="flex min-w-0 flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center xl:flex-col">
-        <div className="w-full max-w-64 shrink-0">
-          <svg
-            viewBox="0 0 120 120"
-            className="mx-auto aspect-square w-full"
-            role="img"
-            aria-label={accessibleLabel}
-          >
-            <circle
-              cx="60"
-              cy="60"
-              r="45"
-              fill="none"
-              strokeWidth="14"
-              className="stroke-muted"
-              data-empty={!hasDistribution || undefined}
-            />
-            {hasDistribution
-              ? items.map((item) => {
-                  const startOffset = offset
-                  offset += item.value.percent
-                  if (item.value.percent <= 0) {
-                    return null
-                  }
-                  return (
-                    <circle
-                      key={item.label}
-                      cx="60"
-                      cy="60"
-                      r="45"
-                      fill="none"
-                      pathLength="100"
-                      strokeWidth="14"
-                      strokeDasharray={`${item.value.percent} ${100 - item.value.percent}`}
-                      strokeDashoffset={-startOffset}
-                      strokeLinecap="butt"
-                      className={segmentStyles[item.tone]}
-                      transform="rotate(-90 60 60)"
-                    />
-                  )
-                })
-              : null}
-            <text x="60" y="57" textAnchor="middle" className="fill-text-primary text-lg font-semibold">
-              {metrics.total.count.toLocaleString('uz-UZ')}
-            </text>
-            <text x="60" y="72" textAnchor="middle" className="fill-text-secondary text-[9px]">
-              Jami
-            </text>
-          </svg>
+        <div className="relative w-full max-w-64 shrink-0">
+          <div role="img" aria-label={accessibleLabel} data-empty={!hasDistribution || undefined}>
+            {hasDistribution && theme ? (
+              <div aria-hidden="true">
+                <PlotViewportBoundary fallback={<div data-plot-loading="donut" className="h-64 w-full rounded-full bg-muted/40 motion-safe:animate-pulse" />}>
+                  <StatusPiePlotRenderer {...createDonutPlotConfig({ pie, metrics }, theme)} />
+                </PlotViewportBoundary>
+              </div>
+            ) : (
+              <div aria-hidden="true" className="mx-auto aspect-square w-full rounded-full border-[28px] border-muted" />
+            )}
+          </div>
+          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+            <div className="min-w-0 w-1/2 text-center">
+              <p className="text-lg font-semibold leading-snug text-text-primary [overflow-wrap:anywhere]">
+                {metrics.total.count.toLocaleString('uz-UZ')}
+              </p>
+              <p className="mt-1 text-xs text-text-secondary">Jami</p>
+            </div>
+          </div>
         </div>
 
         <div className="w-full min-w-0 max-w-xl">

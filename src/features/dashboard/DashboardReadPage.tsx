@@ -33,7 +33,7 @@ import { MetricCards } from './MetricCards'
 import { StatusDonut } from './StatusDonut'
 import { resetDashboardFilters } from './presenters'
 import { useDashboardReadQueries } from './queries'
-import { TrendChart } from './TrendChart'
+import { ChartLocalDateFilter } from './ChartLocalDateFilter'
 
 function DashboardSkeleton() {
   return (
@@ -185,11 +185,11 @@ export function DashboardReadPage({
   const refreshing = dashboard.isFetching || (enabled.recent && recent.isFetching)
 
   function selectPreset(days: DatePresetDays) {
-    dispatch({ type: 'date-draft', range: getTashkentDatePreset(days, initialInstant ?? new Date()) })
+    dispatch({ type: 'commit-dates', range: getTashkentDatePreset(days, initialInstant ?? new Date()) })
   }
 
-  function clearFilters() {
-    dispatch({ type: 'reset', filters: resetDashboardFilters(initialInstant ?? new Date()) })
+  function resetDates() {
+    dispatch({ type: 'commit-dates', range: resetDashboardFilters(initialInstant ?? new Date()) })
   }
 
   async function refreshMountedQueries() {
@@ -229,13 +229,14 @@ export function DashboardReadPage({
         onRefresh={() => void refreshMountedQueries()}
         quickFilters={<DashboardQuickDateFilter range={dateDraft} validationMessage={validationMessage}
           onDraftChange={(range) => dispatch({ type: 'date-draft', range })}
-          onApply={() => dispatch({ type: 'apply-dates' })}
-          onPreset={selectPreset} onReset={clearFilters} />}
+          onRangeComplete={(range) => dispatch({ type: 'commit-dates', range })}
+          onPreset={selectPreset} onReset={resetDates} />}
       >
         <FilterDrawer
           description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
           onApply={() => { dispatch({ type: 'apply-terminal' }); return true }}
-          onReset={clearFilters}
+          onReset={() => dispatch({ type: 'terminal-draft', terminalId: undefined })}
+          onOpenChange={(open) => dispatch({ type: 'terminal-drawer', open })}
           triggerSize="sm"
         >
           <DashboardTerminalFilter value={terminalDraft} options={terminals.data}
@@ -258,7 +259,7 @@ export function DashboardReadPage({
           ) : null}
           <MetricCards metrics={dashboard.data.metrics} />
           <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <TrendChart view={dashboard.data} />
+            <ChartLocalDateFilter view={dashboard.data} filters={applied} initialInstant={initialInstant} />
             <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>
         </>

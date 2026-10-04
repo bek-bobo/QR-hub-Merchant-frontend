@@ -2,7 +2,6 @@ import { safeContractError } from '@/shared/api/errors'
 import type {
   DashboardFilters,
   DashboardView,
-  Money,
 } from '@/shared/contracts/merchant-read'
 import {
   getTashkentDatePreset,
@@ -80,70 +79,3 @@ export function presentQrStatus(statusCode: number): QrStatusPresentation {
   }
 }
 
-export interface AmountTrendPoint {
-  readonly period: string
-  readonly count: number
-  readonly amount: Money
-  readonly x: number
-  readonly y: number
-}
-
-function periodLabel(
-  bucket: DashboardView['buckets'][number],
-  groupBy: string,
-): string {
-  if (
-    groupBy === 'DAY' ||
-    groupBy === 'WEEK' ||
-    groupBy === 'MONTH' ||
-    groupBy === 'YEAR'
-  ) {
-    return bucket.label
-  }
-
-  return bucket.periodStart === bucket.periodEnd
-    ? bucket.periodStart
-    : `${bucket.periodStart} — ${bucket.periodEnd}`
-}
-
-export function projectAmountTrend(
-  view: Pick<DashboardView, 'buckets'>,
-  groupBy: string,
-  width = 640,
-  height = 220,
-): readonly AmountTrendPoint[] {
-  const amounts = view.buckets.map((bucket) =>
-    BigInt(bucket.values.total.amount.minorUnits),
-  )
-  const maximum = amounts.reduce(
-    (current, amount) => (amount > current ? amount : current),
-    0n,
-  )
-  const horizontalPadding = 24
-  const verticalPadding = 20
-  const drawableWidth = Math.max(0, width - horizontalPadding * 2)
-  const drawableHeight = Math.max(0, height - verticalPadding * 2)
-
-  return Object.freeze(
-    view.buckets.map((bucket, index) => {
-      const amount = amounts[index] ?? 0n
-      const ratio =
-        maximum === 0n
-          ? 0
-          : Number((amount * 10_000n) / maximum) / 10_000
-      const x =
-        view.buckets.length <= 1
-          ? width / 2
-          : horizontalPadding +
-            (index / (view.buckets.length - 1)) * drawableWidth
-
-      return Object.freeze({
-        period: periodLabel(bucket, groupBy),
-        count: bucket.values.total.count,
-        amount: bucket.values.total.amount,
-        x,
-        y: height - verticalPadding - ratio * drawableHeight,
-      })
-    }),
-  )
-}

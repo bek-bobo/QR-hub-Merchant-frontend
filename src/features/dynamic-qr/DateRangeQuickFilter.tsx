@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import type { DateRange } from '@/shared/contracts/merchant-read'
 import {
   buildCalendarMonth,
-  monthStart,
+  calendarMonthForRange,
   selectCalendarRangeDate,
   shiftCalendarMonth,
 } from './date-range-calendar'
@@ -85,6 +85,8 @@ function CalendarMonth({
 }
 
 interface DateRangeQuickFilterProps {
+  readonly triggerLabel?: string
+  readonly resetLabel?: string
   readonly value: DateRange
   readonly onDraftChange: (range: DateRange) => void
   readonly onApply: (range: DateRange) => void
@@ -92,13 +94,15 @@ interface DateRangeQuickFilterProps {
 }
 
 export function DateRangeQuickFilter({
+  triggerLabel,
+  resetLabel = 'Standart 7 kunlik oraliq',
   value,
   onDraftChange,
   onApply,
   onReset,
 }: DateRangeQuickFilterProps) {
   const [open, setOpen] = useState(false)
-  const [visibleMonth, setVisibleMonth] = useState(() => monthStart(value.fromDate))
+  const [visibleMonth, setVisibleMonth] = useState(() => calendarMonthForRange(value))
 
   function selectDate(date: string) {
     const next = selectCalendarRangeDate(value, date)
@@ -114,7 +118,7 @@ export function DateRangeQuickFilter({
       open={open}
       onOpenChange={(nextOpen) => {
         if (nextOpen) {
-          setVisibleMonth(monthStart(value.fromDate))
+          setVisibleMonth(calendarMonthForRange(value))
         }
         setOpen(nextOpen)
       }}
@@ -123,14 +127,14 @@ export function DateRangeQuickFilter({
         <Button
           type="button"
           variant="outline"
-          className="h-9 w-full justify-between gap-3 px-3 font-normal sm:w-auto sm:min-w-64"
-          aria-label="Sana oralig‘ini tanlash"
+          className={triggerLabel ? 'h-8 max-w-full gap-2 px-3 font-normal' : 'h-9 w-full justify-between gap-3 px-3 font-normal sm:w-auto sm:min-w-64'}
+          aria-label={triggerLabel ? `Grafik sana oralig‘ini tanlash: ${triggerLabel}` : 'Sana oralig‘ini tanlash'}
         >
-          <span className="flex min-w-0 items-center gap-2">
+          {triggerLabel ? <span>{triggerLabel}</span> : <span className="flex min-w-0 items-center gap-2">
             <span>{value.fromDate}</span>
             <span aria-hidden="true" className="text-text-secondary">→</span>
             <span>{value.toDate || '…'}</span>
-          </span>
+          </span>}
           <CalendarDaysIcon aria-hidden="true" className="shrink-0" />
         </Button>
       </PopoverPrimitive.Trigger>
@@ -183,7 +187,7 @@ export function DateRangeQuickFilter({
               }}
             >
               <RotateCcwIcon aria-hidden="true" />
-              Standart 7 kunlik oraliq
+              {resetLabel}
             </Button>
           </div>
         </PopoverPrimitive.Content>

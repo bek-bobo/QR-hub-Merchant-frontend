@@ -10,6 +10,35 @@ function triggerTag(html: string): string {
 }
 
 describe('FilterDrawer', () => {
+  it('notifies lifecycle consumers on open, dismissal and successful Apply, after committing', () => {
+    const events: string[] = []
+    const handlers = createFilterDrawerHandlers({
+      setOpen: (open) => events.push(`open:${open}`),
+      onOpenChange: (open) => events.push(`lifecycle:${open}`),
+      onApply: () => { events.push('apply'); return true },
+      onReset: () => events.push('reset'),
+    })
+    handlers.setOpen(true)
+    handlers.reset()
+    handlers.setOpen(false)
+    handlers.setOpen(true)
+    handlers.apply()
+    expect(events).toEqual(['open:true', 'lifecycle:true', 'reset', 'open:false',
+      'lifecycle:false', 'open:true', 'lifecycle:true', 'apply', 'open:false', 'lifecycle:false'])
+  })
+
+  it('does not notify a close or discard drafts when Apply validation fails', () => {
+    const events: boolean[] = []
+    const handlers = createFilterDrawerHandlers({
+      setOpen: (open) => events.push(open),
+      onOpenChange: (open) => events.push(open),
+      onApply: () => false,
+      onReset: () => undefined,
+    })
+    handlers.apply()
+    expect(events).toEqual([])
+  })
+
   it('renders a closed Filtrlar trigger initially', () => {
     const html = renderToStaticMarkup(
       <FilterDrawer onApply={() => true} onReset={() => undefined}>

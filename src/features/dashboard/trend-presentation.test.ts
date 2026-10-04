@@ -1,129 +1,128 @@
 import { describe, expect, it } from 'vitest'
 import type { DashboardBucket } from '@/shared/contracts/merchant-read'
-import { projectTrend } from './trend-presentation'
+import { ALL_TREND_SERIES, createTrendPlotConfig, toggleTrendSeries, trendPlotData, trendTooltipItem } from './trend-presentation'
+import { readMerchantPlotTheme } from './plot-theme'
 
-function trendBucket(label: string, count: number, minorUnits: string): DashboardBucket {
-  const total = { count, amount: { minorUnits, currency: 'UZS' as const, scale: 2 as const } }
-  const other = { count: 0, amount: { ...total.amount, minorUnits: '0' } }
-  return { label, periodStart: '2026-10-01', periodEnd: '2026-10-01',
-    values: { total, success: other, processing: other, failed: other } }
+const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
+function bucket(label: string): DashboardBucket {
+  const metric = (count: number, minorUnits: string) => ({ count, amount: { minorUnits, currency: 'UZS' as const, scale: 2 as const } })
+  return { label, periodKind: 'calendar', periodStart: '2026-10-01', periodEnd: '2026-10-01', values: {
+    total: metric(99, '900719925474099301'), success: metric(3, '12345'), processing: metric(1, '1'), failed: metric(7, '8000000'),
+  } }
 }
 
-describe('total trend projection', () => {
-  it('uses total amount and total count independently without changing buckets', () => {
-    const buckets = [trendBucket('A', 9, '100'), trendBucket('B', 1, '900719925474099301')]
-    const original = JSON.stringify(buckets)
-    const amount = projectTrend({ buckets }, 'amount')
-    const count = projectTrend({ buckets }, 'count')
-    expect(amount.points[0]!.y).toBeGreaterThan(amount.points[1]!.y)
-    expect(count.points[0]!.y).toBeLessThan(count.points[1]!.y)
-    expect(amount.points[1]!.amount.minorUnits).toBe('900719925474099301')
-    expect(amount.points.map(({ x }) => x)).toEqual(count.points.map(({ x }) => x))
-    expect([amount.width, amount.height]).toEqual([count.width, count.height])
-    expect(amount.points.map(({ period }) => period)).toEqual(['A', 'B'])
-    expect(JSON.stringify(buckets)).toBe(original)
+describe('Merchant trend plot adapter', () => {
+  it('insets both real endpoints without adding buckets, labels or zero values', () => {
+    const view = { buckets: [bucket('First'), bucket('Last')] }
+    const config = createTrendPlotConfig(view, 'count', ALL_TREND_SERIES, theme)
+    expect(config.scale).toMatchObject({ x: { type: 'point', range: [0.03, 0.97], domain: ['0', '1'] },
+      y: { domainMin: 0 } })
+    const data = config.data as ReturnType<typeof trendPlotData>
+    expect(data).toHaveLength(view.buckets.length * ALL_TREND_SERIES.length)
+    expect([...new Set(data.map(({ bucket }) => bucket))]).toHaveLength(view.buckets.length)
+    expect([...new Set(data.map(({ period }) => period))]).toEqual(['First', 'Last'])
+    expect(data[0]!.value).toBe(view.buckets[0]!.values.total.count)
+    expect(data[4]!.value).toBe(view.buckets[1]!.values.total.count)
+    expect(data.every(({ value }) => value > 0)).toBe(true)
   })
 
-  it.each(['amount', 'count'] as const)('%s scale is finite, monotonic and zero/single-point safe', (mode) => {
-    for (const buckets of [[], [trendBucket('Zero', 0, '0')],
-      [trendBucket('A', 0, '0'), trendBucket('B', 0, '0')],
-      [trendBucket('One', 1, '1')]]) {
-      const chart = projectTrend({ buckets }, mode)
-      expect(chart.ticks).toHaveLength(5)
-      expect(chart.ticks[0]!.value).toBe(0n)
-      expect(chart.ticks[0]!.y).toBe(chart.bottom)
-      expect(chart.points).toHaveLength(buckets.length)
-      for (const point of chart.points) {
-        expect(Number.isFinite(point.x)).toBe(true)
-        expect(Number.isFinite(point.y)).toBe(true)
-        expect(point.x).toBeGreaterThanOrEqual(chart.left)
-        expect(point.x).toBeLessThanOrEqual(chart.width - chart.right)
-      }
-      expect(chart.series).toHaveLength(4)
-      for (const item of chart.series) {
-        expect(item.points).toHaveLength(buckets.length)
-        expect(item.points.every(({ x, y }) => Number.isFinite(x) && Number.isFinite(y))).toBe(true)
-      }
-      chart.ticks.slice(1).forEach((tick, index) => {
-        expect(tick.value).toBeGreaterThan(chart.ticks[index]!.value)
-        expect(tick.y).toBeLessThan(chart.ticks[index]!.y)
-      })
+  it.each(['count', 'amount'] as const)('maps four exact raw series in stable order for %s', (mode) => {
+    const view = { buckets: [bucket('A'), bucket('B')] }
+    const original = JSON.stringify(view)
+    const data = trendPlotData(view, mode)
+    expect(data.map(({ key }) => key)).toEqual([...ALL_TREND_SERIES, ...ALL_TREND_SERIES])
+    expect(data.slice(0, 4).map(({ type }) => type)).toEqual(['Jami', 'Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz'])
+    expect(data.slice(0, 4).map(({ value }) => value)).toEqual(mode === 'count' ? [99, 3, 1, 7] : [Number('900719925474099301') / 100, 123.45, 0.01, 80000])
+    expect(data[0]!.amount.minorUnits).toBe('900719925474099301')
+    expect(data.every(({ value }) => Number.isFinite(value))).toBe(true)
+    expect(trendTooltipItem(data[0]!).value).toBe(mode === 'count' ? '99' : '9 007 199 254 740 993.01 UZS')
+    expect(trendTooltipItem(data[2]!).value).toBe(mode === 'count' ? '1' : '0.01 UZS')
+    expect(JSON.stringify(view)).toBe(original)
+  })
+
+  it.each(['count', 'amount'] as const)('filters hidden series and derives the shared %s scale from visible data', (mode) => {
+    const view = { buckets: [bucket('A')] }
+    const config = createTrendPlotConfig(view, mode, ['success', 'processing'], theme)
+    const data = trendPlotData(view, mode, ['success', 'processing'])
+    expect(data.map(({ key }) => key)).toEqual(['success', 'processing'])
+    expect(data.map(trendTooltipItem).map(({ name }) => name)).toEqual(['Muvaffaqiyatli', 'Jarayonda'])
+    expect(config.scale).toMatchObject({ y: { domainMin: 0, domainMax: mode === 'count' ? 4 : 123.45 } })
+    expect(config.scale).toMatchObject({ color: { domain: ['Jami', 'Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz'],
+      range: ['--status-info-indicator', '--status-success-indicator', '--status-warning-indicator', '--status-error-indicator'] } })
+    expect(config).toMatchObject({ autoFit: true, shapeField: 'smooth', legend: false,
+      interaction: { tooltip: { shared: true, series: true, crosshairsX: true } } })
+  })
+
+  it('includes status-only areas and a native tooltip formatter while keeping Total line-only', () => {
+    const config = createTrendPlotConfig({ buckets: [bucket('A')] }, 'amount', ALL_TREND_SERIES, theme)
+    const areas = config.area?.data as ReturnType<typeof trendPlotData>
+    expect(areas.map(({ key }) => key)).toEqual(['success', 'processing', 'failed'])
+    expect(config.area).toMatchObject({ tooltip: false, zIndex: 0,
+      style: { fillOpacity: 1, opacity: 1, strokeOpacity: 0 } })
+    expect(config.children).toEqual([{ type: 'line', zIndex: 1 }])
+    expect(config.point).toMatchObject({ zIndex: 2 })
+    const dark = createTrendPlotConfig({ buckets: [bucket('A')] }, 'count', ALL_TREND_SERIES, { ...theme, dark: true })
+    expect(dark.area).toMatchObject({ style: { fillOpacity: 1, opacity: 1 } })
+    expect(dark.theme).toBe('classicDark')
+  })
+
+  it.each([false, true])('uses opaque semantic area tints below unchanged lines/markers (dark=%s)', (dark) => {
+    const resolved = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => `${name}:${dark}` }, dark)
+    const view = { buckets: [bucket('A'), bucket('B')] }
+    const original = JSON.stringify(view)
+    const config = createTrendPlotConfig(view, 'count', ALL_TREND_SERIES, resolved)
+    const areas = config.area?.data as ReturnType<typeof trendPlotData>
+    const fill = config.area?.style?.fill as (datum: ReturnType<typeof trendPlotData>[number] | ReturnType<typeof trendPlotData>) => string
+    for (const [key, role] of [['success', 'success'], ['processing', 'warning'], ['failed', 'error']] as const) {
+      const series = areas.filter((datum) => datum.key === key)
+      expect(fill(series)).toBe(`--status-${role}-background:${dark}`)
+      expect(fill(series[0]!)).toBe(resolved.areaTints[key])
+    }
+    expect(areas.some(({ key }) => key === 'total')).toBe(false)
+    expect(config.area).toMatchObject({ zIndex: 0, style: { fillOpacity: 1, opacity: 1 } })
+    expect(config.children).toEqual([{ type: 'line', zIndex: 1 }])
+    expect(config.point).toMatchObject({ zIndex: 2, sizeField: 2 })
+    expect(config.scale?.color).toMatchObject({ range: resolved.colors })
+    expect(config.scale?.x).toMatchObject({ range: [0.03, 0.97], domain: ['0', '1'] })
+    expect(config.data).toEqual(trendPlotData(view, 'count'))
+    expect(config.area?.data).toEqual(trendPlotData(view, 'count').filter(({ key }) => key !== 'total'))
+    expect(config.stack).toBeUndefined()
+    expect(config.normalize).toBeUndefined()
+    expect(JSON.stringify(view)).toBe(original)
+    const hidden = createTrendPlotConfig(view, 'amount', ['processing'], resolved)
+    const area = hidden.area
+    expect(area).toBeDefined()
+    if (!area) throw new Error('Expected the visible Processing series to have an area')
+    expect((area.data as ReturnType<typeof trendPlotData>).every(({ key }) => key === 'processing')).toBe(true)
+  })
+
+  it('preserves duplicate backend labels as separate buckets and handles empty/single/zero inputs', () => {
+    const duplicate = trendPlotData({ buckets: [bucket('same'), bucket('same')] }, 'count')
+    expect([...new Set(duplicate.map(({ bucket }) => bucket))]).toEqual(['0', '1'])
+    expect(duplicate.every(({ period }) => period === 'same')).toBe(true)
+    expect(trendPlotData({ buckets: [] }, 'amount')).toEqual([])
+    const zero = bucket('zero')
+    const zeros = { ...zero, values: Object.fromEntries(ALL_TREND_SERIES.map((key) => [key, { count: 0,
+      amount: { minorUnits: '0', currency: 'UZS', scale: 2 } }])) as DashboardBucket['values'] }
+    for (const mode of ['count', 'amount'] as const) {
+      expect(trendPlotData({ buckets: [zeros] }, mode).map(({ value }) => value)).toEqual([0, 0, 0, 0])
+      expect(createTrendPlotConfig({ buckets: [zeros] }, mode, ALL_TREND_SERIES, theme).scale).toMatchObject({ y: { domainMax: mode === 'count' ? 4 : 1 } })
     }
   })
 
-  it('formats exact money ticks and integral count ticks, including large values', () => {
-    const amount = projectTrend({ buckets: [trendBucket('A', Number.MAX_SAFE_INTEGER, '900719925474099301')] }, 'amount')
-    expect(amount.ticks[0]!.label).toBe('0.00 UZS')
-    expect(amount.ticks[4]!.label).toBe('9 007 199 254 740 993.04 UZS')
-    const count = projectTrend({ buckets: [trendBucket('A', Number.MAX_SAFE_INTEGER, '0')] }, 'count')
-    for (const tick of count.ticks) {
-      expect(tick.label).toMatch(/^[\d\s\u00a0\u202f]+$/)
-      expect(Number.isFinite(tick.y)).toBe(true)
-    }
+  it('rejects unrepresentable plot amounts instead of passing Infinity to the engine', () => {
+    const base = bucket('Overflow')
+    const huge = { ...base, values: { ...base.values, total: { ...base.values.total,
+      amount: { ...base.values.total.amount, minorUnits: '9'.repeat(400) } } } }
+    const original = JSON.stringify(huge)
+    expect(() => trendPlotData({ buckets: [huge] }, 'amount')).toThrow()
+    expect(JSON.stringify(huge)).toBe(original)
   })
 
-  it('selects sparse backend labels deterministically including first and last', () => {
-    const buckets = Array.from({ length: 20 }, (_, index) => trendBucket(`Backend ${index}`, index, String(index)))
-    const chart = projectTrend({ buckets }, 'amount')
-    expect(chart.xLabels.map(({ index }) => index)).toEqual([0, 5, 10, 14, 19])
-    expect(chart.xLabels.map(({ period }) => period)).toEqual(['Backend 0', 'Backend 5', 'Backend 10', 'Backend 14', 'Backend 19'])
-    expect(chart.points).toHaveLength(20)
-  })
-
-  it('uses all four raw series with a shared scale, without reconciling categories to total', () => {
-    const base = trendBucket('Mismatch', 10, '1000')
-    const bucket = { ...base, values: { ...base.values,
-      success: { count: 20, amount: { ...base.values.total.amount, minorUnits: '2000' } },
-      processing: { count: 4, amount: { ...base.values.total.amount, minorUnits: '400' } },
-      failed: { count: 2, amount: { ...base.values.total.amount, minorUnits: '200' } },
-    } }
-    const original = JSON.stringify(bucket)
-    for (const mode of ['amount', 'count'] as const) {
-      const chart = projectTrend({ buckets: [bucket] }, mode)
-      expect(chart.series.map(({ key }) => key)).toEqual(['total', 'success', 'processing', 'failed'])
-      expect(chart.series.map(({ points }) => points[0]!.value)).toEqual(mode === 'amount'
-        ? [1000n, 2000n, 400n, 200n] : [10n, 20n, 4n, 2n])
-      expect(chart.ticks[4]!.value).toBe(mode === 'amount' ? 2000n : 20n)
-      expect(chart.series.map(({ points }) => points[0]!.y)).toEqual([100, 20, 148, 164])
-      expect(new Set(chart.series.map(({ points }) => points[0]!.x)).size).toBe(1)
-    }
-    expect(JSON.stringify(bucket)).toBe(original)
-  })
-
-  it('keeps large status amounts exact while projecting against the same ceiling', () => {
-    const base = trendBucket('Large', 1, '100')
-    const bucket = { ...base, values: { ...base.values,
-      failed: { count: 2, amount: { ...base.values.total.amount, minorUnits: '900719925474099301' } },
-    } }
-    const chart = projectTrend({ buckets: [bucket] }, 'amount')
-    expect(chart.series[3]!.points[0]!.amount.minorUnits).toBe('900719925474099301')
-    expect(chart.ticks[4]!.value).toBe(900719925474099304n)
-    expect(chart.series.every(({ points }) => Number.isFinite(points[0]!.y))).toBe(true)
-    expect(chart.series[0]!.points[0]!.y).toBeGreaterThan(chart.series[3]!.points[0]!.y)
-  })
-
-  it('switches every series together across multiple buckets with identical horizontal positions', () => {
-    const buckets = [0, 1].map((index) => {
-      const base = trendBucket(`Bucket ${index}`, index + 10, String(1000 - index * 100))
-      return { ...base, values: { ...base.values,
-        success: { count: index + 5, amount: { ...base.values.total.amount, minorUnits: String(500 - index * 100) } },
-        processing: { count: index + 3, amount: { ...base.values.total.amount, minorUnits: String(300 - index * 100) } },
-        failed: { count: index + 1, amount: { ...base.values.total.amount, minorUnits: String(100 - index * 100) } },
-      } }
-    })
-    const amount = projectTrend({ buckets }, 'amount')
-    const count = projectTrend({ buckets }, 'count')
-    expect(amount.series.map(({ points }) => points.map(({ value }) => value)))
-      .toEqual([[1000n, 900n], [500n, 400n], [300n, 200n], [100n, 0n]])
-    expect(count.series.map(({ points }) => points.map(({ value }) => value)))
-      .toEqual([[10n, 11n], [5n, 6n], [3n, 4n], [1n, 2n]])
-    for (let index = 0; index < 4; index++) {
-      const moneyPoints = amount.series[index]!.points
-      const countPoints = count.series[index]!.points
-      expect(moneyPoints[0]!.y).toBeLessThan(moneyPoints[1]!.y)
-      expect(countPoints[0]!.y).toBeGreaterThan(countPoints[1]!.y)
-      expect(moneyPoints.map(({ x }) => x)).toEqual(amount.points.map(({ x }) => x))
-      expect(countPoints.map(({ x }) => x)).toEqual(moneyPoints.map(({ x }) => x))
-    }
+  it('restores legend order and cannot hide the final series', () => {
+    const hidden = toggleTrendSeries(ALL_TREND_SERIES, 'total')
+    expect(hidden).toEqual(['success', 'processing', 'failed'])
+    expect(toggleTrendSeries(hidden, 'total')).toEqual(ALL_TREND_SERIES)
+    expect(toggleTrendSeries(['success'], 'success')).toEqual(['success'])
   })
 })

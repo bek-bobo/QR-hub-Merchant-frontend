@@ -56,6 +56,16 @@ export function isIsoCalendarDate(value: string): boolean {
   )
 }
 
+// Inclusive trailing calendar year; clamp February 29 before advancing the start.
+export function getTashkentYearPreset(instant = new Date()): DateRange {
+  const toDate = tashkentCalendarDate(instant)
+  const [year, month, day] = toDate.split('-').map(Number)
+  const previousYear = year - 1
+  const lastDay = new Date(Date.UTC(previousYear, month, 0)).getUTCDate()
+  const anniversary = `${previousYear}-${String(month).padStart(2, '0')}-${String(Math.min(day, lastDay)).padStart(2, '0')}`
+  return Object.freeze({ fromDate: subtractCalendarDays(anniversary, -1), toDate })
+}
+
 export function isValidDateRange(range: DateRange): boolean {
   return (
     isIsoCalendarDate(range.fromDate) &&

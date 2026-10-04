@@ -53,7 +53,7 @@ vi.mock('@tanstack/react-query', () => ({
 
 // Keep this suite focused on page coordination rather than chart rendering.
 vi.mock('./MetricCards', () => ({ MetricCards: () => <div data-test-analytics="metrics" /> }))
-vi.mock('./TrendChart', () => ({ TrendChart: () => <div data-test-analytics="trend" /> }))
+vi.mock('./ChartLocalDateFilter', () => ({ ChartLocalDateFilter: () => <div data-test-analytics="trend" /> }))
 vi.mock('./StatusDonut', () => ({ StatusDonut: () => <div data-test-analytics="status" /> }))
 
 // Expose the drawer contents in server rendering, where a closed Sheet has no content.
@@ -97,6 +97,7 @@ describe('Dashboard filter placement and query coordination', () => {
     expect(quick).toContain('Sana oralig‘ini tanlash')
     expect(quick).toContain('2026-09-25')
     expect(quick).toContain('2026-10-01')
+    expect(quick).not.toContain('Sanalarni qo‘llash')
     for (const days of [1, 7, 30]) expect(quick).toContain(`>${days} kun</button>`)
     expect(drawer).toContain('Barcha terminallar')
     expect(drawer).toContain('Terminal A')
@@ -106,7 +107,7 @@ describe('Dashboard filter placement and query coordination', () => {
     expect(observations.recent[0]).toEqual({ ...observations.dashboard[0], search: '', status: undefined, page: 0, size: 10 })
   })
 
-  it('feeds both reads only the applied selection through date Apply, Terminal Apply and Reset', () => {
+  it('coordinates both reads through immediate date commits, Terminal Apply and drawer Reset', () => {
     function Probe({ filters }: { filters: DashboardFilters }) {
       useDashboardReadQueries(filters)
       return null
@@ -123,8 +124,10 @@ describe('Dashboard filter placement and query coordination', () => {
     inspect()
     expect(observations.dashboard.at(-1)?.terminalId).toBe('applied-terminal')
     expect(observations.dashboard.at(-1)?.fromDate).toBe('2026-09-25')
-    state = dashboardFilterReducer(state, { type: 'apply-dates' })
+    state = dashboardFilterReducer(state, { type: 'commit-dates', range: state.dateDraft })
     inspect()
+    expect(state.terminalDraft).toBe('applied-terminal')
+    state = dashboardFilterReducer(state, { type: 'terminal-draft', terminalId: 'draft-terminal' })
     state = dashboardFilterReducer(state, { type: 'apply-terminal' })
     inspect()
     expect(observations.dashboard.at(-1)?.terminalId).toBe('draft-terminal')

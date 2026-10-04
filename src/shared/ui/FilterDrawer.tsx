@@ -18,6 +18,7 @@ interface FilterDrawerProps {
   readonly description?: ReactNode
   readonly onApply: () => boolean | void
   readonly onReset: () => void
+  readonly onOpenChange?: (open: boolean) => void
   readonly applyDisabled?: boolean
   readonly triggerSize?: 'default' | 'sm'
 }
@@ -27,11 +28,12 @@ export function FilterDrawer({
   description,
   onApply,
   onReset,
+  onOpenChange,
   applyDisabled = false,
   triggerSize = 'default',
 }: FilterDrawerProps) {
   const [open, setOpen] = useState(false)
-  const handlers = createFilterDrawerHandlers({ setOpen, onApply, onReset })
+  const handlers = createFilterDrawerHandlers({ setOpen, onApply, onReset, onOpenChange })
 
   return (
     <Sheet open={open} onOpenChange={handlers.setOpen}>

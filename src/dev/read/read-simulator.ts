@@ -215,6 +215,7 @@ function dashboardBucket(
 ): DashboardBucket {
   return Object.freeze({
     label: date,
+    periodKind: 'calendar' as const,
     periodStart: date,
     periodEnd: date,
     values: Object.freeze({

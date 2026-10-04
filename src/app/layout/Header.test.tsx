@@ -56,7 +56,7 @@ describe('Header', () => {
     expect(html).toContain('truncate')
   })
 
-  it('uses the avatar as the accessible account entry point and keeps identity in its tooltip', () => {
+  it('uses the avatar as the accessible profile menu trigger and keeps identity in its tooltip', () => {
     const html = renderToStaticMarkup(
       <MemoryRouter>
         <ThemeContext.Provider
@@ -76,11 +76,15 @@ describe('Header', () => {
     expect(html.match(/MERCHANT/g)).toHaveLength(1)
     expect(html).toContain('role="tooltip"')
     expect(html).toContain('aria-describedby="account-avatar-tooltip"')
-    expect(html).toContain('aria-label="Hisobni ochish"')
-    expect(html).toContain('href="/account"')
+    expect(html).toContain('aria-label="Profil menyusi"')
+    expect(html).toContain('aria-haspopup="menu"')
+    expect(html).toContain('aria-expanded="false"')
+    expect(html).not.toContain('href="/account"')
     expect(html).toContain('>B</span>')
     expect(html).toContain('aria-label="Ko‘rinish: Tungi. Keyingi rejimga o‘tish"')
-    expect(html).toContain('aria-label="Chiqish"')
+    expect(html).not.toContain('aria-label="Chiqish"')
+    expect(html).not.toContain('lucide-log-out')
+    expect(html.match(/<button\b/g)).toHaveLength(2)
     expect(html).not.toContain('<select')
     expect(html).not.toContain('>Chiqish</button>')
   })

@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
   getTashkentDatePreset,
+  getTashkentYearPreset,
   isIsoCalendarDate,
   isValidDateRange,
   toDateTerminalQuery,
 } from './date-range'
 
 describe('date range query helpers', () => {
+  it('uses an inclusive Tashkent calendar year and safely clamps leap-day anniversaries', () => {
+    expect(getTashkentYearPreset(new Date('2026-10-02T20:00:00Z'))).toEqual({ fromDate: '2025-10-04', toDate: '2026-10-03' })
+    expect(getTashkentYearPreset(new Date('2024-02-29T00:00:00Z'))).toEqual({ fromDate: '2023-03-01', toDate: '2024-02-29' })
+    expect(getTashkentYearPreset(new Date('2025-02-28T00:00:00Z'))).toEqual({ fromDate: '2024-02-29', toDate: '2025-02-28' })
+  })
   it('validates real calendar dates and ordered inclusive ranges', () => {
     expect(isIsoCalendarDate('2024-02-29')).toBe(true)
     expect(isIsoCalendarDate('2026-02-29')).toBe(false)

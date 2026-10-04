@@ -1,6 +1,7 @@
 import type { Ref } from 'react'
 import { LogOutIcon, MenuIcon } from 'lucide-react'
 import { Link } from 'react-router'
+import { DropdownMenu as Menu } from 'radix-ui'
 import { Button } from '@/components/ui/button'
 import { ThemeModeSelect } from '@/shared/theme/ThemeModeSelect'
 
@@ -64,42 +65,58 @@ export function Header({
 
       {onLogout && compactAccountControls ? (
         <div className="flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
-          <Link
-            to="/account"
-            aria-label="Hisobni ochish"
-            aria-describedby="account-avatar-tooltip"
-            className="group relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-brand-soft text-xs font-semibold uppercase text-brand outline-none ring-offset-2 ring-offset-surface transition-shadow focus-visible:ring-2 focus-visible:ring-brand"
-          >
-            <span
-              id="account-avatar-tooltip"
-              role="tooltip"
-              className="pointer-events-none invisible absolute right-[calc(100%+0.5rem)] top-1/2 z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-surface px-2.5 py-2 text-right normal-case opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100 sm:block"
-            >
-              <span className="block max-w-48 truncate text-sm font-medium text-text-primary">
-                {identityLabel ?? 'Merchant foydalanuvchi'}
-              </span>
-              {identitySecondary ? (
-                <span className="mt-0.5 block max-w-48 truncate text-xs text-text-secondary">
-                  {identitySecondary}
-                </span>
-              ) : null}
-            </span>
-            <span aria-hidden="true">
-              {(identityLabel ?? 'M').trim().slice(0, 1) || 'M'}
-            </span>
-          </Link>
           <ThemeModeSelect compact />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            aria-label={logoutPending ? 'Chiqilmoqda' : 'Chiqish'}
-            title="Chiqish"
-            disabled={logoutPending}
-            onClick={onLogout}
-          >
-            <LogOutIcon aria-hidden="true" />
-          </Button>
+          <Menu.Root>
+            <Menu.Trigger asChild>
+              <button
+                type="button"
+                aria-label="Profil menyusi"
+                aria-describedby="account-avatar-tooltip"
+                className="group relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-brand-soft text-xs font-semibold uppercase text-brand outline-none ring-offset-2 ring-offset-surface transition-shadow focus-visible:ring-2 focus-visible:ring-brand"
+              >
+                <span
+                  id="account-avatar-tooltip"
+                  role="tooltip"
+                  className="pointer-events-none invisible absolute right-[calc(100%+0.5rem)] top-1/2 z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-surface px-2.5 py-2 text-right normal-case opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100 sm:block"
+                >
+                  <span className="block max-w-48 truncate text-sm font-medium text-text-primary">
+                    {identityLabel ?? 'Merchant foydalanuvchi'}
+                  </span>
+                  {identitySecondary ? (
+                    <span className="mt-0.5 block max-w-48 truncate text-xs text-text-secondary">
+                      {identitySecondary}
+                    </span>
+                  ) : null}
+                </span>
+                <span aria-hidden="true">
+                  {(identityLabel ?? 'M').trim().slice(0, 1) || 'M'}
+                </span>
+              </button>
+            </Menu.Trigger>
+            <Menu.Portal>
+              <Menu.Content
+                side="bottom"
+                align="end"
+                sideOffset={6}
+                className="z-50 min-w-36 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg"
+              >
+                <Menu.Item
+                  asChild
+                  className="flex cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-muted data-[highlighted]:text-text-primary"
+                >
+                  <Link to="/account">Profil</Link>
+                </Menu.Item>
+                <Menu.Item
+                  disabled={logoutPending}
+                  onSelect={onLogout}
+                  className="flex cursor-default select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm text-destructive outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-destructive/10 dark:data-[highlighted]:bg-destructive/20"
+                >
+                  <LogOutIcon className="size-4 shrink-0" aria-hidden="true" />
+                  Chiqish
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Portal>
+          </Menu.Root>
         </div>
       ) : onLogout ? (
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">

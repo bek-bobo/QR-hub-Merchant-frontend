@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { DashboardBucket } from '@/shared/contracts/merchant-read'
 import {
   applyDashboardFilters,
   formatGrowth,
   presentQrStatus,
-  projectAmountTrend,
   reconcileDashboard,
   resetDashboardFilters,
 } from './presenters'
@@ -14,25 +12,6 @@ const money = (minorUnits: string) => ({
   currency: 'UZS' as const,
   scale: 2 as const,
 })
-
-function bucket(
-  label: string,
-  periodStart: string,
-  totalAmount: string,
-): DashboardBucket {
-  const countAmount = { count: 1, amount: money(totalAmount) }
-  return {
-    label,
-    periodStart,
-    periodEnd: periodStart,
-    values: {
-      total: countAmount,
-      success: countAmount,
-      processing: { count: 0, amount: money('0') },
-      failed: { count: 0, amount: money('0') },
-    },
-  }
-}
 
 describe('dashboard presenters', () => {
   it('keeps draft validation separate and reset applies the default range', () => {
@@ -83,23 +62,6 @@ describe('dashboard presenters', () => {
     expect(presentation).toEqual({ label: 'Noma’lum', tone: 'neutral' })
     expect(presentation.label).not.toContain('777')
     expect(statusCode).toBe(777)
-  })
-
-  it('projects only backend buckets and retains exact money', () => {
-    const buckets = [
-      bucket('09.09', '2026-09-09', '100'),
-      bucket('11.09', '2026-09-11', '900719925474099300'),
-    ]
-    const view = { buckets }
-    const points = projectAmountTrend(view, 'UNKNOWN', 600, 180)
-
-    expect(points).toHaveLength(2)
-    expect(points.map((point) => point.period)).toEqual([
-      '2026-09-09',
-      '2026-09-11',
-    ])
-    expect(points[1]?.amount.minorUnits).toBe('900719925474099300')
-    expect(Number.isFinite(points[1]!.y)).toBe(true)
   })
 
   it('hides category percentages when counts do not cover total and checks money separately', () => {

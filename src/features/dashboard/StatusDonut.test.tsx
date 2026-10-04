@@ -1,7 +1,14 @@
 import { renderToStaticMarkup } from 'react-dom/server'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { StatusDonut } from './StatusDonut'
+import { createDonutPlotConfig, donutPlotData } from './donut-presentation'
+import { readMerchantPlotTheme } from './plot-theme'
+
+vi.mock('./LazyPlotRenderers', () => ({ StatusPiePlotRenderer: () => <div data-plot="pie" /> }))
+vi.mock('./plot-theme', async (importOriginal) => ({ ...await importOriginal<typeof import('./plot-theme')>(),
+  useMerchantPlotTheme: () => ({ dark: false, colors: ['blue', 'green', 'orange', 'red'], text: 'black', secondary: 'gray', axis: 'gray', grid: 'gray', surface: 'white', border: 'gray', fontFamily: 'Inter' }),
+}))
 
 const money = (minorUnits: string) => ({
   minorUnits,
@@ -38,10 +45,25 @@ function viewWith(counts: readonly [number, number, number]): Pick<DashboardView
 }
 
 describe('StatusDonut', () => {
+  it('maps raw category counts and exact tooltip fields to the Pie adapter', () => {
+    const data = viewWith([1, 1, 2])
+    const original = JSON.stringify(data)
+    const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, true)
+    const config = createDonutPlotConfig(data, theme)
+    expect(donutPlotData(data).map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 2]])
+    expect(donutPlotData(data).map(({ exactAmount }) => exactAmount)).toEqual(['100.00 UZS', '100.00 UZS', '200.00 UZS'])
+    expect(config).toMatchObject({ angleField: 'value', colorField: 'type', innerRadius: 0.64, legend: false, label: false, theme: 'classicDark', autoFit: true })
+    expect(config.scale).toMatchObject({ color: { range: ['--status-success-indicator', '--status-warning-indicator', '--status-error-indicator'] } })
+    expect(config.tooltip).toMatchObject({ items: [{ field: 'exactCount', name: 'Soni' }, { field: 'exactAmount', name: 'Summa' }] })
+    expect(JSON.stringify(data)).toBe(original)
+    expect(donutPlotData({ ...data, metrics: { ...data.metrics, total: metric(100, '1000000') } })).toEqual([])
+    expect(donutPlotData(viewWith([0, 0, 0]))).toEqual([])
+  })
   it('renders the authoritative status distribution as an accessible donut and legend', () => {
     const html = renderToStaticMarkup(<StatusDonut {...viewWith([1, 1, 2])} />)
 
-    expect(html).toContain('<svg')
+    expect(html).toContain('data-plot="pie"')
+    expect(html).not.toContain('<svg')
     expect(html).toContain('role="img"')
     expect(html).toContain('Muvaffaqiyatli: 25%')
     expect(html).toContain('Jarayonda: 25%')
@@ -89,11 +111,9 @@ describe('StatusDonut', () => {
     expect(html).toContain('Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.')
     expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
     expect(html).toContain('data-empty="true"')
-    expect(html.match(/<circle\b/g)).toHaveLength(1)
-    expect(html).not.toContain('strokeDasharray')
-    expect(html).not.toContain('stroke-dasharray')
-    expect(html).toMatch(/<text\b[^>]*>100<\/text>/)
-    const details = html.slice(html.indexOf('<dl', html.indexOf('<svg')))
+    expect(html).not.toContain('data-plot="pie"')
+    expect(html).toMatch(/<p\b[^>]*text-text-primary[^>]*>100<\/p>/)
+    const details = html.slice(html.indexOf('<dl', html.indexOf('data-empty')))
     expect(details).toContain('>60</p>')
     expect(details).toContain('>20</p>')
     expect(details).toContain('>10</p>')
@@ -109,16 +129,15 @@ describe('StatusDonut', () => {
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
     expect(html).toMatch(/<dd\b[^>]*>80%<\/dd>/)
     expect(html).toContain('Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.')
-    expect(html.match(/<circle\b/g)).toHaveLength(1)
+    expect(html).not.toContain('data-plot="pie"')
   })
 
-  it('preserves category arc/swatch roles, neutral center and details, and amount-only mismatch notes', () => {
+  it('preserves status swatches, neutral center and details, and amount-only mismatch notes', () => {
     const base = viewWith([1, 1, 2])
     const data = { ...base, metrics: { ...base.metrics, total: metric(4, '40001') } }
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
-    expect(html).toMatch(/<text\b[^>]*fill-text-primary[^>]*>4<\/text>/)
+    expect(html).toMatch(/<p\b[^>]*text-text-primary[^>]*>4<\/p>/)
     for (const tone of ['success', 'warning', 'error']) {
-      expect(html).toContain(`stroke-status-${tone}-indicator`)
       expect(html).toContain(`bg-status-${tone}-indicator`)
     }
     expect(html).not.toContain('text-status-')
@@ -128,6 +147,23 @@ describe('StatusDonut', () => {
     expect(html).toContain('200.00 UZS')
     expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
     expect(html).not.toContain('Ayrim holatlar ushbu taqsimotga kirmagan')
-    expect(html.match(/<circle\b/g)).toHaveLength(4)
+    expect(html).toContain('data-plot="pie"')
+  })
+
+  it('keeps a long authoritative total in a wrapping neutral center without changing reconciliation', () => {
+    const base = viewWith([1, 1, 2])
+    const total = Number.MAX_SAFE_INTEGER
+    const data = { ...base, metrics: { ...base.metrics, total: metric(total, '900719925474099301') } }
+    const html = renderToStaticMarkup(<StatusDonut {...data} />)
+    const center = html.match(/<p\b[^>]*>([^<]*)<\/p>/g)?.find((tag) => tag.includes(total.toLocaleString('uz-UZ')))
+    expect(center).toBeDefined()
+    expect(center).toContain('[overflow-wrap:anywhere]')
+    expect(center).toContain('text-text-primary')
+    expect(center).not.toContain('text-status-')
+    expect(html).not.toContain('<text')
+    expect(html).toContain('data-empty="true"')
+    expect(html).toContain('Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.')
+    expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
+    expect(html).not.toMatch(/NaN|Infinity/)
   })
 })

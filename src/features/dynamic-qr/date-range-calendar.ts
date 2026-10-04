@@ -1,4 +1,5 @@
 import type { DateRange } from '@/shared/contracts/merchant-read'
+import { getTashkentDatePreset, isIsoCalendarDate } from '@/shared/filters/date-range'
 
 export interface CalendarDay {
   readonly date: string
@@ -17,6 +18,14 @@ function formatDate(value: Date): string {
 export function monthStart(value: string): string {
   const date = parseDate(value)
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-01`
+}
+
+// Choose a display month without normalizing or committing the user's draft.
+export function calendarMonthForRange(range: DateRange, instant = new Date()): string {
+  const anchor = isIsoCalendarDate(range.fromDate) ? range.fromDate
+    : isIsoCalendarDate(range.toDate) ? range.toDate
+      : getTashkentDatePreset(1, instant).fromDate
+  return monthStart(anchor)
 }
 
 export function shiftCalendarMonth(value: string, offset: number): string {

@@ -3,6 +3,7 @@ import {
   contractObject,
   finiteNumber,
   isoCalendarDate,
+  isoLocalDateTime,
   nullableFiniteNumber,
   requiredString,
   safeInteger,
@@ -67,14 +68,29 @@ function decodePie(value: unknown): DashboardView['pie'] {
 }
 
 function decodeChartGroupBy(value: unknown): ChartGroupBy {
-  if (value === 'DAY' || value === 'WEEK' || value === 'MONTH' || value === 'YEAR') {
+  if (value === 'HOUR' || value === 'DAY' || value === 'WEEK' || value === 'MONTH' || value === 'YEAR') {
     return value
   }
 
   throw safeContractError()
 }
 
-function decodeBucket(value: unknown): DashboardBucket {
+// Validate the local date/time and optional ISO offset separately. Do not parse
+// through Date: it can normalize invalid dates or interpret offsetless values
+// in the browser timezone. Keep backend precision and offset unchanged.
+function hourBoundary(value: unknown): string {
+  if (typeof value !== 'string') throw safeContractError()
+  const match = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,9})?)?)(Z|[+-]\d{2}:\d{2})?$/.exec(value)
+  if (!match) throw safeContractError()
+  isoLocalDateTime(match[1])
+  const offset = match[2]
+  if (offset && offset !== 'Z' && (Number(offset.slice(1, 3)) > 23 || Number(offset.slice(4, 6)) > 59)) {
+    throw safeContractError()
+  }
+  return value
+}
+
+function decodeBucket(value: unknown, groupBy: ChartGroupBy): DashboardBucket {
   const source = contractObject(value)
   const values = Object.fromEntries(
     outcomes.map((outcome) => [outcome, countAmount(source, outcome)]),
@@ -82,8 +98,9 @@ function decodeBucket(value: unknown): DashboardBucket {
 
   return Object.freeze({
     label: requiredString(source.label),
-    periodStart: isoCalendarDate(source.periodStart),
-    periodEnd: isoCalendarDate(source.periodEnd),
+    periodKind: groupBy === 'HOUR' ? 'hour' : 'calendar',
+    periodStart: groupBy === 'HOUR' ? hourBoundary(source.periodStart) : isoCalendarDate(source.periodStart),
+    periodEnd: groupBy === 'HOUR' ? hourBoundary(source.periodEnd) : isoCalendarDate(source.periodEnd),
     values: Object.freeze(values),
   })
 }
@@ -93,11 +110,12 @@ export function decodeDashboardResponse(payload: unknown): DashboardView {
   if (!Array.isArray(data.chartStats)) {
     throw safeContractError()
   }
+  const chartGroupBy = decodeChartGroupBy(data.chartGroupBy)
 
   return Object.freeze({
     metrics: decodeMetrics(data.summary),
     pie: decodePie(data.pieStats),
-    chartGroupBy: decodeChartGroupBy(data.chartGroupBy),
-    buckets: Object.freeze(data.chartStats.map(decodeBucket)),
+    chartGroupBy,
+    buckets: Object.freeze(data.chartStats.map((bucket) => decodeBucket(bucket, chartGroupBy))),
   })
 }
