@@ -51,6 +51,9 @@ describe('cashier terminal assignment modal', () => {
     expect(html).toContain('Biriktirilgan terminallar')
     expect(html).toContain('Cashier A')
     expect(html).toContain('+998 90 123 45 67')
+    expect(html).toContain('>CA</span>')
+    expect(html).toContain('>3 ta terminal</span>')
+    expect(html).toContain('Ushbu kassirga hozirda biriktirilgan faol terminallar ro‘yxati.')
     for (const terminal of cashier.terminals) {
       expect(html).toContain(terminal.name)
       expect(html).toContain(terminal.id)
@@ -91,6 +94,7 @@ describe('cashier terminal assignment modal', () => {
       assignSurface={<AssignmentSurface />} onUnassign={vi.fn()} unassignSurface={<p>unassign-confirmation</p>} />)
     expect(assignmentMount).toHaveBeenCalledOnce()
     expect(html).toContain('Terminal qo‘shish')
+    expect(html).toContain('+998 90 123 45 67')
     expect(html).toContain('assignment-form')
     expect(html).not.toContain('Faol terminal biriktirishlari')
     expect(html).not.toContain('unassign-confirmation')
@@ -109,6 +113,7 @@ describe('cashier terminal assignment modal', () => {
     const html = renderToStaticMarkup(<CashierTerminalsContent cashier={cashier} mode="unassign" onUnassign={() => undefined}
       unassignSurface={<p>existing-unassign-confirmation</p>} />)
     expect(html.match(/>Ajratish</g)).toHaveLength(3)
+    expect(html).toContain('Ajratiladigan terminal')
     expect(html).toContain('existing-unassign-confirmation')
     expect(renderToStaticMarkup(<CashierTerminalsContent cashier={cashier} />)).not.toContain('>Ajratish<')
     expect(pageSource).toContain("can(access, 'cashier.assignTerminals', false)")

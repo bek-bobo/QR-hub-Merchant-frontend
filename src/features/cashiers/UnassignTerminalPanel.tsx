@@ -101,12 +101,12 @@ export function UnassignTerminalPanel({ target, resultData, resultKey, dataUpdat
     })
   }
 
-  return <section aria-label="Terminalni ajratishni tasdiqlash" className="min-w-0 space-y-3 rounded-lg border p-3">
-    <h4 className="font-medium">Terminalni kassirdan ajratish</h4>
-    <p className="break-words text-sm">{current.cashier.fullname} kassirdan <span className="font-medium">{current.terminal.name}</span> (<span className="break-all">{current.terminal.id}</span>) terminalining biriktirilishini olib tashlashni tasdiqlaysizmi?</p>
+  return <section aria-label="Terminalni ajratishni tasdiqlash" className="min-w-0 space-y-3 rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+    <h4 className="font-semibold text-text-primary">Terminalni kassirdan ajratish</h4>
+    <p className="break-words text-sm text-text-secondary">{current.cashier.fullname} kassirdan <span className="font-medium text-text-primary">{current.terminal.name}</span> (<span className="break-all">{current.terminal.id}</span>) terminalining biriktirilishini olib tashlashni tasdiqlaysizmi?</p>
     <div className="flex flex-wrap gap-2">
-      <Button type="button" variant="destructive" onClick={confirm} disabled={state.outcome.kind !== 'idle'}>Terminalni ajratish</Button>
-      <Button type="button" variant="outline" onClick={onCancel} disabled={state.outcome.kind === 'pending'}>Bekor qilish</Button>
+      <Button type="button" variant="destructive" className="rounded-lg" onClick={confirm} disabled={state.outcome.kind !== 'idle'}>Terminalni ajratish</Button>
+      <Button type="button" variant="outline" className="rounded-lg" onClick={onCancel} disabled={state.outcome.kind === 'pending'}>Bekor qilish</Button>
     </div>
     {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
     {state.outcome.kind === 'pending' ? <p role="status">Ajratish so‘rovi yuborilmoqda.</p> : null}
