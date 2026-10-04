@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -7,6 +7,8 @@ import { DashboardReadPage } from './DashboardReadPage'
 import { useDashboardReadQueries } from './queries'
 import { createDashboardFilterState, dashboardFilterReducer } from './filter-state'
 import { resetDashboardFilters } from './presenters'
+import { formatInstantTime } from '@/shared/presentation/date-time'
+import type { DashboardPageHeader } from './DashboardPageHeader'
 
 const observations = vi.hoisted(() => ({
   dashboard: [] as DashboardFilters[],
@@ -15,7 +17,19 @@ const observations = vi.hoisted(() => ({
   terminalError: false,
   dashboardReady: false,
   recentError: false,
+  dataUpdatedAt: 0,
+  header: undefined as ComponentProps<typeof DashboardPageHeader> | undefined,
+  dashboardRefetch: vi.fn(),
+  recentRefetch: vi.fn(),
 }))
+
+vi.mock('./DashboardPageHeader', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./DashboardPageHeader')>()
+  return { DashboardPageHeader: (props: ComponentProps<typeof DashboardPageHeader>) => {
+    observations.header = props
+    return <actual.DashboardPageHeader {...props} />
+  } }
+})
 
 vi.mock('@/app/read/useReadRuntime', () => ({
   useReadRuntime: () => ({
@@ -44,9 +58,10 @@ vi.mock('@tanstack/react-query', () => ({
     return {
       data: dashboard && observations.dashboardReady ? { metrics: {}, pie: [] }
         : terminal && !observations.terminalError ? [{ id: 'terminal-a', name: 'Terminal A' }] : undefined,
-      dataUpdatedAt: 0, isPending: !terminal && !(dashboard && observations.dashboardReady) && !recentError,
+      dataUpdatedAt: dashboard ? observations.dataUpdatedAt : 0, isPending: !terminal && !(dashboard && observations.dashboardReady) && !recentError,
       isFetching: false,
-      isError: (terminal && observations.terminalError) || recentError, refetch: vi.fn(),
+      isError: (terminal && observations.terminalError) || recentError,
+      refetch: dashboard ? observations.dashboardRefetch : terminal ? vi.fn() : observations.recentRefetch,
     }
   },
 }))
@@ -69,6 +84,26 @@ describe('Dashboard filter placement and query coordination', () => {
     observations.terminalError = false
     observations.dashboardReady = false
     observations.recentError = false
+    observations.dataUpdatedAt = 0
+    observations.header = undefined
+    observations.dashboardRefetch.mockReset()
+    observations.recentRefetch.mockReset()
+  })
+
+  it('keeps the query timestamp as the header value and refreshes the same mounted queries', () => {
+    const render = () => renderToStaticMarkup(<MemoryRouter>
+      <DashboardReadPage initialInstant={new Date('2026-09-30T19:01:00Z')} />
+    </MemoryRouter>)
+    render()
+    expect(observations.header?.updatedAt).toBeUndefined()
+    for (const instant of ['2026-10-04T09:47:32Z', '2026-10-04T09:48:12Z']) {
+      observations.dataUpdatedAt = Date.parse(instant)
+      expect(render()).not.toContain('Oxirgi yangilanish:')
+      expect(observations.header?.updatedAt).toBe(formatInstantTime(observations.dataUpdatedAt))
+    }
+    observations.header?.onRefresh()
+    expect(observations.dashboardRefetch).toHaveBeenCalledExactlyOnceWith()
+    expect(observations.recentRefetch).toHaveBeenCalledExactlyOnceWith()
   })
 
   it.each([false, true])('keeps analytics before the independent Recent QR panel (error=%s)', (error) => {

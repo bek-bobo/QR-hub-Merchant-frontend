@@ -33,6 +33,15 @@ function renderResult(result: CreateResultModel, currentScope: ReadScope = scope
 beforeEach(() => { qrCalls.length = 0 })
 
 describe('payment QR presentation boundary', () => {
+  it('accepts a larger SVG size while preserving the payload and quiet zone', () => {
+    const validatedLink = validateCreateLink(original, ['https:'])
+    if (validatedLink.kind !== 'available') throw Error('Expected an accepted fixture link')
+    const html = renderToString(<PaymentQrCode validatedLink={validatedLink} size={384} />)
+    expect(html).toContain('max-width:384px')
+    expect(qrCalls[0]).toMatchObject({ value: original, size: 384, marginSize: 4,
+      fgColor: '#000000', bgColor: '#FFFFFF', className: 'block h-auto max-w-full' })
+  })
+
   it('renders a local SVG for a confirmed result with a policy-accepted link', () => {
     const result = presentCreateResult(confirmed, ['https:'])!
     const html = renderResult(result)

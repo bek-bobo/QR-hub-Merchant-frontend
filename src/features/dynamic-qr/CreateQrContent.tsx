@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormField } from '@/components/forms/FormField'
 import { Select } from '@/components/ui/select'
-import { formatMoney } from '@/shared/money/minor'
+import { formatMinorValue, formatMoney } from '@/shared/money/minor'
 import { MoneyInput } from '@/shared/money/MoneyInput'
 import { PageHeader } from '@/shared/ui/PageHeader'
 import { buildCreateQrRequest, createAmountBounds, createCreateQrController } from './create-qr'
@@ -227,10 +227,14 @@ export function CreateQrContent({
         {terminals.data?.length === 0 ? <p className="text-sm">Biriktirilgan faol terminal topilmadi.</p> : null}
         {terminalId && terminals.data && !selected ? <p role="alert" className="text-sm text-destructive">Tanlangan terminal endi mavjud emas. Qayta tanlang.</p> : null}
         {selected && !bounds ? <p role="alert" className="text-sm text-destructive">Bu terminal uchun summa oralig‘i mavjud emas.</p> : null}
-        {bounds ? <p className="text-xs text-text-secondary">Ruxsatli oraliq: {formatMoney({ minorUnits: String(bounds.minimum), currency: 'UZS', scale: 2 })} – {formatMoney({ minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2 })}</p> : null}
         <FormField id="create-qr-amount" label="Summa, UZS"
-          helpText="Faqat raqam va bitta nuqta yoki vergul; ko‘pi bilan ikki kasr xonasi."
-          errorText={amountInput && bounds && !amountValid ? 'Summa formati yoki oralig‘i noto‘g‘ri.' : undefined}>
+          helpText={<>
+            Masalan: 12 500.50 yoki 12 500,50
+            {bounds ? <span className="mt-1.5 block">
+              Ruxsat etilgan summa: {formatMinorValue({ minorUnits: String(bounds.minimum), scale: 2 })} – {formatMoney({ minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2 })}
+            </span> : null}
+          </>}
+          errorText={amountInput && bounds && !amountValid ? 'Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting.' : undefined}>
           {(controlProps) => <MoneyInput {...controlProps} value={amountInput} onValueChange={setAmountInput} />}
         </FormField>
         {!currencyAllowed ? <p role="status" className="text-sm">Valyuta ro‘yxatiga ruxsat mavjud emas.</p> : null}

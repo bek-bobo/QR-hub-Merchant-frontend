@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { parseCreateAmount } from './create-amount'
 
 describe('create QR UZS amount', () => {
+  it.each(['12 500.50', '12 500,50'])('accepts the displayed helper example %s', (input) => {
+    expect(parseCreateAmount(input)).toBe('1250050')
+  })
   it('uses exact minor units at both boundaries', () => {
     expect(parseCreateAmount('1000')).toBe('100000')
     expect(parseCreateAmount('1000.00')).toBe('100000')

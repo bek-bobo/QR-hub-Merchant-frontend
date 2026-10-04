@@ -9,6 +9,10 @@ const { qrCalls } = vi.hoisted(() => ({
 }))
 
 vi.mock('qrcode.react', () => ({
+  QRCodeCanvas: (props: Record<string, unknown>) => {
+    qrCalls.push(props)
+    return <canvas data-testid="poster-source-qr" />
+  },
   QRCodeSVG: (props: Record<string, unknown>) => {
     qrCalls.push(props)
     return <svg data-testid="shared-payment-qr" />
@@ -20,6 +24,60 @@ const original = 'https://qrhub.uz/Exact/%2fPath?type=02&case=MiXeD#Part%2FOne'
 beforeEach(() => { qrCalls.length = 0 })
 
 describe('shared QR presentation', () => {
+  it('keeps the link below the left info card and bilingual branding inside the bounded right QR panel', () => {
+    const link = validateCreateLink(original)
+    const html = renderToString(<QrPresentation emphasizeQr qrId="qr-1" terminalName="Terminal A"
+      amountLabel="5 000.00 UZS" statusLabel="Muddati o‘tgan" link={link}
+      unavailableMessage="Unavailable" onCopy={async () => 'copied'}
+      footer={<button type="button">Yopish</button>} />)
+
+    expect(html).toContain('sm:grid-cols-[minmax(0,1fr)_20rem]')
+    expect(html).toContain('max-w-80')
+    expect(html).toContain('background-color:#FA0A4B')
+    expect(html).toContain('aspect-ratio:620 / 877')
+    expect(html).toContain('BU YERDA QR - KOD YORDAMIDA')
+    expect(html).toContain('ЗДЕСЬ МОЖНО ОПЛАТИТЬ')
+    expect(html).toContain('lang="uz"')
+    expect(html).toContain('lang="ru"')
+    expect(html.indexOf('Kanonik havola')).toBeGreaterThan(html.indexOf('</dl>'))
+    expect(html.indexOf('Kanonik havola')).toBeLessThan(html.indexOf('PDF yuklab olish'))
+    expect(html.indexOf('PNG yuklab olish')).toBeLessThan(html.indexOf('BU YERDA QR'))
+    expect(html).toContain('QRHUB')
+    expect(html).toContain('PDF yuklab olish')
+    expect(html).toContain('PNG yuklab olish')
+    expect(html.match(/disabled=""/g)).toHaveLength(2)
+    expect(html).toContain('truncate')
+    expect(html).toContain(`title="${original.replaceAll('&', '&amp;')}"`)
+    expect(html).toContain('Havolani nusxalash')
+    expect(html).toContain('Terminal A')
+    expect(html).toContain('5 000.00 UZS')
+    expect(html).toContain('Muddati o‘tgan')
+    expect(html).toContain('Yopish')
+    expect(qrCalls).toHaveLength(1)
+    expect(qrCalls[0]).toMatchObject({ value: original, size: 600,
+      marginSize: 4, level: 'M', fgColor: '#000000', bgColor: '#FFFFFF' })
+  })
+
+  it('keeps other presentations at the existing size and layout', () => {
+    const html = renderToString(<QrPresentation qrId="qr-1" terminalName="Terminal A"
+      link={validateCreateLink(original)} unavailableMessage="Unavailable" />)
+    expect(html).toContain('md:grid-cols-[minmax(0,1fr)_17rem]')
+    expect(html).not.toContain('BU YERDA QR')
+    expect(html).not.toContain('ЗДЕСЬ МОЖНО ОПЛАТИТЬ')
+    expect(html).not.toContain('PDF yuklab olish')
+    expect(qrCalls[0].size).toBe(240)
+  })
+
+  it('preserves the unavailable state in the emphasized layout', () => {
+    const html = renderToString(<QrPresentation emphasizeQr qrId="qr-1" terminalName="Terminal A"
+      link={{ kind: 'unavailable' }} unavailableMessage="Unavailable" />)
+    expect(html).toContain('Unavailable')
+    expect(html).not.toContain('Kanonik havola')
+    expect(html).not.toContain('BU YERDA QR')
+    expect(html).not.toContain('PNG yuklab olish')
+    expect(qrCalls).toHaveLength(0)
+  })
+
   it('renders and copies the exact policy-approved HTTPS link', async () => {
     const link = validateCreateLink(original)
     const html = renderToString(<QrPresentation qrId="qr-1" terminalName="Terminal A"

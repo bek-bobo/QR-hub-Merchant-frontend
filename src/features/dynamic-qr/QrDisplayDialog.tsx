@@ -41,6 +41,7 @@ export function QrDisplayDialog({ row, onOpenChange }: QrDisplayDialogProps) {
         </DialogPrimitive.Close>
         <div className="p-4 sm:p-6">
           <QrPresentation
+            emphasizeQr
             qrId={row.pkey}
             terminalName={row.terminalName}
             amountLabel={formatMoney(row.amount)}
