@@ -58,6 +58,7 @@ export function StaticQrAdvancedFilterFields({ draft, merchants, terminals, regi
       state={draft.regionId ? districtState : 'unavailable'} allLabel="Barcha tumanlar"
       emptyLabel="Bu viloyat uchun tuman mavjud emas"
       errorLabel={draft.regionId ? 'Tumanlarni yuklab bo‘lmadi' : 'Avval viloyatni tanlang'}
+      hideUnavailableDescription={!draft.regionId}
       onChange={(id) => onChange({ ...draft, districtId: id })} />
   </div>
 }

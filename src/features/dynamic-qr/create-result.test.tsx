@@ -62,6 +62,22 @@ describe('create result and link security policy', () => {
     expect(result).toMatchObject({ kind: 'confirmed', pkey: 'opaque-pkey', link: { kind: 'unavailable' } })
   })
 
+  it('omits the duplicate close action in the modal result while retaining the new QR action', () => {
+    const result = presentCreateResult(confirmed)!
+    const html = renderToString(<CreateQrResult result={result} currentScope={() => scope}
+      canCreate={() => true} onClose={() => undefined} onNewIntent={() => undefined} showHeading={false} />)
+    expect(html).not.toMatch(/>Yopish<\/button>/)
+    expect(html).toContain('Yangi QR')
+    expect(html).toContain('opaque-pkey')
+  })
+
+  it('retains the standalone page close action where there is no modal X control', () => {
+    const result = presentCreateResult(confirmed)!
+    const html = renderToString(<CreateQrResult result={result} currentScope={() => scope}
+      canCreate={() => true} onClose={() => undefined} onNewIntent={() => undefined} />)
+    expect(html).toMatch(/>Yopish<\/button>/)
+  })
+
   it('renders the exact canonical live link without constructing a URL from pkey', () => {
     const result = presentCreateResult(confirmed)!
     const html = renderToString(<CreateQrResult result={result} currentScope={() => scope}

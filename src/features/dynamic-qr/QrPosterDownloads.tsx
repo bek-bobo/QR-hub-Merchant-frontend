@@ -24,13 +24,13 @@ export function QrPosterDownloads({ poster, qrId }: QrPosterDownloadsProps) {
   }
 
   return <div className="space-y-2">
-    <div className="flex flex-wrap gap-2">
-      <Button type="button" size="sm" disabled={!poster || pending !== null}
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <Button type="button" className="h-11 w-full" disabled={!poster || pending !== null}
         aria-busy={pending === 'pdf'} onClick={() => void download('pdf')}>
         <FileDownIcon aria-hidden="true" />
         PDF yuklab olish
       </Button>
-      <Button type="button" size="sm" variant="outline" disabled={!poster || pending !== null}
+      <Button type="button" className="h-11 w-full" variant="outline" disabled={!poster || pending !== null}
         aria-busy={pending === 'png'} onClick={() => void download('png')}>
         <DownloadIcon aria-hidden="true" />
         PNG yuklab olish

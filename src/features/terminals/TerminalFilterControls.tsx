@@ -58,6 +58,7 @@ export function TerminalAdvancedFilterFields({ draft, merchants, banks, regions,
       state={draft.regionId ? districtState : 'unavailable'} allLabel="Barcha tumanlar"
       emptyLabel="Bu viloyat uchun tuman mavjud emas"
       errorLabel={draft.regionId ? 'Tumanlarni yuklab bo‘lmadi' : 'Avval viloyatni tanlang'}
+      hideUnavailableDescription={!draft.regionId}
       onChange={(id) => onChange({ ...draft, districtId: id })} />
   </div>
 }

@@ -56,6 +56,13 @@ export async function renderQrPoster(qr: HTMLCanvasElement): Promise<HTMLCanvasE
   context.scale(QR_POSTER.scale, QR_POSTER.scale)
   context.fillStyle = QR_POSTER.background
   context.fillRect(0, 0, QR_POSTER.width, QR_POSTER.height)
+  // Low-contrast curves sit behind the content; the QR frame stays opaque white.
+  context.fillStyle = 'rgba(255,255,255,0.06)'
+  for (const [x, y, radius] of [[720, 280, 270], [-80, 880, 360], [640, 880, 210]] as const) {
+    context.beginPath()
+    context.arc(x, y, radius, 0, Math.PI * 2)
+    context.fill()
+  }
   context.fillStyle = '#ffffff'
   context.textAlign = 'center'
   context.textBaseline = 'middle'

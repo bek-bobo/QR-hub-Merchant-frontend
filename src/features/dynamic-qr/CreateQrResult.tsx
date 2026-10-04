@@ -3,6 +3,8 @@ import type { ReadScope } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { copyExactCreateLink, type CreateResultModel } from './create-result'
 import { QrPresentation } from './QrPresentation'
+import { QrDisplayHeader } from './QrDisplayShell'
+import { writeQrClipboardText } from './qr-presentation'
 
 interface CreateQrResultProps {
   readonly result: CreateResultModel
@@ -24,19 +26,13 @@ export function CreateQrResult({ result, currentScope, canCreate, onClose, onNew
   async function copyLink() {
     return copyExactCreateLink({
       result, currentScope, canCreate,
-      writeText: async (text) => {
-        if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
-        await navigator.clipboard.writeText(text)
-      },
+      writeText: writeQrClipboardText,
     })
   }
 
   return <section role={result.kind === 'confirmed' ? 'status' : 'alert'} className="space-y-4">
     {result.kind === 'confirmed' ? <>
-      {showHeading ? <div>
-        <h3 className="text-xl font-semibold text-text-primary">QR ko‘rsatish</h3>
-        <p className="mt-1 text-sm text-text-secondary">Dinamik QR muvaffaqiyatli yaratildi.</p>
-      </div> : null}
+      {showHeading ? <QrDisplayHeader /> : null}
       <QrPresentation
         qrId={result.pkey}
         terminalName={result.terminalName}
@@ -45,7 +41,7 @@ export function CreateQrResult({ result, currentScope, canCreate, onClose, onNew
         unavailableMessage="QR yaratildi, lekin havolani xavfsiz ko‘rsatib bo‘lmadi."
         onCopy={copyLink}
         footer={<>
-          <Button type="button" variant="outline" onClick={onClose}>Yopish</Button>
+          {showHeading ? <Button type="button" variant="outline" onClick={onClose}>Yopish</Button> : null}
           <Button type="button" onClick={onNewIntent}>Yangi QR</Button>
         </>}
       />

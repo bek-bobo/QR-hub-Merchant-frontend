@@ -57,6 +57,11 @@ describe('Dashboard quick date and Terminal controls', () => {
     expect(html).toContain(label)
     expect(html).toContain('disabled=""')
     expect(html).toContain('role="status"')
+    expect(html.match(/role="status"/g)).toHaveLength(1)
+    if (!error) {
+      expect(html).toContain(`<span role="status" aria-live="polite" class="sr-only">${label}</span>`)
+      expect(html).not.toContain('<p')
+    }
     expect(html.includes('Qayta urinish')).toBe(error)
   })
 
@@ -68,6 +73,7 @@ describe('Dashboard quick date and Terminal controls', () => {
     expect(html).toMatch(/<option(?=[^>]*value="terminal-a")(?=[^>]*selected="")[^>]*>/)
     expect(html.match(/<select\b/g)).toHaveLength(1)
     expect(html).not.toContain('disabled=""')
+    expect(html).not.toContain('role="status"')
     expect(html).not.toMatch(/<input\b|Davr presetlari|Boshlanish sanasi|Tugash sanasi|Merchant|Status|Search|Region|District|Bank/)
   })
 })

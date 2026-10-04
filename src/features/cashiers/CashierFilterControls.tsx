@@ -48,6 +48,7 @@ export function CashierAdvancedFilterFields({ draft, merchants, terminals, merch
       state={draft.merchantId ? terminalState : 'unavailable'} allLabel="Barcha terminallar"
       emptyLabel="Bu merchant uchun terminal mavjud emas"
       errorLabel={draft.merchantId ? 'Terminallarni yuklab bo‘lmadi' : 'Avval merchantni tanlang'}
+      hideUnavailableDescription={!draft.merchantId}
       onChange={(id) => onChange({ ...draft, terminalId: id })} />
     {appliedTerminalId ? <p className="text-sm text-text-secondary">Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin.</p> : null}
   </div>

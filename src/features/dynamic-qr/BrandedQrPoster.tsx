@@ -36,7 +36,7 @@ export function BrandedQrPoster({ validatedLink, onReady }: BrandedQrPosterProps
     return () => { cancelled = true; cancelAnimationFrame(frame) }
   }, [original, onReady])
 
-  return <div role="group" aria-label="QRHUB to‘lov plakati" className="mx-auto w-full max-w-80 overflow-hidden rounded-2xl shadow-sm"
+  return <div role="group" aria-label="QRHUB to‘lov plakati" className="mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-sm"
     style={{ aspectRatio: `${QR_POSTER.width} / ${QR_POSTER.height}`, backgroundColor: QR_POSTER.background }}>
     <div className="hidden" aria-hidden="true">
       <QRCodeCanvas ref={qrRef} value={original} size={600} level="M" marginSize={4}

@@ -23,6 +23,7 @@ import { UnassignTerminalPanel } from './UnassignTerminalPanel'
 import type { UnassignTarget } from './unassign-terminal'
 import { cashierColumns } from './columns'
 import { CreateCashierDialog } from './CreateCashierDialog'
+import type { CashierTerminalsMode } from './CashierTerminalsDialog'
 
 function terminalLookupState(enabled: boolean, error: boolean, data: readonly TerminalOption[] | undefined, granted: boolean): LookupState {
   if (!enabled) return granted ? 'unavailable' : 'denied'
@@ -46,30 +47,48 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
 }) {
   const access = useAccessContext()
   const [selectedTarget, setSelectedTarget] = useState<CashierTarget | null>(null)
+  const [terminalMode, setTerminalMode] = useState<CashierTerminalsMode>('view')
+  const canAssign = can(access, 'cashier.assignTerminals', false)
+  const canUnassign = can(access, 'cashier.unassignTerminal', false)
   const selectedCashierRef = useRef<CashierRow | null>(null)
   const selectedEpochRef = useRef(0)
   const [assignNotice, setAssignNotice] = useState<string | null>(null)
   const [unassignSelection, setUnassignSelection] = useState<{ target: UnassignTarget; epoch: number } | null>(null)
   const [unassignNotice, setUnassignNotice] = useState<string | null>(null)
-  const selected = resolveCashierTarget(selectedTarget, scope, data.content, true)
+  const candidate = resolveCashierTarget(selectedTarget, scope, data.content, true)
+  const selected = (terminalMode === 'assign' && !canAssign) || (terminalMode === 'unassign' && !canUnassign)
+    ? null : candidate
   const currentUnassign = selected && unassignSelection?.target.cashier === selected && selected.terminals.includes(unassignSelection.target.terminal)
     ? unassignSelection.target : null
+  function openTerminals(row: CashierRow, mode: CashierTerminalsMode) {
+    if ((mode === 'assign' && !canAssign) || (mode === 'unassign' && (!canUnassign || !row.terminals.length))) return
+    selectedEpochRef.current++
+    selectedCashierRef.current = row
+    setAssignNotice(null)
+    setUnassignNotice(null)
+    setUnassignSelection(null)
+    setTerminalMode(mode)
+    setSelectedTarget(createCashierTarget(row, getCurrentScope()))
+  }
   return <CashierResults blocked={false} pending={false} error={false} data={data} selected={selected}
     columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
     onRetry={onRetry} onPageChange={onPageChange}
     headerActions={headerActions}
     quickFilters={quickFilters}
-    onSelect={(row) => { selectedEpochRef.current++; selectedCashierRef.current = row; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(createCashierTarget(row, getCurrentScope())) }}
+    terminalMode={terminalMode}
+    onSelect={(row) => openTerminals(row, 'view')}
+    onAssign={canAssign ? (row) => openTerminals(row, 'assign') : undefined}
+    onSelectUnassign={canUnassign ? (row) => openTerminals(row, 'unassign') : undefined}
     onClose={() => { selectedEpochRef.current++; selectedCashierRef.current = null; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(null) }}
-    onUnassign={selected !== null && can(access, 'cashier.unassignTerminal', false)
+    onUnassign={terminalMode === 'unassign' && selected !== null && canUnassign
       ? (terminal) => { selectedEpochRef.current++; selectedCashierRef.current = selected; setUnassignNotice(null); setUnassignSelection({ target: { cashier: selected, terminal }, epoch: selectedEpochRef.current }) } : undefined}
-    unassignSurface={selected !== null && can(access, 'cashier.unassignTerminal', false)
+    unassignSurface={terminalMode === 'unassign' && selected !== null && canUnassign
       ? <>{unassignNotice === selected.id ? <p role="status">Terminalni ajratish so‘rovi tasdiqlandi. Joriy faol biriktirishlar yangilangach tekshiriladi.</p> : null}
         {currentUnassign ? <UnassignTerminalPanel key={JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision, resultKey, dataUpdatedAt, currentUnassign.cashier.id, currentUnassign.terminal.id, currentUnassign.cashier.terminals.indexOf(currentUnassign.terminal)])}
         target={currentUnassign} resultData={data} resultKey={resultKey} dataUpdatedAt={dataUpdatedAt} scope={scope}
         isSelected={() => selectedCashierRef.current === currentUnassign.cashier && selectedEpochRef.current === unassignSelection?.epoch}
         onRefresh={onRetry} onCancel={() => setUnassignSelection(null)} onConfirmed={() => setUnassignNotice(selected.id)} /> : null}</> : null}
-    assignSurface={selected !== null && can(access, 'cashier.assignTerminals', false)
+    assignSurface={terminalMode === 'assign' && selected !== null && canAssign
       ? <>{assignNotice === selected.id ? <p role="status">Terminallar biriktirildi. Faol biriktirishlar ro‘yxati yangilangach tekshiriladi.</p> : null}
         <AssignTerminalsPanel key={JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision, resultKey, dataUpdatedAt, selected.id])}
           target={selected} resultData={data} resultKey={resultKey} dataUpdatedAt={dataUpdatedAt} scope={scope} onRefresh={onRetry} onConfirmed={() => setAssignNotice(selected.id)} /></> : null} />

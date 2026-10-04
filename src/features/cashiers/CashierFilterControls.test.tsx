@@ -74,9 +74,10 @@ describe('Cashier structured drawer', () => {
   })
 
   it('requires a merchant before terminal selection', () => {
-    const { terminal } = renderFields({ draft: {}, terminalState: 'ready' })
+    const { html, terminal } = renderFields({ draft: {}, terminalState: 'ready' })
     expect(terminal).toContain('disabled=""')
     expect(terminal).toContain('Avval merchantni tanlang')
+    expect(html.split('Avval merchantni tanlang')).toHaveLength(2)
     expect(terminal).not.toContain('Barcha terminallar')
   })
 

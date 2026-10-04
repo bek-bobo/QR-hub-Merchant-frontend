@@ -1,13 +1,12 @@
 import { useRef, type ReactNode } from 'react'
-import { MonitorIcon } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
-import { CashierTerminalsDialog } from './CashierTerminalsDialog'
+import { CashierTerminalsDialog, type CashierTerminalsMode } from './CashierTerminalsDialog'
+import { CashierActionsMenu } from './CashierActionsMenu'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
@@ -28,6 +27,9 @@ interface CashierResultsProps {
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
   readonly onSelect: (row: CashierRow) => void
+  readonly onAssign?: (row: CashierRow) => void
+  readonly onSelectUnassign?: (row: CashierRow) => void
+  readonly terminalMode?: CashierTerminalsMode
   readonly onClose: () => void
   readonly headerActions?: ReactNode
   readonly quickFilters?: ReactNode
@@ -54,7 +56,8 @@ function resolveColumns(
 
 export function CashierResults({ blocked, pending, error, data, selected,
   columnOrder, visibleColumnIds, onRetry, onPageChange, onSelect, onClose,
-  headerActions, quickFilters, assignSurface, onUnassign, unassignSurface }: CashierResultsProps) {
+  headerActions, quickFilters, assignSurface, onUnassign, unassignSurface,
+  onAssign, onSelectUnassign, terminalMode = 'view' }: CashierResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
   const selectionTrigger = useRef<HTMLButtonElement | null>(null)
 
@@ -77,16 +80,15 @@ export function CashierResults({ blocked, pending, error, data, selected,
                   : <div className="min-w-0">
         <TableScrollRegion ariaLabel="Kassirlar jadvali">
           <Table className="min-w-[46rem]">
-            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="text-right">Faol terminallar</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">Amallar</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
               return <TableRow key={`${row.id}-${index}`}>
                 {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
-                <TableCell className="text-right"><Button type="button" variant="outline" size="sm"
-                  className="whitespace-nowrap" aria-label={`${row.fullname} uchun biriktirilgan terminallarni ko‘rish`}
-                  aria-haspopup="dialog" aria-expanded={selected?.id === row.id}
-                  onClick={(event) => { selectionTrigger.current = event.currentTarget; onSelect(row) }}>
-                  <MonitorIcon className="size-4" aria-hidden="true" />Terminallar · {row.terminals.length}
-                </Button></TableCell>
+                <TableCell className="text-right"><CashierActionsMenu row={row}
+                  onViewTerminals={(target, trigger) => { selectionTrigger.current = trigger; onSelect(target) }}
+                  onAssign={onAssign ? (target, trigger) => { selectionTrigger.current = trigger; onAssign(target) } : undefined}
+                  onUnassign={onSelectUnassign ? (target, trigger) => { selectionTrigger.current = trigger; onSelectUnassign(target) } : undefined} />
+                </TableCell>
               </TableRow>
             })}</TableBody>
           </Table>
@@ -97,7 +99,7 @@ export function CashierResults({ blocked, pending, error, data, selected,
           onPageChange={onPageChange} /> : null}
       </CardContent>
     </Card>
-    {selected ? <CashierTerminalsDialog key={selected.id} cashier={selected} onClose={onClose}
+    {selected ? <CashierTerminalsDialog key={`${selected.id}:${terminalMode}`} cashier={selected} mode={terminalMode} onClose={onClose}
       assignSurface={assignSurface} onUnassign={onUnassign} unassignSurface={unassignSurface}
       onCloseAutoFocus={(event) => {
         if (selectionTrigger.current?.isConnected) {

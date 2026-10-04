@@ -9,10 +9,10 @@ import { TerminalDetailsContent } from './TerminalDetailsSheet'
 import { TerminalQrContent } from './TerminalQrDialog'
 
 const qr = vi.hoisted(() => ({ value: null as string | null }))
-vi.mock('qrcode.react', () => ({ QRCodeSVG: ({ value }: { value: string }) => {
+vi.mock('qrcode.react', () => ({ QRCodeCanvas: ({ value }: { value: string }) => {
   qr.value = value
-  return <svg data-payment-qr="true" />
-} }))
+  return <canvas data-payment-qr="true" />
+}, QRCodeSVG: () => <svg /> }))
 
 function terminal(overrides: Record<string, unknown> = {}) {
   const result = decodeTerminalPage({ success: true, data: {
@@ -52,7 +52,9 @@ describe('terminal loaded-row details and QR', () => {
     expect(qr.value).toBe(row.staticQrLink)
     expect(qr.value).not.toContain(row.staticQrId)
     expect(html).toContain('data-payment-qr="true"')
-    expect(html).toContain('bg-white')
+    expect(html).toContain('QRHUB to‘lov plakati')
+    expect(html).toContain('PDF yuklab olish')
+    expect(html).toContain('PNG yuklab olish')
     expect(html).toContain(row.staticQrLink)
     expect(html).toContain('Havolani nusxalash')
     expect(html).toContain(row.pkey)

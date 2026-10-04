@@ -208,7 +208,7 @@ export function CreateQrContent({
     onClose?.()
   }
 
-  return <div className={embedded ? 'space-y-4' : 'mx-auto max-w-2xl space-y-4'}>
+  return <div className={embedded ? 'space-y-4' : resultKind === 'confirmed' ? 'mx-auto max-w-5xl space-y-4' : 'mx-auto max-w-2xl space-y-4'}>
     {!embedded ? <PageHeader title="Dinamik QR yaratish" description="Summa UZSda kiritiladi." /> : null}
     {!result && !controllerState.closed ? <CreateFormShell embedded={embedded}>
       <form className="space-y-4" onSubmit={submit}>

@@ -36,11 +36,10 @@ function results(row: CashierRow) {
 describe('cashier terminal assignment modal', () => {
   it.each([0, 1, 3])('shows a compact accessible trigger for %i terminals, including zero', (count) => {
     const html = results({ ...cashier, terminals: cashier.terminals.slice(0, count) })
-    expect(html).toContain(`Terminallar · ${count}`)
-    expect(html).toContain('aria-label="Cashier A uchun biriktirilgan terminallarni ko‘rish"')
-    expect(html).toContain('aria-haspopup="dialog"')
+    expect(html).toContain('aria-label="Cashier A uchun amallarni ochish"')
+    expect(html).toContain('aria-haspopup="menu"')
     expect(html).not.toContain('Biriktirishlarni ko‘rish')
-    const trigger = html.match(/<button[^>]*aria-label="Cashier A uchun biriktirilgan terminallarni ko‘rish"[^>]*>/)?.[0]
+    const trigger = html.match(/<button[^>]*aria-label="Cashier A uchun amallarni ochish"[^>]*>/)?.[0]
     expect(trigger).toBeDefined()
     // Ignore quoted values so CSS variants cannot masquerade as HTML attributes.
     expect(trigger?.replace(/"[^"]*"|'[^']*'/g, '""')).not.toMatch(/\sdisabled(?:\s|=|\/?>)/i)
@@ -79,15 +78,35 @@ describe('cashier terminal assignment modal', () => {
     const html = renderToStaticMarkup(<CashierTerminalsDialog cashier={cashier} onClose={() => undefined}
       assignSurface={<AssignmentSurface />} />)
     expect(assignmentMount).not.toHaveBeenCalled()
-    expect(html).toContain('Terminallarni qo‘shish')
+    expect(html).not.toContain('Terminallarni qo‘shish')
     expect(html).not.toContain('assignment-form')
-    expect(dialogSource).toContain('assignOpen ? assignSurface')
-    expect(dialogSource).toContain('onClick={() => setAssignOpen(true)}')
+    expect(dialogSource).not.toContain('setAssignOpen')
     expect(dialogSource).not.toMatch(/\bfetch\s*\(|\buseQuery\s*\(|\bqueryKey\s*:/)
   })
 
+  it('mounts the same assignment surface immediately in assign mode without membership or unassign controls', () => {
+    const assignmentMount = vi.fn()
+    function AssignmentSurface() { assignmentMount(); return <p>assignment-form</p> }
+    const html = renderToStaticMarkup(<CashierTerminalsDialog cashier={cashier} mode="assign" onClose={() => undefined}
+      assignSurface={<AssignmentSurface />} onUnassign={vi.fn()} unassignSurface={<p>unassign-confirmation</p>} />)
+    expect(assignmentMount).toHaveBeenCalledOnce()
+    expect(html).toContain('Terminal qo‘shish')
+    expect(html).toContain('assignment-form')
+    expect(html).not.toContain('Faol terminal biriktirishlari')
+    expect(html).not.toContain('unassign-confirmation')
+  })
+
+  it('keeps view mode read-only even when mutation surfaces are supplied', () => {
+    const html = renderToStaticMarkup(<CashierTerminalsContent cashier={cashier}
+      assignSurface={<p>assignment-form</p>} onUnassign={vi.fn()} unassignSurface={<p>unassign-confirmation</p>} />)
+    expect(html).toContain('Faol terminal biriktirishlari')
+    expect(html).not.toContain('assignment-form')
+    expect(html).not.toContain('unassign-confirmation')
+    expect(html).not.toContain('>Ajratish<')
+  })
+
   it('retains authorized unassign controls and existing confirmation surfaces', () => {
-    const html = renderToStaticMarkup(<CashierTerminalsContent cashier={cashier} onUnassign={() => undefined}
+    const html = renderToStaticMarkup(<CashierTerminalsContent cashier={cashier} mode="unassign" onUnassign={() => undefined}
       unassignSurface={<p>existing-unassign-confirmation</p>} />)
     expect(html.match(/>Ajratish</g)).toHaveLength(3)
     expect(html).toContain('existing-unassign-confirmation')

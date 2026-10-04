@@ -75,11 +75,12 @@ describe('Terminal structured drawer', () => {
   })
 
   it('requires a region for districts while preserving supported unscoped bank options', () => {
-    const { selects } = renderFields({ draft: {} })
+    const { html, selects } = renderFields({ draft: {} })
     expect(selects[1]).toContain('Barcha bank hisoblari')
     expect(selects[1]).not.toContain('disabled=""')
     expect(selects[3]).toContain('disabled=""')
     expect(selects[3]).toContain('Avval viloyatni tanlang')
+    expect(html.split('Avval viloyatni tanlang')).toHaveLength(2)
     expect(renderFields({ draft: {}, bankState: 'empty' }).selects[1]).toContain('Bank hisobi mavjud emas')
   })
 })

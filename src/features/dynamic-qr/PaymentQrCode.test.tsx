@@ -11,6 +11,10 @@ const { qrCalls } = vi.hoisted(() => ({
 }))
 
 vi.mock('qrcode.react', () => ({
+  QRCodeCanvas: (props: Record<string, unknown>) => {
+    qrCalls.push(props)
+    return <canvas data-testid="poster-source-qr" />
+  },
   QRCodeSVG: (props: Record<string, unknown>) => {
     qrCalls.push(props)
     return <svg data-testid="payment-qr" aria-label={String(props.title)} />
@@ -42,10 +46,12 @@ describe('payment QR presentation boundary', () => {
       fgColor: '#000000', bgColor: '#FFFFFF', className: 'block h-auto max-w-full' })
   })
 
-  it('renders a local SVG for a confirmed result with a policy-accepted link', () => {
+  it('renders a branded poster source for a confirmed result with a policy-accepted link', () => {
     const result = presentCreateResult(confirmed, ['https:'])!
     const html = renderResult(result)
-    expect(html).toContain('data-testid="payment-qr"')
+    expect(html).toContain('data-testid="poster-source-qr"')
+    expect(html).toContain('PDF yuklab olish')
+    expect(html).toContain('PNG yuklab olish')
     expect(qrCalls).toHaveLength(1)
   })
 
@@ -63,7 +69,9 @@ describe('payment QR presentation boundary', () => {
   })
 
   it('uses a square, high-contrast SVG with a four-module quiet zone and accessible title', () => {
-    renderResult(presentCreateResult(confirmed, ['https:'])!)
+    const validatedLink = validateCreateLink(original, ['https:'])
+    if (validatedLink.kind !== 'available') throw Error('Expected an accepted fixture link')
+    renderToString(<PaymentQrCode validatedLink={validatedLink} />)
     expect(qrCalls[0]).toMatchObject({
       size: 240, level: 'M', marginSize: 4, fgColor: '#000000', bgColor: '#FFFFFF',
       title: 'To‘lov havolasi QR kodi', className: 'block h-auto max-w-full',

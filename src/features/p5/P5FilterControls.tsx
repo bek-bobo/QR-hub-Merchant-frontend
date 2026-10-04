@@ -41,6 +41,7 @@ export function P5AdvancedFilterFields({ draft, merchants, terminals, merchantSt
       state={draft.merchantId ? terminalState : 'unavailable'} allLabel="Barcha terminallar"
       emptyLabel="Bu merchant uchun terminal mavjud emas"
       errorLabel={draft.merchantId ? 'Terminallarni yuklab bo‘lmadi' : 'Avval merchantni tanlang'}
+      hideUnavailableDescription={!draft.merchantId}
       onChange={(id) => onChange({ ...draft, terminalId: id })} />
     <label className="block min-w-0 space-y-1.5 text-sm font-medium text-text-primary">Status
       <Select value={draft.statusDraft.mode} onChange={(event) => onChange({ ...draft,

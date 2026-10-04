@@ -73,11 +73,12 @@ describe('Static QR advanced drawer', () => {
   })
 
   it('allows global Terminal options without a merchant but requires a region for districts', () => {
-    const { selects } = renderFields({ draft: {} })
+    const { html, selects } = renderFields({ draft: {} })
     expect(selects[1]).toContain('Terminal Exact')
     expect(selects[1]).not.toContain('disabled=""')
     expect(selects[3]).toContain('disabled=""')
     expect(selects[3]).toContain('Avval viloyatni tanlang')
+    expect(html.split('Avval viloyatni tanlang')).toHaveLength(2)
     expect(renderFields({ draft: {}, terminalState: 'empty' }).selects[1]).toContain('Terminal mavjud emas')
   })
 })

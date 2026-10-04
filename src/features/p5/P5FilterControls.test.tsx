@@ -62,9 +62,10 @@ describe('P5 structured filters', () => {
     expect(merchant).not.toContain('Barcha merchantlar'); expect(terminal).not.toContain('Barcha terminallar')
   })
   it('requires merchant before terminal selection', () => {
-    const { terminal } = renderFields({ draft: createP5AdvancedDraft() })
+    const { html, terminal } = renderFields({ draft: createP5AdvancedDraft() })
     expect(terminal).toContain('disabled=""')
     expect(terminal).toContain('Avval merchantni tanlang')
+    expect(html.split('Avval merchantni tanlang')).toHaveLength(2)
   })
   it('presents a valid unknown code without inventing a semantic label', () => {
     const { html } = renderFields({ draft: { ...createP5AdvancedDraft(), statusDraft: { mode: 'custom', code: '777' } } })

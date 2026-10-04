@@ -33,7 +33,7 @@ describe('cashier results', () => {
     expect(html.indexOf('type="search"')).toBeLessThan(html.indexOf('Yangi kassir'))
     expect(html.indexOf('Yangi kassir')).toBeLessThan(html.indexOf('aria-label="Kassirlar jadvali"'))
     expect(html).toContain('Cashier A')
-    expect(html).toContain('Terminallar ·')
+    expect(html).toContain('Cashier A uchun amallarni ochish')
     const pending = render({ ...controls, pending: true, data: undefined })
     expect(pending).toContain('placeholder="F.I.Sh. yoki telefon"')
     expect(pending).toContain('Yangi kassir')
@@ -81,16 +81,18 @@ describe('cashier results', () => {
     expect(html).not.toContain('>0<')
   })
 
-  it('places the optional assign surface only inside an open current membership panel', () => {
+  it('places the existing assign surface only in the direct assignment mode', () => {
     expect(render({ assignSurface: createElement('button', { type: 'button' }, 'Terminallarni qo‘shish') })).not.toContain('Terminallarni qo‘shish')
-    const html = render({ selected: cashier, assignSurface: createElement('button', { type: 'button' }, 'Terminallarni qo‘shish') })
+    expect(render({ selected: cashier, assignSurface: createElement('button', { type: 'button' }, 'Terminallarni qo‘shish') })).not.toContain('Terminallarni qo‘shish')
+    const html = render({ selected: cashier, terminalMode: 'assign', assignSurface: createElement('button', { type: 'button' }, 'Terminallarni qo‘shish') })
     expect(html).toContain('Terminallarni qo‘shish')
     expect(html).not.toContain('Biriktirishni bekor qilish')
   })
 
   it('offers one unassign control per selected ACTIVE membership only when authorized by the caller', () => {
     expect(render({ selected: cashier })).not.toContain('terminalini ajratish')
-    const html = render({ selected: cashier, onUnassign: () => undefined })
+    expect(render({ selected: cashier, onUnassign: () => undefined })).not.toContain('terminalini ajratish')
+    const html = render({ selected: cashier, terminalMode: 'unassign', onUnassign: () => undefined })
     expect(html).toContain('term-active) terminalini ajratish')
     expect(html).toContain('term-second) terminalini ajratish')
     expect(html).not.toContain('term-inactive-filter')
@@ -109,9 +111,9 @@ describe('cashier results', () => {
     expect(() => decodeCashierPage({ success: true, data: { content: [{ id: 11, fullname: 'Cashier A', phone: '+998900000001', status: 0, terminals: null }], totalElements: 1, totalPages: 1, page: 0, size: 10 } })).toThrow()
   })
 
-  it('renders default business columns with Faol terminallar fixed final', () => {
+  it('renders default business columns with Amallar fixed final', () => {
     expect(cellTexts(render({ data: { ...page, content: [cashier] } }), 'th')).toEqual([
-      'F.I.Sh.', 'Telefon', 'Rol', 'Holat', 'Faol terminallar',
+      'F.I.Sh.', 'Telefon', 'Rol', 'Holat', 'Amallar',
     ])
   })
 
@@ -121,26 +123,26 @@ describe('cashier results', () => {
       columnOrder: ['status', 'fullName', 'role', 'phone'],
     })
     expect(cellTexts(html, 'th')).toEqual([
-      'Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Faol terminallar',
+      'Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Amallar',
     ])
     expect(cellTexts(html, 'td')).toEqual([
-      'Noma’lum', 'Cashier A', 'Merchant user', '+998900000001', `Terminallar · ${cashier.terminals.length}`,
+      'Noma’lum', 'Cashier A', 'Merchant user', '+998900000001', '',
     ])
-    expect(html).toContain('aria-label="Cashier A uchun biriktirilgan terminallarni ko‘rish"')
+    expect(html).toContain('aria-label="Cashier A uchun amallarni ochish"')
   })
 
-  it('hides and restores a business column without affecting Faol terminallar', () => {
+  it('hides and restores a business column without affecting Amallar', () => {
     const columnOrder = ['status', 'fullName', 'role', 'phone'] as const
     expect(cellTexts(render({
       data: { ...page, content: [cashier] },
       columnOrder,
       visibleColumnIds: ['status', 'fullName', 'role'],
-    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Faol terminallar'])
+    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Amallar'])
     expect(cellTexts(render({
       data: { ...page, content: [cashier] },
       columnOrder,
       visibleColumnIds: columnOrder,
-    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Faol terminallar'])
+    }), 'th')).toEqual(['Holat', 'F.I.Sh.', 'Rol', 'Telefon', 'Amallar'])
   })
 
   it('keeps the table scroll owner and operational control reachable with one business column', () => {
@@ -150,7 +152,7 @@ describe('cashier results', () => {
     })
     const scrollRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="Kassirlar jadvali"[^>]*>/)?.[0]
     expect(scrollRegion).toContain('overflow-x-auto')
-    expect(cellTexts(html, 'th')).toEqual(['F.I.Sh.', 'Faol terminallar'])
-    expect(html).toContain('Terminallar · ')
+    expect(cellTexts(html, 'th')).toEqual(['F.I.Sh.', 'Amallar'])
+    expect(html).toContain('Cashier A uchun amallarni ochish')
   })
 })

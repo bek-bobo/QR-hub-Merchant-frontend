@@ -31,7 +31,7 @@ describe('admin QRHub poster composition', () => {
     vi.stubGlobal('window', { setTimeout, clearTimeout })
     vi.stubGlobal('document', { createElement: () => {
       const context = { drawImage: vi.fn(), fillRect: vi.fn(), scale: vi.fn(), fillText: vi.fn(),
-        beginPath: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), globalCompositeOperation: '', fillStyle: '' }
+        beginPath: vi.fn(), arc: vi.fn(), roundRect: vi.fn(), fill: vi.fn(), globalCompositeOperation: '', fillStyle: '' }
       const canvas = { width: 0, height: 0, getContext: () => context }
       contexts.push(context)
       canvases.push(canvas)

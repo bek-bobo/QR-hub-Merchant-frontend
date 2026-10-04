@@ -11,11 +11,14 @@ interface LookupFilterSelectProps {
   readonly emptyLabel: string
   readonly errorLabel: string
   readonly loadingLabel?: string
+  // Only hide prerequisite hints already shown in the disabled option.
+  readonly hideUnavailableDescription?: boolean
   readonly onChange: (id?: string) => void
 }
 
 export function LookupFilterSelect({ label, value, options, state, allLabel,
-  emptyLabel, errorLabel, loadingLabel = 'Yuklanmoqda...', onChange }: LookupFilterSelectProps) {
+  emptyLabel, errorLabel, loadingLabel = 'Yuklanmoqda...', hideUnavailableDescription = false,
+  onChange }: LookupFilterSelectProps) {
   const ready = state === 'ready'
   const selected = ready && options?.some((item) => item.id === value) ? value : ''
   const reason = state === 'loading' ? loadingLabel : state === 'empty' ? emptyLabel : errorLabel
@@ -29,7 +32,8 @@ export function LookupFilterSelect({ label, value, options, state, allLabel,
         </> : <option value="" disabled>{reason}</option>}
       </Select>
     </label>
-    {!ready ? <p role="status" className="text-xs text-text-secondary">{reason}</p> : null}
+    {state === 'error' || (state === 'unavailable' && !hideUnavailableDescription)
+      ? <p role="status" className="text-xs text-text-secondary">{reason}</p> : null}
     {value && !ready && state !== 'empty' ? <Button type="button" variant="ghost" size="sm"
       aria-label={`${label} tanlovini tozalash`} onClick={() => onChange(undefined)}>Tozalash</Button> : null}
   </div>

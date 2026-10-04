@@ -24,7 +24,10 @@ vi.mock('radix-ui', async (importOriginal) => {
     Dialog: { ...actual.Dialog, Root: part, Portal: part, Overlay: part, Content: part, Title: part, Description: part, Close: part },
   }
 })
-vi.mock('qrcode.react', () => ({ QRCodeSVG: ({ value }: { value: string }) => <svg data-payment-qr="true" data-payload={value} /> }))
+vi.mock('qrcode.react', () => ({
+  QRCodeCanvas: ({ value }: { value: string }) => <canvas data-payment-qr="true" data-payload={value} />,
+  QRCodeSVG: () => <svg />,
+}))
 
 const row: P5Row = {
   deviceId: '00P5-EXACT', description: null, deviceStatus: 0,
@@ -55,6 +58,9 @@ describe('P5 loaded row actions', () => {
     expect(html).toContain('Havolani nusxalash')
     expect(html).toContain('00P5-EXACT')
     expect(html).toContain('Terminal A')
+    expect(html).toContain('QRHUB to‘lov plakati')
+    expect(html).toContain('PDF yuklab olish')
+    expect(html).toContain('PNG yuklab olish')
     const writer = vi.fn(async (_text: string) => undefined)
     expect(await copyExactPresentedLink(presentQrLink(row.staticQrLink), writer)).toBe('copied')
     expect(writer).toHaveBeenCalledWith(row.staticQrLink)
