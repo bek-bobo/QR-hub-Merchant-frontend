@@ -12,6 +12,8 @@ interface HeaderProps {
   navigationOpen?: boolean
   navigationControls?: string
   navigationTriggerRef?: Ref<HTMLButtonElement>
+  sidebarCollapsed?: boolean
+  onToggleSidebar?: () => void
   identityLabel?: string
   identitySecondary?: string
   compactAccountControls?: boolean
@@ -26,6 +28,8 @@ export function Header({
   navigationOpen = false,
   navigationControls,
   navigationTriggerRef,
+  sidebarCollapsed = false,
+  onToggleSidebar,
   identityLabel,
   identitySecondary,
   compactAccountControls = false,
@@ -33,7 +37,7 @@ export function Header({
   onLogout,
 }: HeaderProps) {
   return (
-    <header className="flex min-w-0 items-center justify-between gap-2 border-b bg-surface px-4 py-4 sm:gap-4 sm:px-6 lg:px-8">
+    <header className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/70 bg-surface px-4 py-2 shadow-sm sm:gap-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
         {onOpenNavigation ? (
           <Button
@@ -50,9 +54,16 @@ export function Header({
             <MenuIcon aria-hidden="true" />
           </Button>
         ) : null}
+        {onToggleSidebar ? (
+          <Button type="button" variant="ghost" size="icon" className="hidden size-10 lg:inline-flex"
+            aria-label={sidebarCollapsed ? 'Yon panelni ochish' : 'Yon panelni yopish'}
+            aria-expanded={!sidebarCollapsed} onClick={onToggleSidebar}>
+            <MenuIcon className="size-6" aria-hidden="true" />
+          </Button>
+        ) : null}
         {title ? (
           titleAsHeading ? (
-            <h1 className="min-w-0 truncate text-lg font-semibold text-text-primary sm:text-xl">
+            <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight text-text-primary sm:text-xl lg:border-l lg:border-border lg:pl-5">
               {title}
             </h1>
           ) : (

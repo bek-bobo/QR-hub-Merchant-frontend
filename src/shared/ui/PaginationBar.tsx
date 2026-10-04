@@ -1,5 +1,6 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { cn } from 'cn'
+import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
 import {
   PAGINATION_ELLIPSIS,
@@ -14,6 +15,8 @@ export interface PaginationBarProps {
   readonly onPageChange: (page: number) => void
   readonly disabled?: boolean
   readonly showTotal?: boolean
+  readonly totalLabel?: ReactNode
+  readonly className?: string
 }
 
 export function PaginationBar({
@@ -24,6 +27,8 @@ export function PaginationBar({
   onPageChange,
   disabled = false,
   showTotal = true,
+  totalLabel,
+  className,
 }: PaginationBarProps) {
   const pages = createPaginationWindow(currentPage, totalPages)
   const previousDisabled = disabled || currentPage <= 0
@@ -35,11 +40,12 @@ export function PaginationBar({
       className={cn(
         'flex min-w-0 flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center',
         showTotal ? 'sm:justify-between' : 'sm:justify-end',
+        className,
       )}
     >
       {showTotal ? (
         <p className="shrink-0 text-sm text-text-secondary">
-          Jami: {totalItems.toLocaleString('uz-UZ')}
+          {totalLabel ?? `Jami: ${totalItems.toLocaleString('uz-UZ')}`}
         </p>
       ) : null}
       <span aria-live="polite" className="sr-only">

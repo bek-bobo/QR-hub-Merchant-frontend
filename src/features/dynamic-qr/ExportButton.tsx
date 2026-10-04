@@ -1,4 +1,5 @@
 import { useLayoutEffect, useState } from 'react'
+import { FileSpreadsheetIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
@@ -15,6 +16,8 @@ interface ExportButtonProps {
   readonly terminalValid: boolean
   readonly intentRevision?: number
   readonly compact?: boolean
+  readonly className?: string
+  readonly showIcon?: boolean
 }
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
@@ -22,7 +25,7 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
     left.accessRevision === right.accessRevision
 }
 
-function ExportForAppliedFilters({ applied, terminalValid, compact = false, scope }: ExportButtonProps & {
+function ExportForAppliedFilters({ applied, terminalValid, compact = false, className, showIcon = false, scope }: ExportButtonProps & {
   readonly scope: ReadScope
 }) {
   const { getCurrentScope } = useReadRuntime()
@@ -71,15 +74,19 @@ function ExportForAppliedFilters({ applied, terminalValid, compact = false, scop
 
   return <span className="flex flex-wrap items-center gap-2" aria-busy={pending}>
     <Button type="button" variant="outline" size={compact ? 'sm' : 'default'}
+      className={className}
       disabled={pending || !terminalValid}
-      onClick={() => void download()}>Tanlangan filtrlar bo‘yicha XLSX</Button>
+      onClick={() => void download()}>
+      {showIcon ? <FileSpreadsheetIcon className="size-4" aria-hidden="true" /> : null}
+      Tanlangan filtrlar bo‘yicha XLSX
+    </Button>
     {pending ? <Button type="button" variant="ghost" size={compact ? 'sm' : 'default'} onClick={() => { intent.cancel(); setPending(false) }}>Kutishni to‘xtatish</Button> : null}
     {pending ? <span role="status" className="text-xs text-text-secondary">XLSX tayyorlanmoqda.</span> : null}
     {message ? <span role="status" className="text-xs text-text-secondary">{message}</span> : null}
   </span>
 }
 
-export function ExportButton({ applied, terminalValid, intentRevision = 0, compact = false }: ExportButtonProps) {
+export function ExportButton({ applied, terminalValid, intentRevision = 0, compact = false, className, showIcon = false }: ExportButtonProps) {
   const { scope } = useReadRuntime()
   const access = useAccessContext()
   if (!can(access, 'dynamicQr.export', false)) return null
@@ -87,5 +94,5 @@ export function ExportButton({ applied, terminalValid, intentRevision = 0, compa
   const key = JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision,
     filterKey, terminalValid, intentRevision])
   return <ExportForAppliedFilters key={key} applied={applied} terminalValid={terminalValid}
-    compact={compact} scope={scope} />
+    compact={compact} className={className} showIcon={showIcon} scope={scope} />
 }

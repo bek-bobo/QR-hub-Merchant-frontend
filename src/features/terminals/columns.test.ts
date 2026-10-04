@@ -3,7 +3,7 @@ import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/tabl
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
 import { TERMINAL_DEFAULT_COLUMN_ORDER, terminalColumns } from './columns'
 
-const expectedBusinessColumnIds = ['terminalId', 'name', 'merchant', 'bankAccount', 'status'] as const
+const expectedBusinessColumnIds = ['terminalId', 'merchant', 'name', 'bankAccount', 'status'] as const
 
 class MemoryStorage implements TableColumnStorage {
   readonly values = new Map<string, string>()
@@ -53,26 +53,26 @@ describe('Terminal column metadata and preferences', () => {
 
     expect(runtime.toggleVisibility('bankAccount')).toEqual({
       order: expectedBusinessColumnIds,
-      visible: ['terminalId', 'name', 'merchant', 'status'],
+      visible: ['terminalId', 'merchant', 'name', 'status'],
       hidden: ['bankAccount'],
     })
-    expect(runtime.move('merchant', 'name')).toEqual({
-      order: ['terminalId', 'merchant', 'name', 'bankAccount', 'status'],
-      visible: ['terminalId', 'merchant', 'name', 'status'],
+    expect(runtime.move('name', 'terminalId')).toEqual({
+      order: ['name', 'terminalId', 'merchant', 'bankAccount', 'status'],
+      visible: ['name', 'terminalId', 'merchant', 'status'],
       hidden: ['bankAccount'],
     })
     expect(JSON.parse(storage.values.get(TABLE_COLUMN_STORAGE_KEY) ?? '{}')).toEqual({
       version: 2,
       tables: {
         terminals: {
-          order: ['terminalId', 'merchant', 'name', 'bankAccount', 'status'],
+          order: ['name', 'terminalId', 'merchant', 'bankAccount', 'status'],
           hidden: ['bankAccount'],
         },
       },
     })
     expect(createRuntime(storage).getSnapshot()).toEqual({
-      order: ['terminalId', 'merchant', 'name', 'bankAccount', 'status'],
-      visible: ['terminalId', 'merchant', 'name', 'status'],
+      order: ['name', 'terminalId', 'merchant', 'bankAccount', 'status'],
+      visible: ['name', 'terminalId', 'merchant', 'status'],
       hidden: ['bankAccount'],
     })
   })
@@ -87,7 +87,7 @@ describe('Terminal column metadata and preferences', () => {
     const hiddenAfterToggle = runtime.getSnapshot().hidden
     const afterMove = runtime.move('status', 'terminalId')
     expect(new Set(afterMove.visible)).toEqual(new Set(visibleAfterToggle))
-    expect(afterMove.visible).toEqual(['status', 'terminalId', 'merchant', 'name'])
+    expect(afterMove.visible).toEqual(['status', 'terminalId', 'name', 'merchant'])
     expect(afterMove.hidden).toEqual(hiddenAfterToggle)
 
     runtime.toggleVisibility('terminalId')

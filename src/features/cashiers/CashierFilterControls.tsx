@@ -14,9 +14,9 @@ interface QuickSearchProps {
 
 export function CashierQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
   function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onApply(searchDraft) }
-  return <form className="relative w-full min-w-0 sm:w-80" role="search" onSubmit={submit}>
-    <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-secondary" />
-    <Input type="text" enterKeyHint="search" value={searchDraft} className="h-9 pl-9 pr-9"
+  return <form className="relative w-full min-w-0 sm:w-[21rem]" role="search" onSubmit={submit}>
+    <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
+    <Input type="text" enterKeyHint="search" value={searchDraft} className="h-10 rounded-xl bg-surface pl-10 pr-9 text-sm"
       aria-label="F.I.Sh. yoki telefon bo‘yicha qidirish" placeholder="F.I.Sh. yoki telefon"
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"

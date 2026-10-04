@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
-import { HandCoinsIcon, WalletCardsIcon } from 'lucide-react'
+import { CreditCardIcon, InfoIcon, PercentIcon, PlusIcon, ScanLineIcon, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import {
@@ -53,6 +53,8 @@ interface DynamicQrPageProps {
   readonly initialInstant?: Date
 }
 
+const listCardClassName = 'dynamic-qr-list min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4.5)] sm:[--card-spacing:--spacing(6)]'
+
 function initialFiltersFromState(
   initialState: unknown,
   instant = new Date(),
@@ -75,6 +77,60 @@ function ListSkeleton() {
         <div key={index} className="h-10 animate-pulse rounded-lg bg-muted" />
       ))}
     </div>
+  )
+}
+
+function SummaryCard({
+  title,
+  value,
+  icon: Icon,
+  tone,
+  helper,
+}: {
+  readonly title: string
+  readonly value: string
+  readonly icon: LucideIcon
+  readonly tone: 'brand' | 'neutral'
+  readonly helper: string | null
+}) {
+  return (
+    <section
+      aria-label={title}
+      className={`relative min-w-0 overflow-hidden rounded-xl border p-5 ${
+        tone === 'brand'
+          ? 'border-brand/20 bg-linear-to-br from-surface/70 to-brand-soft'
+          : 'border-border bg-linear-to-br from-surface to-muted/40'
+      }`}
+    >
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 180 140"
+        preserveAspectRatio="none"
+        className={`pointer-events-none absolute inset-y-0 right-0 h-full w-2/5 ${tone === 'brand' ? 'text-brand/3' : 'text-text-secondary/3'}`}
+      >
+        <path fill="currentColor" d="M180 0C90 0 130 85 40 140H180Z" />
+        <path fill="currentColor" d="M180 55C115 50 70 105 0 140H180Z" />
+      </svg>
+      <div className="relative flex items-start gap-4">
+        <span className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${
+          tone === 'brand' ? 'bg-brand/7 text-brand' : 'bg-muted text-text-primary'
+        }`}>
+          <Icon className="size-5" aria-hidden="true" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="mt-0.5 text-sm font-semibold text-text-primary">{title}</h2>
+          <p className="mt-2 text-[28px] font-bold leading-tight tracking-tight text-text-primary [overflow-wrap:anywhere] sm:text-3xl">
+            {value}
+          </p>
+          {helper ? (
+            <p role="status" className="mt-2.5 flex items-start gap-2 text-xs leading-5 text-text-secondary">
+              <InfoIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>{helper}</span>
+            </p>
+          ) : null}
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -153,6 +209,7 @@ export function DynamicQrPage({
         onApply={applyFilters}
         onReset={clearFilters}
         triggerSize="sm"
+        triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm"
       >
         <DynamicQrAdvancedFilterFields {...advancedFilterFieldProps(lookups, advancedDraft, setAdvancedDraft)} />
         {lookups.merchants.isError || lookups.draftBanks.isError || lookups.draftTerminals.isError
@@ -164,10 +221,11 @@ export function DynamicQrPage({
 
   function renderQuickFilters() {
     return (
-      <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+      <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
         <DynamicQrQuickFilters
           range={dateDraft}
           searchDraft={searchDraft}
+          searchPlaceholder="Terminal nomi bo‘yicha qidirish"
           onRangeDraftChange={setDateDraft}
           onRangeApply={applyQuickDateRange}
           onRangeReset={restoreQuickDateRange}
@@ -175,7 +233,8 @@ export function DynamicQrPage({
           onSearchApply={applyQuickSearch}
         />
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact />
+          <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact showIcon
+            className="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm" />
           {renderFilterDrawer()}
         </div>
       </div>
@@ -186,7 +245,10 @@ export function DynamicQrPage({
     return (
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         {can(access, 'dynamicQr.create', false) ? (
-          <Button type="button" size="sm" onClick={() => setCreateOpen(true)}>Yangi QR yaratish</Button>
+          <Button type="button" size="sm" className="h-10 gap-2 rounded-xl px-4 text-sm" onClick={() => setCreateOpen(true)}>
+            <PlusIcon className="size-4" aria-hidden="true" />
+            Yangi QR yaratish
+          </Button>
         ) : null}
         <div className="flex min-w-0 items-center gap-2">
           <TableColumnPreferences
@@ -195,6 +257,7 @@ export function DynamicQrPage({
             order={columnPreferences.order}
             hidden={columnPreferences.hidden}
             iconOnly
+            triggerClassName="size-10 rounded-xl bg-muted/30"
             onMoveUp={columnPreferences.moveUp}
             onMoveDown={columnPreferences.moveDown}
             onMove={columnPreferences.move}
@@ -203,6 +266,7 @@ export function DynamicQrPage({
             onReset={columnPreferences.reset}
           />
           <RefreshIconButton
+            className="size-10 rounded-xl bg-muted/30"
             updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
             disabled={!enabled.list || list.isFetching}
             loading={list.isFetching}
@@ -213,6 +277,23 @@ export function DynamicQrPage({
           />
         </div>
       </div>
+    )
+  }
+
+  function renderListHeader() {
+    return (
+      <CardHeader className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+        <div className="flex min-w-0 items-center gap-4.5">
+          <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
+            <ScanLineIcon className="size-7" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Dinamik QR ro‘yxati</CardTitle>
+            <p className="mt-0.5 text-sm leading-5 text-text-secondary">Yaratilgan dinamik QR kodlar va ularning holati</p>
+          </div>
+        </div>
+        {renderTableHeaderActions()}
+      </CardHeader>
     )
   }
 
@@ -234,6 +315,11 @@ export function DynamicQrPage({
   const emptyHighPage = Boolean(
     list.data && list.data.page > 0 && list.data.content.length === 0,
   )
+  const statsHelper = !statsFeatureEnabled
+    ? 'Statistika hozircha mavjud emas'
+    : enabled.stats && stats.isError
+      ? 'Jami summa va xizmat haqini yuklab bo‘lmadi.'
+      : null
 
   return (
     <div className="min-w-0 space-y-4">
@@ -247,63 +333,34 @@ export function DynamicQrPage({
         setSelectedDetailsRow(null)
         setSelectedQrRow(row)
       }} />
-      <Card className="min-w-0 overflow-hidden">
-        <CardContent className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
-          <p className="text-xs text-text-secondary sm:col-span-2">Jami summa va xizmat haqi sana oralig‘i va terminal bo‘yicha.</p>
-          <section className="min-w-0 rounded-xl border border-brand/15 bg-brand-soft/60 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium text-text-secondary">Jami summa</p>
-              <span className="rounded-lg bg-surface/80 p-2 text-brand">
-                <WalletCardsIcon className="size-4" aria-hidden="true" />
-              </span>
-            </div>
-            <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
-                {enabled.stats && stats.data ? formatMoney(stats.data.totalAmount) : '—'}
-            </p>
-          </section>
-          <section className="min-w-0 rounded-xl border border-border bg-muted/40 p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium text-text-secondary">Xizmat haqi</p>
-              <span className="rounded-lg bg-surface p-2 text-text-secondary">
-                <HandCoinsIcon className="size-4" aria-hidden="true" />
-              </span>
-            </div>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
-                  {enabled.stats && stats.data
-                      ? formatMoney(stats.data.totalServiceFeeAmount)
-                      : '—'}
-              </p>
-          </section>
-          {!statsFeatureEnabled ? (
-            <p role="status" className="text-xs text-text-secondary sm:col-span-2">
-              Statistika hozircha mavjud emas
-            </p>
-          ) : null}
-          {enabled.stats && stats.isError ? (
-            <p role="status" className="text-xs text-text-secondary sm:col-span-2">
-              Jami summa va xizmat haqini yuklab bo‘lmadi.
-            </p>
-          ) : null}
-        </CardContent>
-      </Card>
+      <div className="grid min-w-0 gap-4 sm:grid-cols-2">
+        <SummaryCard
+          title="Jami summa"
+          icon={CreditCardIcon}
+          tone="brand"
+          value={enabled.stats && stats.data ? formatMoney(stats.data.totalAmount) : '—'}
+          helper={statsHelper}
+        />
+        <SummaryCard
+          title="Xizmat haqi"
+          icon={PercentIcon}
+          tone="neutral"
+          value={enabled.stats && stats.data ? formatMoney(stats.data.totalServiceFeeAmount) : '—'}
+          helper={statsHelper}
+        />
+      </div>
 
       {filterState === 'checking' ? (
-        <Card className="min-w-0">
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle>Dinamik QR ro‘yxati</CardTitle>
-            {renderTableHeaderActions()}
-          </CardHeader>
+        <Card className={listCardClassName}>
+          {renderListHeader()}
           <CardContent className="space-y-4 text-sm text-text-secondary">
             {renderQuickFilters()}
             <p>Tanlangan filtrlar tekshirilmoqda.</p>
           </CardContent>
         </Card>
       ) : filterState === 'invalid' ? (
-        <Card className="min-w-0">
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle>Dinamik QR ro‘yxati</CardTitle>
-            {renderTableHeaderActions()}
-          </CardHeader>
+        <Card className={listCardClassName}>
+          {renderListHeader()}
           <CardContent className="space-y-3">
             {renderQuickFilters()}
             <div>
@@ -318,12 +375,9 @@ export function DynamicQrPage({
           </CardContent>
         </Card>
       ) : (
-        <Card className="min-w-0" aria-busy={list.isFetching}>
-          <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle>Dinamik QR ro‘yxati</CardTitle>
-            {renderTableHeaderActions()}
-          </CardHeader>
-          <CardContent className="min-w-0 space-y-4">
+        <Card className={listCardClassName} aria-busy={list.isFetching}>
+          {renderListHeader()}
+          <CardContent className="min-w-0 space-y-4.5">
             {renderQuickFilters()}
             {list.isPending ? (
               <ListSkeleton />
@@ -357,7 +411,9 @@ export function DynamicQrPage({
             {list.data ? (
               <PaginationBar ariaLabel="Dinamik QR sahifalari"
                 currentPage={list.data.page} totalPages={list.data.totalPages}
-                totalItems={list.data.totalElements} showTotal={false}
+                totalItems={list.data.totalElements}
+                totalLabel={`Jami ${list.data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+                className="dynamic-qr-pagination border-0 pt-2"
                 onPageChange={goToPage} />
             ) : null}
           </CardContent>

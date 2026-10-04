@@ -74,7 +74,7 @@ export function BankAccountPage() {
   if (!runtime.capabilities.bankAccountList) return <NoAccessState description="Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.bankAccountList.kind === 'unavailable') return <ErrorState title="Bank hisoblari integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl">
+  return <div className="mx-auto min-w-0 max-w-[96rem]">
     <BankAccountResults blocked={!parentReady} pending={list.isPending} error={list.isError} data={list.data}
       columnOrder={columnPreferences.order}
       visibleColumnIds={columnPreferences.visible}
@@ -82,7 +82,7 @@ export function BankAccountPage() {
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       quickFilters={<BankAccountQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={applySearch} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
           <BankAccountMerchantFilter merchantId={merchantDraft.merchantId} merchants={merchants.data}
             state={merchantPresentation} onChange={(merchantId) => setMerchantDraft({ merchantId })} />
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
@@ -93,6 +93,7 @@ export function BankAccountPage() {
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
           iconOnly
+          triggerClassName="size-10 rounded-xl bg-muted/30"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}
@@ -101,6 +102,7 @@ export function BankAccountPage() {
           onReset={columnPreferences.reset}
         />
         <RefreshIconButton
+          className="size-10 rounded-xl bg-muted/30"
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}

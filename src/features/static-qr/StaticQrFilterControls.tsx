@@ -15,9 +15,9 @@ interface QuickSearchProps {
 
 export function StaticQrQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
   function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onApply(searchDraft) }
-  return <form className="relative w-full min-w-0 sm:w-80" role="search" onSubmit={submit}>
-    <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-secondary" />
-    <Input type="text" enterKeyHint="search" value={searchDraft} className="h-9 pl-9 pr-9"
+  return <form className="relative w-full min-w-0 sm:w-[min(100%,24rem)]" role="search" onSubmit={submit}>
+    <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
+    <Input type="text" enterKeyHint="search" value={searchDraft} className="h-10 rounded-xl bg-surface pl-12 pr-10 text-sm"
       aria-label="QR ID bo‘yicha qidirish" placeholder="QR ID bo‘yicha"
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"

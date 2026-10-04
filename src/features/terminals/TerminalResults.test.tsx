@@ -24,16 +24,17 @@ describe('terminal results', () => {
     expect(html).toContain('aria-label="Amallarni ochish"')
     expect(html).toContain('aria-label="Terminal sahifalari"')
     expect(html).toContain('flex-wrap')
-    expect(html).toContain('min-w-[40rem]')
+    expect(html).toContain('overflow-x-auto')
     expect(html).not.toContain('bg-red-')
   })
-  it('preserves duplicate rows while hiding the visible total and presenting unknown status neutrally', () => {
+  it('preserves duplicate rows, shows the server total and presents unknown status neutrally', () => {
     const html = render()
     const normalizedHtml = html.replace(/<!-- -->/g, '')
     expect(html.match(/Terminal A/g)).toHaveLength(2)
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
     expect(normalizedHtml).not.toContain('Jami: 47')
+    expect(normalizedHtml).toContain('Jami 47 ta yozuv')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')
@@ -52,7 +53,7 @@ describe('terminal results', () => {
   })
   it('renders every default business column with fixed final actions', () => {
     expect(cellTexts(render({ data: { ...data, content: [row] } }), 'th')).toEqual([
-      'Terminal ID', 'Nomi', 'Merchant', 'Bank hisobi', 'Holat', 'Amallar',
+      'Terminal ID', 'Merchant', 'Nomi', 'Bank hisobi', 'Holat', 'Amallar',
     ])
     expect(render()).toContain('aria-label="Amallarni ochish"')
     expect(render()).toContain('sticky right-0')

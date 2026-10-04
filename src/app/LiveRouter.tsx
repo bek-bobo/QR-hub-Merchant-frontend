@@ -74,6 +74,8 @@ function LiveShell({
           navigationControls={navigation.controls}
           navigationTriggerRef={navigation.triggerRef}
           onOpenNavigation={navigation.openNavigation}
+          sidebarCollapsed={navigation.sidebarCollapsed}
+          onToggleSidebar={navigation.toggleSidebar}
           identityLabel={identityLabel}
           identitySecondary={profile?.roles[0]}
           compactAccountControls

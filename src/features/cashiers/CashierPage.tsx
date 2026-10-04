@@ -182,10 +182,11 @@ export function CashierPage() {
   function renderHeaderActions() {
     return <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
       {canCreate ? <Button ref={createTrigger} type="button" size="sm" aria-label="Yangi kassir yaratish" aria-haspopup="dialog"
+        className="h-10 gap-2 rounded-xl px-4 text-sm"
         aria-expanded={createOpen} onClick={() => setCreateScope(runtime.getCurrentScope())}>
         <UserPlusIcon aria-hidden="true" />Yangi kassir
       </Button> : null}
-      <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+      <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
         <CashierAdvancedFilterFields draft={reconciledDraft} merchants={merchants.data} terminals={draftTerminals.data}
           merchantState={merchantPresentation} terminalState={terminalPresentation} onChange={setDraft} appliedTerminalId={applied.terminalId}
           onReconcileDraft={reconciledDraft !== draft ? () => setDraft(reconciledDraft) : undefined} />
@@ -197,6 +198,7 @@ export function CashierPage() {
         order={columnPreferences.order}
         hidden={columnPreferences.hidden}
         iconOnly
+        triggerClassName="size-10 rounded-xl bg-muted/30"
         onMoveUp={columnPreferences.moveUp}
         onMoveDown={columnPreferences.moveDown}
         onMove={columnPreferences.move}
@@ -205,6 +207,7 @@ export function CashierPage() {
         onReset={columnPreferences.reset}
       />
       <RefreshIconButton
+        className="size-10 rounded-xl bg-muted/30"
         updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
         disabled={!listOptions.enabled || list.isFetching}
         loading={list.isFetching}
@@ -216,7 +219,7 @@ export function CashierPage() {
   if (!runtime.capabilities.cashierList) return <NoAccessState description="Kassirlar ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.cashierList.kind === 'unavailable') return <ErrorState title="Kassirlar integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl">
+  return <div className="mx-auto min-w-0 max-w-[96rem]">
     {visibleData ? <ScopedCashierResults key={cashierSelectionKey(listOptions.queryKey, visibleData)} data={visibleData} scope={runtime.scope} resultKey={listOptions.queryKey} dataUpdatedAt={list.dataUpdatedAt} getCurrentScope={runtime.getCurrentScope}
       columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}

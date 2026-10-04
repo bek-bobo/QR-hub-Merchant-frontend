@@ -75,7 +75,7 @@ export function StaticQrPage() {
   if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title="Statik QR autentifikatsiyasi sozlanmagan" />
   if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl">
+  return <div className="mx-auto min-w-0 max-w-[96rem]">
     <StaticQrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
       if (!open) setSelectedQrRow(null)
     }} />
@@ -95,11 +95,12 @@ export function StaticQrPage() {
       onViewDetails={setSelectedDetailsRow}
       quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
         onApply={(search) => setApplied((current) => applyStaticQrQuickSearch(current, search))} />}
-      headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+      headerActions={<div className="flex min-w-0 flex-wrap items-center gap-3 sm:justify-end">
         <FilterDrawer
           onApply={applyFilters}
           onReset={resetFilters}
           triggerSize="sm"
+          triggerClassName="h-10 gap-2 rounded-xl border-brand/60 bg-brand-soft/40 px-5 text-sm text-brand hover:bg-brand-soft hover:text-brand aria-expanded:bg-brand-soft aria-expanded:text-brand"
         >
           <StaticQrAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
@@ -110,7 +111,8 @@ export function StaticQrPage() {
           items={staticQrColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
-          iconOnly
+          triggerLabel="Ustunlar"
+          triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-5 text-sm"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}
@@ -119,6 +121,7 @@ export function StaticQrPage() {
           onReset={columnPreferences.reset}
         />
         <RefreshIconButton
+          className="size-10 rounded-xl bg-surface"
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}

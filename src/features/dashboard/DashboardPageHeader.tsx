@@ -21,7 +21,7 @@ export function DashboardPageHeader({
   onRefresh,
 }: DashboardPageHeaderProps) {
   return (
-    <div className="flex min-w-0 flex-col gap-2">
+    <div className="dashboard-filter-toolbar flex min-w-0 flex-col gap-2 rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm sm:px-4">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
         {quickFilters ? <div className="min-w-0 w-full sm:w-auto">{quickFilters}</div> : null}
         <div className="ml-auto flex min-w-0 flex-wrap items-center gap-2">
@@ -33,6 +33,7 @@ export function DashboardPageHeader({
                   type="button"
                   variant="outline"
                   size="sm"
+                  className="h-9 rounded-xl bg-surface px-3"
                   disabled={refreshDisabled}
                   onClick={onRefresh}
                 >

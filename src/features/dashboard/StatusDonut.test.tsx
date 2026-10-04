@@ -63,13 +63,16 @@ describe('StatusDonut', () => {
     const html = renderToStaticMarkup(<StatusDonut {...viewWith([1, 1, 2])} />)
 
     expect(html).toContain('data-plot="pie"')
-    expect(html).not.toContain('<svg')
+    // The title icon is SVG; the distribution still uses the existing Pie adapter.
+    expect(html.slice(html.indexOf('role="img"'))).not.toContain('<svg')
     expect(html).toContain('role="img"')
     expect(html).toContain('Muvaffaqiyatli: 25%')
     expect(html).toContain('Jarayonda: 25%')
     expect(html).toContain('Muvaffaqiyatsiz: 50%')
-    expect(html).toContain('1 · 25%')
-    expect(html).toContain('2 · 50%')
+    expect(html).toContain('>1</span>')
+    expect(html).toContain('>25%</span>')
+    expect(html).toContain('>2</span>')
+    expect(html).toContain('>50%</span>')
     expect(html).toContain('100.00 UZS')
     expect(html).toContain('200.00 UZS')
   })
@@ -81,7 +84,7 @@ describe('StatusDonut', () => {
     expect(html).toContain('data-empty="true"')
     expect(html).not.toContain('NaN')
     expect(html).not.toContain('Infinity')
-    expect(html.match(/0 · 0%/g)).toHaveLength(3)
+    expect(html.match(/>0%<\/span>/g)).toHaveLength(3)
     expect(html).toMatch(/<dd\b[^>]*>—<\/dd>/)
     expect(html).toContain('Tanlangan davrda tranzaksiyalar mavjud emas.')
     expect(html).not.toMatch(/<dd\b[^>]*>0%<\/dd>/)
@@ -95,7 +98,7 @@ describe('StatusDonut', () => {
     const html = renderToStaticMarkup(<StatusDonut {...viewWith(counts)} />)
     expect(html).toContain('Muvaffaqiyat ulushi')
     expect(html).toMatch(new RegExp(`<dd\\b[^>]*>${expected}</dd>`))
-    const shareTag = html.match(/<dd\b[^>]*>/)?.[0] ?? ''
+    const shareTag = html.match(new RegExp(`<dd\\b[^>]*>${expected}</dd>`))?.[0] ?? ''
     expect(shareTag).toContain('text-text-primary')
     expect(shareTag).not.toContain('text-status-')
     expect(html).toContain('Jami tranzaksiyalar soniga nisbatan')
@@ -114,10 +117,10 @@ describe('StatusDonut', () => {
     expect(html).not.toContain('data-plot="pie"')
     expect(html).toMatch(/<p\b[^>]*text-text-primary[^>]*>100<\/p>/)
     const details = html.slice(html.indexOf('<dl', html.indexOf('data-empty')))
-    expect(details).toContain('>60</p>')
-    expect(details).toContain('>20</p>')
-    expect(details).toContain('>10</p>')
-    expect(details).not.toContain('%</p>')
+    expect(details).toContain('>60</span>')
+    expect(details).toContain('>20</span>')
+    expect(details).toContain('>10</span>')
+    expect(details).not.toContain('%</span>')
     for (const amount of ['6 000.00 UZS', '2 000.00 UZS', '1 000.00 UZS']) expect(details).toContain(amount)
     expect(html).not.toMatch(/Boshqa|Unknown|Bekor qilingan|Rad etilgan/)
     expect(JSON.stringify(data)).toBe(original)
@@ -140,9 +143,10 @@ describe('StatusDonut', () => {
     for (const tone of ['success', 'warning', 'error']) {
       expect(html).toContain(`bg-status-${tone}-indicator`)
     }
-    expect(html).not.toContain('text-status-')
-    expect(html).toContain('1 · 25%')
-    expect(html).toContain('2 · 50%')
+    expect(html).toContain('>1</span>')
+    expect(html).toContain('>25%</span>')
+    expect(html).toContain('>2</span>')
+    expect(html).toContain('>50%</span>')
     expect(html).toContain('100.00 UZS')
     expect(html).toContain('200.00 UZS')
     expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
@@ -155,7 +159,10 @@ describe('StatusDonut', () => {
     const total = Number.MAX_SAFE_INTEGER
     const data = { ...base, metrics: { ...base.metrics, total: metric(total, '900719925474099301') } }
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
-    const center = html.match(/<p\b[^>]*>([^<]*)<\/p>/g)?.find((tag) => tag.includes(total.toLocaleString('uz-UZ')))
+    const centers = [...html.matchAll(/<p\b[^>]*data-slot="donut-center-total"[^>]*>([^<]*)<\/p>/g)]
+    expect(centers).toHaveLength(1)
+    expect(centers[0]?.[1]).toBe(total.toLocaleString('uz-UZ'))
+    const center = centers[0]?.[0]
     expect(center).toBeDefined()
     expect(center).toContain('[overflow-wrap:anywhere]')
     expect(center).toContain('text-text-primary')

@@ -1,6 +1,7 @@
 import { TrendPlotViewport } from './TrendPlotViewport'
 import { useMerchantPlotTheme } from './plot-theme'
 import { useState, type ReactNode } from 'react'
+import { ChartNoAxesColumnIncreasingIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -17,22 +18,27 @@ import { useTrendSeriesPreferences } from './useTrendSeriesPreferences'
 interface TrendChartProps {
   readonly view: DashboardView
   readonly rangeControls?: ReactNode
+  readonly periodLabel?: ReactNode
   readonly feedback?: ReactNode
   readonly plotUnavailable?: boolean
 }
 
-export function TrendChart({ view, rangeControls, feedback, plotUnavailable = false }: TrendChartProps) {
+export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUnavailable = false }: TrendChartProps) {
   const [mode, setMode] = useState<TrendMode>('count')
   const { visible, toggle } = useTrendSeriesPreferences()
   const theme = useMerchantPlotTheme()
 
   return (
-    <Card className="min-w-0">
+    <Card className="dashboard-trend min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4)] sm:[--card-spacing:--spacing(5)]">
       <CardHeader className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
+        <div className="flex min-w-0 items-start gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><ChartNoAxesColumnIncreasingIcon className="size-5" aria-hidden="true" /></span>
+          <div className="min-w-0">
           <CardTitle>Tranzaksiyalar dinamikasi</CardTitle>
-          <p className="mt-1 text-xs text-text-secondary">{mode === 'amount' ? 'Summa (UZS)' : 'Tranzaksiyalar soni'}</p>
+          <p className="mt-1 text-xs text-text-secondary">{mode === 'amount' ? 'Summa (UZS)' : 'Tranzaksiyalar soni (dona)'}</p>
+          {periodLabel}
           {!plotUnavailable ? <p className="mt-1 text-xs text-text-secondary">Guruhlash: {TREND_GROUP_LABELS[view.chartGroupBy]}</p> : null}
+          </div>
         </div>
         <div className="flex min-w-0 max-w-full flex-wrap items-start gap-2">
           {rangeControls}
@@ -40,7 +46,7 @@ export function TrendChart({ view, rangeControls, feedback, plotUnavailable = fa
             {(['amount', 'count'] as const).map((option) => (
               <Button key={option} type="button" variant="outline" size="sm"
                 aria-pressed={mode === option}
-                className="border-transparent bg-transparent shadow-none dark:bg-transparent aria-pressed:border-border aria-pressed:bg-card aria-pressed:text-text-primary aria-pressed:font-semibold dark:aria-pressed:bg-card"
+                className="rounded-lg border-transparent bg-transparent shadow-none dark:bg-transparent aria-pressed:border-brand/20 aria-pressed:bg-brand-soft aria-pressed:text-brand aria-pressed:font-semibold dark:aria-pressed:bg-brand-soft"
                 onClick={() => { setMode(option) }}>
                 {option === 'amount' ? 'Summa' : 'Soni'}
               </Button>
@@ -50,14 +56,6 @@ export function TrendChart({ view, rangeControls, feedback, plotUnavailable = fa
         </div>
       </CardHeader>
       <CardContent className="min-w-0 space-y-5">
-        <ul aria-label="Trend qatorlari" className="flex flex-wrap gap-x-3 gap-y-2 text-xs text-text-secondary">
-          {TREND_SERIES.filter((item) => visible.includes(item.key)).map((item) => (
-            <li key={item.key} className="flex items-center gap-2 py-1">
-              <span aria-hidden="true" className={`h-0.5 w-3 shrink-0 rounded-full ${item.swatch}`} />
-              <span>{item.label}</span>
-            </li>
-          ))}
-        </ul>
         {feedback}
         {plotUnavailable ? null : view.buckets.length === 0 ? (
           <p className="rounded-lg border border-dashed p-6 text-center text-sm text-text-secondary">
@@ -71,6 +69,14 @@ export function TrendChart({ view, rangeControls, feedback, plotUnavailable = fa
               : <div className="h-80" />}
           </div>
         )}
+        <ul aria-label="Trend qatorlari" className="flex flex-wrap gap-x-5 gap-y-2 text-xs text-text-secondary">
+          {TREND_SERIES.filter((item) => visible.includes(item.key)).map((item) => (
+            <li key={item.key} className="flex items-center gap-2 py-1">
+              <span aria-hidden="true" className={`size-2.5 shrink-0 rounded-full ${item.swatch}`} />
+              <span>{item.label}{!plotUnavailable ? ` (${mode === 'amount' ? formatMoney(view.metrics[item.key].amount) : view.metrics[item.key].count.toLocaleString('uz-UZ')})` : ''}</span>
+            </li>
+          ))}
+        </ul>
         {!plotUnavailable && view.buckets.length > 0 ? (
           <section className="sr-only" aria-label="Trend: davrlar bo‘yicha aniq qiymatlar">
             <p>Har bir davr uchun barcha to‘rt seriyaning aniq soni va summasi, yashirilgan seriyalar bilan birga.</p>

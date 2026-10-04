@@ -18,12 +18,12 @@ interface DynamicQrColumnDefinition<Id extends string = string>
 
 const dynamicQrColumnDefinitions = [
   {
-    id: 'qrId',
-    label: 'QR ID',
+    id: 'merchant',
+    label: 'Merchant',
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: DynamicQrRow) => <MetadataId value={row.pkey} />,
+    renderCell: (row: DynamicQrRow) => presentNullableCell(row.merchantName),
   },
   {
     id: 'createdAt',
@@ -42,12 +42,12 @@ const dynamicQrColumnDefinitions = [
     renderCell: (row: DynamicQrRow) => presentNullableCell(row.terminalName),
   },
   {
-    id: 'merchant',
-    label: 'Merchant',
+    id: 'qrId',
+    label: 'QR ID',
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: DynamicQrRow) => presentNullableCell(row.merchantName),
+    renderCell: (row: DynamicQrRow) => <MetadataId value={row.pkey} className="max-w-none whitespace-normal break-all" />,
   },
   {
     id: 'amount',
@@ -68,8 +68,9 @@ const dynamicQrColumnDefinitions = [
     renderCell: (row: DynamicQrRow) => {
       const status = presentQrStatus(row.statusCode)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-          {status.label}
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} gap-1.5 rounded-full px-2.5 py-1 font-medium`}>
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
+          <span>{status.label}</span>
         </Badge>
       )
     },
@@ -90,8 +91,7 @@ export type DynamicQrColumn = DynamicQrColumnDefinition & {
   readonly id: DynamicQrColumnId
 }
 
-export const dynamicQrColumns: readonly DynamicQrColumn[] =
-  dynamicQrColumnDefinitions
+export const dynamicQrColumns: readonly DynamicQrColumn[] = dynamicQrColumnDefinitions
 
 export const DYNAMIC_QR_DEFAULT_COLUMN_ORDER: readonly DynamicQrColumnId[] =
-  dynamicQrColumnDefinitions.map((column) => column.id)
+  dynamicQrColumns.map((column) => column.id)

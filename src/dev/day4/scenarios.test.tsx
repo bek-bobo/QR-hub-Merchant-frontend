@@ -196,8 +196,11 @@ describe('D4 static preview data', () => {
     expect(html).not.toContain('Muvaffaqiyatli')
     expect(html).not.toContain('To‘lov havolasi QR kodi')
     expect(html).not.toContain('Havolani nusxalash')
-    expect(html).not.toContain('<a ')
-    expect(html).not.toContain('href=')
+    // SSR may emit image-preload links; these are not canonical QR links.
+    expect(html).not.toMatch(/<a\b[^>]*>/i)
+    expect(html).not.toMatch(/<link\b[^>]*\brel="canonical"/i)
+    expect(html).not.toContain(d4CreateLink.replaceAll('&', '&amp;'))
+    expect(page.content.every((row) => row.link === null && row.redirectUrl === null)).toBe(true)
     expect(d4StaticRows.every((row) => row.link === null && row.redirectUrl === null)).toBe(true)
   })
 

@@ -19,7 +19,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    cellClassName: 'font-medium text-foreground',
+    cellClassName: 'whitespace-normal break-words font-semibold text-foreground',
     renderCell: (row: BankAccountRow) => row.name,
   },
   {
@@ -28,6 +28,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: BankAccountRow) => row.bankName,
   },
   {
@@ -36,7 +37,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: BankAccountRow) => <MetadataId value={row.accountNumber} />,
+    renderCell: (row: BankAccountRow) => <MetadataId value={row.accountNumber} className="max-w-none whitespace-normal break-all font-sans text-sm font-normal tabular-nums" />,
   },
   {
     id: 'merchant',
@@ -44,6 +45,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: BankAccountRow) => row.merchantName,
   },
   {
@@ -52,7 +54,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    cellClassName: 'font-mono text-xs tabular-nums',
+    cellClassName: 'whitespace-normal break-all tabular-nums',
     renderCell: (row: BankAccountRow) => row.mfo ?? '—',
   },
   {
@@ -61,7 +63,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    cellClassName: 'font-mono text-xs tabular-nums',
+    cellClassName: 'whitespace-normal break-all tabular-nums',
     renderCell: (row: BankAccountRow) => row.tin ?? '—',
   },
   {
@@ -70,6 +72,7 @@ const bankAccountColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: BankAccountRow) => row.contractNumber ?? '—',
   },
   {
@@ -81,8 +84,9 @@ const bankAccountColumnDefinitions = [
     renderCell: (row: BankAccountRow) => {
       const status = presentActiveStatus(row.statusCode)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-          {status.label}
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full gap-1.5 rounded-full px-2.5 py-1 font-medium whitespace-normal`}>
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
+          <span>{status.label}</span>
         </Badge>
       )
     },

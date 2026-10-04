@@ -74,11 +74,12 @@ describe('static QR result presentation', () => {
     expect(html).not.toContain('Statik QR sahifalari')
   })
 
-  it('uses accessible, bounded pagination without visible total text', () => {
+  it('uses accessible, bounded pagination with the authoritative QR total', () => {
     const first = render()
     expect(first).toContain('aria-label="Oldingi sahifa" disabled=""')
     expect(first).toContain('aria-label="Keyingi sahifa"')
     expect(first.replace(/<!-- -->/g, '')).not.toContain('Jami: 2')
+    expect(first).toContain('2 ta QR topildi')
     expect(first).toContain('aria-current="page"')
     expect(first).toContain('>1</button>')
     const last = render({ page: 1, data: { ...data, page: 1 } })

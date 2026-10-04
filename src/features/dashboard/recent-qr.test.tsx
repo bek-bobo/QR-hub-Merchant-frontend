@@ -224,7 +224,7 @@ describe('Dashboard recent QR async presentation', () => {
 
   it('renders normal data with all columns, neutral cells, and badge-only status treatment', () => {
     const html = panel(successfulRecentQrQuery(recentQrPage()))
-    expect(headers(html)).toEqual(['QR ID', 'Vaqt', 'Terminal', 'Summa', 'Status', 'Amallar'])
+    expect(headers(html)).toEqual(['Summa', 'QR ID', 'Vaqt', 'Terminal', 'Status', 'Amallar'])
     for (const value of ['dashboard-qr-exact', 'Terminal A', '5 000.00 UZS', '30.09.2026 11:26']) {
       expect(html).toContain(value)
     }
@@ -281,16 +281,16 @@ describe('Dashboard recent QR preferences and actions', () => {
     expect(target).toBeDefined()
     ;(target!.props.onDrop as (event: { preventDefault: () => void }) => void)({ preventDefault: () => undefined })
     expect(preferences.getSnapshot().hidden).toEqual(hidden)
-    expect(headers(table(preferences))).toEqual(['QR ID', 'Status', 'Vaqt', 'Summa', 'Amallar'])
+    expect(headers(table(preferences))).toEqual(['Summa', 'QR ID', 'Status', 'Vaqt', 'Amallar'])
     expect(renderToStaticMarkup(list)).toContain('draggable="true"')
     expect(renderToStaticMarkup(list)).not.toContain('data-column-id="actions"')
   })
 
   it('defines only five customizable business columns in the compact default order', () => {
     expect(DASHBOARD_RECENT_QR_TABLE_KEY).toBe('dashboardRecentQr')
-    expect(dashboardRecentQrColumns.map(({ id }) => id)).toEqual(['qrId', 'createdAt', 'terminal', 'amount', 'status'])
+    expect(dashboardRecentQrColumns.map(({ id }) => id)).toEqual(['amount', 'qrId', 'createdAt', 'terminal', 'status'])
     expect(dashboardRecentQrColumns.every((column) => column.defaultVisible && column.hideable && column.reorderable)).toBe(true)
-    expect(headers(table(runtime().preferences))).toEqual(['QR ID', 'Vaqt', 'Terminal', 'Summa', 'Status', 'Amallar'])
+    expect(headers(table(runtime().preferences))).toEqual(['Summa', 'QR ID', 'Vaqt', 'Terminal', 'Status', 'Amallar'])
   })
 
   it('hides headers and cells, restores saved position, and keeps actions final', () => {
@@ -299,10 +299,10 @@ describe('Dashboard recent QR preferences and actions', () => {
     const order = preferences.getSnapshot().order
     preferences.toggleVisibility('terminal')
     expect(preferences.getSnapshot().order).toEqual(order)
-    expect(headers(table(preferences))).toEqual(['QR ID', 'Vaqt', 'Summa', 'Status', 'Amallar'])
+    expect(headers(table(preferences))).toEqual(['Summa', 'QR ID', 'Vaqt', 'Status', 'Amallar'])
     expect(table(preferences)).not.toContain('Terminal A')
     preferences.toggleVisibility('terminal')
-    expect(headers(table(preferences))[0]).toBe('Terminal')
+    expect(headers(table(preferences))).toEqual(['Summa', 'Terminal', 'QR ID', 'Vaqt', 'Status', 'Amallar'])
     expect(table(preferences)).toContain('aria-label="Amallarni ochish"')
   })
 
@@ -312,7 +312,7 @@ describe('Dashboard recent QR preferences and actions', () => {
     const hidden = preferences.getSnapshot().hidden
     preferences.move('status', 'createdAt')
     expect(preferences.getSnapshot().hidden).toEqual(hidden)
-    expect(headers(table(preferences))).toEqual(['QR ID', 'Status', 'Vaqt', 'Summa', 'Amallar'])
+    expect(headers(table(preferences))).toEqual(['Summa', 'QR ID', 'Status', 'Vaqt', 'Amallar'])
     expect(TABLE_COLUMN_STORAGE_KEY).toBe('qrhub:table-columns:v2')
     expect([...values.keys()]).toEqual([TABLE_COLUMN_STORAGE_KEY])
     expect(values.get(TABLE_COLUMN_STORAGE_KEY)).toContain('dashboardRecentQr')
@@ -329,7 +329,7 @@ describe('Dashboard recent QR preferences and actions', () => {
     preferences.move('status', 'qrId')
     preferences.reset()
     expect(preferences.getSnapshot().hidden).toEqual([])
-    expect(headers(table(preferences))).toEqual(['QR ID', 'Vaqt', 'Terminal', 'Summa', 'Status', 'Amallar'])
+    expect(headers(table(preferences))).toEqual(['Summa', 'QR ID', 'Vaqt', 'Terminal', 'Status', 'Amallar'])
   })
 
   it('reuses loaded source-confirmed details without mutating the DTO', () => {

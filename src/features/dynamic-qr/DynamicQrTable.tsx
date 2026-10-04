@@ -53,9 +53,34 @@ export function DynamicQrTableContent({
   onViewDetails,
 }: DynamicQrTableContentProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const widths: Record<DynamicQrColumnId, number> = {
+    merchant: 150,
+    createdAt: 156,
+    terminal: 170,
+    qrId: 280,
+    amount: 125,
+    status: 150,
+    rrn: 96,
+  }
+  const actionsWidth = 76
+  const totalWidth = columns.reduce((width, column) => width + widths[column.id], actionsWidth)
+  const flexibleIds = new Set<DynamicQrColumnId>(['merchant', 'terminal', 'qrId'])
+  const flexibleCount = columns.filter((column) => flexibleIds.has(column.id)).length
 
   return (
-    <Table className="min-w-[60rem]">
+    <Table className="dynamic-qr-table table-fixed" style={{ minWidth: totalWidth, width: flexibleCount > 0 ? '100%' : totalWidth }}>
+      <colgroup>
+        {columns.map((column) => (
+          <col key={column.id} style={{
+            width: !flexibleIds.has(column.id)
+              ? widths[column.id]
+              : column.id === 'qrId' && flexibleCount > 1
+                ? `${widths.qrId / totalWidth * 100}%`
+                : undefined,
+          }} />
+        ))}
+        <col style={{ width: actionsWidth }} />
+      </colgroup>
       <TableHeader>
         <TableRow>
           {columns.map((column) => (
@@ -63,18 +88,18 @@ export function DynamicQrTableContent({
               {column.label}
             </TableHead>
           ))}
-          <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
+          <TableHead className="sticky right-0 text-right" style={{ paddingInline: 12 }}>Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.pkey}>
             {columns.map((column) => (
-              <TableCell key={column.id} className={column.cellClassName}>
+              <TableCell key={column.id} className={`${column.cellClassName ?? ''} ${column.id === 'merchant' || column.id === 'terminal' || column.id === 'rrn' ? 'whitespace-normal break-words' : ''}`}>
                 {column.renderCell(row)}
               </TableCell>
             ))}
-            <TableCell className="sticky right-0 bg-surface text-right">
+            <TableCell className="sticky right-0 bg-surface text-right" style={{ paddingInline: 12 }}>
               <DynamicQrActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />
             </TableCell>
           </TableRow>
@@ -92,7 +117,7 @@ export function DynamicQrTable({
   onViewDetails,
 }: DynamicQrTableProps) {
   return (
-    <TableScrollRegion ariaLabel="Dinamik QR ro‘yxati">
+    <TableScrollRegion ariaLabel="Dinamik QR ro‘yxati" className="rounded-2xl border border-border/70 focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2">
       <DynamicQrTableContent rows={rows} columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
         onViewQr={onViewQr} onViewDetails={onViewDetails} />
     </TableScrollRegion>

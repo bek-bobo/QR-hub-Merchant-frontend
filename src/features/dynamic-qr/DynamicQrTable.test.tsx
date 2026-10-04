@@ -42,7 +42,7 @@ describe('DynamicQrTable column preferences pilot', () => {
         onViewQr={onViewQr} onViewDetails={onViewDetails} />,
     )
     expect(cellTexts(html, 'th')).toEqual([
-      'QR ID', 'Yaratilgan vaqt', 'Terminal', 'Merchant', 'Summa', 'Status', 'RRN', 'Amallar',
+      'Merchant', 'Yaratilgan vaqt', 'Terminal', 'QR ID', 'Summa', 'Status', 'RRN', 'Amallar',
     ])
   })
 

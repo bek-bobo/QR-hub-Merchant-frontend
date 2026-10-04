@@ -6,10 +6,10 @@ import {
 } from './columns'
 
 const expectedBusinessColumnIds = [
-  'qrId',
+  'merchant',
   'createdAt',
   'terminal',
-  'merchant',
+  'qrId',
   'amount',
   'status',
   'rrn',
@@ -47,10 +47,10 @@ describe('Dynamic QR column metadata', () => {
       fixedIds: ['action'],
     })).toEqual([
       'rrn',
-      'qrId',
+      'merchant',
       'createdAt',
       'terminal',
-      'merchant',
+      'qrId',
       'amount',
       'status',
     ])

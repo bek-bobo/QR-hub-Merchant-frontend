@@ -68,7 +68,6 @@ export function ChartRangeController({ view, filters, initialInstant }: ChartLoc
           value={draft} onDraftChange={setDraft} onApply={applyCustom} onReset={reset} />
       </div>
     </div>
-    <p className="text-xs text-text-secondary">Grafik davri: {request.fromDate} → {request.toDate}</p>
     {validation ? <p role="alert" className="text-xs text-destructive">{validation}</p> : null}
   </div>
 
@@ -80,5 +79,7 @@ export function ChartRangeController({ view, filters, initialInstant }: ChartLoc
     </div> : null}
   </> : null
 
-  return <TrendChart view={data ?? view} rangeControls={controls} feedback={feedback} plotUnavailable={!data} />
+  return <TrendChart view={data ?? view} rangeControls={controls}
+    periodLabel={<p className="mt-1 text-xs text-text-secondary">Grafik davri: {request.fromDate} → {request.toDate}</p>}
+    feedback={feedback} plotUnavailable={!data} />
 }

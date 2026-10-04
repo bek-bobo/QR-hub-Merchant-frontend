@@ -64,7 +64,7 @@ export function TerminalPage() {
   if (!runtime.capabilities.terminalList) return <NoAccessState description="Terminal ro‘yxatini ko‘rish huquqi mavjud emas." />
   if (runtime.readiness.terminalList.kind === 'unavailable') return <ErrorState title="Terminal integratsiyasi sozlanmagan" />
 
-  return <div className="mx-auto min-w-0 max-w-7xl">
+  return <div className="mx-auto min-w-0 max-w-[96rem]">
     <TerminalResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data}
       columnOrder={columnPreferences.order}
       visibleColumnIds={columnPreferences.visible}
@@ -75,7 +75,7 @@ export function TerminalPage() {
       quickFilters={<TerminalQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
         onApply={(search) => setApplied((current) => applyTerminalQuickSearch(current, search))} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
           <TerminalAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
@@ -86,6 +86,7 @@ export function TerminalPage() {
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
           iconOnly
+          triggerClassName="size-10 rounded-xl bg-muted/30"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}
@@ -94,6 +95,7 @@ export function TerminalPage() {
           onReset={columnPreferences.reset}
         />
         <RefreshIconButton
+          className="size-10 rounded-xl bg-muted/30"
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}

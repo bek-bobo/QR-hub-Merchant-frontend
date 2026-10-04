@@ -30,7 +30,7 @@ describe('bank-account results', () => {
     expect(pending).toContain('toolbar-actions')
     expect(pending).toContain('yuklanmoqda')
   })
-  it('preserves source order, exact account text, and neutral fallback while hiding the visible total', () => {
+  it('preserves source order, exact account text, neutral fallback and the server total', () => {
     const html = render()
     const text = html.replace(/<!-- -->/g, '')
     expect(html.indexOf('Main')).toBeLessThan(html.indexOf('Second'))
@@ -41,6 +41,7 @@ describe('bank-account results', () => {
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
     expect(text).not.toContain('Jami: 47')
+    expect(text).toContain('Jami 47 ta yozuv')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Balans')
     expect(html).not.toContain('Muvaffaqiyatli')
@@ -103,6 +104,10 @@ describe('bank-account results', () => {
     const html = render({ data: { ...data, content: [row] } })
     const scrollRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="Bank hisoblari jadvali"[^>]*>/)?.[0]
     expect(scrollRegion).toContain('overflow-x-auto')
-    expect(html).toContain('min-w-[64rem]')
+    const tableInRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="Bank hisoblari jadvali"[^>]*>[\s\S]*?(<table\b[^>]*>)/)?.[1]
+    expect(tableInRegion).toBeDefined()
+    const minimumWidth = tableInRegion?.match(/\bstyle="[^"]*\bmin-width:([\d.]+)px(?:;|")/)?.[1]
+    expect(minimumWidth).toBeDefined()
+    expect(Number(minimumWidth)).toBeGreaterThan(0)
   })
 })

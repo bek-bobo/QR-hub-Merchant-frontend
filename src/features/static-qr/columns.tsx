@@ -18,7 +18,7 @@ const staticQrColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: StaticQrRow) => <MetadataId value={row.id} />,
+    renderCell: (row: StaticQrRow) => <MetadataId value={row.id} className="max-w-none whitespace-normal break-all font-sans text-sm" />,
   },
   {
     id: 'terminal',
@@ -45,8 +45,9 @@ const staticQrColumnDefinitions = [
     renderCell: (row: StaticQrRow) => {
       const status = presentActiveStatus(row.statusCode)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-          {status.label}
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} gap-2 rounded-full border-transparent px-3 py-1.5 text-sm font-medium`}>
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
+          <span>{status.label}</span>
         </Badge>
       )
     },

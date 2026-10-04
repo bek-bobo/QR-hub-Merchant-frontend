@@ -26,6 +26,7 @@ export function CashierActionsMenu({ row, onViewTerminals, onAssign, onUnassign 
   return <Menu.Root>
     <Menu.Trigger asChild>
       <Button ref={trigger} type="button" variant="outline" size="icon-sm"
+        className="size-9 rounded-lg bg-muted/30"
         aria-label={`${row.fullname} uchun amallarni ochish`}>
         <MoreHorizontalIcon aria-hidden="true" />
       </Button>

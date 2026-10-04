@@ -12,9 +12,8 @@ import {
   CardHeader,
 } from '@/components/ui/card'
 import type { DashboardView, Metric, Outcome } from '@/shared/contracts/merchant-read'
-import { formatMoney } from '@/shared/money/minor'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
-import { MetricGrowthIndicator } from './MetricGrowthIndicator'
+import { reconcileDashboard } from './presenters'
 
 interface MetricDefinition {
   readonly outcome: Outcome
@@ -22,6 +21,8 @@ interface MetricDefinition {
   readonly metric: Metric
   readonly icon: LucideIcon
   readonly iconClassName: string
+  readonly description: string
+  readonly percent?: number | undefined
 }
 
 function MetricCard({
@@ -30,39 +31,39 @@ function MetricCard({
   metric,
   icon: Icon,
   iconClassName,
+  description,
+  percent,
 }: MetricDefinition) {
   return (
-    <Card className="min-w-0">
-      <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] gap-3">
-        <CardDescription>{label}</CardDescription>
-        <span className={`rounded-lg p-2 ${iconClassName}`}>
-          <Icon className="size-4" aria-hidden="true" />
+    <Card data-outcome={outcome} className="dashboard-metric relative min-w-0 gap-2 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)]">
+      <svg aria-hidden="true" viewBox="0 0 240 70" preserveAspectRatio="none" className="pointer-events-none absolute inset-y-0 right-0 h-full w-3/4 text-[var(--metric-accent)]">
+        <path d="M0 70C100 70 132 55 166 21S216 0 240 8V70Z" fill="currentColor" opacity="0.035" />
+        <path d="M0 70C118 70 141 58 179 39S220 23 240 25V70Z" fill="currentColor" opacity="0.04" />
+      </svg>
+      <CardHeader className="relative flex min-h-11 flex-row items-center gap-4">
+        <span className={`relative flex size-11 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
+          <Icon className="size-6" aria-hidden="true" />
         </span>
+        <CardDescription className="relative font-semibold">{label}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <p className="text-2xl font-semibold tracking-tight text-text-primary [overflow-wrap:anywhere]">
-          {formatMoney(metric.amount)}
-        </p>
-        <p className="mt-1 text-sm text-text-secondary">
-          {metric.count.toLocaleString('uz-UZ')} ta tranzaksiya
-        </p>
-        <div className="mt-4 border-t pt-3 text-xs">
-          <dl className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,7rem),1fr))] gap-3">
-            <MetricGrowthIndicator label="Soni o‘zgarishi" value={metric.countGrowthPct} outcome={outcome} />
-            <MetricGrowthIndicator label="Summa o‘zgarishi" value={metric.amountGrowthPct} outcome={outcome} />
-          </dl>
-          <p className="mt-2 text-text-secondary">Oldingi davrga nisbatan</p>
+      <CardContent className="relative">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <p className="text-3xl font-bold tracking-tight text-text-primary [overflow-wrap:anywhere]">{metric.count.toLocaleString('uz-UZ')}</p>
+          {percent !== undefined ? <span aria-label={`${label} ulushi`} className={`rounded-full px-3 py-0.5 text-sm font-semibold ${iconClassName}`}>{percent.toLocaleString('uz-UZ')}%</span> : null}
         </div>
+        <p className="mt-1 text-sm text-text-secondary">{description}</p>
       </CardContent>
     </Card>
   )
 }
 
-export function MetricCards({ metrics }: Pick<DashboardView, 'metrics'>) {
+export function MetricCards({ metrics, pie }: Pick<DashboardView, 'metrics'> & Partial<Pick<DashboardView, 'pie'>>) {
+  const showPercent = Boolean(pie && metrics.total.count > 0 && reconcileDashboard({ metrics, pie }).countMatches)
   const definitions: readonly MetricDefinition[] = [
     {
       outcome: 'total',
       label: 'Jami',
+      description: 'Barcha tranzaksiyalar',
       metric: metrics.total,
       icon: QrCodeIcon,
       iconClassName: 'bg-brand-soft text-brand',
@@ -70,6 +71,8 @@ export function MetricCards({ metrics }: Pick<DashboardView, 'metrics'>) {
     {
       outcome: 'success',
       label: 'Muvaffaqiyatli',
+      description: 'Muvaffaqiyatli tranzaksiyalar',
+      percent: showPercent ? pie?.success.percent : undefined,
       metric: metrics.success,
       icon: CircleCheckIcon,
       iconClassName: statusToneClasses.success.icon,
@@ -77,6 +80,8 @@ export function MetricCards({ metrics }: Pick<DashboardView, 'metrics'>) {
     {
       outcome: 'processing',
       label: 'Jarayonda',
+      description: 'Jarayondagi tranzaksiyalar',
+      percent: showPercent ? pie?.processing.percent : undefined,
       metric: metrics.processing,
       icon: Clock3Icon,
       iconClassName: statusToneClasses.warning.icon,
@@ -84,6 +89,8 @@ export function MetricCards({ metrics }: Pick<DashboardView, 'metrics'>) {
     {
       outcome: 'failed',
       label: 'Muvaffaqiyatsiz',
+      description: 'Muvaffaqiyatsiz tranzaksiyalar',
+      percent: showPercent ? pie?.failed.percent : undefined,
       metric: metrics.failed,
       icon: TriangleAlertIcon,
       iconClassName: statusToneClasses.error.icon,

@@ -25,12 +25,22 @@ export function DashboardRecentQrTable({ rows, columnOrder, visibleColumnIds, on
 
   if (rows.length === 0) return <EmptyState description="Tanlangan davrda dinamik QR topilmadi." />
 
-  return <TableScrollRegion ariaLabel="So‘nggi dinamik QRlar">
-    <Table className="min-w-[46rem]">
+  const actionsWidth = 80
+  const totalWidth = columns.reduce((width, column) => width + column.width, actionsWidth)
+  const flexibleColumns = columns.filter((column) => column.flexible)
+
+  return <TableScrollRegion ariaLabel="So‘nggi dinamik QRlar" className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+    <Table className="dashboard-recent-qr-table table-fixed" style={{ minWidth: totalWidth, width: flexibleColumns.length > 0 ? '100%' : totalWidth }}>
+      <colgroup>
+        {columns.map((column) => <col key={column.id} style={{ width: column.flexible
+          ? column.id === 'qrId' && flexibleColumns.length > 1 ? `${column.width / totalWidth * 100}%` : undefined
+          : column.width }} />)}
+        <col style={{ width: actionsWidth }} />
+      </colgroup>
       <TableHeader>
         <TableRow>
           {columns.map((column) => <TableHead key={column.id} className={column.headerClassName}>{column.label}</TableHead>)}
-          <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
+          <TableHead className="sticky right-0 text-right">Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

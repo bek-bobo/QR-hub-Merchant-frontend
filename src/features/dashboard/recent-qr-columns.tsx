@@ -11,6 +11,8 @@ import { presentQrStatus } from './presenters'
 export const DASHBOARD_RECENT_QR_TABLE_KEY = 'dashboardRecentQr'
 
 interface DashboardRecentQrColumn extends TableColumnDefinition {
+  readonly width: number
+  readonly flexible?: boolean
   readonly headerClassName?: string
   readonly cellClassName?: string
   readonly renderCell: (row: DynamicQrRow) => ReactNode
@@ -18,27 +20,33 @@ interface DashboardRecentQrColumn extends TableColumnDefinition {
 
 export const dashboardRecentQrColumns: readonly DashboardRecentQrColumn[] = [
   {
+    id: 'amount', label: 'Summa', defaultVisible: true, hideable: true, reorderable: true,
+    width: 144,
+    cellClassName: 'tabular-nums whitespace-normal break-words',
+    renderCell: (row) => formatMoney(row.amount),
+  },
+  {
     id: 'qrId', label: 'QR ID', defaultVisible: true, hideable: true, reorderable: true,
-    renderCell: (row) => row.pkey ? <MetadataId value={row.pkey} /> : '—',
+    width: 320, flexible: true,
+    renderCell: (row) => row.pkey ? <MetadataId value={row.pkey} className="max-w-none whitespace-normal break-all" /> : '—',
   },
   {
     id: 'createdAt', label: 'Vaqt', defaultVisible: true, hideable: true, reorderable: true,
+    width: 164,
     renderCell: (row) => formatOffsetlessDateTime(row.createdAt),
   },
   {
     id: 'terminal', label: 'Terminal', defaultVisible: true, hideable: true, reorderable: true,
+    width: 220, flexible: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row) => row.terminalName || '—',
   },
   {
-    id: 'amount', label: 'Summa', defaultVisible: true, hideable: true, reorderable: true,
-    headerClassName: 'text-right', cellClassName: 'text-right tabular-nums',
-    renderCell: (row) => formatMoney(row.amount),
-  },
-  {
     id: 'status', label: 'Status', defaultVisible: true, hideable: true, reorderable: true,
+    width: 152,
     renderCell: (row) => {
       const status = presentQrStatus(row.statusCode)
-      return <Badge variant="outline" className={statusToneClasses[status.tone].badge}>{status.label}</Badge>
+      return <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full rounded-full px-2.5 py-1 font-medium whitespace-normal`}>{status.label}</Badge>
     },
   },
 ]

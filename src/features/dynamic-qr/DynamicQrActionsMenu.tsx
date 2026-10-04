@@ -15,7 +15,7 @@ const itemClassName = 'flex cursor-default select-none items-center gap-2 rounde
 export function DynamicQrActionsMenu({ row, onViewQr, onViewDetails }: DynamicQrActionsMenuProps) {
   return <DropdownMenuPrimitive.Root>
     <DropdownMenuPrimitive.Trigger asChild>
-      <Button type="button" variant="outline" size="icon-sm" aria-label="Amallarni ochish">
+      <Button type="button" variant="outline" size="icon-sm" className="h-9 w-10 rounded-lg bg-muted/40" aria-label="Amallarni ochish">
         <MoreHorizontalIcon aria-hidden="true" />
       </Button>
     </DropdownMenuPrimitive.Trigger>

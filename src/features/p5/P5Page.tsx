@@ -190,14 +190,16 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
     ? 'PIN reset funksiyasi hozir mavjud emas.'
     : undefined
 
-  return <div className="mx-auto min-w-0 max-w-7xl space-y-4">
+  return <div className="mx-auto min-w-0 max-w-[96rem] space-y-5">
     <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <P5QuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={(search) => {
         setSearchDraft(search.trim())
         setApplied((current) => applyP5QuickSearch(current, search))
       }} />
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" applyDisabled={!isP5StatusDraftValid(draft.statusDraft)}>
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm"
+          triggerClassName="h-11 gap-2 rounded-xl bg-muted/30 px-4 text-sm"
+          applyDisabled={!isP5StatusDraftValid(draft.statusDraft)}>
           <P5Filters
             draft={reconciledDraft}
             merchantState={merchantPresentation}
@@ -215,6 +217,7 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
           iconOnly
+          triggerClassName="size-11 rounded-xl bg-muted/30"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}
@@ -223,6 +226,7 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
           onReset={columnPreferences.reset}
         />
         <RefreshIconButton
+          className="size-11 rounded-xl bg-muted/30"
           updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}

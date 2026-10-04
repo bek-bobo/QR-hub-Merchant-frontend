@@ -59,7 +59,8 @@ describe('Merchant trend plot adapter', () => {
     expect(areas.map(({ key }) => key)).toEqual(['success', 'processing', 'failed'])
     expect(config.area).toMatchObject({ tooltip: false, zIndex: 0,
       style: { fillOpacity: 1, opacity: 1, strokeOpacity: 0 } })
-    expect(config.children).toEqual([{ type: 'line', zIndex: 1 }])
+    expect(config.children).toBeUndefined()
+    expect(config).toMatchObject({ zIndex: 1 })
     expect(config.point).toMatchObject({ zIndex: 2 })
     const dark = createTrendPlotConfig({ buckets: [bucket('A')] }, 'count', ALL_TREND_SERIES, { ...theme, dark: true })
     expect(dark.area).toMatchObject({ style: { fillOpacity: 1, opacity: 1 } })
@@ -80,7 +81,8 @@ describe('Merchant trend plot adapter', () => {
     }
     expect(areas.some(({ key }) => key === 'total')).toBe(false)
     expect(config.area).toMatchObject({ zIndex: 0, style: { fillOpacity: 1, opacity: 1 } })
-    expect(config.children).toEqual([{ type: 'line', zIndex: 1 }])
+    expect(config.children).toBeUndefined()
+    expect(config).toMatchObject({ zIndex: 1 })
     expect(config.point).toMatchObject({ zIndex: 2, sizeField: 2 })
     expect(config.scale?.color).toMatchObject({ range: resolved.colors })
     expect(config.scale?.x).toMatchObject({ range: [0.03, 0.97], domain: ['0', '1'] })

@@ -22,6 +22,7 @@ describe('Dashboard quick date and Terminal controls', () => {
     const onPreset = vi.fn()
     const onReset = vi.fn()
     const element = DashboardQuickDateFilter({ range: { fromDate: '2026-09-25', toDate: '2026-10-01' },
+      initialInstant: new Date('2026-10-01T12:00:00Z'),
       validationMessage: null, onDraftChange, onRangeComplete, onPreset, onReset })
     const calendar = findElement(element, (child) => child.type === DateRangeQuickFilter)!
     const complete = { fromDate: '2026-09-01', toDate: '2026-09-10' }
@@ -34,6 +35,7 @@ describe('Dashboard quick date and Terminal controls', () => {
     expect(findElement(element, (child) => child.props.children === 'Sanalarni qo‘llash')).toBeUndefined()
     for (const days of [1, 7, 30]) {
       const preset = findElement(element, (child) => Children.toArray(child.props.children as ReactNode).join('') === `${days} kun`)!
+      expect(preset.props['aria-pressed']).toBe(days === 7)
       ;(preset.props.onClick as () => void)()
       expect(onPreset).toHaveBeenLastCalledWith(days)
     }

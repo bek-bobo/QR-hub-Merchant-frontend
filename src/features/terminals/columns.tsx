@@ -19,16 +19,7 @@ const terminalColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: TerminalRow) => <MetadataId value={row.id} />,
-  },
-  {
-    id: 'name',
-    label: 'Nomi',
-    defaultVisible: true,
-    hideable: true,
-    reorderable: true,
-    cellClassName: 'font-medium text-foreground',
-    renderCell: (row: TerminalRow) => row.name,
+    renderCell: (row: TerminalRow) => <MetadataId value={row.id} className="max-w-none whitespace-normal break-all font-sans text-sm font-normal" />,
   },
   {
     id: 'merchant',
@@ -36,7 +27,17 @@ const terminalColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: TerminalRow) => row.merchantName,
+  },
+  {
+    id: 'name',
+    label: 'Nomi',
+    defaultVisible: true,
+    hideable: true,
+    reorderable: true,
+    cellClassName: 'whitespace-normal break-words font-semibold text-foreground',
+    renderCell: (row: TerminalRow) => row.name,
   },
   {
     id: 'bankAccount',
@@ -44,6 +45,7 @@ const terminalColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: TerminalRow) => row.bankAccountName,
   },
   {
@@ -55,8 +57,9 @@ const terminalColumnDefinitions = [
     renderCell: (row: TerminalRow) => {
       const status = presentActiveStatus(row.statusCode)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-          {status.label}
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full gap-1.5 rounded-full px-2.5 py-1 font-medium whitespace-normal`}>
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
+          <span>{status.label}</span>
         </Badge>
       )
     },

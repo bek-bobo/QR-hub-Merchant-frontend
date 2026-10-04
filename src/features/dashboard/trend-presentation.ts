@@ -54,15 +54,30 @@ export function trendTooltipItem(datum: TrendPlotDatum) {
 export function createTrendPlotConfig(view: Pick<DashboardView, 'buckets'>, mode: TrendMode, visible: readonly TrendSeriesKey[], theme: MerchantPlotTheme): LineConfig {
   const data = trendPlotData(view, mode, visible)
   const maximum = data.reduce((max, datum) => Math.max(max, datum.value), 0)
+  const scale: LineConfig['scale'] = {
+    x: { type: 'point', domain: view.buckets.map((_, index) => String(index)), range: [0.03, 0.97] },
+    y: { domainMin: 0, domainMax: mode === 'count' ? Math.max(4, Math.ceil(maximum / 4) * 4) : maximum || 1, tickCount: 5, nice: true },
+    color: { domain: TREND_SERIES.map(({ label }) => label), range: [...theme.colors] },
+  }
+  const axis: LineConfig['axis'] = {
+    x: { title: false, labelFill: theme.secondary, labelFontSize: 11, line: true, lineStroke: theme.axis, tick: false,
+      labelFormatter: (value: string) => view.buckets[Number(value)]?.label ?? value },
+    y: { title: false, labelFill: theme.secondary, labelFontSize: 11, grid: true, gridStroke: theme.grid,
+      gridStrokeOpacity: 0.4, gridLineDash: [0, 0], line: false, tick: false,
+      labelFormatter: (value: number) => Number(value).toLocaleString('uz-UZ', mode === 'amount'
+        ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 }) + (mode === 'amount' ? ' UZS' : '') },
+  }
   return {
     data, autoFit: true, height: 320, theme: theme.dark ? 'classicDark' : 'classic',
     xField: 'bucket', yField: 'value', colorField: 'type', shapeField: 'smooth',
     style: { lineWidth: 2 },
-    // The Line adaptor appends auxiliary marks; mark-level zIndex keeps every
-    // line/marker above the opaque areas regardless of child insertion order.
-    children: [{ type: 'line', zIndex: 1 }],
-    point: { sizeField: 2, tooltip: false, zIndex: 2 },
-    area: { data: data.filter(({ key }) => key !== 'total'), shapeField: 'smooth', tooltip: false, zIndex: 0,
+    // Let Line allocate its own children: the adaptor mutates supplied arrays,
+    // leaking generated marks/scales into reused props during Strict Mode replay.
+    zIndex: 1,
+    // Auxiliary marks do not inherit scale/axis in the Line adaptor. Explicitly
+    // update every mark so G2's merge cannot retain an older mode/range's scale.
+    point: { sizeField: 2, tooltip: false, zIndex: 2, scale, axis },
+    area: { data: data.filter(({ key }) => key !== 'total'), shapeField: 'smooth', tooltip: false, zIndex: 0, scale, axis,
       style: {
         // G2 supplies the full series to area style callbacks.
         fill: (datum: TrendPlotDatum | TrendPlotDatum[]) => {
@@ -71,19 +86,7 @@ export function createTrendPlotConfig(view: Pick<DashboardView, 'buckets'>, mode
         },
         fillOpacity: 1, opacity: 1, strokeOpacity: 0, lineWidth: 0,
       } },
-    scale: {
-      x: { type: 'point', domain: view.buckets.map((_, index) => String(index)), range: [0.03, 0.97] },
-      y: { domainMin: 0, domainMax: mode === 'count' ? Math.max(4, Math.ceil(maximum / 4) * 4) : maximum || 1, tickCount: 5, nice: true },
-      color: { domain: TREND_SERIES.map(({ label }) => label), range: [...theme.colors] },
-    },
-    axis: {
-      x: { title: false, labelFill: theme.secondary, labelFontSize: 11, line: true, lineStroke: theme.axis, tick: false,
-        labelFormatter: (value: string) => view.buckets[Number(value)]?.label ?? value },
-      y: { title: false, labelFill: theme.secondary, labelFontSize: 11, grid: true, gridStroke: theme.grid,
-        gridStrokeOpacity: 0.4, gridLineDash: [0, 0], line: false, tick: false,
-        labelFormatter: (value: number) => Number(value).toLocaleString('uz-UZ', mode === 'amount'
-          ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : { maximumFractionDigits: 0 }) + (mode === 'amount' ? ' UZS' : '') },
-    },
+    scale, axis,
     // Merchant series settings own visibility and the last-series guard.
     legend: false,
     tooltip: { title: (datum: TrendPlotDatum) => datum.period, items: [

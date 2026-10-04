@@ -54,13 +54,13 @@
     --status-neutral-border: #667085;
     --status-neutral-indicator: #667085;
     --radius: 0.625rem;
-    --sidebar: #101828;
+    --sidebar: #180f16;
     --sidebar-foreground: #f9fafb;
     --sidebar-primary: #d92d3e;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #1d2939;
+    --sidebar-accent: #32151f;
     --sidebar-accent-foreground: #f9fafb;
-    --sidebar-border: #344054;
+    --sidebar-border: #42252c;
     --sidebar-ring: #f04455;
 
     --brand-primary: var(--primary);
@@ -221,13 +221,13 @@ body {
     --status-neutral-background: #1d2939;
     --status-neutral-border: #98a2b3;
     --status-neutral-indicator: #98a2b3;
-    --sidebar: #101828;
+    --sidebar: #180f16;
     --sidebar-foreground: #f2f4f7;
     --sidebar-primary: #d92d3e;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #1d2939;
+    --sidebar-accent: #32151f;
     --sidebar-accent-foreground: #f9fafb;
-    --sidebar-border: #344054;
+    --sidebar-border: #42252c;
     --sidebar-ring: #f04455;
 }
 
@@ -241,4 +241,152 @@ body {
   html {
     @apply font-sans;
     }
+}
+
+@layer utilities {
+  .dashboard-metric { --metric-accent: var(--brand-primary); }
+  .dashboard-metric[data-outcome='success'] { --metric-accent: var(--status-success-indicator); }
+  .dashboard-metric[data-outcome='processing'] { --metric-accent: var(--status-warning-indicator); }
+  .dashboard-metric[data-outcome='failed'] { --metric-accent: var(--status-error-indicator); }
+
+  .dashboard-filter-toolbar button[aria-label='Sana oralig‘ini tanlash'] {
+    height: 2.25rem;
+    border-radius: 0.75rem;
+  }
+
+  .dashboard-trend button[aria-pressed='true'] {
+    border-color: color-mix(in srgb, var(--brand-primary) 20%, transparent);
+    background: var(--brand-soft);
+    color: var(--brand-primary);
+  }
+
+  .dashboard-trend button[data-slot='button'] {
+    border-radius: 0.625rem;
+  }
+
+  .merchant-workspace {
+    background-image: radial-gradient(ellipse at 30% 0%, color-mix(in srgb, var(--brand-soft) 65%, transparent), transparent 50%);
+  }
+
+  .merchant-sidebar {
+    background-image: linear-gradient(145deg, color-mix(in srgb, var(--sidebar) 80%, var(--brand-primary)), var(--sidebar) 65%);
+  }
+
+  .merchant-sidebar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 110% 28% at -15% 100%, color-mix(in srgb, var(--brand-primary) 22%, transparent) 65%, transparent 66%),
+      radial-gradient(ellipse 120% 22% at 110% 108%, color-mix(in srgb, var(--brand-primary) 16%, transparent) 70%, transparent 71%);
+  }
+
+  .static-qr-table [data-slot='table-header'],
+  .static-qr-table [data-slot='table-head'],
+  .p5-table [data-slot='table-header'],
+  .p5-table [data-slot='table-head'],
+  .cashier-table [data-slot='table-header'],
+  .bank-account-table [data-slot='table-header'],
+  .terminal-table [data-slot='table-header'],
+  .dashboard-recent-qr-table [data-slot='table-header'],
+  .dashboard-recent-qr-table [data-slot='table-head'],
+  .terminal-table [data-slot='table-head'],
+  .bank-account-table [data-slot='table-head'],
+  .cashier-table [data-slot='table-head'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-header'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-head'] {
+    background: color-mix(in srgb, var(--brand-soft) 75%, var(--surface));
+  }
+
+  .static-qr-table [data-slot='table-head'],
+  .cashier-table [data-slot='table-head'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-head'] {
+    height: 3rem;
+    padding-inline: 1.25rem;
+    font-size: 0.875rem;
+    letter-spacing: normal;
+  }
+
+  .static-qr-table [data-slot='table-cell'],
+  .cashier-table [data-slot='table-cell'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-cell'] {
+    padding: 0.6875rem 1.25rem;
+  }
+
+  .static-qr-table [data-slot='table-row'],
+  .p5-table [data-slot='table-row'],
+  .bank-account-table [data-slot='table-row'],
+  .terminal-table [data-slot='table-row'],
+  .dashboard-recent-qr-table [data-slot='table-row'],
+  .cashier-table [data-slot='table-row'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-row'] {
+    border-color: color-mix(in srgb, var(--border) 65%, transparent);
+  }
+
+  .static-qr-pagination [data-slot='button'],
+  .p5-pagination [data-slot='button'],
+  .bank-account-pagination [data-slot='button'],
+  .terminal-pagination [data-slot='button'],
+  .cashier-pagination [data-slot='button'],
+  .dynamic-qr-pagination [data-slot='button'] {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.625rem;
+  }
+
+  .static-qr-pagination [data-variant='outline'],
+  .p5-pagination [data-variant='outline'],
+  .bank-account-pagination [data-variant='outline'],
+  .terminal-pagination [data-variant='outline'],
+  .cashier-pagination [data-variant='outline'],
+  .dynamic-qr-pagination [data-variant='outline'] {
+    background: var(--surface);
+  }
+
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-head'],
+  .dynamic-qr-list .dynamic-qr-table [data-slot='table-cell'] {
+    padding-inline: 1rem;
+  }
+
+  .dynamic-qr-list .dynamic-qr-table [data-slot='badge'] {
+    border-color: color-mix(in srgb, currentColor 20%, transparent);
+  }
+
+  .p5-table [data-slot='table-head'],
+  .bank-account-table [data-slot='table-head'],
+  .terminal-table [data-slot='table-head'],
+  .dashboard-recent-qr-table [data-slot='table-head'] {
+    height: 3.25rem;
+    padding-inline: 0.75rem;
+    font-size: 0.875rem;
+    letter-spacing: normal;
+  }
+
+  .cashier-table [data-slot='table-head']:last-child,
+  .cashier-table [data-slot='table-cell']:last-child {
+    padding-inline: 0.75rem;
+  }
+
+  .p5-table [data-slot='table-cell'],
+  .bank-account-table [data-slot='table-cell'],
+  .terminal-table [data-slot='table-cell'],
+  .dashboard-recent-qr-table [data-slot='table-cell'] {
+    padding: 0.875rem 0.75rem;
+  }
+
+  .dynamic-qr-list .dynamic-qr-quick-filters {
+    flex: 1;
+    gap: 0.75rem;
+  }
+
+  .dynamic-qr-list .dynamic-qr-search {
+    flex: 1;
+  }
+
+  .dynamic-qr-list .dynamic-qr-search input,
+  .dynamic-qr-list button[aria-label='Sana oralig‘ini tanlash'] {
+    height: 2.5rem;
+    border-radius: 0.75rem;
+  }
 }

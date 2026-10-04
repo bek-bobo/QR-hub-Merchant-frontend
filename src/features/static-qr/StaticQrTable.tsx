@@ -48,22 +48,34 @@ export function StaticQrTable({
   onViewDetails,
 }: StaticQrTableProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const columnWidths: Record<StaticQrColumnId, number> = {
+    qrId: 320,
+    terminal: 240,
+    merchant: 240,
+    status: 144,
+  }
+  const actionsWidth = 96
+  const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
 
   return (
-    <Table className="min-w-[38rem]">
+    <Table className="static-qr-table table-fixed" style={{ minWidth: totalWidth }}>
+      <colgroup>
+        {columns.map((column) => <col key={column.id} style={{ width: `calc((100% - ${actionsWidth}px) * ${columnWidths[column.id] / (totalWidth - actionsWidth)})` }} />)}
+        <col style={{ width: actionsWidth }} />
+      </colgroup>
       <TableHeader>
         <TableRow>
           {columns.map((column) => (
             <TableHead key={column.id}>{column.label}</TableHead>
           ))}
-          <TableHead className="sticky right-0 w-16 bg-surface text-right">Amallar</TableHead>
+          <TableHead className="sticky right-0 text-right">Amallar</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {rows.map((row) => (
           <TableRow key={row.id}>
             {columns.map((column) => (
-              <TableCell key={column.id}>{column.renderCell(row)}</TableCell>
+              <TableCell key={column.id} className={column.id === 'terminal' || column.id === 'merchant' ? 'whitespace-normal break-words' : undefined}>{column.renderCell(row)}</TableCell>
             ))}
             <TableCell className="sticky right-0 bg-surface text-right">
               <StaticQrActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />

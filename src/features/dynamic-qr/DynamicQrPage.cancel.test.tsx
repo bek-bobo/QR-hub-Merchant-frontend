@@ -41,6 +41,10 @@ function pageWith(permissions: string[]) {
   </AccessProvider></MemoryRouter>)
 }
 
+function summaryCardHtml(html: string, title: 'Jami summa' | 'Xizmat haqi') {
+  return html.match(new RegExp(`<section\\b[^>]*aria-label="${title}"[^>]*>[\\s\\S]*?</section>`))?.[0] ?? ''
+}
+
 describe('production cancel list gate', () => {
   beforeEach(() => {
     queryState.stats = { data: undefined, isError: false }
@@ -78,6 +82,8 @@ describe('production cancel list gate', () => {
     const html = pageWith(['GET_DYNAMIC_QRS'])
 
     expect(html).toContain('Dinamik QR ro‘yxati')
+    expect(html).toContain('Yaratilgan dinamik QR kodlar va ularning holati')
+    expect(html).toContain('placeholder="Terminal nomi bo‘yicha qidirish"')
     expect(html).toContain('Filtrlar')
     expect(html).toContain('Jadval ustunlari')
     expect(html).not.toContain('Tranzaksiyalar')
@@ -105,7 +111,12 @@ describe('production cancel list gate', () => {
     expect(html).toContain('Jami summa')
     expect(html).toContain('Xizmat haqi')
     expect(html).not.toContain('Joriy API javobida agregat mavjud emas')
-    expect(html.match(/text-2xl[^>]*>—<\/p>/g)).toHaveLength(2)
+    expect(html).not.toContain('Jami summa va xizmat haqi sana oralig‘i va terminal bo‘yicha.')
+    for (const title of ['Jami summa', 'Xizmat haqi'] as const) {
+      const card = summaryCardHtml(html, title)
+      expect(card).toMatch(/<p\b[^>]*>—<\/p>/)
+      expect(card).not.toContain('role="status"')
+    }
   })
 
   it('keeps the list table usable when only stats fail', () => {
@@ -113,8 +124,12 @@ describe('production cancel list gate', () => {
     queryState.listReady = true
     const html = pageWith(['GET_DYNAMIC_QRS'])
     expect(html).toContain('Jami summa va xizmat haqini yuklab bo‘lmadi.')
+    for (const title of ['Jami summa', 'Xizmat haqi'] as const) {
+      expect(summaryCardHtml(html, title)).toContain('Jami summa va xizmat haqini yuklab bo‘lmadi.')
+    }
     expect(html).toContain('<table')
     expect(html).toContain('Asosiy terminal')
+    expect(html).toContain('Jami 1 ta yozuv')
   })
 
   it('keeps disabled stats neutral and the list usable even with cached stats errors', () => {
@@ -123,8 +138,13 @@ describe('production cancel list gate', () => {
     queryState.stats.isError = true
     queryState.listReady = true
     const html = pageWith(['GET_DYNAMIC_QRS'])
-    expect(html).toContain('Statistika hozircha mavjud emas')
-    expect(html.match(/text-2xl[^>]*>—<\/p>/g)).toHaveLength(2)
+    expect(html.match(/Statistika hozircha mavjud emas/g)).toHaveLength(2)
+    for (const title of ['Jami summa', 'Xizmat haqi'] as const) {
+      const card = summaryCardHtml(html, title)
+      expect(card).toMatch(/<p\b[^>]*>—<\/p>/)
+      expect(card).toContain('role="status"')
+      expect(card).toContain('Statistika hozircha mavjud emas')
+    }
     expect(html).not.toContain('Jami summa va xizmat haqini yuklab bo‘lmadi.')
     expect(html).not.toContain('role="alert"')
     expect(html).toContain('<table')
@@ -136,8 +156,9 @@ describe('production cancel list gate', () => {
   it('renders both returned totals in the large primary text', () => {
     queryState.stats.data = { totalAmount: { minorUnits: '125000000', currency: 'UZS', scale: 2 }, totalServiceFeeAmount: { minorUnits: '1875000', currency: 'UZS', scale: 2 } }
     const html = pageWith(['GET_DYNAMIC_QRS'])
-    expect(html).toMatch(/text-2xl[^>]*>1 250 000\.00 UZS<\/p>/)
-    expect(html).toMatch(/text-2xl[^>]*>18 750\.00 UZS<\/p>/)
+    expect(summaryCardHtml(html, 'Jami summa')).toMatch(/<p\b[^>]*>1 250 000\.00 UZS<\/p>/)
+    expect(summaryCardHtml(html, 'Xizmat haqi')).toMatch(/<p\b[^>]*>18 750\.00 UZS<\/p>/)
+    expect(html).not.toContain('Statistika hozircha mavjud emas')
   })
 
   it('hides cached totals when stats execution is disabled', () => {

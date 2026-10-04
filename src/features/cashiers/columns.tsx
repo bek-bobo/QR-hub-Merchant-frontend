@@ -18,7 +18,7 @@ const cashierColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    cellClassName: 'font-medium text-foreground',
+    cellClassName: 'whitespace-normal break-words font-semibold text-foreground',
     renderCell: (row: CashierRow) => row.fullname,
   },
   {
@@ -36,6 +36,7 @@ const cashierColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
+    cellClassName: 'whitespace-normal break-words',
     renderCell: (row: CashierRow) => row.roleDisplay ?? '—',
   },
   {
@@ -47,8 +48,9 @@ const cashierColumnDefinitions = [
     renderCell: (row: CashierRow) => {
       const status = presentActiveStatus(row.statusCode)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
-          {status.label}
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full gap-2 rounded-full px-3 py-1 font-medium whitespace-normal`}>
+          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
+          <span>{status.label}</span>
         </Badge>
       )
     },

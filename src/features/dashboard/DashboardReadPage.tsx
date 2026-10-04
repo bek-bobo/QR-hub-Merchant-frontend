@@ -1,5 +1,6 @@
 import { useReducer, useState } from 'react'
 import { Link } from 'react-router'
+import { ChartNoAxesColumnIncreasingIcon, ChevronRightIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -94,15 +95,21 @@ export function RecentQrPanel({
   }
 
   return (
-    <Card className="min-w-0">
-      <CardHeader className="flex flex-wrap items-start justify-between gap-3 border-b">
-        <div className="min-w-0 flex-1 basis-64 space-y-1">
-          <CardTitle>So‘nggi dinamik QRlar</CardTitle>
-          <CardDescription>Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.</CardDescription>
+    <Card className="min-w-0 gap-5 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(6)]">
+      <CardHeader className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex min-w-0 flex-1 basis-64 items-center gap-4">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
+            <ChartNoAxesColumnIncreasingIcon className="size-6" aria-hidden="true" />
+          </span>
+          <div className="min-w-0 space-y-1">
+            <CardTitle className="text-xl font-bold tracking-tight">So‘nggi dinamik QRlar</CardTitle>
+            <CardDescription>Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.</CardDescription>
+          </div>
         </div>
         <div className="flex max-w-full flex-wrap items-center gap-2">
           <TableColumnPreferences
             tableLabel="So‘nggi dinamik QRlar"
+            triggerClassName="size-10 rounded-xl bg-muted/30"
             items={dashboardRecentQrColumns}
             order={columnPreferences.order}
             hidden={columnPreferences.hidden}
@@ -114,7 +121,7 @@ export function RecentQrPanel({
             canHide={columnPreferences.canHide}
             onReset={columnPreferences.reset}
           />
-          <Button asChild variant="outline" size="sm">
+          <Button asChild variant="outline" size="sm" className="h-11 gap-3 rounded-xl border-brand/15 bg-brand-soft px-4 text-sm font-semibold text-brand hover:bg-brand-soft/80 hover:text-brand">
             <Link
               to={dynamicQrPath}
               state={{
@@ -126,6 +133,7 @@ export function RecentQrPanel({
               }}
             >
               Barchasini ko‘rish
+              <ChevronRightIcon aria-hidden="true" />
             </Link>
           </Button>
         </div>
@@ -217,7 +225,7 @@ export function DashboardReadPage({
   }
 
   return (
-    <div className="min-w-0 space-y-6">
+    <div className="mx-auto min-w-0 max-w-[96rem] space-y-4">
       <DashboardPageHeader
         updatedAt={
           dashboard.dataUpdatedAt > 0
@@ -227,7 +235,7 @@ export function DashboardReadPage({
         refreshDisabled={!enabled.dashboard || refreshing}
         refreshing={refreshing}
         onRefresh={() => void refreshMountedQueries()}
-        quickFilters={<DashboardQuickDateFilter range={dateDraft} validationMessage={validationMessage}
+        quickFilters={<DashboardQuickDateFilter range={dateDraft} initialInstant={initialInstant} validationMessage={validationMessage}
           onDraftChange={(range) => dispatch({ type: 'date-draft', range })}
           onRangeComplete={(range) => dispatch({ type: 'commit-dates', range })}
           onPreset={selectPreset} onReset={resetDates} />}
@@ -238,6 +246,7 @@ export function DashboardReadPage({
           onReset={() => dispatch({ type: 'terminal-draft', terminalId: undefined })}
           onOpenChange={(open) => dispatch({ type: 'terminal-drawer', open })}
           triggerSize="sm"
+          triggerClassName="h-9 rounded-xl bg-surface px-3"
         >
           <DashboardTerminalFilter value={terminalDraft} options={terminals.data}
             enabled={enabled.terminals} pending={terminals.isPending} error={terminals.isError}
@@ -257,8 +266,8 @@ export function DashboardReadPage({
               Yangilanmadi
             </p>
           ) : null}
-          <MetricCards metrics={dashboard.data.metrics} />
-          <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <MetricCards metrics={dashboard.data.metrics} pie={dashboard.data.pie} />
+          <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(16rem,1.1fr)]">
             <ChartLocalDateFilter view={dashboard.data} filters={applied} initialInstant={initialInstant} />
             <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>

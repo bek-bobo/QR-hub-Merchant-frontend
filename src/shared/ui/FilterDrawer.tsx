@@ -21,6 +21,7 @@ interface FilterDrawerProps {
   readonly onOpenChange?: (open: boolean) => void
   readonly applyDisabled?: boolean
   readonly triggerSize?: 'default' | 'sm'
+  readonly triggerClassName?: string
 }
 
 export function FilterDrawer({
@@ -31,6 +32,7 @@ export function FilterDrawer({
   onOpenChange,
   applyDisabled = false,
   triggerSize = 'default',
+  triggerClassName,
 }: FilterDrawerProps) {
   const [open, setOpen] = useState(false)
   const handlers = createFilterDrawerHandlers({ setOpen, onApply, onReset, onOpenChange })
@@ -42,7 +44,7 @@ export function FilterDrawer({
           type="button"
           variant="outline"
           size={triggerSize}
-          className="w-fit max-w-full"
+          className={`w-fit max-w-full ${triggerClassName ?? ''}`}
         >
           <ListFilterIcon aria-hidden="true" />
           Filtrlar

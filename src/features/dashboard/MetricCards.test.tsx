@@ -57,56 +57,62 @@ function metric(count: number, minorUnits: string, countGrowthPct: number | null
 }
 
 describe('Dashboard metric cards', () => {
-  it('preserves four neutral amounts/counts and existing icon semantics, with both growth measures', () => {
+  it('shows four count-first cards without obsolete amount/comparison disclosures', () => {
     const metrics: DashboardView['metrics'] = {
       total: metric(7, '900719925474099301', 1, -2),
       success: metric(3, '12345', 12.5, -6.25),
       processing: metric(2, '5678', null, 0),
       failed: metric(2, '9012', 8, -4),
     }
+    const original = JSON.stringify(metrics)
     const html = renderToStaticMarkup(<MetricCards metrics={metrics} />)
     const cards = html.split('data-slot="card"').slice(1)
     expect(cards).toHaveLength(4)
-    expect(html).not.toMatch(/<a\b|<button\b/)
-
+    expect(html).not.toMatch(/<a\b|<button\b|<details\b|<summary\b/)
+    expect(html).not.toMatch(/Summa va taqqoslash|Soni o‘zgarishi|Summa o‘zgarishi|UZS/)
     const expected = [
-      ['Jami', '9 007 199 254 740 993.01 UZS', '7', 'bg-brand-soft text-brand', '+1%', '-2%'],
-      ['Muvaffaqiyatli', '123.45 UZS', '3', 'bg-status-success-background text-status-success-foreground', '+12,5%', '-6,25%'],
-      ['Jarayonda', '56.78 UZS', '2', 'bg-status-warning-background text-status-warning-foreground', '—', '0%'],
-      ['Muvaffaqiyatsiz', '90.12 UZS', '2', 'bg-status-error-background text-status-error-foreground', '+8%', '-4%'],
+      ['Jami', '7', 'bg-brand-soft text-brand', 'Barcha tranzaksiyalar'],
+      ['Muvaffaqiyatli', '3', 'bg-status-success-background text-status-success-foreground', 'Muvaffaqiyatli tranzaksiyalar'],
+      ['Jarayonda', '2', 'bg-status-warning-background text-status-warning-foreground', 'Jarayondagi tranzaksiyalar'],
+      ['Muvaffaqiyatsiz', '2', 'bg-status-error-background text-status-error-foreground', 'Muvaffaqiyatsiz tranzaksiyalar'],
     ]
-    expected.forEach(([label, amount, count, chip, countGrowth, amountGrowth], index) => {
+    expected.forEach(([label, count, chip, description], index) => {
       const card = cards[index] ?? ''
       expect(card).toContain(`>${label}</div>`)
       expect(card).toContain(chip)
-      const amountTag = card.match(/<p\b[^>]*>/)?.[0] ?? ''
-      expect(amountTag).toContain('text-text-primary')
-      expect(amountTag).not.toContain('text-status-')
-      expect(card).toContain(`>${amount}</p>`)
-      expect(card).toContain(`>${count} ta tranzaksiya</p>`)
-      const countTag = card.match(/<p\b[^>]*>[^<]* ta tranzaksiya<\/p>/)?.[0] ?? ''
-      expect(countTag).toContain('text-text-secondary')
-      expect(countTag).not.toContain('text-status-')
-      const measures = [...card.matchAll(/<dt\b[^>]*>([^<]*)<\/dt>[\s\S]*?<dd\b[^>]*>([\s\S]*?)<\/dd>/g)]
-      expect(measures).toHaveLength(2)
-      expect(measures[0]?.[1]).toBe('Soni o‘zgarishi')
-      expect(measures[0]?.[2]).toContain(`>${countGrowth}</span>`)
-      expect(measures[1]?.[1]).toBe('Summa o‘zgarishi')
-      expect(measures[1]?.[2]).toContain(`>${amountGrowth}</span>`)
-      expect(card).toContain('Oldingi davrga nisbatan')
+      expect(card).toContain(`>${count}</p>`)
+      expect(card).toContain(description)
+      expect(card.match(/<p\b[^>]*>/)?.[0]).toContain('text-text-primary')
     })
-    // Both failed measures apply inverse desirability independently.
-    const failedDeltas = [...(cards[3] ?? '').matchAll(/<dd\b[^>]*>/g)].map((match) => match[0])
-    expect(failedDeltas[0]).toContain('text-status-error-foreground')
-    expect(failedDeltas[1]).toContain('text-status-success-foreground')
+    // Removing the disclosure does not modify exact amounts or growth data.
+    expect(JSON.stringify(metrics)).toBe(original)
   })
 
-  it('keeps zero money/count distinct from unavailable comparisons', () => {
+  it('keeps zero counts valid without undefined percentages', () => {
     const empty = metric(0, '0', null, null)
-    const html = renderToStaticMarkup(<MetricCards metrics={{ total: empty, success: empty, processing: empty, failed: empty }} />)
-    expect(html.match(/>0\.00 UZS<\/p>/g)).toHaveLength(4)
-    expect(html.match(/>0 ta tranzaksiya<\/p>/g)).toHaveLength(4)
-    expect(html.match(/>—<\/span>/g)).toHaveLength(8)
-    expect(html).not.toContain('>0%</span>')
+    const segment = { ...empty, percent: 0 }
+    const html = renderToStaticMarkup(<MetricCards
+      metrics={{ total: empty, success: empty, processing: empty, failed: empty }}
+      pie={{ success: segment, processing: segment, failed: segment }} />)
+    expect(html.match(/>0<\/p>/g)).toHaveLength(4)
+    expect(html).not.toMatch(/NaN|Infinity|ulushi|<details/)
+  })
+
+  it('uses reconciled pie percentages for count badges and suppresses mismatched shares', () => {
+    const metrics = { total: metric(4, '400', null, null), success: metric(2, '200', null, null),
+      processing: metric(1, '100', null, null), failed: metric(1, '100', null, null) }
+    const pie: DashboardView['pie'] = {
+      success: { count: 2, amount: metrics.success.amount, percent: 50 },
+      processing: { count: 1, amount: metrics.processing.amount, percent: 25 },
+      failed: { count: 1, amount: metrics.failed.amount, percent: 25 },
+    }
+    const html = renderToStaticMarkup(<MetricCards metrics={metrics} pie={pie} />)
+    expect(html).toContain('aria-label="Muvaffaqiyatli ulushi"')
+    expect(html).toContain('>50%</span>')
+    expect(html.match(/>25%<\/span>/g)).toHaveLength(2)
+    expect(html).toContain('Barcha tranzaksiyalar')
+    expect(html).not.toContain('<details')
+    const mismatched = renderToStaticMarkup(<MetricCards metrics={{ ...metrics, total: metric(5, '500', null, null) }} pie={pie} />)
+    expect(mismatched).not.toContain('aria-label="Muvaffaqiyatli ulushi"')
   })
 })

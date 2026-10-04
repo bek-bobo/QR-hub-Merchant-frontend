@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from 'react'
+import { UsersIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
@@ -15,6 +16,14 @@ import {
   type CashierColumn,
   type CashierColumnId,
 } from './columns'
+
+const columnWidths: Record<CashierColumnId, number> = {
+  fullName: 220,
+  phone: 190,
+  role: 280,
+  status: 140,
+}
+const actionsWidth = 80
 
 interface CashierResultsProps {
   readonly blocked: boolean
@@ -60,26 +69,36 @@ export function CashierResults({ blocked, pending, error, data, selected,
   onAssign, onSelectUnassign, terminalMode = 'view' }: CashierResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
   const selectionTrigger = useRef<HTMLButtonElement | null>(null)
+  const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
+  const hasFlexibleColumn = columns.some((column) => column.id === 'fullName' || column.id === 'role')
 
   return <div className="min-w-0 space-y-4">
-    <Card className="min-w-0" aria-busy={pending}>
-      <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <CardTitle>Kassirlar ro‘yxati</CardTitle>
-        {quickFilters ? null : headerActions}
+    <Card className="min-w-0 gap-4 rounded-2xl border border-border/70 pt-4 shadow-sm ring-0 sm:pt-5 [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(6)]" aria-busy={pending}>
+      <CardHeader className="flex flex-col gap-5 sm:flex-row sm:items-start">
+        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
+          <UsersIcon className="size-7" aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1 space-y-3">
+          <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Kassirlar ro‘yxati</CardTitle>
+          <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+            {quickFilters}
+            {headerActions}
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="min-w-0 space-y-4">
-        {quickFilters ? <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          {quickFilters}
-          {headerActions}
-        </div> : null}
         {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
           : pending ? <LoadingState title="Kassirlar yuklanmoqda" />
             : error ? <ErrorState onRetry={onRetry} />
               : !data ? <ErrorState title="Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi" />
                 : data.content.length === 0 ? <EmptyState description="Kassir topilmadi." />
                   : <div className="min-w-0">
-        <TableScrollRegion ariaLabel="Kassirlar jadvali">
-          <Table className="min-w-[46rem]">
+        <TableScrollRegion ariaLabel="Kassirlar jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Table className="cashier-table table-fixed" style={{ minWidth: totalWidth, width: hasFlexibleColumn ? '100%' : totalWidth }}>
+            <colgroup>
+              {columns.map((column) => <col key={column.id} style={{ width: column.id === 'fullName' || column.id === 'role' ? undefined : columnWidths[column.id] }} />)}
+              <col style={{ width: actionsWidth }} />
+            </colgroup>
             <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">Amallar</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
               return <TableRow key={`${row.id}-${index}`}>
@@ -95,7 +114,9 @@ export function CashierResults({ blocked, pending, error, data, selected,
         </TableScrollRegion>
       </div>}
         {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
-          totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+          totalPages={data.totalPages} totalItems={data.totalElements}
+          totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+          className="cashier-pagination border-t-0 pt-0"
           onPageChange={onPageChange} /> : null}
       </CardContent>
     </Card>

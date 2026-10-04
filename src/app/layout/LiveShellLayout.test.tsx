@@ -22,6 +22,8 @@ describe('LiveShellLayout', () => {
               navigationControls={navigation.controls}
               navigationTriggerRef={navigation.triggerRef}
               onOpenNavigation={navigation.openNavigation}
+              sidebarCollapsed={navigation.sidebarCollapsed}
+              onToggleSidebar={navigation.toggleSidebar}
             />
           )}
           navigationItems={navigationItems}
@@ -35,18 +37,22 @@ describe('LiveShellLayout', () => {
     )
 
     const aside = html.match(/<aside\b[^>]*>[\s\S]*?<\/aside>/)?.[0]
-    const shellHeader = html.match(/<header\b[^>]*border-b[^>]*>[\s\S]*?<\/header>/)?.[0]
+    const shellHeader = html.match(/<header\b[^>]*>[\s\S]*?<\/header>/)?.[0]
     const navigation = aside?.match(/<nav\b[^>]*aria-label="Live navigatsiya"[^>]*>[\s\S]*?<\/nav>/)?.[0]
 
     expect(html.match(/<h1\b/g)).toHaveLength(1)
     expect(aside).toBeDefined()
     expect(aside).toContain('hidden')
-    expect(aside).toContain('lg:block')
+    expect(aside).toContain('lg:flex')
     expect(navigation).toContain('href="/dashboard"')
     expect(navigation).toContain('href="/dynamic-qrs"')
     expect(navigation).not.toContain('href="/account"')
-    expect(aside).toContain('aria-label="Yon panelni yopish"')
-    expect(aside).toContain('aria-expanded="true"')
+    expect(aside).not.toContain('<button')
+    expect(aside).not.toContain('aria-label="Yon panelni yopish"')
+    expect(shellHeader).toContain('aria-label="Yon panelni yopish"')
+    expect(shellHeader).toContain('aria-expanded="true"')
+    expect(html.match(/aria-label="Yon panelni yopish"/g)).toHaveLength(1)
+    expect(aside).toContain('qrhub-favicon.svg')
     expect(html).toContain('aria-label="Navigatsiyani ochish"')
     expect(html).toContain('aria-expanded="false"')
     expect(html).toContain('aria-controls="live-mobile-navigation"')

@@ -20,7 +20,7 @@ const p5ColumnDefinitions = [
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: P5Row) => <MetadataId value={row.deviceId} />,
+    renderCell: (row: P5Row) => <MetadataId value={row.deviceId} className="max-w-none whitespace-normal break-all font-semibold" />,
   },
   {
     id: 'description',
@@ -40,8 +40,8 @@ const p5ColumnDefinitions = [
     cellClassName: 'max-w-64 whitespace-normal break-words',
     renderCell: (row: P5Row) => (
       <>
-        <span className="font-medium text-foreground">{row.terminalName}</span>
-        <MetadataId value={row.terminalId} variant="secondary" />
+        <span className="font-semibold text-foreground">{row.terminalName}</span>
+        <MetadataId value={row.terminalId} variant="secondary" className="mt-1 max-w-none whitespace-normal break-all font-sans" />
       </>
     ),
   },
@@ -63,7 +63,7 @@ const p5ColumnDefinitions = [
     renderCell: (row: P5Row) => {
       const status = presentP5Status(row.deviceStatus)
       return (
-        <Badge variant="outline" className={statusToneClasses[status.tone].badge}>
+        <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full whitespace-normal rounded-full px-2.5 py-1 text-center font-medium`}>
           {status.label}
         </Badge>
       )

@@ -14,6 +14,18 @@ import {
   type BankAccountColumnId,
 } from './columns'
 
+const columnWidths: Record<BankAccountColumnId, number> = {
+  name: 150,
+  bank: 180,
+  accountNumber: 210,
+  merchant: 180,
+  mfo: 72,
+  stir: 100,
+  contract: 106,
+  status: 120,
+}
+const flexibleColumnIds = new Set<BankAccountColumnId>(['name', 'bank', 'merchant'])
+
 interface BankAccountResultsProps {
   readonly blocked: boolean
   readonly pending: boolean
@@ -46,25 +58,29 @@ function resolveColumns(
 export function BankAccountResults({ blocked, pending, error, data, columnOrder,
   visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters }: BankAccountResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], 0)
+  const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
 
-  return <Card className="min-w-0" aria-busy={pending}>
-    <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <CardTitle>Bank hisoblari ro‘yxati</CardTitle>
-      {quickFilters ? null : headerActions}
-    </CardHeader>
-    <CardContent className="min-w-0 space-y-4">
-      {quickFilters ? <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+  return <Card className="min-w-0 gap-5 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(6)]" aria-busy={pending}>
+    <CardHeader className="flex flex-col gap-4">
+      <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Bank hisoblari ro‘yxati</CardTitle>
+      <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
         {quickFilters}
         {headerActions}
-      </div> : null}
+      </div>
+    </CardHeader>
+    <CardContent className="min-w-0 space-y-4">
       {blocked ? <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
         : pending ? <LoadingState title="Bank hisoblari yuklanmoqda" />
           : error ? <ErrorState onRetry={onRetry} />
             : !data ? <ErrorState title="Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi" />
               : data.content.length === 0 ? <EmptyState description="Bank hisobi topilmadi." />
                 : <div className="min-w-0">
-        <TableScrollRegion ariaLabel="Bank hisoblari jadvali">
-          <Table className="min-w-[64rem]">
+        <TableScrollRegion ariaLabel="Bank hisoblari jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          <Table className="bank-account-table table-fixed" style={{ minWidth: totalWidth, width: hasFlexibleColumn ? '100%' : totalWidth }}>
+            <colgroup>
+              {columns.map((column) => <col key={column.id} style={{ width: flexibleColumnIds.has(column.id) ? undefined : columnWidths[column.id] }} />)}
+            </colgroup>
             <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}</TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => <TableRow key={`${row.id}-${index}`}>
               {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
@@ -73,7 +89,9 @@ export function BankAccountResults({ blocked, pending, error, data, columnOrder,
         </TableScrollRegion>
       </div>}
       {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
-        totalPages={data.totalPages} totalItems={data.totalElements} showTotal={false}
+        totalPages={data.totalPages} totalItems={data.totalElements}
+        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+        className="bank-account-pagination border-t-0 pt-2"
         onPageChange={onPageChange} /> : null}
     </CardContent>
   </Card>

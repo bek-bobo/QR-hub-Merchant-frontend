@@ -8,6 +8,7 @@ import { DateRangeQuickFilter } from './DateRangeQuickFilter'
 interface DynamicQrQuickFiltersProps {
   readonly range: DateRange
   readonly searchDraft: string
+  readonly searchPlaceholder?: string
   readonly onRangeDraftChange: (range: DateRange) => void
   readonly onRangeApply: (range: DateRange) => void
   readonly onRangeReset: () => void
@@ -18,6 +19,7 @@ interface DynamicQrQuickFiltersProps {
 export function DynamicQrQuickFilters({
   range,
   searchDraft,
+  searchPlaceholder = 'Terminal nomi bo‘yicha',
   onRangeDraftChange,
   onRangeApply,
   onRangeReset,
@@ -30,14 +32,14 @@ export function DynamicQrQuickFilters({
   }
 
   return (
-    <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
+    <div className="dynamic-qr-quick-filters flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center">
       <DateRangeQuickFilter
         value={range}
         onDraftChange={onRangeDraftChange}
         onApply={onRangeApply}
         onReset={onRangeReset}
       />
-      <form className="relative min-w-0 sm:w-80" role="search" onSubmit={submitSearch}>
+      <form className="dynamic-qr-search relative min-w-0 sm:w-80" role="search" onSubmit={submitSearch}>
         <SearchIcon
           aria-hidden="true"
           className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-secondary"
@@ -48,7 +50,7 @@ export function DynamicQrQuickFilters({
           value={searchDraft}
           className="h-9 pl-9 pr-9"
           aria-label="Terminal nomi bo‘yicha qidirish"
-          placeholder="Terminal nomi bo‘yicha"
+          placeholder={searchPlaceholder}
           onChange={(event) => onSearchDraftChange(event.target.value)}
         />
         {searchDraft ? (

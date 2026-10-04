@@ -1,4 +1,5 @@
 import { StatusPiePlotRenderer } from './LazyPlotRenderers'
+import { ChartPieIcon } from 'lucide-react'
 import { PlotViewportBoundary } from './PlotViewportBoundary'
 import { createDonutPlotConfig } from './donut-presentation'
 import { useMerchantPlotTheme } from './plot-theme'
@@ -38,20 +39,17 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
     : 'Status taqsimoti mavjud emas'
 
   return (
-    <Card className="min-w-0">
+    <Card className="min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4)] sm:[--card-spacing:--spacing(5)]">
       <CardHeader>
-        <CardTitle>Statuslar taqsimoti</CardTitle>
-        <dl className="mt-3 min-w-0">
-          <dt className="text-sm text-text-secondary">Muvaffaqiyat ulushi</dt>
-          <dd className="mt-1 text-xl font-semibold text-text-primary [overflow-wrap:anywhere]">{successShare}</dd>
-        </dl>
-        <p className="mt-1 text-xs text-text-secondary">
-          {metrics.total.count === 0
-            ? 'Tanlangan davrda tranzaksiyalar mavjud emas.'
-            : 'Jami tranzaksiyalar soniga nisbatan'}
-        </p>
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><ChartPieIcon className="size-5" aria-hidden="true" /></span>
+          <div className="min-w-0">
+            <CardTitle>Statuslar taqsimoti</CardTitle>
+            <p className="mt-1 text-xs text-text-secondary">Jami tranzaksiyalar: {metrics.total.count.toLocaleString('uz-UZ')}</p>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent className="flex min-w-0 flex-col items-center gap-6 lg:flex-row lg:items-center lg:justify-center xl:flex-col">
+      <CardContent className="flex min-w-0 flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-center xl:flex-col">
         <div className="relative w-full max-w-64 shrink-0">
           <div role="img" aria-label={accessibleLabel} data-empty={!hasDistribution || undefined}>
             {hasDistribution && theme ? (
@@ -66,7 +64,7 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
           </div>
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="min-w-0 w-1/2 text-center">
-              <p className="text-lg font-semibold leading-snug text-text-primary [overflow-wrap:anywhere]">
+              <p data-slot="donut-center-total" className="text-2xl font-semibold leading-snug text-text-primary [overflow-wrap:anywhere]">
                 {metrics.total.count.toLocaleString('uz-UZ')}
               </p>
               <p className="mt-1 text-xs text-text-secondary">Jami</p>
@@ -75,11 +73,11 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
         </div>
 
         <div className="w-full min-w-0 max-w-xl">
-          <dl className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <dl className="grid gap-3">
             {items.map((item) => (
               <div
                 key={item.label}
-                className="grid min-w-0 grid-cols-1 items-start gap-1 rounded-lg border p-3"
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border/60 pb-2 last:border-0"
               >
                 <dt className="flex min-w-0 items-center gap-2 text-sm text-text-secondary">
                   <span
@@ -88,20 +86,23 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
                   />
                   <span className="min-w-0 break-words">{item.label}</span>
                 </dt>
-                <dd className="min-w-0 text-left [overflow-wrap:anywhere]">
-                  <p className="font-semibold text-text-primary">
+                <dd className="flex min-w-0 flex-wrap items-center justify-end gap-3 text-sm [overflow-wrap:anywhere]">
+                  <span className="font-semibold text-text-primary">
                     {item.value.count.toLocaleString('uz-UZ')}
-                    {reconciliation.countMatches
-                      ? ` · ${item.value.percent.toLocaleString('uz-UZ')}%`
-                      : ''}
-                  </p>
-                  <p className="mt-1 text-xs text-text-secondary">
-                    {formatMoney(item.value.amount)}
-                  </p>
+                  </span>
+                  {reconciliation.countMatches ? <span className={`rounded-full px-3 py-0.5 font-semibold ${statusToneClasses[item.tone].icon}`}>{item.value.percent.toLocaleString('uz-UZ')}%</span> : null}
                 </dd>
               </div>
             ))}
           </dl>
+          <details className="mt-3 text-xs text-text-secondary">
+            <summary className="w-fit cursor-pointer rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">Summalar va muvaffaqiyat ulushi</summary>
+            <dl className="mt-2 space-y-2">
+              <div><dt>Muvaffaqiyat ulushi</dt><dd className="text-text-primary">{successShare}</dd></div>
+              {items.map((item) => <div key={item.label} className="flex flex-wrap justify-between gap-2"><dt>{item.label}</dt><dd>{formatMoney(item.value.amount)}</dd></div>)}
+            </dl>
+            <p className="mt-2">{metrics.total.count === 0 ? 'Tanlangan davrda tranzaksiyalar mavjud emas.' : 'Jami tranzaksiyalar soniga nisbatan'}</p>
+          </details>
           {!reconciliation.countMatches ? (
             <p role="note" className="mt-4 text-sm text-text-secondary">
               Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.

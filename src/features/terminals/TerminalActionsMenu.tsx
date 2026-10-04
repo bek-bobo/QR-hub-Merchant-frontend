@@ -14,7 +14,7 @@ const itemClassName = 'flex cursor-default select-none items-center gap-2 rounde
 export function TerminalActionsMenu({ row, onViewQr, onViewDetails }: TerminalActionsMenuProps) {
   return <Menu.Root>
     <Menu.Trigger asChild>
-      <Button type="button" variant="outline" size="icon-sm" aria-label="Amallarni ochish">
+      <Button type="button" variant="outline" size="icon-sm" className="size-9 rounded-lg bg-muted/30" aria-label="Amallarni ochish">
         <MoreHorizontalIcon aria-hidden="true" />
       </Button>
     </Menu.Trigger>

@@ -1,5 +1,5 @@
 import { useReducer, useRef, type ReactNode, type RefObject } from 'react'
-import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -18,6 +18,8 @@ export interface LiveShellHeaderContext {
   readonly controls: string
   readonly triggerRef: RefObject<HTMLButtonElement | null>
   readonly openNavigation: () => void
+  readonly sidebarCollapsed: boolean
+  readonly toggleSidebar: () => void
 }
 
 interface LiveShellLayoutProps {
@@ -43,51 +45,40 @@ export function LiveShellLayout({
       open={mobileNavigationOpen}
       onOpenChange={(open) => dispatch({ type: 'set', open })}
     >
-      <div className={`min-h-dvh min-w-0 bg-workspace text-text-primary lg:grid motion-safe:transition-[grid-template-columns] motion-safe:duration-200 motion-reduce:transition-none ${
+      <div className={`merchant-workspace min-h-dvh min-w-0 bg-workspace text-text-primary lg:grid motion-safe:transition-[grid-template-columns] motion-safe:duration-200 motion-reduce:transition-none ${
         collapsed
           ? 'lg:grid-cols-[4.5rem_minmax(0,1fr)]'
-          : 'lg:grid-cols-[15rem_minmax(0,1fr)]'
+          : 'lg:grid-cols-[17rem_minmax(0,1fr)]'
       }`}>
-        <aside className="hidden bg-sidebar text-sidebar-foreground lg:block lg:min-h-dvh">
-          <div className={`flex min-h-24 border-b border-sidebar-border py-5 ${
-            collapsed ? 'items-center justify-center px-2' : 'items-start justify-between gap-3 px-5'
+        <aside className="merchant-sidebar relative hidden bg-sidebar text-sidebar-foreground lg:sticky lg:top-0 lg:flex lg:h-dvh lg:self-start lg:flex-col">
+          <div className={`relative flex min-h-28 shrink-0 border-b border-sidebar-foreground/10 py-6 ${
+            collapsed ? 'items-center justify-center px-2' : 'items-center px-5'
           }`}>
-            <div className={collapsed ? 'sr-only' : undefined}>
-              <div className="text-lg font-semibold tracking-tight">QRHub Merchant</div>
-              <div className="mt-1 text-xs text-sidebar-foreground/70">
-                Merchant workspace
+            <div className="flex min-w-0 items-center gap-3">
+              <img src={`${import.meta.env.BASE_URL}qrhub-favicon.svg`} alt="" className="size-10 shrink-0" />
+              <div className={collapsed ? 'sr-only' : 'min-w-0'}>
+                <div className="whitespace-nowrap text-base font-semibold tracking-tight">QRHub Merchant</div>
+                <div className="mt-1 text-xs text-sidebar-foreground/60">Merchant workspace</div>
               </div>
             </div>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="shrink-0 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              aria-label={collapsed ? 'Yon panelni ochish' : 'Yon panelni yopish'}
-              aria-expanded={!collapsed}
-              onClick={toggleCollapsed}
-            >
-              {collapsed ? (
-                <ChevronRightIcon aria-hidden="true" />
-              ) : (
-                <ChevronLeftIcon aria-hidden="true" />
-              )}
-            </Button>
           </div>
           <ShellNavigation
             items={navigationItems}
             label="Live navigatsiya"
             collapsed={collapsed}
+            className={collapsed ? undefined : 'min-h-0 flex-1 overflow-y-auto'}
           />
         </aside>
-        <div className="min-w-0">
+        <div className="min-w-0 px-4 pt-4 sm:px-6 lg:px-7">
           {header({
             open: mobileNavigationOpen,
             controls: 'live-mobile-navigation',
             triggerRef: navigationTriggerRef,
             openNavigation: () => dispatch({ type: 'set', open: true }),
+            sidebarCollapsed: collapsed,
+            toggleSidebar: toggleCollapsed,
           })}
-          <main className="min-w-0 px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+          <main className="min-w-0 py-6">{children}</main>
         </div>
       </div>
 
@@ -95,7 +86,7 @@ export function LiveShellLayout({
         id="live-mobile-navigation"
         side="left"
         showCloseButton={false}
-        className="w-[min(20rem,85vw)] gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
+        className="merchant-sidebar w-[min(20rem,85vw)] gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
         onCloseAutoFocus={(event) => {
           event.preventDefault()
           navigationTriggerRef.current?.focus()

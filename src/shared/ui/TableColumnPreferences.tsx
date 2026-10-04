@@ -186,6 +186,8 @@ interface TableColumnPreferencesProps {
   readonly order: readonly string[]
   readonly hidden: readonly string[]
   readonly iconOnly?: boolean
+  readonly triggerLabel?: string
+  readonly triggerClassName?: string
   readonly onMoveUp: (columnId: string) => void
   readonly onMoveDown: (columnId: string) => void
   readonly onMove: (columnId: string, targetId: string) => void
@@ -200,6 +202,8 @@ export function TableColumnPreferences({
   order,
   hidden,
   iconOnly = false,
+  triggerLabel = 'Jadval ustunlari',
+  triggerClassName,
   onMoveUp,
   onMoveDown,
   onMove,
@@ -280,11 +284,12 @@ export function TableColumnPreferences({
             type="button"
             variant="outline"
             size={iconOnly ? 'icon-sm' : 'sm'}
-            aria-label={iconOnly ? 'Jadval ustunlarini sozlash' : undefined}
+            aria-label={iconOnly || triggerLabel !== 'Jadval ustunlari' ? 'Jadval ustunlarini sozlash' : undefined}
             aria-describedby={iconOnly ? tooltipId : undefined}
+            className={triggerClassName}
           >
             <Columns3Icon aria-hidden="true" />
-            {iconOnly ? null : 'Jadval ustunlari'}
+            {iconOnly ? null : triggerLabel}
           </Button>
         </SheetTrigger>
         {iconOnly ? (
