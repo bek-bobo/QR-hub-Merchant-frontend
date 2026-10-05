@@ -2,8 +2,10 @@ import { useId, useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  CheckIcon,
   Columns3Icon,
   GripVerticalIcon,
+  RotateCcwIcon,
   XIcon,
 } from 'lucide-react'
 import { cn } from 'cn'
@@ -12,12 +14,14 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
+import './filter-drawer.css'
 
 export type TableColumnPreferenceItem = Pick<
   TableColumnDefinition,
@@ -72,7 +76,7 @@ export function TableColumnPreferenceList({
             key={item.id}
             data-column-id={item.id}
             className={cn(
-              'relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-lg border border-border bg-background px-2 py-2 transition-[border-color,box-shadow,opacity]',
+              'relative grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 rounded-2xl border border-border bg-background/60 px-2 py-3 transition-[border-color,box-shadow,opacity] sm:gap-3 sm:px-4 sm:py-2',
               draggedColumnId === item.id && 'cursor-grabbing opacity-60 shadow-sm',
               dropTargetId === item.id
                 && draggedColumnId !== item.id
@@ -103,7 +107,7 @@ export function TableColumnPreferenceList({
                 draggable
                 aria-label={`${item.label} ustunini ko‘chirish`}
                 className={cn(
-                  'flex size-8 shrink-0 cursor-grab items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground active:cursor-grabbing',
+                  'flex size-8 shrink-0 cursor-grab items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing',
                   draggedColumnId === item.id && 'cursor-grabbing',
                 )}
                 onDragStart={(event) => {
@@ -113,49 +117,49 @@ export function TableColumnPreferenceList({
                 }}
                 onDragEnd={onDragEnd}
               >
-                <GripVerticalIcon aria-hidden="true" />
+                <GripVerticalIcon aria-hidden="true" className="size-5" />
               </button>
             ) : (
               <span className="size-8" aria-hidden="true" />
             )}
-            <label className="flex min-w-0 cursor-pointer items-center gap-3">
+            <label className="flex min-w-0 cursor-pointer items-center gap-2 sm:gap-4">
               <input
                 type="checkbox"
-                className="size-4 shrink-0 accent-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="size-6 shrink-0 rounded-md accent-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
                 aria-label={`${item.label} ustuni ko‘rinishi`}
                 checked={!hiddenIds.has(item.id)}
                 disabled={!item.hideable || (!hiddenIds.has(item.id) && !canHide(item.id))}
                 onChange={() => onToggleVisibility(item.id)}
               />
               <span className="min-w-0">
-                <span className="block break-words font-medium text-foreground">{item.label}</span>
-                <span className="block text-xs text-muted-foreground">
+                <span className="block break-words text-sm font-semibold leading-5 text-foreground sm:text-base sm:leading-5">{item.label}</span>
+                <span className="mt-0.5 block text-sm leading-4 text-muted-foreground">
                   {index + 1} / {orderedItems.length}
                 </span>
               </span>
             </label>
-            <div className="flex shrink-0 gap-2">
+            <div className="flex shrink-0 gap-1.5 sm:gap-2">
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="size-9"
+                className="size-10 rounded-xl bg-surface"
                 disabled={!item.reorderable || index === 0}
                 aria-label={`${item.label} ustunini chapga — ro‘yxatda yuqoriga ko‘chirish`}
                 onClick={() => onMoveUp(item.id)}
               >
-                <ArrowUpIcon aria-hidden="true" />
+                <ArrowUpIcon aria-hidden="true" className="size-5" />
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
-                className="size-9"
+                className="size-10 rounded-xl bg-surface"
                 disabled={!item.reorderable || index === orderedItems.length - 1}
                 aria-label={`${item.label} ustunini o‘ngga — ro‘yxatda pastga ko‘chirish`}
                 onClick={() => onMoveDown(item.id)}
               >
-                <ArrowDownIcon aria-hidden="true" />
+                <ArrowDownIcon aria-hidden="true" className="size-5" />
               </Button>
             </div>
           </li>
@@ -174,7 +178,8 @@ export function TableColumnPreferenceReset({
   readonly onReset: () => void
 }) {
   return (
-    <Button type="button" variant="outline" onClick={onReset}>
+    <Button type="button" variant="outline" className="h-auto min-h-12 min-w-0 flex-1 gap-2 rounded-xl bg-surface px-3 py-3 text-sm whitespace-normal sm:text-base" onClick={onReset}>
+      <RotateCcwIcon aria-hidden="true" className="size-5" />
       Standart tartibga qaytarish
     </Button>
   )
@@ -306,16 +311,19 @@ export function TableColumnPreferences({
       <SheetContent
         side="right"
         showCloseButton={false}
-        className="w-full max-w-[27.5rem] gap-0 overflow-hidden p-0"
+        className="min-h-0 gap-0 overflow-hidden rounded-l-3xl border-border bg-surface p-0 shadow-xl data-[side=right]:w-full data-[side=right]:sm:max-w-[35rem]"
       >
-        <SheetHeader className="relative shrink-0 border-b px-4 py-4 pr-14 text-left">
-          <SheetTitle>{tableLabel} jadvali ustunlari</SheetTitle>
+        <SheetHeader className="column-preferences-header relative shrink-0 overflow-hidden px-5 pb-6 pt-14 text-left sm:px-7 sm:pb-4 sm:pt-6">
+          <SheetTitle className="relative pr-9 text-xl font-semibold leading-7">{tableLabel} jadvali ustunlari</SheetTitle>
+          <SheetDescription className="relative mt-2 text-sm leading-6 sm:text-base">
+            Jadvalda ko‘rsatiladigan ustunlarni tanlang va ularning tartibini o‘zgartiring.
+          </SheetDescription>
           <SheetClose asChild>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              className="absolute right-3 top-3"
+              className="absolute right-5 top-5 size-11 rounded-2xl border border-border bg-background/70 sm:right-7 sm:top-4"
               aria-label="Ustun sozlamalarini yopish"
             >
               <XIcon aria-hidden="true" />
@@ -323,7 +331,7 @@ export function TableColumnPreferences({
           </SheetClose>
         </SheetHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4 sm:px-7">
           <TableColumnPreferenceList
             items={items}
             order={order}
@@ -342,10 +350,13 @@ export function TableColumnPreferences({
           />
         </div>
 
-        <SheetFooter className="mt-0 shrink-0 flex-row flex-wrap items-center justify-between border-t bg-popover px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <SheetFooter className="mt-0 shrink-0 flex-row items-stretch justify-between gap-3 border-t bg-surface px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:gap-6 sm:px-7">
           <TableColumnPreferenceReset onReset={handleReset} />
           <SheetClose asChild>
-            <Button type="button">Tayyor</Button>
+            <Button type="button" className="h-auto min-h-12 gap-2 rounded-xl px-4 py-3 text-sm shadow-sm sm:px-6 sm:text-base">
+              <CheckIcon aria-hidden="true" className="size-5" />
+              Tayyor
+            </Button>
           </SheetClose>
         </SheetFooter>
       </SheetContent>

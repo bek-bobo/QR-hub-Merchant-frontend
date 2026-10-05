@@ -1,4 +1,5 @@
-.filter-drawer-header::before {
+.filter-drawer-header::before,
+.column-preferences-header::before {
   content: '';
   position: absolute;
   right: -3rem;
@@ -9,6 +10,14 @@
   transform: rotate(-16deg);
   background: linear-gradient(140deg, transparent, var(--brand-soft));
   pointer-events: none;
+}
+
+.column-preferences-header::before {
+  top: -4rem;
+  bottom: auto;
+  width: 25rem;
+  height: 10rem;
+  transform: rotate(16deg);
 }
 
 .filter-field-card {
