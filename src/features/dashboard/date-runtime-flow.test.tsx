@@ -19,7 +19,8 @@ const flow = vi.hoisted(() => ({
   controls: null as ComponentProps<typeof DashboardQuickDateFilter> | null,
   selectDate: null as ((date: string) => void) | null,
   apply: null as (() => void) | null,
-  terminalApply: null as (() => void) | null,
+  filterApply: null as (() => void) | null,
+  terminalChange: null as ((terminalId?: string) => void) | null,
   terminalReset: null as (() => void) | null,
   drawerOpenChange: null as ((open: boolean) => void) | null,
   refresh: null as (() => void) | null,
@@ -31,7 +32,10 @@ const flow = vi.hoisted(() => ({
 function findHandler(node: ReactNode, prop: string, label?: string): ((value?: string) => void) | null {
   for (const child of Children.toArray(node)) {
     if (!isValidElement<Record<string, unknown>>(child)) continue
-    if (typeof child.props[prop] === 'function' && (label === undefined || child.props.children === label)) {
+    // Footer actions include decorative icons alongside their visible text.
+    const text = Children.toArray(child.props.children as ReactNode)
+      .filter((part) => typeof part === 'string' || typeof part === 'number').join('').trim()
+    if (typeof child.props[prop] === 'function' && (label === undefined || text === label)) {
       return child.props[prop] as (value?: string) => void
     }
     const nested = findHandler(child.props.children as ReactNode, prop, label)
@@ -74,10 +78,11 @@ vi.mock('@/features/dynamic-qr/DateRangeQuickFilter', async (importOriginal) => 
 vi.mock('@/shared/ui/FilterDrawer', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/shared/ui/FilterDrawer')>()
   return { FilterDrawer: (props: ComponentProps<typeof actual.FilterDrawer>) => {
-    flow.terminalReset = props.onReset
-    flow.drawerOpenChange = props.onOpenChange ?? null
     const tree = actual.FilterDrawer(props)
-    flow.terminalApply = findHandler(tree, 'onClick', 'Qo‘llash')
+    flow.filterApply = findHandler(tree, 'onClick', 'Qo‘llash')
+    flow.terminalReset = findHandler(tree, 'onClick', 'Qayta tiklash')
+    flow.drawerOpenChange = tree.props.onOpenChange
+    flow.terminalChange = findHandler(props.children, 'onChange')
     return tree
   } }
 })
@@ -132,7 +137,8 @@ async function requests() {
 }
 
 beforeEach(() => {
-  flow.state = null; flow.controls = null; flow.selectDate = null; flow.apply = null; flow.terminalApply = null
+  flow.state = null; flow.controls = null; flow.selectDate = null; flow.apply = null; flow.filterApply = null
+  flow.terminalChange = null
   flow.terminalReset = null; flow.drawerOpenChange = null; flow.refresh = null; flow.refreshed = []
   vi.clearAllMocks()
 })
@@ -140,33 +146,47 @@ beforeEach(() => {
 describe('Dashboard rendered date controls to read requests', () => {
   it('wires drawer cancellation, draft Reset and Apply without changing date inputs', () => {
     renderPage()
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'T1' })
-    flow.terminalApply!()
+    expect(flow.filterApply).toBeTypeOf('function')
+    expect(flow.terminalReset).toBeTypeOf('function')
+    expect(flow.terminalChange).toBeTypeOf('function')
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('T1')
+    renderPage()
+    expect(flow.state!.applied.terminalId).toBeUndefined()
+    dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).not.toBe('T1'))
+    flow.filterApply!()
     renderPage()
     const applied = flow.state!.applied
+    expect(applied.terminalId).toBe('T1')
+    const dateDraft = flow.state!.dateDraft
     flow.drawerOpenChange!(true)
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'T2' })
+    flow.terminalChange!('T2')
     flow.drawerOpenChange!(false)
     flow.drawerOpenChange!(true)
     expect(flow.state!.terminalDraft).toBe('T1')
+    expect(flow.state!.applied).toBe(applied)
+    expect(flow.state!.dateDraft).toBe(dateDraft)
     flow.terminalReset!()
     renderPage()
     expect(flow.state!.terminalDraft).toBeUndefined()
     expect(flow.state!.applied).toBe(applied)
     dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).toBe('T1'))
-    flow.terminalApply!()
+    flow.filterApply!()
     renderPage()
     expect(flow.state!.applied).toEqual({ fromDate: applied.fromDate, toDate: applied.toDate })
+    expect(flow.state!.dateDraft).toBe(dateDraft)
     dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).not.toBe('T1'))
   })
 
   it('refreshes the applied context without committing or discarding an open terminal edit', () => {
     renderPage()
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'T1' })
-    flow.terminalApply!()
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('T1')
+    renderPage()
+    flow.filterApply!()
     renderPage()
     flow.drawerOpenChange!(true)
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'T2' })
+    flow.terminalChange!('T2')
     renderPage()
     const applied = flow.state!.applied
     flow.refresh!()
@@ -179,9 +199,12 @@ describe('Dashboard rendered date controls to read requests', () => {
   it('keeps incomplete drafts out of queries and commits calendar completion immediately to both reads', async () => {
     renderPage()
     // Terminal is already applied; pending terminal edits must not leak into date commits.
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'terminal-a' })
-    flow.state = dashboardFilterReducer(flow.state, { type: 'apply-terminal' })
-    flow.state = dashboardFilterReducer(flow.state, { type: 'terminal-draft', terminalId: 'terminal-b' })
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('terminal-a')
+    renderPage()
+    flow.filterApply!()
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('terminal-b')
     renderPage()
     const initialKeys = dataQueries().map(({ queryKey }) => queryKey)
     const initialRequests = await requests()
@@ -212,13 +235,18 @@ describe('Dashboard rendered date controls to read requests', () => {
     const resetRequests = await requests()
     expect(resetRequests[0].query).toEqual(flow.state!.applied)
     expect(resetRequests[1].query).toEqual({ ...flow.state!.applied, page: '0', size: '10' })
-    expect(flow.terminalApply).toBeTypeOf('function')
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'terminal-b' })
+    expect(flow.filterApply).toBeTypeOf('function')
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('terminal-b')
     renderPage()
-    flow.terminalApply!()
+    flow.filterApply!()
     renderPage()
     expect(flow.state!.applied.terminalId).toBe('terminal-b')
     expect(flow.state!.applied.fromDate).toBe('2026-09-25')
+    dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).toBe('terminal-b'))
+    const terminalRequests = await requests()
+    expect(terminalRequests[0].query).toEqual(flow.state!.applied)
+    expect(terminalRequests[1].query).toEqual({ ...flow.state!.applied, page: '0', size: '10' })
   })
 
   it.each([
@@ -245,9 +273,12 @@ describe('Dashboard rendered date controls to read requests', () => {
     [1, '2026-10-01'], [7, '2026-09-25'], [30, '2026-09-02'],
   ] as const)('immediately commits the %s-day Tashkent preset with the applied terminal', (days, fromDate) => {
     renderPage()
-    flow.state = dashboardFilterReducer(flow.state!, { type: 'terminal-draft', terminalId: 'terminal-a' })
-    flow.state = dashboardFilterReducer(flow.state, { type: 'apply-terminal' })
-    flow.state = dashboardFilterReducer(flow.state, { type: 'terminal-draft', terminalId: 'terminal-b' })
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('terminal-a')
+    renderPage()
+    flow.filterApply!()
+    flow.drawerOpenChange!(true)
+    flow.terminalChange!('terminal-b')
     renderPage()
     flow.controls!.onPreset(days)
     renderPage()

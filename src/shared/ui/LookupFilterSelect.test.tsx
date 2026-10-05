@@ -42,16 +42,18 @@ describe('lookup filter descriptions', () => {
 
   it.each([
     ['error', 'Tumanlarni yuklab bo‘lmadi'], ['unavailable', 'Tuman filtriga ruxsat mavjud emas'],
-  ] as const)('preserves the %s notice even though its disabled option also explains the state', (state, reason) => {
+  ] as const)('announces the %s notice without a duplicate visible description', (state, reason) => {
     const html = renderToStaticMarkup(<LookupFilterSelect {...defaults} state={state} errorLabel={reason} />)
     expect(html).toContain('disabled=""')
     expect(html).toMatch(/<p role="status"[^>]*>/)
+    expect(html).toContain('<p role="status" class="sr-only">')
     expect(html.split(reason)).toHaveLength(3)
   })
 
   it('never hides a lookup error when the prerequisite presentation flag is supplied', () => {
     const html = renderToStaticMarkup(<LookupFilterSelect {...defaults} state="error" hideUnavailableDescription />)
     expect(html).toContain('role="status"')
+    expect(html).toContain('<p role="status" class="sr-only">')
     expect(html.split(defaults.errorLabel)).toHaveLength(3)
   })
 

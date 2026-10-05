@@ -1,6 +1,7 @@
 import { Select } from '@/components/ui/select'
 import { useEffect } from 'react'
 import { LookupFilterSelect } from '@/shared/ui/LookupFilterSelect'
+import { FilterFieldCard } from '@/shared/ui/FilterFieldCard'
 import { resolveLookupSelectState, type LookupSelectState } from '@/shared/ui/lookup-select-state'
 import type { DistributionStatusFilter, QrStatusFilter, TerminalOption } from '@/shared/contracts/merchant-read'
 import { parseQrStatusInput } from './page-state'
@@ -71,7 +72,7 @@ export function DynamicQrAdvancedFilterFields({
         allLabel="Barcha bank hisoblari"
         emptyLabel={merchantId ? 'Bu merchant uchun bank hisobi mavjud emas' : 'Bank hisobi mavjud emas'}
         errorLabel="Bank hisoblarini yuklab bo‘lmadi" onChange={onBankAccountChange} />
-      <label className="block space-y-1.5 text-sm font-medium text-text-primary">
+      <FilterFieldCard><label className="block space-y-1.5 text-sm font-medium text-text-primary">
         Terminal
         <Select
           value={terminalId ?? ''}
@@ -86,8 +87,8 @@ export function DynamicQrAdvancedFilterFields({
             </option>
           ))}
         </Select>
-      </label>
-      <label className="block space-y-1.5 text-sm font-medium text-text-primary">
+      </label></FilterFieldCard>
+      <FilterFieldCard><label className="block space-y-1.5 text-sm font-medium text-text-primary">
         Status
         <Select
           value={status === undefined ? '' : String(status)}
@@ -99,13 +100,13 @@ export function DynamicQrAdvancedFilterFields({
             </option>
           ))}
         </Select>
-      </label>
-      <label className="block space-y-1.5 text-sm font-medium text-text-primary">Tarqatish holati
+      </label></FilterFieldCard>
+      <FilterFieldCard><label className="block space-y-1.5 text-sm font-medium text-text-primary">Tarqatish holati
         <Select value={distributionStatus === undefined ? '' : String(distributionStatus)}
           onChange={(event) => onDistributionStatusChange(event.target.value === '' ? undefined : Number(event.target.value) as DistributionStatusFilter)}>
           {distributionOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
         </Select>
-      </label>
+      </label></FilterFieldCard>
     </div>
   )
 }

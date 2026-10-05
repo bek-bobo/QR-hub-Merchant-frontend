@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import { LookupFilterSelect } from '@/shared/ui/LookupFilterSelect'
+import { FilterFieldCard } from '@/shared/ui/FilterFieldCard'
 import type { LookupSelectState } from '@/shared/ui/lookup-select-state'
 import { changeP5AdvancedMerchant, isP5StatusDraftValid, resolveP5StatusDraft, type P5AdvancedDraft, type P5StatusDraft } from './page-state'
 
@@ -43,14 +44,14 @@ export function P5AdvancedFilterFields({ draft, merchants, terminals, merchantSt
       errorLabel={draft.merchantId ? 'Terminallarni yuklab bo‘lmadi' : 'Avval merchantni tanlang'}
       hideUnavailableDescription={!draft.merchantId}
       onChange={(id) => onChange({ ...draft, terminalId: id })} />
-    <label className="block min-w-0 space-y-1.5 text-sm font-medium text-text-primary">Status
+    <FilterFieldCard><label className="block min-w-0 space-y-1.5 text-sm font-medium text-text-primary">Status
       <Select value={draft.statusDraft.mode} onChange={(event) => onChange({ ...draft,
         statusDraft: { mode: event.target.value as P5StatusDraft['mode'], code: '' } })}>
         <option value="all">Barchasi</option><option value="0">Faol</option>
         <option value="1">Faol emas / administrator belgisi</option><option value="custom">Boshqa status kodi...</option>
       </Select>
-    </label>
-    {draft.statusDraft.mode === 'custom' ? <div className="min-w-0 space-y-1.5">
+    </label></FilterFieldCard>
+    {draft.statusDraft.mode === 'custom' ? <FilterFieldCard>
       <label className="block min-w-0 space-y-1.5 text-sm font-medium text-text-primary">Status kodi
         <Input type="number" step={1} min={-2147483648} max={2147483647} value={draft.statusDraft.code}
           aria-invalid={!statusValid} aria-describedby={!statusValid ? 'p5-custom-status-error' : undefined}
@@ -58,7 +59,7 @@ export function P5AdvancedFilterFields({ draft, merchants, terminals, merchantSt
       </label>
       {statusValid ? <p className="text-xs text-text-secondary">Status kodi: {resolveP5StatusDraft(draft.statusDraft)}</p>
         : <p id="p5-custom-status-error" role="status" className="text-xs text-text-secondary">Butun status kodini kiriting (-2147483648…2147483647).</p>}
-    </div> : null}
+    </FilterFieldCard> : null}
     {validationMessage ? <p id="p5-filter-error" role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
   </div>
 }
