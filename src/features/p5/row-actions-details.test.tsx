@@ -92,12 +92,16 @@ describe('P5 loaded row actions', () => {
     expect(unavailable).not.toContain('>Statik QR ko‘rish</button>')
   })
 
-  it('uses centered viewport-safe QR and a full-width mobile/right-side details sheet', () => {
+  it('renders the shared details header, reference sections and accessible actions', () => {
     expect(renderToStaticMarkup(<P5QrDialog row={row} onOpenChange={vi.fn()} />)).toContain('max-h-[calc(100dvh-1.5rem)]')
     const html = renderToStaticMarkup(<P5DetailsSheet row={row} onOpenChange={vi.fn()} onViewQr={vi.fn()} />)
     expect(html).toContain('P5 qurilma tafsilotlari')
-    expect(html).toContain('data-[side=right]:sm:max-w-lg')
-    expect(html).toContain('overflow-wrap:anywhere')
+    for (const section of ['Qurilma', 'Terminal', 'Merchant', 'Statik QR']) {
+      expect(html).toContain(`aria-label="${section}"`)
+    }
+    expect(html).toContain('aria-label="Yopish"')
+    expect(html).toContain('aria-label="Havolani nusxalash"')
+    expect(html).toContain('Statik QR ko‘rish')
   })
 
   it('keeps presentation local to loaded data and independent of selection/reset', () => {

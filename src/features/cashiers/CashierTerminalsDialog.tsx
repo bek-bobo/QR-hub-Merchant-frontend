@@ -8,6 +8,7 @@ import { MetadataId } from '@/shared/presentation/MetadataId'
 import { formatUzbekPhoneDisplay } from '@/shared/presentation/phone'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import { presentCashierTerminalStatus } from './status-presentation'
+import { DetailsBody, DetailsDialogShell, DetailsFieldRow, DetailsSectionCard, DetailsStatusBadge } from '@/shared/ui/DetailsDialog'
 
 export type CashierTerminalsMode = 'view' | 'assign' | 'unassign'
 
@@ -70,6 +71,25 @@ function TerminalCard({ terminal, onUnassign }: { readonly terminal: CashierTerm
 }
 
 export function CashierTerminalsContent({ cashier, mode = 'view', assignSurface, onUnassign, unassignSurface }: CashierTerminalsContentProps) {
+  if (mode === 'view') return <DetailsBody>
+    <DetailsSectionCard title="Kassir" icon={UsersRoundIcon}>
+      <DetailsFieldRow label="Kassir"><CashierIdentity cashier={cashier} /></DetailsFieldRow>
+    </DetailsSectionCard>
+    <section aria-label="Faol terminal biriktirishlari" className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm font-semibold uppercase text-text-primary">Biriktirilgan terminallar</h3>
+        <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-text-primary">{cashier.terminals.length} ta terminal</span>
+      </div>
+      {cashier.terminals.length === 0
+        ? <p role="status" className="rounded-2xl border border-dashed p-6 text-center text-sm text-text-secondary">Bu kassirga terminal biriktirilmagan.</p>
+        : <ul className="space-y-3">{cashier.terminals.map((terminal, index) => <li key={`${terminal.id}-${index}`}>
+          <DetailsSectionCard title={terminal.name} icon={MonitorIcon}>
+            <DetailsFieldRow label="Terminal ID"><MetadataId value={terminal.id} className="max-w-none whitespace-normal break-all overflow-visible text-clip" /></DetailsFieldRow>
+            <DetailsFieldRow label="Holat"><DetailsStatusBadge status={presentCashierTerminalStatus(terminal.statusCode)} /></DetailsFieldRow>
+          </DetailsSectionCard>
+        </li>)}</ul>}
+    </section>
+  </DetailsBody>
   return <div className="min-h-0 min-w-0 space-y-4 overflow-y-auto px-5 py-5 [overflow-wrap:anywhere] sm:px-8">
     {mode !== 'assign' ? <CashierIdentity cashier={cashier} /> : null}
     {mode === 'assign' ? assignSurface : <section aria-label="Faol terminal biriktirishlari" className="space-y-3">
@@ -78,7 +98,6 @@ export function CashierTerminalsContent({ cashier, mode = 'view', assignSurface,
           <MonitorIcon className="size-4" aria-hidden="true" />
           {mode === 'unassign' ? 'Ajratiladigan terminal' : 'Biriktirilgan terminallar'}
         </h3>
-        {mode === 'view' ? <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-text-primary">{cashier.terminals.length} ta terminal</span> : null}
       </div>
       {cashier.terminals.length === 0
         ? <div role="status" className="rounded-xl border border-dashed bg-muted/30 p-6 text-center text-sm text-text-secondary">
@@ -100,6 +119,10 @@ export function CashierTerminalsDialog({ cashier, mode = 'view', onClose, onClos
   const title = mode === 'assign' ? 'Terminal qo‘shish' : mode === 'unassign' ? 'Terminal ajratish' : 'Biriktirilgan terminallar'
   const subtitle = mode === 'unassign' ? 'Ushbu terminalni kassirdan ajratishingiz mumkin.'
     : 'Ushbu kassirga hozirda biriktirilgan faol terminallar ro‘yxati.'
+  if (mode === 'view') return <DetailsDialogShell title={title} subtitle={subtitle} icon={UsersRoundIcon}
+    onCloseAutoFocus={onCloseAutoFocus} onOpenChange={(open) => { if (!open) onClose() }}>
+    <CashierTerminalsContent cashier={cashier} mode={mode} {...contentProps} />
+  </DetailsDialogShell>
   return <Dialog.Root open onOpenChange={(open) => { if (!open) onClose() }}>
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/45 supports-backdrop-filter:backdrop-blur-xs" />

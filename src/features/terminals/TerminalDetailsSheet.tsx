@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { LandmarkIcon, MapPinIcon, MonitorIcon, PhoneIcon, QrCodeIcon, StoreIcon } from 'lucide-react'
+import { DetailsBody, DetailsDialogShell, DetailsSectionCard, DetailsFieldRow, DetailsStatusBadge, DetailsCopyField, DetailsPrimaryAction } from '@/shared/ui/DetailsDialog'
 import { presentQrLink } from '@/features/dynamic-qr/qr-presentation'
 import type { TerminalRow } from '@/shared/contracts/management-read'
 import { presentActiveStatus } from '@/shared/presentation/active-status'
@@ -12,60 +11,45 @@ interface TerminalDetailsContentProps {
   readonly onViewQr: (row: TerminalRow) => void
 }
 
-function Section({ title, children }: { readonly title: string; readonly children: ReactNode }) {
-  return <section className="space-y-3 rounded-xl border bg-surface p-4">
-    <h3 className="text-sm font-semibold uppercase tracking-wide text-text-secondary">{title}</h3>
-    <dl className="grid gap-3">{children}</dl>
-  </section>
-}
-
-function Detail({ label, children }: { readonly label: string; readonly children: ReactNode }) {
-  return <div className="grid min-w-0 gap-1 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-3">
-    <dt className="text-sm text-text-secondary">{label}</dt>
-    <dd className="min-w-0 whitespace-pre-wrap break-words text-sm font-medium text-text-primary [overflow-wrap:anywhere]">{children}</dd>
-  </div>
-}
-
 export function TerminalDetailsContent({ row, onViewQr }: TerminalDetailsContentProps) {
   const link = presentQrLink(row.staticQrLink)
-  return <div className="min-w-0 space-y-4 px-4 pb-6 sm:px-5">
-    <Section title="Asosiy">
-      <Detail label="Terminal ID">{row.pkey}</Detail>
-      <Detail label="Nomi">{row.name}</Detail>
-      <Detail label="Holat">{presentActiveStatus(row.statusCode).label}</Detail>
-      <Detail label="Terminal turi">{row.terminalType ?? '—'}</Detail>
-      <Detail label="MCC">{row.mccCode ?? '—'}</Detail>
-      <Detail label="Yaratilgan">{row.createdAt ? formatOffsetlessDateTime(row.createdAt) : '—'}</Detail>
-      <Detail label="Yangilangan">{row.updatedAt ? formatOffsetlessDateTime(row.updatedAt) : '—'}</Detail>
-    </Section>
-    <Section title="Merchant">
-      <Detail label="Merchant">{row.merchantName}</Detail>
-      <Detail label="Merchant ID">{row.merchantId}</Detail>
-    </Section>
-    <Section title="Bank hisobi">
-      <Detail label="Bank hisobi">{row.bankAccountName}</Detail>
-      <Detail label="Bank hisobi ID">{row.bankAccountId}</Detail>
-    </Section>
-    <Section title="Joylashuv">
-      <Detail label="Viloyat">{row.regionName ?? '—'}</Detail>
-      <Detail label="Viloyat ID">{row.regionId ?? '—'}</Detail>
-      <Detail label="Tuman">{row.districtName ?? '—'}</Detail>
-      <Detail label="Tuman ID">{row.districtId ?? '—'}</Detail>
-      <Detail label="Manzil">{row.address ?? '—'}</Detail>
-    </Section>
-    <Section title="Aloqa">
-      <Detail label="Telefonlar">{row.phones.length > 0
+  return <DetailsBody>
+    <DetailsSectionCard title="Asosiy" icon={MonitorIcon}>
+      <DetailsFieldRow label="Terminal ID">{row.pkey}</DetailsFieldRow>
+      <DetailsFieldRow label="Nomi">{row.name}</DetailsFieldRow>
+      <DetailsFieldRow label="Holat"><DetailsStatusBadge status={presentActiveStatus(row.statusCode)} /></DetailsFieldRow>
+      <DetailsFieldRow label="Terminal turi">{row.terminalType ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="MCC">{row.mccCode ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Yaratilgan">{row.createdAt ? formatOffsetlessDateTime(row.createdAt) : '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Yangilangan">{row.updatedAt ? formatOffsetlessDateTime(row.updatedAt) : '—'}</DetailsFieldRow>
+    </DetailsSectionCard>
+    <DetailsSectionCard title="Merchant" icon={StoreIcon}>
+      <DetailsFieldRow label="Merchant">{row.merchantName}</DetailsFieldRow>
+      <DetailsFieldRow label="Merchant ID">{row.merchantId}</DetailsFieldRow>
+    </DetailsSectionCard>
+    <DetailsSectionCard title="Bank hisobi" icon={LandmarkIcon}>
+      <DetailsFieldRow label="Bank hisobi">{row.bankAccountName}</DetailsFieldRow>
+      <DetailsFieldRow label="Bank hisobi ID">{row.bankAccountId}</DetailsFieldRow>
+    </DetailsSectionCard>
+    <DetailsSectionCard title="Joylashuv" icon={MapPinIcon}>
+      <DetailsFieldRow label="Viloyat">{row.regionName ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Viloyat ID">{row.regionId ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Tuman">{row.districtName ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Tuman ID">{row.districtId ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Manzil">{row.address ?? '—'}</DetailsFieldRow>
+    </DetailsSectionCard>
+    <DetailsSectionCard title="Aloqa" icon={PhoneIcon}>
+      <DetailsFieldRow label="Telefonlar">{row.phones.length > 0
         ? <ul className="space-y-1">{row.phones.map((phone, index) => <li key={index}>{formatUzbekPhoneDisplay(phone)}</li>)}</ul>
-        : '—'}</Detail>
-    </Section>
-    <Section title="Statik QR">
-      <Detail label="Statik QR ID">{row.staticQrId ?? '—'}</Detail>
-      <Detail label="Statik QR havola">{link.kind === 'available' ? link.original : '—'}</Detail>
-      {link.kind === 'available'
-        ? <Button type="button" size="sm" onClick={() => onViewQr(row)}>Statik QR ko‘rish</Button>
-        : <p role="status" className="text-sm text-text-secondary">Xavfsiz Statik QR havolasi mavjud emas.</p>}
-    </Section>
-  </div>
+        : '—'}</DetailsFieldRow>
+    </DetailsSectionCard>
+    <DetailsSectionCard title="Statik QR" icon={QrCodeIcon} footer={link.kind === 'available'
+      ? <DetailsPrimaryAction onClick={() => onViewQr(row)}>Statik QR ko‘rish</DetailsPrimaryAction>
+      : <p role="status" className="text-sm text-text-secondary">Xavfsiz Statik QR havolasi mavjud emas.</p>}>
+      <DetailsFieldRow label="Statik QR ID">{row.staticQrId ?? '—'}</DetailsFieldRow>
+      <DetailsFieldRow label="Statik QR havola">{link.kind === 'available' ? <DetailsCopyField value={link.original} /> : '—'}</DetailsFieldRow>
+    </DetailsSectionCard>
+  </DetailsBody>
 }
 
 export function TerminalDetailsSheet({ row, onOpenChange, onViewQr }: {
@@ -73,13 +57,7 @@ export function TerminalDetailsSheet({ row, onOpenChange, onViewQr }: {
   readonly onViewQr: (row: TerminalRow) => void
 }) {
   if (!row) return null
-  return <Sheet open onOpenChange={onOpenChange}>
-    <SheetContent side="right" className="w-full max-w-full overflow-y-auto data-[side=right]:w-full data-[side=right]:sm:max-w-lg">
-      <SheetHeader className="border-b pr-14">
-        <SheetTitle className="text-lg">Terminal tafsilotlari</SheetTitle>
-        <SheetDescription className="break-all">{row.pkey}</SheetDescription>
-      </SheetHeader>
-      <TerminalDetailsContent row={row} onViewQr={onViewQr} />
-    </SheetContent>
-  </Sheet>
+  return <DetailsDialogShell onOpenChange={onOpenChange} icon={MonitorIcon} title="Terminal tafsilotlari" subtitle={row.pkey}>
+    <TerminalDetailsContent row={row} onViewQr={onViewQr} />
+  </DetailsDialogShell>
 }

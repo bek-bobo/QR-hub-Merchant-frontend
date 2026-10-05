@@ -46,7 +46,7 @@ describe('shared QR presentation', () => {
     expect(html).toContain('PDF yuklab olish')
     expect(html).toContain('PNG yuklab olish')
     expect(html.match(/disabled=""/g)).toHaveLength(2)
-    expect(html).toContain('truncate')
+    expect(html).toContain('aria-label="Havolani nusxalash"')
     expect(html).toContain(`title="${original.replaceAll('&', '&amp;')}"`)
     expect(html).toContain('Havolani nusxalash')
     expect(html).toContain('Terminal A')

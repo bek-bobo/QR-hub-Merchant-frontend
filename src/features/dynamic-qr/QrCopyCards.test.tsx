@@ -5,6 +5,7 @@ import type { Button } from '@/components/ui/button'
 import { CanonicalLinkCard } from './CanonicalLinkCard'
 import { QrDetailsCard } from './QrDetailsCard'
 import { copyExactPresentedLink, copyExactQrText, presentQrLink } from './qr-presentation'
+import { DetailsCopyField } from '@/shared/ui/DetailsDialog'
 
 const capture = vi.hoisted(() => ({ buttons: [] as Array<ComponentProps<typeof Button>> }))
 vi.mock('@/components/ui/button', async (importOriginal) => {
@@ -18,13 +19,24 @@ beforeEach(() => { capture.buttons = [] })
 afterEach(() => { vi.unstubAllGlobals() })
 
 describe('shared QR copy controls', () => {
-  it('copies the full original URL through the feature callback despite its compact display', () => {
+  it('copies an exact details-field value without URL normalization', () => {
+    const original = 'https://qrhub.uz/Exact%2f?Case=YES&signature=a%2Bb#Fragment'
+    const writeText = vi.fn(async (_text: string) => undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+    renderToStaticMarkup(<DetailsCopyField value={original} />)
+    expect(capture.buttons[0]!['aria-label']).toBe('Havolani nusxalash')
+    capture.buttons[0]!.onClick?.({} as never)
+    expect(writeText).toHaveBeenCalledExactlyOnceWith(original)
+  })
+
+  it('displays the original URL and copies it through the feature callback', () => {
     const original = 'https://qrhub.uz/Exact%2f?Case=YES&signature=a%2Bb#Fragment'
     const writer = vi.fn(async (_text: string) => undefined)
     const onCopy = vi.fn(() => copyExactPresentedLink(presentQrLink(original), writer))
     const html = renderToStaticMarkup(<CanonicalLinkCard original={original} onCopy={onCopy} />)
     expect(html).toContain(`title="${original.replaceAll('&', '&amp;')}"`)
-    expect(html).toContain('truncate')
+    expect(html).toContain('aria-label="Kanonik havola"')
+    expect(html).toContain('aria-label="Havolani nusxalash"')
     capture.buttons[0]!.onClick?.({} as never)
     expect(onCopy).toHaveBeenCalledOnce()
     expect(writer).toHaveBeenCalledExactlyOnceWith(original)
