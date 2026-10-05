@@ -4,6 +4,8 @@ import { describe, expect, it, vi } from 'vitest'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import { copyExactPresentedLink, presentQrLink } from '@/features/dynamic-qr/qr-presentation'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
+import { P5Results } from './P5Results'
+import { P5_DEFAULT_COLUMN_ORDER } from './columns'
 import { P5ActionsMenu } from './P5ActionsMenu'
 import { P5QrContent, P5QrDialog } from './P5QrDialog'
 import { P5DetailsContent, P5DetailsSheet } from './P5DetailsSheet'
@@ -15,12 +17,12 @@ const captureItem = vi.hoisted(() => vi.fn<(select: () => void) => void>())
 vi.mock('radix-ui', async (importOriginal) => {
   const actual = await importOriginal<typeof import('radix-ui')>()
   const part = ({ children, className }: { children?: ReactNode; className?: string }) => <div className={className}>{children}</div>
-  function Item({ children, onSelect }: { children: ReactNode; onSelect: () => void }) {
-    captureItem(onSelect)
-    return <div role="menuitem">{children}</div>
+  function Item({ children, onSelect, disabled }: { children: ReactNode; onSelect: () => void; disabled?: boolean }) {
+    captureItem(() => { if (!disabled) onSelect() })
+    return <div role="menuitem" aria-disabled={disabled}>{children}</div>
   }
   return { ...actual,
-    DropdownMenu: { ...actual.DropdownMenu, Root: part, Trigger: part, Portal: part, Content: part, Item },
+    DropdownMenu: { ...actual.DropdownMenu, Root: part, Trigger: part, Portal: part, Content: part, Separator: part, Item },
     Dialog: { ...actual.Dialog, Root: part, Portal: part, Overlay: part, Content: part, Title: part, Description: part, Close: part },
   }
 })
@@ -37,19 +39,57 @@ const row: P5Row = {
 }
 
 describe('P5 loaded row actions', () => {
-  it('offers both accessible menu actions using the same row', () => {
+  it('offers QR, details and reset actions using the same row', () => {
     captureItem.mockClear()
     const onViewQr = vi.fn()
     const onViewDetails = vi.fn()
-    const html = renderToStaticMarkup(<P5ActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} />)
+    const onReset = vi.fn()
+    const html = renderToStaticMarkup(<P5ActionsMenu row={row} onViewQr={onViewQr} onViewDetails={onViewDetails} resetDisabled={false} onReset={onReset} />)
     expect(html).toContain('aria-label="Amallarni ochish"')
     expect(html).toContain('Statik QR ko‘rish')
     expect(html).toContain('Qo‘shimcha ma’lumotlar')
-    expect(captureItem).toHaveBeenCalledTimes(2)
+    expect(html).toContain('PIN reset')
+    expect(captureItem).toHaveBeenCalledTimes(3)
     captureItem.mock.calls[0]?.[0]()
     captureItem.mock.calls[1]?.[0]()
     expect(onViewQr).toHaveBeenCalledWith(row)
     expect(onViewDetails).toHaveBeenCalledWith(row)
+    captureItem.mock.calls[2]?.[0]()
+    expect(onReset).toHaveBeenCalledWith(row)
+  })
+
+  it('keeps reset disabled without permission/readiness or for an ineligible row', () => {
+    captureItem.mockClear()
+    const onReset = vi.fn()
+    const html = renderToStaticMarkup(<P5ActionsMenu row={row} resetDisabled
+      resetUnavailableMessage="PIN reset funksiyasi hozir mavjud emas."
+      onReset={onReset} onViewQr={vi.fn()} onViewDetails={vi.fn()} />)
+    expect(html).toContain('aria-disabled="true"')
+    expect(html).toContain('PIN reset funksiyasi hozir mavjud emas.')
+    captureItem.mock.calls[2]?.[0]()
+    expect(onReset).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    [false, 0, false, true],
+    [true, 0, false, false],
+    [true, 1, false, true],
+    [true, 777, false, true],
+    [true, null, false, true],
+    [true, 0, true, true],
+  ] as const)('preserves reset gates for readiness %s, status %s, duplicates %s', (available, status, duplicate, disabled) => {
+    captureItem.mockClear()
+    const onReset = vi.fn()
+    const device = { ...row, deviceStatus: status }
+    const rows = duplicate ? [device, { ...device }] : [device]
+    const html = renderToStaticMarkup(<P5Results blocked={false} pending={false} error={null}
+      data={{ content: rows, totalElements: rows.length, totalPages: 1, page: 0, size: 20 }}
+      columnOrder={P5_DEFAULT_COLUMN_ORDER} visibleColumnIds={P5_DEFAULT_COLUMN_ORDER}
+      resetAvailable={available} onReset={onReset} onRetry={() => undefined} onPageChange={() => undefined} />)
+    expect(html).not.toMatch(/<th[^>]*>PIN reset<\/th>/)
+    captureItem.mock.calls[2]?.[0]()
+    if (disabled) expect(onReset).not.toHaveBeenCalled()
+    else expect(onReset).toHaveBeenCalledWith(device)
   })
 
   it('uses and copies the exact backend HTTPS link as the QR payload', async () => {
@@ -104,7 +144,7 @@ describe('P5 loaded row actions', () => {
     expect(html).toContain('Statik QR ko‘rish')
   })
 
-  it('keeps presentation local to loaded data and independent of selection/reset', () => {
+  it('keeps presentation local to loaded data and independent of reset', () => {
     for (const source of [qrSource, detailsSource]) {
       expect(source).not.toMatch(/useQuery|refetch|fetch\(|\.request\(/)
     }
@@ -112,7 +152,7 @@ describe('P5 loaded row actions', () => {
     expect(resultsSource).toContain('data?.content.includes(action.row)')
     expect(resultsSource).toContain("setAction({ kind: 'qr', row: loadedRow })")
     expect(resultsSource).toContain("setAction({ kind: 'details', row: loadedRow })")
-    expect(resultsSource).toContain('onClick={() => onSelect(row)}')
-    expect(resultsSource).toContain('disabled={!resetAvailable || ambiguous || row.deviceStatus !== 0}')
+    expect(resultsSource).toContain('onReset={onReset}')
+    expect(resultsSource).toContain('resetDisabled={!resetAvailable || ambiguous || row.deviceStatus !== 0}')
   })
 })

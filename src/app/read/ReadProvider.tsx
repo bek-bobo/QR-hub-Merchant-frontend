@@ -9,7 +9,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { can, type AccessContextValue } from '@/shared/auth/access'
 import { useAuth } from '@/shared/auth/useAuth'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
-import type { RuntimeEnvironment } from '@/shared/api/http'
+import { createHttpTransport, validateWebBaseUrl, type RuntimeEnvironment } from '@/shared/api/http'
+import { createLiveP5ResetPort } from '@/features/p5/p5-reset'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import { createLiveReadApi } from './createLiveReadApi'
 import { cleanupReadQueries, createReadRuntime } from './read-runtime'
@@ -53,7 +54,7 @@ export function ReadProvider({
   children,
 }: ReadProviderProps) {
   const auth = useAuth()
-  const { bridge, getSessionSnapshot } = useProtectedReadContext()
+  const { bridge, getSessionSnapshot, protectedMutation } = useProtectedReadContext()
   const queryClient = useQueryClient()
   const [revisionTracker] = useState(() => createAccessRevisionTracker())
   const getCurrentState = useMemo(
@@ -95,6 +96,20 @@ export function ReadProvider({
     () => createReadRuntime(liveApi, getCurrentState),
     [getCurrentState, liveApi],
   )
+  const resetBase = validateWebBaseUrl(webBaseUrl, environment)
+  const resetBaseUrl = resetBase.kind === 'valid' ? resetBase.value : null
+  const p5ResetPort = useMemo(() => {
+    if (!resetBaseUrl) return null
+    const transport = createHttpTransport({ service: 'web', baseUrl: resetBaseUrl })
+    return createLiveP5ResetPort({
+      transport, protectedMutation,
+      recheck: (_request, requestedScope) => {
+        const current = getCurrentState()
+        return sameScope(requestedScope, current.scope) &&
+          can(current.access, 'p5.read', false) && can(current.access, 'p5.resetPin', false)
+      },
+    })
+  }, [getCurrentState, protectedMutation, resetBaseUrl])
   const previousScope = useRef<ReadScope | null>(null)
 
   useEffect(() => {
@@ -108,6 +123,7 @@ export function ReadProvider({
   const value = useMemo<ReadRuntimeContextValue>(
     () => ({
       actionRegistry,
+      p5ResetPort,
       api: runtime.api,
       scope,
       getCurrentScope: () => getCurrentState().scope,
@@ -116,7 +132,7 @@ export function ReadProvider({
           ? { kind: 'unavailable', reason: 'Authentication is unavailable.' }
           : { kind: 'configured' },
         ...liveApi.registrations,
-        p5Reset: { kind: 'unavailable', reason: 'P5 reset live transport is contract-gated.' },
+        p5Reset: p5ResetPort ? { kind: 'configured' } : { kind: 'unavailable', reason: 'P5 reset transport is unavailable.' },
       },
       capabilities: {
         dashboard: can(access, requiredCapabilities.dashboard, false),
@@ -137,7 +153,7 @@ export function ReadProvider({
       requiredCapabilities,
       queries: runtime,
     }),
-    [access, actionRegistry, auth.unavailable, getCurrentState, liveApi.registrations, runtime, scope],
+    [access, actionRegistry, p5ResetPort, auth.unavailable, getCurrentState, liveApi.registrations, runtime, scope],
   )
 
   return <ReadRuntimeContext value={value}>{children}</ReadRuntimeContext>

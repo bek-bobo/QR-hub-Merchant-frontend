@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react'
+import type { P5ResetPort } from '@/features/p5/p5-reset'
 import type { Capability } from '@/shared/auth/access'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { createActionRegistry } from '@/shared/api/one-dispatch-action'
@@ -23,6 +24,7 @@ export interface ReadCapabilityState {
 }
 
 export interface ReadRuntimeContextValue {
+  readonly p5ResetPort?: P5ResetPort | null
   readonly actionRegistry: ReturnType<typeof createActionRegistry>
   readonly api: MerchantReadApi
   readonly scope: ReadScope

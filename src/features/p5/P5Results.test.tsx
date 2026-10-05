@@ -15,9 +15,9 @@ const row: P5Row = {
 }
 const data: Page<P5Row> = { content: [row, row], totalElements: 19, totalPages: 2, page: 0, size: 20 }
 const render = (overrides: Partial<Parameters<typeof P5Results>[0]> = {}) => renderToString(createElement(P5Results, {
-  blocked: false, pending: false, error: null, data, selected: null,
+  blocked: false, pending: false, error: null, data,
   columnOrder: P5_DEFAULT_COLUMN_ORDER, visibleColumnIds: P5_DEFAULT_COLUMN_ORDER,
-  onRetry: () => undefined, onPageChange: () => undefined, onSelect: () => undefined,
+  onRetry: () => undefined, onPageChange: () => undefined,
   ...overrides,
 }))
 
@@ -40,7 +40,7 @@ describe('P5 results', () => {
     expect(html).not.toContain('https://example.test/secret')
     expect(html).not.toContain('<a')
     expect(html).not.toContain('QR preview')
-    expect(html).toContain('PIN reset')
+    expect(html).toContain('aria-label="Amallarni ochish"')
     expect(html).not.toContain('yangi PIN')
   })
 
@@ -49,17 +49,7 @@ describe('P5 results', () => {
     expect(html).toContain('>Faol<')
     expect(html).not.toContain('Faol (0)')
     expect(html).not.toContain('>0<')
-    expect(html).toContain('>PIN reset</button>')
-  })
-
-  it('presents unavailable PIN reset guidance as an accessible compact tooltip', () => {
-    const html = render({
-      data: { ...data, content: [{ ...row, deviceStatus: 0 }] },
-      resetUnavailableMessage: 'PIN reset funksiyasi hozir mavjud emas.',
-    })
-    expect(html).toContain('aria-label="PIN reset haqida ma’lumot"')
-    expect(html).toContain('role="tooltip"')
-    expect(html).toContain('PIN reset funksiyasi hozir mavjud emas.')
+    expect(html).not.toContain('>PIN reset</button>')
   })
 
   it('does not sort rows on the client', () => {
@@ -78,13 +68,19 @@ describe('P5 results', () => {
   })
 
   it('renders default business columns around fixed operational source slots', () => {
-    expect(cellTexts(render({ data: { ...data, content: [row] } }), 'th')).toEqual([
-      'Tanlash', 'Qurilma ID', 'Tavsif', 'Terminal', 'Merchant', 'Qurilma holati',
-      'PIN reset', 'Yaratilgan vaqt', 'Amallar',
+    const html = render({ data: { ...data, content: [row] } })
+    expect(html).not.toContain('Tanlash')
+    expect(html).not.toContain('Tanlangan')
+    expect(html).not.toContain('aria-pressed')
+    expect(html).not.toContain('data-state="selected"')
+    expect(html).toContain('min-width:1016px')
+    expect(cellTexts(html, 'th')).toEqual([
+      'Qurilma ID', 'Tavsif', 'Terminal', 'Merchant', 'Qurilma holati',
+      'Yaratilgan vaqt', 'Amallar',
     ])
   })
 
-  it('respects business order while preserving selection and PIN reset controls', () => {
+  it('respects business order while preserving PIN reset and row action controls', () => {
     const activeRow = { ...row, description: 'Device description', deviceStatus: 0 }
     const html = render({
       data: { ...data, content: [activeRow] },
@@ -92,15 +88,14 @@ describe('P5 results', () => {
       resetAvailable: true,
     })
     expect(cellTexts(html, 'th')).toEqual([
-      'Tanlash', 'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati', 'Tavsif',
-      'PIN reset', 'Yaratilgan vaqt', 'Amallar',
+      'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati', 'Tavsif',
+      'Yaratilgan vaqt', 'Amallar',
     ])
     expect(cellTexts(html, 'td')).toEqual([
-      'Tanlash', 'Merchant A', 'Terminal Aterminal-a', '00AbC-9', 'Faol',
-      'Device description', 'PIN reset', '23.09.2026 14:05', '',
+      'Merchant A', 'Terminal Aterminal-a', '00AbC-9', 'Faol',
+      'Device description', '23.09.2026 14:05', '',
     ])
-    expect(html).toContain('aria-label="00AbC-9 qurilmasini tanlash"')
-    expect(html).toContain('>PIN reset</button>')
+    expect(html).not.toContain('>PIN reset</button>')
   })
 
   it('hides and restores a business column without affecting operational controls', () => {
@@ -110,7 +105,7 @@ describe('P5 results', () => {
       columnOrder,
       visibleColumnIds: ['merchant', 'terminal', 'deviceId', 'status', 'createdAt'],
     }), 'th')).toEqual([
-      'Tanlash', 'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati', 'PIN reset',
+      'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati',
       'Yaratilgan vaqt', 'Amallar',
     ])
     expect(cellTexts(render({
@@ -118,8 +113,8 @@ describe('P5 results', () => {
       columnOrder,
       visibleColumnIds: columnOrder,
     }), 'th')).toEqual([
-      'Tanlash', 'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati', 'Tavsif',
-      'PIN reset', 'Yaratilgan vaqt', 'Amallar',
+      'Merchant', 'Terminal', 'Qurilma ID', 'Qurilma holati', 'Tavsif',
+      'Yaratilgan vaqt', 'Amallar',
     ])
   })
 
@@ -131,8 +126,8 @@ describe('P5 results', () => {
     })
     const scrollRegion = html.match(/<div[^>]*role="region"[^>]*aria-label="P5 qurilmalari jadvali"[^>]*>/)?.[0]
     expect(scrollRegion).toContain('overflow-x-auto')
-    expect(cellTexts(html, 'th')).toEqual(['Tanlash', 'Qurilma ID', 'PIN reset', 'Amallar'])
-    expect(html).toContain('qurilmasini tanlash')
-    expect(html).toContain('>PIN reset</button>')
+    expect(cellTexts(html, 'th')).toEqual(['Qurilma ID', 'Amallar'])
+    expect(html).not.toContain('>PIN reset</button>')
+    expect(html).toContain('min-width:204px')
   })
 })

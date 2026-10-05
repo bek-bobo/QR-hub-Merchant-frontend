@@ -1,4 +1,7 @@
+import { KeyRoundIcon, LoaderCircleIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DetailsBody, DetailsDialogShell } from '@/shared/ui/DetailsDialog'
+import { ResultToast } from '@/shared/ui/ResultToast'
 import type { P5ResetState } from './p5-reset'
 
 interface P5ResetDialogProps {
@@ -10,19 +13,35 @@ interface P5ResetDialogProps {
 
 export function P5ResetDialog({ state, onCancel, onConfirm, onAcknowledgeUnknown }: P5ResetDialogProps) {
   const intent = state.intent
+  const pending = state.outcome.kind === 'pending'
+  const confirmed = state.outcome.kind === 'confirmed'
+  const failed = state.outcome.kind === 'unknown' || state.outcome.kind === 'rejected' || state.outcome.kind === 'not-sent'
   return <>
-    {state.dialogOpen && intent ? <section role="dialog" aria-modal="true" aria-labelledby="p5-reset-title" className="space-y-4 rounded-lg border bg-surface p-4 shadow-lg">
-      <header className="space-y-1"><h3 id="p5-reset-title" className="font-semibold">Qurilma PIN’ini reset qilish</h3><p className="break-all text-sm">{intent.deviceId}</p></header>
-      {intent.description ? <p className="break-words text-sm">{intent.description}</p> : null}
-      {intent.terminalName ? <p className="break-words text-sm text-text-secondary">Terminal: {intent.terminalName}</p> : null}
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" variant="outline" onClick={onCancel}>Bekor qilish</Button>
-        <Button type="button" disabled={state.outcome.kind === 'pending'} onClick={onConfirm}>PIN resetni tasdiqlash</Button>
-      </div>
-    </section> : null}
-    {state.outcome.kind === 'pending' ? <p role="status">PIN reset so‘rovi yuborilmoqda. Oynani yopish serverdagi amalni bekor qilmaydi.</p> : null}
-    {state.outcome.kind === 'confirmed' ? <p role="status">PIN reset so‘rovi bajarilgan deb qayd etildi.</p> : null}
-    {state.outcome.kind === 'unknown' ? <section role="alert" className="space-y-2"><p>Avvalgi reset natijasi noma’lum. Takrorlash yangi reset so‘rovini yuboradi.</p><Button type="button" variant="outline" onClick={onAcknowledgeUnknown}>Yangi reset intenti</Button></section> : null}
-    {state.outcome.kind === 'rejected' || state.outcome.kind === 'not-sent' ? <p role="alert">{state.outcome.reason}</p> : null}
+    {state.dialogOpen && intent ? <DetailsDialogShell icon={KeyRoundIcon} title="PINni tiklash"
+      subtitle={intent.deviceId} onOpenChange={(open) => { if (!open && !pending) onCancel() }}>
+      <DetailsBody>
+        <p className="break-words text-sm text-text-secondary">{intent.deviceId} qurilmasining PIN kodi tiklanadi. Davom etasizmi?</p>
+        {intent.description ? <p className="break-words text-sm">{intent.description}</p> : null}
+        {intent.terminalName ? <p className="break-words text-sm text-text-secondary">Terminal: {intent.terminalName}</p> : null}
+        {pending ? <p role="status" className="flex items-center gap-2 text-sm text-text-secondary"><LoaderCircleIcon className="size-4 animate-spin" aria-hidden="true" />PIN reset so‘rovi yuborilmoqda.</p> : null}
+        <div className="flex flex-wrap justify-end gap-2 pt-2">
+          <Button type="button" variant="outline" disabled={pending} onClick={onCancel}>Bekor qilish</Button>
+          <Button type="button" disabled={pending} onClick={onConfirm}>
+            {pending ? <LoaderCircleIcon className="size-4 animate-spin" aria-hidden="true" /> : null}
+            {pending ? 'Tiklanmoqda…' : 'PINni tiklash'}
+          </Button>
+        </div>
+      </DetailsBody>
+    </DetailsDialogShell> : null}
+    {(confirmed || failed) && intent ? <ResultToast
+      tone={confirmed ? 'success' : 'error'}
+      title={confirmed ? "Reset OTP jo'natildi" : 'Reset OTP yuborilmadi'}
+      description={confirmed
+        ? `${intent.deviceId} qurilmasi uchun reset OTP yuborildi. Kodni P5 qurilmaga kiriting.`
+        : `${intent.deviceId} qurilmasi uchun reset OTP yuborishda xatolik yuz berdi. Qayta urinib ko‘ring.`}
+      detail={state.outcome.kind === 'unknown' ? 'Natija tasdiqlanmadi. Takrorlash yangi reset so‘rovini yuboradi.'
+        : state.refresh === 'failed' ? 'Ro‘yxatni yangilab bo‘lmadi. Yangilash tugmasini bosing.' : undefined}
+      action={failed ? { label: state.outcome.kind === 'unknown' ? 'Yangi resetni tasdiqlash' : 'Qayta urinish', onClick: onAcknowledgeUnknown } : undefined}
+    /> : null}
   </>
 }

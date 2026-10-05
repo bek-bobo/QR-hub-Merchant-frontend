@@ -1,5 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { ActionNotDispatchedError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
+import { ActionBusinessRejectionError, ActionNotDispatchedError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
+import { safeHttpError } from '@/shared/api/errors'
+import type { HttpTransport } from '@/shared/api/http'
 import type { ProtectedOperation, ProtectedOperationResult } from '@/shared/auth/session-controller'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
@@ -7,12 +9,12 @@ import type { P5Row } from '@/shared/contracts/p5-read'
 export interface P5ResetRequest {
   readonly deviceId: string
   readonly method: 'POST'
-  readonly path: string
+  readonly path: `/${string}`
   readonly body: undefined
 }
 
 export interface P5ResetPort {
-  reset(request: P5ResetRequest, scope: ReadScope): Promise<unknown>
+  reset(request: P5ResetRequest, scope: ReadScope, canDispatch?: () => boolean): Promise<unknown>
 }
 
 export interface P5ResetIntent {
@@ -57,7 +59,7 @@ export function isP5ResetEligible(row: P5Row | null | undefined): row is P5Row {
 
 export function buildP5ResetRequest(deviceId: string): P5ResetRequest | null {
   if (!deviceId) return null
-  return Object.freeze({ deviceId, method: 'POST', path: `/p5/reset-pin/${encodeURIComponent(deviceId)}`, body: undefined })
+  return Object.freeze({ deviceId, method: 'POST', path: `/p5/reset-pin/${encodeURIComponent(deviceId)}` as const, body: undefined })
 }
 
 export function decodeP5ResetSuccess(payload: unknown): void {
@@ -74,18 +76,45 @@ export function createProtectedP5ResetPort(input: {
   readonly recheck: (request: P5ResetRequest, scope: ReadScope) => boolean
 }): P5ResetPort {
   return {
-    async reset(request, scope) {
+    async reset(request, scope, canDispatch) {
       let dispatched = false
+      let dispatchError: unknown
       const result = await input.protectedMutation(async (context) => {
-        if (context.signal.aborted || !input.recheck(request, scope)) throw new ActionNotDispatchedError()
+        if (context.signal.aborted || !input.recheck(request, scope) || (canDispatch && !canDispatch())) throw new ActionNotDispatchedError()
         dispatched = true
-        return input.dispatch(request, context)
+        try { return await input.dispatch(request, context) } catch (error) { dispatchError = error; throw error }
       })
       if (result.status === 'success') return result.data
       if (!dispatched) throw new ActionNotDispatchedError()
+      if (dispatchError) throw dispatchError
       throw new Error('Dispatched P5 reset outcome is unknown.')
     },
   }
+}
+
+/** Live adapter reuses the protected port and the configured shared HTTP transport. */
+export function createLiveP5ResetPort(input: {
+  readonly transport: HttpTransport
+  readonly protectedMutation: Parameters<typeof createProtectedP5ResetPort>[0]['protectedMutation']
+  readonly recheck: Parameters<typeof createProtectedP5ResetPort>[0]['recheck']
+}): P5ResetPort {
+  return createProtectedP5ResetPort({
+    protectedMutation: input.protectedMutation,
+    recheck: input.recheck,
+    dispatch: async (request, { accessToken, signal }) => {
+      const response = await input.transport.request({
+        endpoint: { service: 'web', method: request.method, path: request.path, auth: 'bearer', body: 'none' },
+        credential: { kind: 'bearer', accessToken }, signal,
+      })
+      if (!response.ok) throw safeHttpError(response.status)
+      if (response.status !== 200) throw new Error('P5 reset response was not confirmed.')
+      if (typeof response.body === 'object' && response.body !== null &&
+        Reflect.get(response.body, 'success') === false) {
+        throw new ActionBusinessRejectionError('PINni tiklashda xatolik yuz berdi. Qayta urinib ko‘ring.')
+      }
+      return response.body
+    },
+  })
 }
 
 export async function invalidateCurrentP5Lists(queryClient: QueryClient, scope: ReadScope, canRead: boolean): Promise<void> {
@@ -102,7 +131,8 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
   let stopAction: (() => void) | null = null
   let capturedRow: P5Row | null = null
   let capturedPort: P5ResetPort | null = null
-  let state: P5ResetState = { dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' }
+  const inactiveState: P5ResetState = { dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' }
+  let state: P5ResetState = inactiveState
   const listeners = new Set<() => void>()
   const setState = (next: P5ResetState) => { state = next; listeners.forEach((listener) => listener()) }
   const currentTarget = () => {
@@ -122,8 +152,10 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
     setState({ dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' })
   }
   return {
-    getState: (): P5ResetState => state.intent === null || stillCurrent(state.intent.scope)
-      ? state : { dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' },
+    getState: (): P5ResetState => state.intent === null || (sameScope(state.intent.scope, deps.currentScope()) &&
+      deps.canRead() && deps.canReset() && deps.port() === capturedPort &&
+      (state.outcome.kind === 'confirmed' || stillCurrent(state.intent.scope)))
+      ? state : inactiveState,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener) } },
     request(row: P5Row): boolean {
       if (action) {
@@ -148,7 +180,7 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
         prepare: async () => Boolean(await (deps.prepare?.() ?? Promise.resolve(true))) && permitted(),
         dispatch: async () => {
           if (!permitted()) throw new ActionNotDispatchedError()
-          decodeP5ResetSuccess(await port.reset(request, scope))
+          decodeP5ResetSuccess(await port.reset(request, scope, permitted))
         },
       })
       stopAction = action.subscribe(() => {
@@ -157,12 +189,12 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
       setState({ dialogOpen: true, intent, outcome: { kind: 'idle' }, refresh: 'idle' })
       return true
     },
-    dismiss() { setState({ ...state, dialogOpen: false }) },
+    dismiss() { if (!action?.pending) setState({ ...state, dialogOpen: false }) },
     async confirm(): Promise<ActionResult<void>> {
-      if (!action || !state.intent || !state.dialogOpen) return { kind: 'not-sent', reason: 'PIN reset hozir mavjud emas.' }
+      if (!action || action.pending || !state.intent || !state.dialogOpen) return { kind: 'not-sent', reason: 'PIN reset hozir mavjud emas.' }
       const intent = state.intent
-      setState({ ...state, dialogOpen: false })
       const result = await action.run()
+      if (result.kind !== 'stale') setState({ ...state, dialogOpen: false })
       if (result.kind === 'confirmed') {
         const refresh = await invalidateAfterConfirmed({ result, isCurrent: () => stillCurrent(intent.scope), invalidate: () => deps.invalidateConfirmed(intent.scope) })
         if (stillCurrent(intent.scope)) setState({ ...state, refresh: refresh === 'failed' ? 'failed' : 'updated' })

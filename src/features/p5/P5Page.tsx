@@ -20,12 +20,8 @@ import {
   isP5StatusDraftValid,
   type P5AdvancedDraft,
   createDefaultP5Filters,
-  createP5Target,
   p5ParentState,
-  p5SelectionKey,
-  resolveP5Target,
   type MerchantLookupState,
-  type P5Target,
 } from './page-state'
 import { P5Results } from './P5Results'
 import { P5ResetDialog } from './P5ResetDialog'
@@ -45,18 +41,19 @@ export function P5Filters(props: Parameters<typeof P5AdvancedFilterFields>[0]) {
 }
 
 type P5ResetController = ReturnType<typeof createP5ResetController>
+type P5ResetView = { readonly notificationId?: number; readonly controller: P5ResetController; readonly queryKey: string; readonly retry: () => void }
 
-function ResetControllerView({ controller }: { readonly controller: P5ResetController }) {
+function ResetControllerView({ controller, onRetry }: { readonly controller: P5ResetController; readonly onRetry: () => void }) {
   const state = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState)
   return <P5ResetDialog state={state} onCancel={controller.dismiss} onConfirm={() => { void controller.confirm() }}
-    onAcknowledgeUnknown={() => { controller.beginNewIntent(true) }} />
+    onAcknowledgeUnknown={onRetry} />
 }
 
-function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable,
+function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onResetView,
   resetUnavailableMessage, pending, error, data, columnOrder, visibleColumnIds,
   onRetry, onPageChange }: {
-  readonly rows: readonly P5Row[]
   readonly queryKey: readonly unknown[]
+  readonly onResetView: (view: P5ResetView) => void
   readonly runtime: ReturnType<typeof useReadRuntime>
   readonly resetPort: P5ResetPort | null
   readonly resetAvailable: boolean
@@ -70,9 +67,6 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable,
   readonly onPageChange: (page: number) => void
 }) {
   const queryClient = useQueryClient()
-  const [target, setTarget] = useState<P5Target | null>(null)
-  const [resetController, setResetController] = useState<P5ResetController | null>(null)
-  const selected = resolveP5Target(target, runtime.scope, queryKey, rows, runtime.capabilities.p5List)
   const currentRow = (deviceId: string): P5Row | null => {
     const current = queryClient.getQueryState<Page<P5Row>>(queryKey)
     if (current?.status !== 'success' || current.isInvalidated) return null
@@ -88,19 +82,26 @@ function ScopedP5Results({ rows, queryKey, runtime, resetPort, resetAvailable,
       port: () => resetAvailable ? resetPort : null,
       invalidateConfirmed: (scope) => invalidateCurrentP5Lists(queryClient, scope, runtime.capabilities.p5List),
     }))
-    if (controller.request(row)) setResetController(controller)
+    const showReset = () => onResetView({ controller, queryKey: JSON.stringify(queryKey), retry: () => {
+      const deviceId = controller.getState().intent?.deviceId
+      const current = deviceId ? currentRow(deviceId) : null
+      if (current && controller.beginNewIntent(true)) controller.request(current)
+    } })
+    const outcome = controller.getState().outcome.kind
+    if (outcome === 'unknown') { showReset(); return }
+    if (outcome === 'confirmed' || outcome === 'rejected') controller.beginNewIntent(false)
+    if (controller.request(row)) showReset()
   }
-  return <><P5Results blocked={false} pending={pending} error={error} data={data} selected={selected}
+  return <P5Results blocked={false} pending={pending} error={error} data={data}
     columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
     onRetry={onRetry} onPageChange={onPageChange}
-    onSelect={(row) => setTarget(createP5Target(row, runtime.scope, queryKey))}
     resetAvailable={resetAvailable} resetUnavailableMessage={resetUnavailableMessage} onReset={requestReset} />
-    {resetController ? <ResetControllerView controller={resetController} /> : null}
-  </>
 }
 
-export function P5Page({ resetPort = null, resetRegistration }: { readonly resetPort?: P5ResetPort | null; readonly resetRegistration?: ReadRegistration } = {}) {
+export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { readonly resetPort?: P5ResetPort | null; readonly resetRegistration?: ReadRegistration } = {}) {
   const runtime = useReadRuntime()
+  const resetPort = injectedResetPort === undefined ? runtime.p5ResetPort ?? null : injectedResetPort
+  const [resetView, setResetView] = useState<P5ResetView | null>(null)
   const [draft, setDraft] = useState<P5AdvancedDraft>(() => createP5AdvancedDraft())
   const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<P5FilterValues>(createDefaultP5Filters)
@@ -234,12 +235,14 @@ export function P5Page({ resetPort = null, resetRegistration }: { readonly reset
         />
       </div>
     </div>
-    {visibleData ? <ScopedP5Results key={p5SelectionKey(listOptions.queryKey, visibleData.content)} rows={visibleData.content} queryKey={listOptions.queryKey} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
+    {visibleData ? <ScopedP5Results key={JSON.stringify(listOptions.queryKey)} queryKey={listOptions.queryKey} onResetView={(view) => setResetView((current) => ({ ...view, notificationId: (current?.notificationId ?? 0) + 1 }))} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       resetUnavailableMessage={resetUnavailableMessage}
       columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />
-      : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data} selected={null}
+      : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data}
         columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
-        onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} onSelect={() => undefined} />}
+        onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />}
+    {resetView?.queryKey === JSON.stringify(listOptions.queryKey)
+      ? <ResetControllerView key={resetView.notificationId} controller={resetView.controller} onRetry={resetView.retry} /> : null}
   </div>
 }

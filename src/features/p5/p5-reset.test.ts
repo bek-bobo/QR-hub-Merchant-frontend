@@ -1,10 +1,11 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { can } from '@/shared/auth/access'
 import { createActionRegistry } from '@/shared/api/one-dispatch-action'
+import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
 import { readKeys } from '@/shared/api/read-keys'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
-import { buildP5ResetRequest, createP5ResetController, createProtectedP5ResetPort, decodeP5ResetSuccess, invalidateCurrentP5Lists, isP5ResetEligible, p5ResetIntentKey, type P5ResetPort } from './p5-reset'
+import { buildP5ResetRequest, createLiveP5ResetPort, createP5ResetController, createProtectedP5ResetPort, decodeP5ResetSuccess, invalidateCurrentP5Lists, isP5ResetEligible, p5ResetIntentKey, type P5ResetPort } from './p5-reset'
 
 const scope: ReadScope = { source: 'live', sessionScopeId: 'session-a', accessRevision: 1 }
 const row: P5Row = {
@@ -148,9 +149,14 @@ describe('P5 reset contract and controller', () => {
   })
 
   it('retains one same-device pending intent across close, reopen and duplicate rows', async () => {
+    const started = deferred<void>()
     const gate = deferred<unknown>()
     let sends = 0
-    const port: P5ResetPort = { reset: () => { sends += 1; return gate.promise } }
+    const port: P5ResetPort = { reset: async () => {
+      sends += 1
+      started.resolve()
+      return gate.promise
+    } }
     const subject = setup({ port: () => port })
     const registry = createActionRegistry()
     const key = p5ResetIntentKey(scope, row.deviceId)
@@ -161,9 +167,11 @@ describe('P5 reset contract and controller', () => {
     retained.dismiss()
     expect(retained.request({ ...row })).toBe(true)
     expect((await retained.confirm()).kind).toBe('not-sent')
+    await started.promise
     expect(sends).toBe(1)
     gate.resolve(confirmed)
     expect((await flight).kind).toBe('confirmed')
+    expect(sends).toBe(1)
   })
 
   it('keeps ambiguous dispatch UNKNOWN, does not replay, and requires acknowledgement for a new intent', async () => {
@@ -216,5 +224,67 @@ describe('P5 reset contract and controller', () => {
       selected.push(...keys.filter((queryKey) => predicate({ queryKey })))
     } } as never, scope, true)
     expect(selected).toEqual(keys.slice(0, 2))
+  })
+})
+
+
+describe('P5 reset live HTTP adapter', () => {
+  const protectedMutation: Parameters<typeof createProtectedP5ResetPort>[0]['protectedMutation'] = async (operation) => {
+    try {
+      return { status: 'success', data: await operation({ accessToken: 'test-token', signal: new AbortController().signal }) }
+    } catch { return { status: 'failed' } }
+  }
+  function live(payload: unknown, status = 200, networkFailure = false) {
+    const base = validateWebBaseUrl('https://configured.example/api/qh-merchant-web-api', 'production')
+    if (base.kind !== 'valid') throw new Error('Invalid test base')
+    const fetchImpl = vi.fn<typeof fetch>(async () => {
+      if (networkFailure) throw new Error('private network detail')
+      return new Response(JSON.stringify(payload), { status, headers: { 'Content-Type': 'application/json', 'X-Request-ID': 'test-request' } })
+    })
+    const transport = createHttpTransport({ service: 'web', baseUrl: base.value, fetchImpl })
+    const port = createLiveP5ResetPort({ transport, protectedMutation, recheck: () => true })
+    return { port, fetchImpl }
+  }
+
+  it('sends one authenticated bodyless POST for the actual row ID only after confirmation', async () => {
+    const subject = live({ success: true, requestId: null, timeZone: 'Asia/Tashkent', error: null, data: null })
+    const controller = setup({ port: () => subject.port }).controller
+    expect(controller.request(row)).toBe(true)
+    expect(subject.fetchImpl).not.toHaveBeenCalled()
+    const first = controller.confirm()
+    expect(controller.getState().dialogOpen).toBe(true)
+    expect(controller.getState().outcome.kind).toBe('pending')
+    controller.dismiss()
+    expect(controller.getState().dialogOpen).toBe(true)
+    expect((await controller.confirm()).kind).toBe('not-sent')
+    expect((await first).kind).toBe('confirmed')
+    expect(controller.getState().dialogOpen).toBe(false)
+    expect(subject.fetchImpl).toHaveBeenCalledTimes(1)
+    const [url, options] = subject.fetchImpl.mock.calls[0]!
+    expect(String(url)).toBe('https://configured.example/api/qh-merchant-web-api/p5/reset-pin/00%20Ab%2F%252F')
+    expect(options?.method).toBe('POST')
+    expect(options?.body).toBeUndefined()
+    expect(new Headers(options?.headers).get('Authorization')).toBe('Bearer test-token')
+  })
+
+  it.each([
+    [{ success: false, error: { text: 'private backend detail' }, data: null }, 200, false, 'rejected'],
+    [{ success: true, error: {}, data: null }, 200, false, 'unknown'],
+    [{ success: true, error: null, data: {} }, 200, false, 'unknown'],
+    [{}, 500, false, 'unknown'],
+    [null, 200, true, 'unknown'],
+  ] as const)('never confirms an error or malformed response %#', async (payload, status, networkFailure, expected) => {
+    const subject = live(payload, status, networkFailure)
+    const controller = setup({ port: () => subject.port }).controller
+    controller.request(row)
+    expect((await controller.confirm()).kind).toBe(expected)
+    expect(subject.fetchImpl).toHaveBeenCalledTimes(1)
+    expect(controller.getState().dialogOpen).toBe(false)
+  })
+
+  it('rechecks row eligibility after protected-session preflight before HTTP dispatch', async () => {
+    const subject = live(confirmed)
+    await expect(subject.port.reset(buildP5ResetRequest(row.deviceId)!, scope, () => false)).rejects.toThrow('not called')
+    expect(subject.fetchImpl).not.toHaveBeenCalled()
   })
 })
