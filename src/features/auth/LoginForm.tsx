@@ -1,13 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { KeyRoundIcon, ScanLineIcon, ShieldCheckIcon, SmartphoneIcon } from 'lucide-react'
+import { AuthCard, AuthOtpInput, AuthPinInput, AuthPrimaryButton, AuthRestartAction, AuthStepHeader } from './AuthPresentation'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { LoginActions } from '@/shared/auth/useAuth'
 import { isValidOtp, isValidPin } from '@/features/auth/validation'
@@ -134,250 +128,79 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
   }
 
   const status = message ? (
-    <p
-      id="login-feedback"
-      className="rounded-lg bg-brand-soft px-3 py-2 text-sm text-text-primary"
-      role={snapshot.phase === 'error' ? 'alert' : 'status'}
-      aria-live="polite"
-    >
-      {message}
-    </p>
-  ) : (
-    <span id="login-feedback" className="sr-only" aria-live="polite" />
-  )
+    <p id="login-feedback" className="auth-feedback"
+      role={snapshot.phase === 'error' ? 'alert' : 'status'} aria-live="polite">{message}</p>
+  ) : <span id="login-feedback" className="sr-only" aria-live="polite" />
 
   if (snapshot.phase === 'completing' || snapshot.phase === 'complete') {
-    return (
-      <Card className="w-full max-w-[420px] shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl text-text-primary">
-            {snapshot.phase === 'completing'
-              ? 'Profil tekshirilmoqda'
-              : 'Kirish yakunlandi'}
-          </CardTitle>
-          <CardDescription>
-            {snapshot.phase === 'completing'
-              ? 'Xavfsiz sessiya holati tekshirilmoqda.'
-              : 'Private kirish SessionController holati bilan belgilanadi.'}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>{status}</CardContent>
-      </Card>
-    )
+    return <AuthCard>
+      <AuthStepHeader icon={ShieldCheckIcon}
+        title={snapshot.phase === 'completing' ? 'Profil tekshirilmoqda' : 'Kirish yakunlandi'}
+        subtitle={snapshot.phase === 'completing' ? 'Xavfsiz sessiya holati tekshirilmoqda.' : 'Merchant hisobingizga kirish yakunlandi.'} />
+      {status}
+    </AuthCard>
   }
 
-  if (
-    snapshot.phase === 'error' ||
-    snapshot.phase === 'expired' ||
-    snapshot.phase === 'blocked' ||
-    snapshot.phase === 'unavailable'
-  ) {
-    return (
-      <Card className="w-full max-w-[420px] shadow-sm">
-        <CardHeader>
-          <CardTitle className="text-xl text-text-primary">
-            Kirishni davom ettirib bo‘lmadi
-          </CardTitle>
-          <CardDescription>
-            Xavfsiz tarzda qayta boshlashingiz mumkin.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {status}
-          <Button
-            type="button"
-            className="h-11 w-full bg-brand hover:bg-primary-hover"
-            onClick={restart}
-          >
-            Qayta boshlash
-          </Button>
-        </CardContent>
-      </Card>
-    )
+  if (snapshot.phase === 'error' || snapshot.phase === 'expired' || snapshot.phase === 'blocked' || snapshot.phase === 'unavailable') {
+    return <AuthCard>
+      <AuthStepHeader icon={ShieldCheckIcon} title="Kirishni davom ettirib bo‘lmadi" subtitle="Xavfsiz tarzda qayta boshlashingiz mumkin." />
+      <div className="space-y-5">{status}<AuthRestartAction onClick={restart} /></div>
+    </AuthCard>
   }
 
-  return (
-    <Card className="w-full max-w-[420px] shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-xl text-text-primary">
-          {snapshot.phase === 'phone' && 'Tizimga kirish'}
-          {(snapshot.phase === 'otp' || snapshot.phase === 'reset-otp') &&
-            'Tasdiqlash kodi'}
-          {snapshot.phase === 'pin' && 'PIN kiriting'}
-          {snapshot.phase === 'set-pin' && 'Yangi PIN yarating'}
-        </CardTitle>
-        <CardDescription>
-          {snapshot.phase === 'phone'
-            ? 'Merchant hisobingiz telefon raqamini kiriting.'
-            : snapshot.phone
-              ? `Telefon: ${formatUzbekPhoneDisplay(snapshot.phone)}`
-              : 'Kirish ma’lumotlarini tasdiqlang.'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {snapshot.phase === 'phone' && (
-          <form className="space-y-4" onSubmit={submitPhone} noValidate>
-            <div className="space-y-2.5">
-              <UzbekPhoneInput
-                id="login-phone"
-                aria-label="Telefon raqami"
-                autoComplete="tel"
-                placeholder="XX XXX XX XX"
-                value={phone}
-                onValueChange={setPhone}
-                aria-invalid={Boolean(message)}
-                aria-describedby="login-feedback"
-                disabled={snapshot.pending}
-              />
-            </div>
-            {status}
-            <Button
-              type="submit"
-              className="h-11 w-full bg-brand hover:bg-primary-hover"
-              disabled={snapshot.pending}
-            >
-              {snapshot.pending ? 'Kutilmoqda…' : 'Davom etish'}
-            </Button>
-          </form>
-        )}
+  return <AuthCard>
+    <AuthStepHeader
+      icon={snapshot.phase === 'phone' ? SmartphoneIcon : snapshot.phase === 'pin' ? ShieldCheckIcon : snapshot.phase === 'set-pin' ? KeyRoundIcon : ScanLineIcon}
+      title={snapshot.phase === 'phone' ? 'Tizimga kirish' : snapshot.phase === 'pin' ? 'PIN kiriting' : snapshot.phase === 'set-pin' ? 'Yangi PIN yarating' : 'Tasdiqlash kodi'}
+      subtitle={snapshot.phase === 'phone' ? 'Merchant hisobingiz telefon raqamini kiriting.'
+        : snapshot.phone ? `Telefon: ${formatUzbekPhoneDisplay(snapshot.phone)}` : 'Kirish ma’lumotlarini tasdiqlang.'} />
+    {snapshot.phase === 'phone' && <form className="space-y-5" onSubmit={submitPhone} noValidate>
+      <div className="auth-phone">
+        <UzbekPhoneInput id="login-phone" aria-label="Telefon raqami" autoComplete="tel" placeholder="XX XXX XX XX"
+          value={phone} onValueChange={setPhone} aria-invalid={Boolean(message)} aria-describedby="login-feedback" disabled={snapshot.pending} />
+      </div>
+      {status}
+      <AuthPrimaryButton type="submit" disabled={snapshot.pending}>{snapshot.pending ? 'Kutilmoqda…' : 'Davom etish'}</AuthPrimaryButton>
+    </form>}
 
-        {(snapshot.phase === 'otp' || snapshot.phase === 'reset-otp') && (
-          <form className="space-y-4" onSubmit={submitOtp} noValidate>
-            <div className="space-y-1.5">
-              <Input
-                id="login-otp"
-                aria-label="Tasdiqlash kodi"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                maxLength={6}
-                value={otp}
-                onChange={(event) => setOtp(event.target.value)}
-                aria-invalid={Boolean(message)}
-                aria-describedby="login-feedback"
-                disabled={snapshot.pending || otpExpired}
-              />
-            </div>
-            <div className="flex items-center justify-between gap-3 text-sm text-text-secondary">
-              <span>Kodning amal qilish muddati</span>
-              <span aria-hidden="true">{formatCountdown(remainingMs)}</span>
-            </div>
-            {status}
-            <Button
-              type="submit"
-              className="h-11 w-full bg-brand hover:bg-primary-hover"
-              disabled={snapshot.pending || otpExpired}
-            >
-              {snapshot.pending ? 'Tekshirilmoqda…' : 'Tasdiqlash'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="h-10 w-full"
-              disabled={snapshot.pending || !otpExpired}
-              onClick={() => {
-                setOtp('')
-                void actions.resendOtp()
-              }}
-            >
-              Kodni qayta yuborish
-            </Button>
-            <Button type="button" variant="link" className="w-full" onClick={restart}>
-              Qayta boshlash
-            </Button>
-          </form>
-        )}
+    {(snapshot.phase === 'otp' || snapshot.phase === 'reset-otp') && <form className="space-y-5" onSubmit={submitOtp} noValidate>
+      <AuthOtpInput id="login-otp" aria-label="Tasdiqlash kodi" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6}
+        value={otp} onChange={(event) => setOtp(event.target.value)} aria-invalid={Boolean(message)} aria-describedby="login-feedback"
+        disabled={snapshot.pending || otpExpired} />
+      <div className="flex items-center justify-between gap-3 text-sm text-text-secondary">
+        <span>Kodning amal qilish muddati</span><span className="tabular-nums" aria-hidden="true">{formatCountdown(remainingMs)}</span>
+      </div>
+      {status}
+      <AuthPrimaryButton type="submit" disabled={snapshot.pending || otpExpired}>{snapshot.pending ? 'Tekshirilmoqda…' : 'Tasdiqlash'}</AuthPrimaryButton>
+      <Button type="button" variant="outline" className="auth-secondary" disabled={snapshot.pending || !otpExpired}
+        onClick={() => { setOtp(''); void actions.resendOtp() }}>Kodni qayta yuborish</Button>
+      <AuthRestartAction onClick={restart} />
+    </form>}
 
-        {snapshot.phase === 'pin' && (
-          <form className="space-y-4" onSubmit={submitPin} noValidate>
-            <div className="space-y-2.5">
-              <Input
-                id="login-pin"
-                aria-label="PIN"
-                type="password"
-                inputMode="numeric"
-                autoComplete="current-password"
-                value={pin}
-                onChange={(event) => setPin(event.target.value)}
-                aria-invalid={Boolean(message)}
-                aria-describedby="login-feedback"
-                disabled={snapshot.pending}
-              />
-            </div>
-            {status}
-            <Button
-              type="submit"
-              className="h-11 w-full bg-brand hover:bg-primary-hover"
-              disabled={snapshot.pending}
-            >
-              {snapshot.pending ? 'Tekshirilmoqda…' : 'Kirish'}
-            </Button>
-            <Button
-              type="button"
-              variant="link"
-              className="w-full"
-              disabled={snapshot.pending}
-              onClick={() => {
-                setPin('')
-                void actions.startReset()
-              }}
-            >
-              PINni unutdingizmi?
-            </Button>
-            <Button type="button" variant="ghost" className="w-full" onClick={restart}>
-              Qayta boshlash
-            </Button>
-          </form>
-        )}
+    {snapshot.phase === 'pin' && <form className="space-y-5" onSubmit={submitPin} noValidate>
+      <AuthPinInput key="login-pin" id="login-pin" withLock aria-label="PIN" inputMode="numeric" autoComplete="current-password" placeholder="PIN kiriting"
+        value={pin} onChange={(event) => setPin(event.target.value)} aria-invalid={Boolean(message)} aria-describedby="login-feedback" disabled={snapshot.pending} />
+      {status}
+      <AuthPrimaryButton type="submit" disabled={snapshot.pending}>{snapshot.pending ? 'Tekshirilmoqda…' : 'Kirish'}</AuthPrimaryButton>
+      <Button type="button" variant="link" className="auth-text-action" disabled={snapshot.pending}
+        onClick={() => { setPin(''); void actions.startReset() }}>PINni unutdingizmi?</Button>
+      <AuthRestartAction onClick={restart} neutral />
+    </form>}
 
-        {snapshot.phase === 'set-pin' && (
-          <form className="space-y-4" onSubmit={submitNewPin} noValidate>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-text-primary" htmlFor="new-pin">
-                Yangi PIN
-              </label>
-              <Input
-                id="new-pin"
-                type="password"
-                inputMode="numeric"
-                autoComplete="off"
-                value={pin}
-                onChange={(event) => setPin(event.target.value)}
-                aria-invalid={Boolean(message)}
-                aria-describedby="login-feedback"
-                disabled={snapshot.pending}
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium text-text-primary" htmlFor="confirm-pin">
-                PINni tasdiqlang
-              </label>
-              <Input
-                id="confirm-pin"
-                type="password"
-                inputMode="numeric"
-                autoComplete="off"
-                value={pinConfirmation}
-                onChange={(event) => setPinConfirmation(event.target.value)}
-                aria-invalid={Boolean(message)}
-                aria-describedby="login-feedback"
-                disabled={snapshot.pending}
-              />
-            </div>
-            {status}
-            <Button
-              type="submit"
-              className="h-11 w-full bg-brand hover:bg-primary-hover"
-              disabled={snapshot.pending}
-            >
-              {snapshot.pending ? 'Saqlanmoqda…' : 'PINni saqlash'}
-            </Button>
-            <Button type="button" variant="link" className="w-full" onClick={restart}>
-              Qayta boshlash
-            </Button>
-          </form>
-        )}
-      </CardContent>
-    </Card>
-  )
+    {snapshot.phase === 'set-pin' && <form className="space-y-5" onSubmit={submitNewPin} noValidate>
+      <div className="space-y-2">
+        <label className="block text-base font-medium text-text-primary" htmlFor="new-pin">Yangi PIN</label>
+        <AuthPinInput key="new-pin" id="new-pin" inputMode="numeric" autoComplete="off" placeholder="PIN kiriting"
+          value={pin} onChange={(event) => setPin(event.target.value)} aria-invalid={Boolean(message)} aria-describedby="login-feedback" disabled={snapshot.pending} />
+      </div>
+      <div className="space-y-2">
+        <label className="block text-base font-medium text-text-primary" htmlFor="confirm-pin">PINni tasdiqlang</label>
+        <AuthPinInput key="confirm-pin" id="confirm-pin" inputMode="numeric" autoComplete="off" placeholder="PINni qayta kiriting"
+          value={pinConfirmation} onChange={(event) => setPinConfirmation(event.target.value)} aria-invalid={Boolean(message)} aria-describedby="login-feedback" disabled={snapshot.pending} />
+      </div>
+      {status}
+      <AuthPrimaryButton type="submit" disabled={snapshot.pending}>{snapshot.pending ? 'Saqlanmoqda…' : 'PINni saqlash'}</AuthPrimaryButton>
+      <AuthRestartAction onClick={restart} />
+    </form>}
+  </AuthCard>
 }
