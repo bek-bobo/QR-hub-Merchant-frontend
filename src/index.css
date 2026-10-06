@@ -324,26 +324,6 @@ body {
     border-color: color-mix(in srgb, var(--border) 65%, transparent);
   }
 
-  .static-qr-pagination [data-slot='button'],
-  .p5-pagination [data-slot='button'],
-  .bank-account-pagination [data-slot='button'],
-  .terminal-pagination [data-slot='button'],
-  .cashier-pagination [data-slot='button'],
-  .dynamic-qr-pagination [data-slot='button'] {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.625rem;
-  }
-
-  .static-qr-pagination [data-variant='outline'],
-  .p5-pagination [data-variant='outline'],
-  .bank-account-pagination [data-variant='outline'],
-  .terminal-pagination [data-variant='outline'],
-  .cashier-pagination [data-variant='outline'],
-  .dynamic-qr-pagination [data-variant='outline'] {
-    background: var(--surface);
-  }
-
   .dynamic-qr-list .dynamic-qr-table [data-slot='table-head'],
   .dynamic-qr-list .dynamic-qr-table [data-slot='table-cell'] {
     padding-inline: 1rem;
