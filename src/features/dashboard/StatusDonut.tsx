@@ -19,19 +19,19 @@ type StatusDonutProps = Pick<DashboardView, 'pie' | 'metrics'>
 export function StatusDonut({ pie, metrics }: StatusDonutProps) {
   const theme = useMerchantPlotTheme()
   const reconciliation = reconcileDashboard({ metrics, pie })
-  // This share includes ALL transactions, independently of donut reconciliation.
+  // Preserve the backend's independently computed share.
   const successShare = metrics.total.count === 0
     ? '—'
-    : `${(metrics.success.count / metrics.total.count * 100).toLocaleString('uz-UZ', {
+    : `${pie.success.percent.toLocaleString('uz-UZ', {
       maximumFractionDigits: 2,
     })}%`
   const items = [
     { label: 'Muvaffaqiyatli', value: pie.success, tone: 'success' },
     { label: 'Jarayonda', value: pie.processing, tone: 'warning' },
     { label: 'Muvaffaqiyatsiz', value: pie.failed, tone: 'error' },
+    ...(pie.uncategorized.count > 0 ? [{ label: 'Tasniflanmagan', value: pie.uncategorized, tone: 'neutral' } as const] : []),
   ] as const
-  const totalPercent = items.reduce((sum, item) => sum + item.value.percent, 0)
-  const hasDistribution = reconciliation.countMatches && totalPercent > 0
+  const hasDistribution = reconciliation.countMatches && metrics.total.count > 0
   const accessibleLabel = hasDistribution
     ? items
         .map((item) => `${item.label}: ${item.value.percent.toLocaleString('uz-UZ')}%`)
@@ -39,7 +39,7 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
     : 'Status taqsimoti mavjud emas'
 
   return (
-    <Card className="min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4)] sm:[--card-spacing:--spacing(5)]">
+    <Card className="@container min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4)] sm:[--card-spacing:--spacing(5)]">
       <CardHeader>
         <div className="flex min-w-0 items-center gap-3">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand"><ChartPieIcon className="size-5" aria-hidden="true" /></span>
@@ -49,17 +49,17 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex min-w-0 flex-col items-center gap-4 lg:flex-row lg:items-center lg:justify-center xl:flex-col">
-        <div className="relative w-full max-w-64 shrink-0">
+      <CardContent className="flex min-w-0 flex-col items-center gap-5 @md:flex-row @md:items-center">
+        <div className="relative size-52 max-w-full shrink-0">
           <div role="img" aria-label={accessibleLabel} data-empty={!hasDistribution || undefined}>
             {hasDistribution && theme ? (
               <div aria-hidden="true">
-                <PlotViewportBoundary fallback={<div data-plot-loading="donut" className="h-64 w-full rounded-full bg-muted/40 motion-safe:animate-pulse" />}>
+                <PlotViewportBoundary fallback={<div data-plot-loading="donut" className="h-52 w-full rounded-full bg-muted/40 motion-safe:animate-pulse" />}>
                   <StatusPiePlotRenderer {...createDonutPlotConfig({ pie, metrics }, theme)} />
                 </PlotViewportBoundary>
               </div>
             ) : (
-              <div aria-hidden="true" className="mx-auto aspect-square w-full rounded-full border-[28px] border-muted" />
+              <div aria-hidden="true" className="mx-auto aspect-square w-full rounded-full border-[22px] border-muted" />
             )}
           </div>
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -72,25 +72,25 @@ export function StatusDonut({ pie, metrics }: StatusDonutProps) {
           </div>
         </div>
 
-        <div className="w-full min-w-0 max-w-xl">
+        <div className="w-full min-w-0 flex-1">
           <dl className="grid gap-3">
             {items.map((item) => (
               <div
                 key={item.label}
-                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 border-b border-border/60 pb-2 last:border-0"
+                className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 border-b border-border/60 pb-3 last:border-0"
               >
-                <dt className="flex min-w-0 items-center gap-2 text-sm text-text-secondary">
+                <dt className="flex min-w-0 items-center gap-2 text-sm text-text-primary">
                   <span
                     aria-hidden="true"
                     className={`size-2 shrink-0 rounded-full ${statusToneClasses[item.tone].indicator}`}
                   />
                   <span className="min-w-0 break-words">{item.label}</span>
                 </dt>
-                <dd className="flex min-w-0 flex-wrap items-center justify-end gap-3 text-sm [overflow-wrap:anywhere]">
+                <dd className="flex min-w-0 flex-wrap items-center justify-end gap-3 text-sm tabular-nums [overflow-wrap:anywhere]">
                   <span className="font-semibold text-text-primary">
                     {item.value.count.toLocaleString('uz-UZ')}
                   </span>
-                  {reconciliation.countMatches ? <span className={`rounded-full px-3 py-0.5 font-semibold ${statusToneClasses[item.tone].icon}`}>{item.value.percent.toLocaleString('uz-UZ')}%</span> : null}
+                  {reconciliation.countMatches ? <span className="min-w-14 text-right text-xs text-text-secondary">{item.value.percent.toLocaleString('uz-UZ')}%</span> : null}
                 </dd>
               </div>
             ))}

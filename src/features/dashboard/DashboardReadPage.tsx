@@ -34,7 +34,8 @@ import { MetricCards } from './MetricCards'
 import { StatusDonut } from './StatusDonut'
 import { resetDashboardFilters } from './presenters'
 import { useDashboardReadQueries } from './queries'
-import { ChartLocalDateFilter } from './ChartLocalDateFilter'
+import { GranularityControl } from './GranularityControl'
+import { TrendChart } from './TrendChart'
 
 function DashboardSkeleton() {
   return (
@@ -188,7 +189,7 @@ export function DashboardReadPage({
     (instant) => createDashboardFilterState(resetDashboardFilters(instant ?? new Date())),
   )
   const { applied, dateDraft, terminalDraft, validationMessage } = filters
-  const queries = useDashboardReadQueries(applied)
+  const queries = useDashboardReadQueries(applied, filters.requestedGranularity)
   const { dashboard, terminals, recent, enabled, runtime } = queries
   const refreshing = dashboard.isFetching || (enabled.recent && recent.isFetching)
 
@@ -241,7 +242,6 @@ export function DashboardReadPage({
           onPreset={selectPreset} onReset={resetDates} />}
       >
         <FilterDrawer
-          description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
           onApply={() => { dispatch({ type: 'apply-terminal' }); return true }}
           onReset={() => dispatch({ type: 'terminal-draft', terminalId: undefined })}
           onOpenChange={(open) => dispatch({ type: 'terminal-drawer', open })}
@@ -268,7 +268,10 @@ export function DashboardReadPage({
           ) : null}
           <MetricCards metrics={dashboard.data.metrics} pie={dashboard.data.pie} />
           <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(16rem,1.1fr)]">
-            <ChartLocalDateFilter view={dashboard.data} filters={applied} initialInstant={initialInstant} />
+            <TrendChart view={dashboard.data}
+              granularityControls={<GranularityControl aggregation={dashboard.data.aggregation}
+                onSelect={(granularity) => dispatch({ type: 'granularity', granularity })} />}
+              periodLabel={<p className="mt-1 text-xs text-text-secondary">Grafik davri: {dashboard.data.range.fromDate} → {dashboard.data.range.toDate}</p>} />
             <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>
         </>

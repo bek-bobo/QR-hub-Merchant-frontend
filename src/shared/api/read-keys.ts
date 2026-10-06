@@ -1,5 +1,6 @@
 import type {
     DashboardFilters,
+    DashboardRequest,
     DynamicQrFilters,
     ReadScope,
 } from '@/shared/contracts/merchant-read'
@@ -40,8 +41,8 @@ function dynamicQrFiltersKey(filters: DynamicQrFilters) {
 
 export const readKeys = {
     scope: scopeKey,
-    dashboard: (scope: ReadScope, filters: DashboardFilters) =>
-        [...scopeKey(scope), 'dashboard', ...dashboardFiltersKey(filters)] as const,
+    dashboard: (scope: ReadScope, filters: DashboardRequest) =>
+        [...scopeKey(scope), 'dashboard', ...dashboardFiltersKey(filters), filters.granularity ?? 'AUTO'] as const,
     dynamicQrs: (scope: ReadScope, filters: DynamicQrFilters) =>
         [...scopeKey(scope), 'dynamic-qrs', ...dynamicQrFiltersKey(filters)] as const,
     dynamicQrStats: (scope: ReadScope, filters: DashboardFilters) =>

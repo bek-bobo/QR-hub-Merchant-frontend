@@ -2,19 +2,20 @@ import { useId } from 'react'
 import { SlidersHorizontalIcon } from 'lucide-react'
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
-import { TREND_SERIES, type TrendSeriesKey } from './trend-presentation'
+import { ALL_TREND_SERIES, TREND_SERIES, type TrendSeriesKey } from './trend-presentation'
 
 interface TrendSeriesSettingsProps {
   readonly visible: readonly TrendSeriesKey[]
+  readonly available?: readonly TrendSeriesKey[]
   readonly onToggle: (key: TrendSeriesKey) => void
 }
 
-export function TrendSeriesSettingsList({ visible, onToggle }: TrendSeriesSettingsProps) {
+export function TrendSeriesSettingsList({ visible, available = ALL_TREND_SERIES, onToggle }: TrendSeriesSettingsProps) {
   const helpId = useId()
   return <div className="min-w-0 space-y-3">
     <p className="text-sm font-semibold text-text-primary">Grafik qatorlari</p>
     <ul className="space-y-2">
-      {TREND_SERIES.map((item) => {
+      {TREND_SERIES.filter(({ key }) => available.includes(key)).map((item) => {
         const checked = visible.includes(item.key)
         return <li key={item.key}>
           <label className="flex min-w-0 cursor-pointer items-center gap-3 rounded-lg border border-border bg-background px-3 py-2">

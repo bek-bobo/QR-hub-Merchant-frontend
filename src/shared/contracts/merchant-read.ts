@@ -14,8 +14,10 @@ export type QrStatusKind =
   | 'success'
   | 'unknown'
 export type PageSize = 10 | 20 | 25 | 50
-export type Outcome = 'total' | 'success' | 'processing' | 'failed'
+export type Outcome = 'total' | 'success' | 'processing' | 'failed' | 'uncategorized'
 export type ChartGroupBy = 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
+export type DashboardGranularity = 'AUTO' | ChartGroupBy
+export type DashboardCoverage = 'COMPLETED' | 'PARTIAL' | 'FUTURE'
 
 export type Money = Readonly<{
   minorUnits: string
@@ -35,6 +37,7 @@ export type DateRange = Readonly<{ fromDate: string; toDate: string }>
 
 export type DashboardFilters = DateRange &
   Readonly<{ terminalId?: string }>
+export type DashboardRequest = DashboardFilters & Readonly<{ granularity?: DashboardGranularity }>
 
 export type DynamicQrFilters = DashboardFilters &
   Readonly<{
@@ -85,11 +88,16 @@ export type DashboardBucket = Readonly<{
   periodKind: 'calendar' | 'hour'
   periodStart: string
   periodEnd: string
+  coverageStart: string
+  coverageEnd: string
+  observedEnd: string
+  coverage: DashboardCoverage
+  partial: boolean
   values: Readonly<Record<Outcome, CountAmount>>
 }>
 
 export type DashboardView = Readonly<{
-  metrics: Readonly<Record<Outcome, Metric>>
+  metrics: Readonly<Record<Exclude<Outcome, 'uncategorized'>, Metric> & { uncategorized: CountAmount }>
   pie: Readonly<
     Record<
       Exclude<Outcome, 'total'>,
@@ -98,6 +106,10 @@ export type DashboardView = Readonly<{
   >
   chartGroupBy: ChartGroupBy
   buckets: readonly DashboardBucket[]
+  range: DateRange & Readonly<{ timezone: 'Asia/Tashkent'; startInclusive: string; endExclusive: string; asOf: string }>
+  aggregation: Readonly<{ requestedGranularity: DashboardGranularity; resolvedGranularity: ChartGroupBy;
+    allowedGranularities: readonly ChartGroupBy[]; zeroBucketsIncluded: true; timeField: 'CREATED_AT' }>
+  filters: Readonly<{ terminalId?: string }>
 }>
 
 export type ReadScope = Readonly<{

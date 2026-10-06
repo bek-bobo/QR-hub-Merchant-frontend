@@ -40,18 +40,18 @@ export function formatGrowth(value: number | null): string {
 }
 
 export function reconcileDashboard(view: Pick<DashboardView, 'metrics'> & Partial<Pick<DashboardView, 'pie'>>) {
-  const { total, success, processing, failed } = view.metrics
-  const categorizedCount = BigInt(success.count) + BigInt(processing.count) + BigInt(failed.count)
+  const { total, success, processing, failed, uncategorized } = view.metrics
+  const categorizedCount = BigInt(success.count) + BigInt(processing.count) + BigInt(failed.count) + BigInt(uncategorized.count)
   const categorizedAmount = BigInt(success.amount.minorUnits) +
-    BigInt(processing.amount.minorUnits) + BigInt(failed.amount.minorUnits)
+    BigInt(processing.amount.minorUnits) + BigInt(failed.amount.minorUnits) + BigInt(uncategorized.amount.minorUnits)
   return Object.freeze({
     countMatches: categorizedCount === BigInt(total.count) &&
       (!view.pie || (view.pie.success.count === success.count &&
-        view.pie.processing.count === processing.count && view.pie.failed.count === failed.count)),
+        view.pie.processing.count === processing.count && view.pie.failed.count === failed.count && view.pie.uncategorized.count === uncategorized.count)),
     amountMatches: categorizedAmount === BigInt(total.amount.minorUnits) &&
       (!view.pie || (view.pie.success.amount.minorUnits === success.amount.minorUnits &&
         view.pie.processing.amount.minorUnits === processing.amount.minorUnits &&
-        view.pie.failed.amount.minorUnits === failed.amount.minorUnits)),
+        view.pie.failed.amount.minorUnits === failed.amount.minorUnits && view.pie.uncategorized.amount.minorUnits === uncategorized.amount.minorUnits)),
   })
 }
 
@@ -78,4 +78,3 @@ export function presentQrStatus(statusCode: number): QrStatusPresentation {
       return { label: 'Noma’lum', tone: 'neutral' }
   }
 }
-

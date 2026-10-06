@@ -11,21 +11,24 @@ import {
 } from '@/components/ui/card'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
-import { createTrendPlotConfig, TREND_GROUP_LABELS, TREND_SERIES, type TrendMode } from './trend-presentation'
+import { availableTrendSeries, visibleTrendSeries, createTrendPlotConfig, TREND_GROUP_LABELS, TREND_SERIES, type TrendMode } from './trend-presentation'
 import { TrendSeriesSettings } from './TrendSeriesSettings'
 import { useTrendSeriesPreferences } from './useTrendSeriesPreferences'
 
 interface TrendChartProps {
   readonly view: DashboardView
-  readonly rangeControls?: ReactNode
+  readonly granularityControls?: ReactNode
   readonly periodLabel?: ReactNode
   readonly feedback?: ReactNode
   readonly plotUnavailable?: boolean
 }
 
-export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUnavailable = false }: TrendChartProps) {
+export function TrendChart({ view, granularityControls, periodLabel, feedback, plotUnavailable = false }: TrendChartProps) {
   const [mode, setMode] = useState<TrendMode>('count')
-  const { visible, toggle } = useTrendSeriesPreferences()
+  const available = availableTrendSeries(view)
+  const preferences = useTrendSeriesPreferences(undefined, available)
+  const visible = visibleTrendSeries(preferences.visible, available)
+  const toggle = preferences.toggle
   const theme = useMerchantPlotTheme()
 
   return (
@@ -41,7 +44,7 @@ export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUna
           </div>
         </div>
         <div className="flex min-w-0 max-w-full flex-wrap items-start gap-2">
-          {rangeControls}
+          {granularityControls}
           <div role="group" aria-label="Trend ko‘rinishi" className="flex max-w-full flex-wrap gap-0.5 rounded-lg bg-muted/60 p-0.5">
             {(['amount', 'count'] as const).map((option) => (
               <Button key={option} type="button" variant="outline" size="sm"
@@ -52,7 +55,7 @@ export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUna
               </Button>
             ))}
           </div>
-          <TrendSeriesSettings visible={visible} onToggle={toggle} />
+          <TrendSeriesSettings visible={visible} available={available} onToggle={toggle} />
         </div>
       </CardHeader>
       <CardContent className="min-w-0 space-y-5">
@@ -62,7 +65,7 @@ export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUna
             Tanlangan davr uchun trend nuqtalari mavjud emas.
           </p>
         ) : (
-          <div className="min-w-0 w-full" aria-hidden="true">
+          <div className="min-w-0 w-full">
             {theme ? (
               <TrendPlotViewport config={createTrendPlotConfig(view, mode, visible, theme)} />
             )
@@ -79,12 +82,13 @@ export function TrendChart({ view, rangeControls, periodLabel, feedback, plotUna
         </ul>
         {!plotUnavailable && view.buckets.length > 0 ? (
           <section className="sr-only" aria-label="Trend: davrlar bo‘yicha aniq qiymatlar">
-            <p>Har bir davr uchun barcha to‘rt seriyaning aniq soni va summasi, yashirilgan seriyalar bilan birga.</p>
+            <p>Har bir davr uchun statuslarning aniq soni va summasi, yashirilgan qatorlar bilan birga.</p>
             <ul>
               {view.buckets.map((bucket, index) => (
                 <li key={`${bucket.label}-${index}`}>
-                  {bucket.label}: {TREND_SERIES.map((item) =>
-                    `${item.label}: Soni: ${bucket.values[item.key].count.toLocaleString('uz-UZ')}, Summa: ${formatMoney(bucket.values[item.key].amount)}`).join('; ')}
+                  {bucket.label}: {bucket.coverage === 'FUTURE' ? 'Hali kuzatilmagan' : <>
+                    {bucket.partial || bucket.coverage === 'PARTIAL' ? 'Qisman davr. ' : ''}{TREND_SERIES.filter(({ key }) => available.includes(key)).map((item) =>
+                    `${item.label}: Soni: ${bucket.values[item.key].count.toLocaleString('uz-UZ')}, Summa: ${formatMoney(bucket.values[item.key].amount)}`).join('; ')}</>}
                 </li>
               ))}
             </ul>
