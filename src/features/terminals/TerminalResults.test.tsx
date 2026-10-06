@@ -34,7 +34,7 @@ describe('terminal results', () => {
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
     expect(normalizedHtml).not.toContain('Jami: 47')
-    expect(normalizedHtml).toContain('Jami 47 ta yozuv')
+    expect(normalizedHtml).toContain('Jami 47 ta Terminal')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')

@@ -56,7 +56,7 @@ vi.mock('@tanstack/react-query', () => ({
     const dashboard = options.queryKey[0] === 'dashboard'
     const recentError = options.queryKey[0] === 'recent' && observations.recentError
     return {
-      data: dashboard && observations.dashboardReady ? { metrics: {}, pie: [] }
+      data: dashboard && observations.dashboardReady ? { metrics: {}, pie: [], range: { fromDate: '2026-09-25', toDate: '2026-10-01' }, aggregation: { resolvedGranularity: 'HOUR', allowedGranularities: ['HOUR'] } }
         : terminal && !observations.terminalError ? [{ id: 'terminal-a', name: 'Terminal A' }] : undefined,
       dataUpdatedAt: dashboard ? observations.dataUpdatedAt : 0, isPending: !terminal && !(dashboard && observations.dashboardReady) && !recentError,
       isFetching: false,
@@ -68,7 +68,7 @@ vi.mock('@tanstack/react-query', () => ({
 
 // Keep this suite focused on page coordination rather than chart rendering.
 vi.mock('./MetricCards', () => ({ MetricCards: () => <div data-test-analytics="metrics" /> }))
-vi.mock('./ChartLocalDateFilter', () => ({ ChartLocalDateFilter: () => <div data-test-analytics="trend" /> }))
+vi.mock('./TrendChart', () => ({ TrendChart: () => <div data-test-analytics="trend" /> }))
 vi.mock('./StatusDonut', () => ({ StatusDonut: () => <div data-test-analytics="status" /> }))
 
 // Expose the drawer contents in server rendering, where a closed Sheet has no content.
@@ -138,8 +138,8 @@ describe('Dashboard filter placement and query coordination', () => {
     expect(drawer).toContain('Terminal A')
     expect(drawer.match(/<select\b/g)).toHaveLength(1)
     expect(drawer).not.toMatch(/<input\b|Davr presetlari|Sana oralig|\d+ kun|Merchant|Status|Search|Region|District|Bank/)
-    expect(observations.dashboard[0]).toEqual({ fromDate: '2026-09-25', toDate: '2026-10-01' })
-    expect(observations.recent[0]).toEqual({ ...observations.dashboard[0], search: '', status: undefined, page: 0, size: 10 })
+    expect(observations.dashboard[0]).toEqual({ fromDate: '2026-09-25', toDate: '2026-10-01', granularity: 'AUTO' })
+    expect(observations.recent[0]).toEqual({ fromDate: observations.dashboard[0]!.fromDate, toDate: observations.dashboard[0]!.toDate, search: '', status: undefined, page: 0, size: 10 })
   })
 
   it('coordinates both reads through immediate date commits, Terminal Apply and drawer Reset', () => {
@@ -151,7 +151,7 @@ describe('Dashboard filter placement and query coordination', () => {
     let state = createDashboardFilterState({ ...resetDashboardFilters(instant), terminalId: 'applied-terminal' })
     const inspect = () => {
       renderToStaticMarkup(<Probe filters={state.applied} />)
-      expect(observations.dashboard.at(-1)).toBe(state.applied)
+      expect(observations.dashboard.at(-1)).toEqual({ ...state.applied, granularity: state.requestedGranularity })
       expect(observations.recent.at(-1)).toEqual({ ...state.applied, search: '', status: undefined, page: 0, size: 10 })
     }
     state = dashboardFilterReducer(state, { type: 'date-draft', range: { fromDate: '2026-09-01', toDate: '2026-09-10' } })
@@ -168,7 +168,7 @@ describe('Dashboard filter placement and query coordination', () => {
     expect(observations.dashboard.at(-1)?.terminalId).toBe('draft-terminal')
     state = dashboardFilterReducer(state, { type: 'reset', filters: resetDashboardFilters(instant) })
     inspect()
-    expect(observations.dashboard.at(-1)).toEqual({ fromDate: '2026-09-25', toDate: '2026-10-01' })
+    expect(observations.dashboard.at(-1)).toEqual({ fromDate: '2026-09-25', toDate: '2026-10-01', granularity: 'AUTO' })
   })
 
   it('keeps Dashboard and recent reads enabled when the Terminal lookup fails', () => {

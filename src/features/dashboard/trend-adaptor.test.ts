@@ -1,3 +1,4 @@
+import { nextDate, completedCoverage, dashboardZero } from './test-fixtures'
 import { describe, expect, it } from 'vitest'
 import type { LineConfig } from '@ant-design/plots'
 // Exercise the installed adaptor, including its array mutation and auxiliary
@@ -11,11 +12,11 @@ import { ALL_TREND_SERIES, createTrendPlotConfig, type TrendMode, type TrendPlot
 
 const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
 const metric = (count: number, minorUnits: string) => ({ count, amount: { minorUnits, currency: 'UZS' as const, scale: 2 as const } })
-const buckets: DashboardBucket[] = ['2026-01-01', '2026-05-01', '2026-08-01'].map((date, index) => ({
-  label: date.slice(0, 7), periodKind: 'calendar', periodStart: date, periodEnd: date,
+const buckets: DashboardBucket[] = ['2026-01-01', '2026-05-01', '2026-08-01'].map((date, index) => ({ ...completedCoverage(date, nextDate(date)),
+  label: date.slice(0, 7), periodKind: 'calendar', periodStart: date, periodEnd: nextDate(date),
   values: index === 1
-    ? { total: metric(0, '0'), success: metric(0, '0'), processing: metric(0, '0'), failed: metric(0, '0') }
-    : { total: metric(300, '560000000'), success: metric(170, '400000000'), processing: metric(30, '100000000'), failed: metric(100, '60000000') },
+    ? { uncategorized: dashboardZero, total: metric(0, '0'), success: metric(0, '0'), processing: metric(0, '0'), failed: metric(0, '0') }
+    : { uncategorized: dashboardZero, total: metric(300, '560000000'), success: metric(170, '400000000'), processing: metric(30, '100000000'), failed: metric(100, '60000000') },
 }))
 
 type AdaptorOptions = Parameters<typeof adaptor>[0]['options']
@@ -51,8 +52,8 @@ describe('trend configuration through the installed Line adaptor', () => {
     const before = JSON.stringify(config)
     const first = adapt(config)
     const replay = adapt(config)
-    expect(first.children?.map(({ type }) => type)).toEqual(['line', 'point', 'area'])
-    expect(replay.children?.map(({ type }) => type)).toEqual(['line', 'point', 'area'])
+    expect(first.children?.map(({ type }) => type)).toEqual(['line', 'area'])
+    expect(replay.children?.map(({ type }) => type)).toEqual(['line', 'area'])
     expect(JSON.stringify(config)).toBe(before)
   })
 
@@ -69,7 +70,7 @@ describe('trend configuration through the installed Line adaptor', () => {
     for (const [mode, visible, selected, selectedTheme] of sequence) {
       const config = createTrendPlotConfig({ buckets: selected }, mode, visible, selectedTheme)
       const spec = adapt(config)
-      expect(spec.children).toHaveLength(3)
+      expect(spec.children).toHaveLength(2)
       spec.children!.forEach((mark, index) => {
         // G2 updates retain omitted properties. Explicit current options must
         // replace all prior scale/axis settings, including auxiliary marks.
@@ -82,13 +83,12 @@ describe('trend configuration through the installed Line adaptor', () => {
         if (maximum === undefined || !data || !formatter) {
           throw new Error('Expected current data, domain and formatter on every trend mark')
         }
-        expect(data.every((datum) => visible.includes(datum.key) && datum.value <= maximum)).toBe(true)
+        expect(data.every((datum) => visible.includes(datum.key) && datum.value !== null && datum.value <= maximum)).toBe(true)
         expect(merged.scale!.x!.domain).toHaveLength(selected.length)
-        expect(formatter(1).includes('UZS')).toBe(mode === 'amount')
+        expect(formatter(1)).toBe('1')
       })
       expect(spec.children![0]!.zIndex).toBe(1)
-      expect(spec.children![1]!.zIndex).toBe(2)
-      expect(spec.children![2]!.zIndex).toBe(0)
+      expect(spec.children![1]!.zIndex).toBe(0)
       previous = spec.children
     }
   })

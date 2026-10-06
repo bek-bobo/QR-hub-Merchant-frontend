@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ALL_TREND_SERIES } from './trend-presentation'
+import { ALL_TREND_SERIES, DEFAULT_TREND_SERIES } from './trend-presentation'
 import { readTrendSeriesPreferences, writeTrendSeriesPreferences, TREND_SERIES_STORAGE_KEY, type TrendSeriesStorage } from './trend-series-storage'
 
 function memoryStorage(raw: string | null = null): TrendSeriesStorage {
@@ -9,13 +9,13 @@ function memoryStorage(raw: string | null = null): TrendSeriesStorage {
 }
 
 describe('Trend series storage', () => {
-  it('defaults to all four and persists/restores stable IDs in their canonical order', () => {
+  it('defaults to status series and persists/restores stable IDs in their canonical order', () => {
     const storage = memoryStorage()
-    expect(readTrendSeriesPreferences(storage)).toEqual(ALL_TREND_SERIES)
-    writeTrendSeriesPreferences(storage, ['failed', 'success'])
-    expect(readTrendSeriesPreferences(storage)).toEqual(['success', 'failed'])
+    expect(readTrendSeriesPreferences(storage)).toEqual(DEFAULT_TREND_SERIES)
+    writeTrendSeriesPreferences(storage, ['failed', 'success', 'uncategorized'])
+    expect(readTrendSeriesPreferences(storage)).toEqual(['success', 'failed', 'uncategorized'])
     expect(JSON.parse(storage.getItem(TREND_SERIES_STORAGE_KEY)!)).toEqual({
-      version: 1, knownSeries: ALL_TREND_SERIES, visible: ['success', 'failed'],
+      version: 1, knownSeries: ALL_TREND_SERIES, visible: ['success', 'failed', 'uncategorized'],
     })
   })
 
@@ -25,7 +25,7 @@ describe('Trend series storage', () => {
     '{"version":1,"visible":[42],"knownSeries":["total"]}',
     '{"version":1,"visible":["total"],"knownSeries":null}',
   ])('restores all visible for malformed or unusable storage: %s', (raw) => {
-    expect(readTrendSeriesPreferences(memoryStorage(raw))).toEqual(ALL_TREND_SERIES)
+    expect(readTrendSeriesPreferences(memoryStorage(raw))).toEqual(DEFAULT_TREND_SERIES)
   })
 
   it('ignores unknown/duplicate IDs while preserving intentional hidden series', () => {
@@ -35,17 +35,23 @@ describe('Trend series storage', () => {
 
   it('defaults newly introduced IDs to visible without restoring existing hidden IDs', () => {
     const raw = JSON.stringify({ version: 1, knownSeries: ['total', 'success', 'processing'], visible: ['success'] })
-    expect(readTrendSeriesPreferences(memoryStorage(raw))).toEqual(['success', 'failed'])
+    expect(readTrendSeriesPreferences(memoryStorage(raw))).toEqual(['success', 'failed', 'uncategorized'])
   })
 
   it('restores defaults for empty writes and tolerates unavailable or denied storage', () => {
     const storage = memoryStorage()
     writeTrendSeriesPreferences(storage, [])
-    expect(readTrendSeriesPreferences(storage)).toEqual(ALL_TREND_SERIES)
+    expect(readTrendSeriesPreferences(storage)).toEqual(DEFAULT_TREND_SERIES)
     const denied = { getItem: () => { throw new Error('denied') }, setItem: () => { throw new Error('quota') } }
-    expect(readTrendSeriesPreferences(denied)).toEqual(ALL_TREND_SERIES)
-    expect(readTrendSeriesPreferences(undefined)).toEqual(ALL_TREND_SERIES)
+    expect(readTrendSeriesPreferences(denied)).toEqual(DEFAULT_TREND_SERIES)
+    expect(readTrendSeriesPreferences(undefined)).toEqual(DEFAULT_TREND_SERIES)
     expect(() => writeTrendSeriesPreferences(denied, ['success'])).not.toThrow()
     expect(() => writeTrendSeriesPreferences(undefined, ['success'])).not.toThrow()
   })
+})
+
+it('retains an explicitly selected Total through preference reload', () => {
+  const storage = memoryStorage()
+  writeTrendSeriesPreferences(storage, ['total'])
+  expect(readTrendSeriesPreferences(storage)).toEqual(['total'])
 })

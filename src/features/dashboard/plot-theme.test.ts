@@ -1,3 +1,4 @@
+import { dashboardZero } from './test-fixtures'
 import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -48,8 +49,6 @@ describe('Merchant plot theme adapter', () => {
     expect(theme.dark).toBe(dark)
     expect(theme.axis).toBe(`--chart-axis:${dark}`)
     expect(theme.grid).toBe(`--chart-grid:${dark}`)
-    expect(theme.areaTints).toEqual({ success: `--status-success-background:${dark}`,
-      processing: `--status-warning-background:${dark}`, failed: `--status-error-background:${dark}` })
     expect(plotTooltipInteraction(theme).css['.g2-tooltip']).toMatchObject({ background: `--popover:${dark}`, color: `--text-primary:${dark}` })
   })
 
@@ -76,8 +75,8 @@ describe('Merchant plot theme adapter', () => {
     const amount = { minorUnits: '0', currency: 'UZS' as const, scale: 2 as const }
     const metric = { count: 0, amount, countGrowthPct: null, amountGrowthPct: null }
     const segment = { count: 0, amount, percent: 0 }
-    const donutView = { metrics: { total: metric, success: metric, processing: metric, failed: metric },
-      pie: { success: segment, processing: segment, failed: segment } }
+    const donutView = { metrics: { uncategorized: dashboardZero, total: metric, success: metric, processing: metric, failed: metric },
+      pie: { uncategorized: dashboardZero, success: segment, processing: segment, failed: segment } }
     const notify = vi.fn()
     const unsubscribe = store.subscribe!(notify)
     expect(observe).toHaveBeenCalledWith(root, { attributes: true, attributeFilter: ['class'] })
@@ -87,8 +86,6 @@ describe('Merchant plot theme adapter', () => {
       const theme = renderTheme()!
       expect(theme.dark).toBe(resolved === 'dark')
       expect(theme.colors).toEqual(['info', 'success', 'warning', 'error'].map((status) => `--status-${status}-indicator:${theme.dark}`))
-      expect(theme.areaTints).toEqual({ success: `--status-success-background:${theme.dark}`,
-        processing: `--status-warning-background:${theme.dark}`, failed: `--status-error-background:${theme.dark}` })
       const config = createTrendPlotConfig({ buckets: [] }, 'count', ALL_TREND_SERIES, theme)
       expect(config.theme).toBe(theme.dark ? 'classicDark' : 'classic')
       expect(config.scale?.color).toMatchObject({ range: theme.colors })

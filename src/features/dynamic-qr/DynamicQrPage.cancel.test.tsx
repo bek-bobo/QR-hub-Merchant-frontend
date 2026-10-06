@@ -129,7 +129,7 @@ describe('production cancel list gate', () => {
     }
     expect(html).toContain('<table')
     expect(html).toContain('Asosiy terminal')
-    expect(html).toContain('Jami 1 ta yozuv')
+    expect(html).toContain('Jami 1 ta QR')
   })
 
   it('keeps disabled stats neutral and the list usable even with cached stats errors', () => {

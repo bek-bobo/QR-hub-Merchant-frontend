@@ -1,3 +1,4 @@
+import { dashboardZero, dashboardMetadata, nextDate, completedCoverage } from './test-fixtures'
 import { Suspense } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -28,7 +29,6 @@ vi.mock('./plot-theme', async (importOriginal) => ({
   ...await importOriginal<typeof import('./plot-theme')>(),
   useMerchantPlotTheme: () => ({
     dark: renderer.dark, colors: ['blue', 'green', 'orange', 'red'],
-    areaTints: { success: 'success-tint', processing: 'warning-tint', failed: 'error-tint' },
     text: 'black', secondary: 'gray', axis: 'gray', grid: 'gray',
     surface: 'white', border: 'gray', fontFamily: 'Inter',
   }),
@@ -39,12 +39,12 @@ function view(): DashboardView {
   const metric = { ...value, countGrowthPct: null, amountGrowthPct: null }
   const total = { ...metric, count: 3, amount: { ...value.amount, minorUnits: '30000' } }
   const segment = { ...value, percent: 100 / 3 }
-  return {
+  return { ...dashboardMetadata,
     chartGroupBy: 'DAY',
-    metrics: { total, success: metric, processing: metric, failed: metric },
-    pie: { success: segment, processing: segment, failed: segment },
-    buckets: [{ label: 'A', periodKind: 'calendar', periodStart: '2026-10-01', periodEnd: '2026-10-01',
-      values: { total, success: value, processing: value, failed: value } }],
+    metrics: { uncategorized: dashboardZero, total, success: metric, processing: metric, failed: metric },
+    pie: { uncategorized: dashboardZero, success: segment, processing: segment, failed: segment },
+    buckets: [{ ...completedCoverage('2026-10-01', nextDate('2026-10-01')), label: 'A', periodKind: 'calendar', periodStart: '2026-10-01', periodEnd: nextDate('2026-10-01'),
+      values: { uncategorized: dashboardZero, total, success: value, processing: value, failed: value } }],
   }
 }
 
@@ -59,7 +59,7 @@ describe('local plot loading boundaries', () => {
     const html = renderToStaticMarkup(
       <Suspense fallback={<p data-dashboard-loading>Dashboard loading</p>}>
         <p>KPI content</p>
-        <TrendChart view={data} rangeControls={<button>Dashboard davri</button>} />
+        <TrendChart view={data} granularityControls={<button>Dashboard davri</button>} />
         <StatusDonut {...data} />
       </Suspense>,
     )
@@ -73,7 +73,7 @@ describe('local plot loading boundaries', () => {
     expect(html).toContain('data-plot-loading="trend"')
     expect(html).toContain('h-80 w-full')
     expect(html).toContain('data-plot-loading="donut"')
-    expect(html).toContain('h-64 w-full')
+    expect(html).toContain('h-52 w-full')
     expect(html).toMatch(/<p\b[^>]*text-text-primary[^>]*>3<\/p>/)
     expect(renderer.line).toHaveBeenCalled()
     expect(renderer.pie).toHaveBeenCalled()
@@ -85,8 +85,8 @@ describe('local plot loading boundaries', () => {
     const emptySegment = { ...emptyMetric, percent: 0 }
     const html = renderToStaticMarkup(<>
       <TrendChart view={{ ...data, buckets: [] }} />
-      <StatusDonut metrics={{ total: emptyMetric, success: emptyMetric, processing: emptyMetric, failed: emptyMetric }}
-        pie={{ success: emptySegment, processing: emptySegment, failed: emptySegment }} />
+      <StatusDonut metrics={{ uncategorized: dashboardZero, total: emptyMetric, success: emptyMetric, processing: emptyMetric, failed: emptyMetric }}
+        pie={{ uncategorized: dashboardZero, success: emptySegment, processing: emptySegment, failed: emptySegment }} />
     </>)
     expect(html).toContain('Tanlangan davr uchun trend nuqtalari mavjud emas.')
     expect(html).toContain('data-empty="true"')
@@ -98,7 +98,7 @@ describe('local plot loading boundaries', () => {
   it('retains unavailable-chart feedback and reconciliation notes without invoking a renderer', () => {
     const data = view()
     const html = renderToStaticMarkup(<>
-      <TrendChart view={data} plotUnavailable rangeControls={<button>Dashboard davri</button>}
+      <TrendChart view={data} plotUnavailable granularityControls={<button>Dashboard davri</button>}
         feedback={<p role="alert">Grafikni yuklab bo‘lmadi.</p>} />
       <StatusDonut pie={data.pie} metrics={{ ...data.metrics, total: { ...data.metrics.total, count: 4 } }} />
     </>)
@@ -117,8 +117,8 @@ describe('local plot loading boundaries', () => {
     const theme = dark ? 'classicDark' : 'classic'
     expect(renderer.line.mock.calls[0]![0]).toMatchObject({ theme, height: 320, legend: false,
       scale: { color: { range: ['blue', 'green', 'orange', 'red'] } },
-      shapeField: 'smooth', point: { sizeField: 2 } })
-    expect(renderer.pie.mock.calls[0]![0]).toMatchObject({ theme, height: 256, legend: false,
-      innerRadius: 0.64, scale: { color: { range: ['green', 'orange', 'red'] } } })
+      shapeField: 'line' })
+    expect(renderer.pie.mock.calls[0]![0]).toMatchObject({ theme, height: 208, legend: false,
+      innerRadius: 0.72, scale: { color: { range: ['green', 'orange', 'red'] } } })
   })
 })

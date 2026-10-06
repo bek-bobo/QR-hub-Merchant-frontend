@@ -13,7 +13,7 @@ describe('dashboard query composition', () => {
     const filters = { fromDate: '2026-10-01', toDate: '2026-10-07', terminalId: 'terminal-a' }
     expect(toDateTerminalQuery(filters)).toEqual(filters)
     expect(readKeys.dashboard({ source: 'live', sessionScopeId: 'session', accessRevision: 1 }, filters))
-      .toEqual(['live', 'session', 1, 'dashboard', '2026-10-01', '2026-10-07', 'terminal-a'])
+      .toEqual(['live', 'session', 1, 'dashboard', '2026-10-01', '2026-10-07', 'terminal-a', 'AUTO'])
     expect(toDateTerminalQuery(filters)).not.toHaveProperty('groupBy')
   })
 

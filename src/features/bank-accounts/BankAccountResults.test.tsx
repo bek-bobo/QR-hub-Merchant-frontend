@@ -41,7 +41,7 @@ describe('bank-account results', () => {
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
     expect(text).not.toContain('Jami: 47')
-    expect(text).toContain('Jami 47 ta yozuv')
+    expect(text).toContain('Jami 47 ta Bank hisoblari')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Balans')
     expect(html).not.toContain('Muvaffaqiyatli')

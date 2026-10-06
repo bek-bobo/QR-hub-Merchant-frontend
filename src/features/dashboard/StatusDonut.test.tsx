@@ -1,3 +1,4 @@
+import { dashboardZero } from './test-fixtures'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
@@ -30,13 +31,13 @@ function viewWith(counts: readonly [number, number, number]): Pick<DashboardView
   const total = success + processing + failed
   const percent = (count: number) => total === 0 ? 0 : (count / total) * 100
   return {
-    metrics: {
+    metrics: { uncategorized: dashboardZero,
       total: metric(total, String(total * 10_000)),
       success: metric(success, String(success * 10_000)),
       processing: metric(processing, String(processing * 10_000)),
       failed: metric(failed, String(failed * 10_000)),
     },
-    pie: {
+    pie: { uncategorized: dashboardZero,
       success: { count: success, amount: money(String(success * 10_000)), percent: percent(success) },
       processing: { count: processing, amount: money(String(processing * 10_000)), percent: percent(processing) },
       failed: { count: failed, amount: money(String(failed * 10_000)), percent: percent(failed) },
@@ -52,7 +53,7 @@ describe('StatusDonut', () => {
     const config = createDonutPlotConfig(data, theme)
     expect(donutPlotData(data).map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 2]])
     expect(donutPlotData(data).map(({ exactAmount }) => exactAmount)).toEqual(['100.00 UZS', '100.00 UZS', '200.00 UZS'])
-    expect(config).toMatchObject({ angleField: 'value', colorField: 'type', innerRadius: 0.64, legend: false, label: false, theme: 'classicDark', autoFit: true })
+    expect(config).toMatchObject({ angleField: 'value', colorField: 'type', innerRadius: 0.72, legend: false, label: false, theme: 'classicDark', autoFit: true })
     expect(config.scale).toMatchObject({ color: { range: ['--status-success-indicator', '--status-warning-indicator', '--status-error-indicator'] } })
     expect(config.tooltip).toMatchObject({ items: [{ field: 'exactCount', name: 'Soni' }, { field: 'exactAmount', name: 'Summa' }] })
     expect(JSON.stringify(data)).toBe(original)
@@ -105,12 +106,12 @@ describe('StatusDonut', () => {
     expect(html).not.toMatch(/A’lo|Yaxshi|O‘rtacha|Yomon|Excellent|Good|Average|Poor/i)
   })
 
-  it('uses summary total as denominator despite category and pie mismatch, retaining raw details and notes', () => {
+  it('uses authoritative backend percentage despite mismatch, retaining raw details and notes', () => {
     const base = viewWith([60, 20, 10])
     const data = { ...base, metrics: { ...base.metrics, total: metric(100, '1000000') } }
     const original = JSON.stringify(data)
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
-    expect(html).toMatch(/<dd\b[^>]*>60%<\/dd>/)
+    expect(html).toMatch(/<dd\b[^>]*>66,67%<\/dd>/)
     expect(html).toContain('Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.')
     expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
     expect(html).toContain('data-empty="true"')
@@ -126,11 +127,11 @@ describe('StatusDonut', () => {
     expect(JSON.stringify(data)).toBe(original)
   })
 
-  it('derives success share from summary rather than a different pie success count', () => {
+  it('preserves authoritative pie percentage rather than recalculating summary share', () => {
     const base = viewWith([80, 10, 10])
     const data = { ...base, pie: { ...base.pie, success: { ...base.pie.success, count: 70, percent: 70 } } }
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
-    expect(html).toMatch(/<dd\b[^>]*>80%<\/dd>/)
+    expect(html).toMatch(/<dd\b[^>]*>70%<\/dd>/)
     expect(html).toContain('Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.')
     expect(html).not.toContain('data-plot="pie"')
   })
@@ -173,4 +174,33 @@ describe('StatusDonut', () => {
     expect(html).toContain('Kategoriyalar summasi jami summaga teng emas.')
     expect(html).not.toMatch(/NaN|Infinity/)
   })
+})
+
+describe('Uncategorized distribution', () => {
+  it('omits empty unknown status but truthfully presents nonzero unknown counts and rounded percentages', () => {
+    const base = viewWith([1, 1, 1])
+    expect(renderToStaticMarkup(<StatusDonut {...base} />)).not.toContain('Tasniflanmagan')
+    const unknown = { count: 1, amount: money('10000'), percent: 25.01 }
+    const data = { metrics: { ...base.metrics, total: metric(4, '40000'), uncategorized: unknown },
+      pie: { success: { ...base.pie.success, percent: 25.01 }, processing: { ...base.pie.processing, percent: 25.01 },
+        failed: { ...base.pie.failed, percent: 25.01 }, uncategorized: unknown } }
+    const chart = donutPlotData(data)
+    expect(chart.map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 1], ['uncategorized', 1]])
+    const html = renderToStaticMarkup(<StatusDonut {...data} />)
+    expect(html).toContain('Tasniflanmagan: 25,01%')
+    expect(html).toContain('Jarayonda: 25,01%')
+    expect(html).not.toContain('mos kelmaydi')
+    const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
+    expect(createDonutPlotConfig(data, theme).scale?.color).toMatchObject({ range: [...theme.colors.slice(1), theme.secondary] })
+  })
+})
+
+it('keeps the donut compact, details responsive and all status meaning textual', () => {
+  const html = renderToStaticMarkup(<StatusDonut {...viewWith([1, 0, 2])} />)
+  expect(html).toContain('@container')
+  expect(html).toContain('flex-col')
+  expect(html).toContain('@md:flex-row')
+  expect(html).toContain('data-slot="donut-center-total"')
+  expect(html).toContain('>3</p>')
+  for (const label of ['Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz']) expect(html).toContain(label)
 })

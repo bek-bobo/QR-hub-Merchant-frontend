@@ -1,6 +1,7 @@
 import { Children, isValidElement, type ChangeEvent, type ReactElement, type ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { Select } from '@/components/ui/select'
 import { PaginationBar } from './PaginationBar'
 
 interface ActionProps {
@@ -36,13 +37,27 @@ function findAction(node: ReactNode, ariaLabel: string): ReactElement<ActionProp
 
 describe('PaginationBar', () => {
   it('renders the controlled page size with the existing supported sizes', () => {
-    const html = renderToString(<PaginationBar ariaLabel="Natija sahifalari"
-      currentPage={0} totalPages={14} totalItems={140} pageSize={10}
-      onPageChange={() => undefined} onPageSizeChange={() => undefined} />)
-
-    expect(html).toContain('aria-label="Sahifadagi yozuvlar soni"')
-    expect(html).toContain('<option value="10" selected="">10 / sah.</option>')
-    for (const size of [20, 25, 50]) expect(html).toContain(`<option value="${size}">${size} / sah.</option>`)
+    const tree = PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 0,
+      totalPages: 14, totalItems: 140, pageSize: 10,
+      onPageChange: () => undefined, onPageSizeChange: () => undefined })
+    const control = findAction(tree, 'Sahifadagi yozuvlar soni')
+    expect(control.type).toBe(Select)
+    const select = Select(control.props)
+    expect(select.type).toBe('select')
+    expect(select.props['aria-label']).toBe('Sahifadagi yozuvlar soni')
+    expect(String(select.props.value)).toBe('10')
+    const options = Children.toArray(select.props.children).map((node) => {
+      if (!isValidElement<{ value: number; children: ReactNode }>(node) || node.type !== 'option') {
+        throw new Error('Expected a native page-size option')
+      }
+      return { value: String(node.props.value), label: Children.toArray(node.props.children).join('') }
+    })
+    expect(options).toEqual([
+      { value: '10', label: '10 / sah.' },
+      { value: '20', label: '20 / sah.' },
+      { value: '25', label: '25 / sah.' },
+      { value: '50', label: '50 / sah.' },
+    ])
   })
 
   it('sends supported size changes through their own callback and ignores invalid values', () => {

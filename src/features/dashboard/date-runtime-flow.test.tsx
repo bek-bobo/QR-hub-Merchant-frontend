@@ -4,7 +4,8 @@ import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createLiveReadApi } from '@/app/read/createLiveReadApi'
 import { readKeys } from '@/shared/api/read-keys'
-import type { DashboardFilters, DynamicQrFilters, ReadScope } from '@/shared/contracts/merchant-read'
+import type { DashboardRequest, DashboardView, ChartGroupBy, DynamicQrFilters, ReadScope } from '@/shared/contracts/merchant-read'
+import { dashboardMetadata, dashboardZero } from './test-fixtures'
 import { DashboardReadPage } from './DashboardReadPage'
 import type { DashboardQuickDateFilter } from './DashboardQuickDateFilter'
 import { dashboardFilterReducer, type DashboardFilterAction, type DashboardFilterState } from './filter-state'
@@ -26,6 +27,11 @@ const flow = vi.hoisted(() => ({
   refresh: null as (() => void) | null,
   refreshed: [] as (readonly unknown[])[],
   queries: [] as CapturedQuery[],
+  selectGranularity: null as ((value: ChartGroupBy) => void) | null,
+  view: null as DashboardView | null,
+  cards: null as DashboardView['metrics'] | null,
+  chart: null as DashboardView | null,
+  donut: null as DashboardView['pie'] | null,
   get: vi.fn().mockResolvedValue(undefined),
 }))
 
@@ -103,7 +109,7 @@ vi.mock('@/app/read/useReadRuntime', () => ({
   useReadRuntime: () => ({
     readiness: { dashboard: { kind: 'configured' } }, capabilities: { dashboard: true },
     queries: {
-      dashboardOptions: (filters: DashboardFilters) => ({ enabled: true,
+      dashboardOptions: (filters: DashboardRequest) => ({ enabled: true,
         queryKey: readKeys.dashboard(scope, filters),
         queryFn: ({ signal }: { signal: AbortSignal }) => api.dashboard(filters, signal) }),
       dynamicQrOptions: (filters: DynamicQrFilters) => ({ enabled: true,
@@ -117,7 +123,7 @@ vi.mock('@/app/read/useReadRuntime', () => ({
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (options: CapturedQuery) => {
     flow.queries.push(options)
-    return { data: undefined, dataUpdatedAt: 0, isPending: true, isError: false,
+    return { data: options.queryKey[3] === 'dashboard' ? flow.view : undefined, dataUpdatedAt: 0, isPending: !(options.queryKey[3] === 'dashboard' && flow.view), isError: false,
       isFetching: false, refetch: vi.fn(async () => { flow.refreshed.push(options.queryKey) }) }
   },
 }))
@@ -137,6 +143,7 @@ async function requests() {
 }
 
 beforeEach(() => {
+  flow.view = null; flow.selectGranularity = null; flow.cards = null; flow.chart = null; flow.donut = null
   flow.state = null; flow.controls = null; flow.selectDate = null; flow.apply = null; flow.filterApply = null
   flow.terminalChange = null
   flow.terminalReset = null; flow.drawerOpenChange = null; flow.refresh = null; flow.refreshed = []
@@ -224,7 +231,7 @@ describe('Dashboard rendered date controls to read requests', () => {
     dataQueries().forEach(({ queryKey }, index) => expect(queryKey).not.toEqual(initialKeys[index]))
     const changedRequests = await requests()
     expect(changedRequests.map(({ endpoint }) => endpoint.path)).toEqual(['/dashboard/transactions', '/dynamic-qrs/get-all'])
-    expect(changedRequests[0].query).toEqual({ ...complete, terminalId: 'terminal-a' })
+    expect(changedRequests[0].query).toEqual({ ...complete, terminalId: 'terminal-a', granularity: 'AUTO' })
     expect(changedRequests[1].query).toEqual({ ...complete, terminalId: 'terminal-a', page: '0', size: '10' })
     expect(changedRequests[0].query).not.toEqual(initialRequests[0].query)
 
@@ -233,7 +240,7 @@ describe('Dashboard rendered date controls to read requests', () => {
     expect(flow.state!.applied).toEqual({ fromDate: '2026-09-25', toDate: '2026-10-01', terminalId: 'terminal-a' })
     expect(flow.state!.terminalDraft).toBe('terminal-a')
     const resetRequests = await requests()
-    expect(resetRequests[0].query).toEqual(flow.state!.applied)
+    expect(resetRequests[0].query).toEqual({ ...flow.state!.applied, granularity: 'AUTO' })
     expect(resetRequests[1].query).toEqual({ ...flow.state!.applied, page: '0', size: '10' })
     expect(flow.filterApply).toBeTypeOf('function')
     flow.drawerOpenChange!(true)
@@ -245,7 +252,7 @@ describe('Dashboard rendered date controls to read requests', () => {
     expect(flow.state!.applied.fromDate).toBe('2026-09-25')
     dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).toBe('terminal-b'))
     const terminalRequests = await requests()
-    expect(terminalRequests[0].query).toEqual(flow.state!.applied)
+    expect(terminalRequests[0].query).toEqual({ ...flow.state!.applied, granularity: 'AUTO' })
     expect(terminalRequests[1].query).toEqual({ ...flow.state!.applied, page: '0', size: '10' })
   })
 
@@ -292,5 +299,39 @@ describe('Dashboard rendered date controls to read requests', () => {
       [selected.fromDate, selected.toDate], [selected.fromDate, selected.toDate],
     ])
     dataQueries().forEach(({ queryKey }) => expect(queryKey[6]).toBe('terminal-a'))
+  })
+})
+
+vi.mock('./MetricCards', () => ({ MetricCards: (props: { metrics: DashboardView['metrics'] }) => { flow.cards = props.metrics; return null } }))
+vi.mock('./StatusDonut', () => ({ StatusDonut: (props: { pie: DashboardView['pie'] }) => { flow.donut = props.pie; return null } }))
+vi.mock('./TrendChart', () => ({ TrendChart: (props: { view: DashboardView; granularityControls: ReactNode }) => { flow.chart = props.view; return <section>{props.granularityControls}</section> } }))
+vi.mock('./GranularityControl', () => ({ GranularityControl: (props: { onSelect: (value: ChartGroupBy) => void }) => { flow.selectGranularity = props.onSelect; return null } }))
+
+describe('One Dashboard analytics owner', () => {
+  it('shares one response across all three consumers and refreshes explicit granularity without changing dates', async () => {
+    flow.view = { ...dashboardMetadata, metrics: { total: dashboardZero, success: dashboardZero, processing: dashboardZero, failed: dashboardZero, uncategorized: dashboardZero },
+      pie: { success: dashboardZero, processing: dashboardZero, failed: dashboardZero, uncategorized: dashboardZero }, chartGroupBy: 'DAY', buckets: [] }
+    renderPage()
+    expect(flow.cards).toBe(flow.view.metrics)
+    expect(flow.chart).toBe(flow.view)
+    expect(flow.donut).toBe(flow.view.pie)
+    expect(flow.queries.filter(({ queryKey }) => queryKey[3] === 'dashboard')).toHaveLength(1)
+    const applied = flow.state!.applied
+    flow.selectGranularity!('WEEK')
+    renderPage()
+    expect(flow.state!.applied).toBe(applied)
+    expect((await requests())[0].query).toEqual({ ...applied, granularity: 'WEEK' })
+    flow.refresh!()
+    expect(flow.refreshed.filter((key) => key[3] === 'dashboard')).toEqual([readKeys.dashboard(scope, { ...applied, granularity: 'WEEK' })])
+    expect(flow.state!.requestedGranularity).toBe('WEEK')
+    flow.terminalChange!('T1')
+    renderPage()
+    flow.filterApply!()
+    renderPage()
+    expect((await requests())[0].query).toEqual({ ...applied, terminalId: 'T1', granularity: 'WEEK' })
+    flow.controls!.onPreset(1)
+    renderPage()
+    expect(flow.state!.requestedGranularity).toBe('AUTO')
+    expect((await requests())[0].query).toEqual({ fromDate: '2026-10-01', toDate: '2026-10-01', terminalId: 'T1', granularity: 'AUTO' })
   })
 })

@@ -1,3 +1,4 @@
+import { dashboardZero } from './test-fixtures'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import type { DashboardView, Metric, Outcome } from '@/shared/contracts/merchant-read'
@@ -58,7 +59,7 @@ function metric(count: number, minorUnits: string, countGrowthPct: number | null
 
 describe('Dashboard metric cards', () => {
   it('shows four count-first cards without obsolete amount/comparison disclosures', () => {
-    const metrics: DashboardView['metrics'] = {
+    const metrics: DashboardView['metrics'] = { uncategorized: dashboardZero,
       total: metric(7, '900719925474099301', 1, -2),
       success: metric(3, '12345', 12.5, -6.25),
       processing: metric(2, '5678', null, 0),
@@ -92,16 +93,16 @@ describe('Dashboard metric cards', () => {
     const empty = metric(0, '0', null, null)
     const segment = { ...empty, percent: 0 }
     const html = renderToStaticMarkup(<MetricCards
-      metrics={{ total: empty, success: empty, processing: empty, failed: empty }}
-      pie={{ success: segment, processing: segment, failed: segment }} />)
+      metrics={{ uncategorized: dashboardZero, total: empty, success: empty, processing: empty, failed: empty }}
+      pie={{ uncategorized: dashboardZero, success: segment, processing: segment, failed: segment }} />)
     expect(html.match(/>0<\/p>/g)).toHaveLength(4)
     expect(html).not.toMatch(/NaN|Infinity|ulushi|<details/)
   })
 
   it('uses reconciled pie percentages for count badges and suppresses mismatched shares', () => {
-    const metrics = { total: metric(4, '400', null, null), success: metric(2, '200', null, null),
+    const metrics = { uncategorized: dashboardZero, total: metric(4, '400', null, null), success: metric(2, '200', null, null),
       processing: metric(1, '100', null, null), failed: metric(1, '100', null, null) }
-    const pie: DashboardView['pie'] = {
+    const pie: DashboardView['pie'] = { uncategorized: dashboardZero,
       success: { count: 2, amount: metrics.success.amount, percent: 50 },
       processing: { count: 1, amount: metrics.processing.amount, percent: 25 },
       failed: { count: 1, amount: metrics.failed.amount, percent: 25 },

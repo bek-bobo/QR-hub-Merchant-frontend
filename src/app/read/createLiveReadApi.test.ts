@@ -149,3 +149,19 @@ describe('live read API registration', () => {
     expect(runtime).not.toHaveProperty('p5ResetPin')
   })
 })
+
+describe('Dashboard analytics request serialization', () => {
+  it.each(['AUTO', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR'] as const)('serializes %s with exact dates, trimmed terminal and no caller identity', async (granularity) => {
+    const get = vi.fn().mockResolvedValue({})
+    const api = createLiveReadApi({ webBaseUrl: 'https://merchant.example/qh-merchant-web-api', environment: 'production', bridge: { get } })
+    const signal = new AbortController().signal
+    const filters = { fromDate: '2026-09-01', toDate: '2026-09-30', terminalId: ' T1 ', granularity, userId: 'forbidden', merchantId: 'forbidden' }
+    await api.dashboard(filters, signal)
+    const [request, passedSignal] = get.mock.calls[0]!
+    expect(request.endpoint.path).toBe('/dashboard/transactions')
+    expect(request.query).toEqual({ fromDate: filters.fromDate, toDate: filters.toDate, terminalId: 'T1', granularity })
+    expect(passedSignal).toBe(signal)
+    await api.dashboard({ fromDate: filters.fromDate, toDate: filters.toDate }, signal)
+    expect(get.mock.calls[1]![0].query).toEqual({ fromDate: filters.fromDate, toDate: filters.toDate, granularity: 'AUTO' })
+  })
+})

@@ -34,7 +34,7 @@ describe('P5 results', () => {
     expect(html).not.toContain('Holat: 777')
     expect(html).toContain('23.09.2026 14:05')
     expect(html).not.toContain('Jami: 19')
-    expect(html).toContain('Jami 19 ta yozuv')
+    expect(html).toContain('Jami 19 ta qurilma')
     expect(html).toContain('aria-current="page"')
     expect(html).toContain('>—<')
     expect(html).not.toContain('https://example.test/secret')

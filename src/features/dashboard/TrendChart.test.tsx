@@ -1,10 +1,11 @@
+import { dashboardZero, dashboardMetadata, nextDate, completedCoverage } from './test-fixtures'
 import { Children, isValidElement, type ReactNode, type ReactElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LineConfig } from '@ant-design/plots'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { TrendChart } from './TrendChart'
-import { ALL_TREND_SERIES, toggleTrendSeries, type TrendSeriesKey } from './trend-presentation'
+import { toggleTrendSeries, type TrendSeriesKey } from './trend-presentation'
 
 const harness = vi.hoisted(() => ({ mode: 'count' as 'count' | 'amount', visible: ['total', 'success', 'processing', 'failed'] as TrendSeriesKey[], configs: [] as LineConfig[], query: vi.fn() }))
 vi.mock('react', async (importOriginal) => {
@@ -21,7 +22,7 @@ vi.mock('./useTrendSeriesPreferences', () => ({ useTrendSeriesPreferences: () =>
 }) }))
 vi.mock('./LazyPlotRenderers', () => ({ TrendLinePlotRenderer: (props: LineConfig) => { harness.configs.push(props); return <div data-plot="line" /> } }))
 vi.mock('./plot-theme', async (importOriginal) => ({ ...await importOriginal<typeof import('./plot-theme')>(),
-  useMerchantPlotTheme: () => ({ dark: false, colors: ['blue', 'green', 'orange', 'red'], areaTints: { success: 'success-tint', processing: 'warning-tint', failed: 'error-tint' }, text: 'black', secondary: 'gray', axis: 'gray', grid: 'gray', surface: 'white', border: 'gray', fontFamily: 'Inter' }),
+  useMerchantPlotTheme: () => ({ dark: false, colors: ['blue', 'green', 'orange', 'red'], text: 'black', secondary: 'gray', axis: 'gray', grid: 'gray', surface: 'white', border: 'gray', fontFamily: 'Inter' }),
 }))
 vi.mock('@tanstack/react-query', () => ({ useQuery: harness.query }))
 
@@ -29,9 +30,9 @@ function view(): DashboardView {
   const raw = { count: 1, amount: { minorUnits: '900719925474099301', currency: 'UZS' as const, scale: 2 as const } }
   const metric = { ...raw, countGrowthPct: null, amountGrowthPct: null }
   const segment = { ...raw, percent: 25 }
-  return { chartGroupBy: 'DAY', metrics: { total: metric, success: metric, processing: metric, failed: metric },
-    pie: { success: segment, processing: segment, failed: segment }, buckets: ['A', 'B'].map((label) => ({ label,
-      periodKind: 'calendar' as const, periodStart: '2026-10-01', periodEnd: '2026-10-01', values: { total: raw, success: raw, processing: raw, failed: raw } })) }
+  return { ...dashboardMetadata, chartGroupBy: 'DAY', metrics: { uncategorized: dashboardZero, total: metric, success: metric, processing: metric, failed: metric },
+    pie: { uncategorized: dashboardZero, success: segment, processing: segment, failed: segment }, buckets: ['A', 'B'].map((label) => ({ ...completedCoverage('2026-10-01', nextDate('2026-10-01')), label,
+      periodKind: 'calendar' as const, periodStart: '2026-10-01', periodEnd: nextDate('2026-10-01'), values: { uncategorized: dashboardZero, total: raw, success: raw, processing: raw, failed: raw } })) }
 }
 function find(node: unknown, predicate: (element: ReactElement<Record<string, unknown>>) => boolean): ReactElement<Record<string, unknown>> | undefined {
   if (Array.isArray(node)) {
@@ -60,7 +61,7 @@ function toggleSeries(key: TrendSeriesKey) {
 function legend(html: string) {
   return html.match(/<ul aria-label="Trend qatorlari"[^>]*>(.*?)<\/ul>/)?.[1] ?? ''
 }
-beforeEach(() => { harness.mode = 'count'; harness.visible = [...ALL_TREND_SERIES]; harness.configs = []; vi.clearAllMocks() })
+beforeEach(() => { harness.mode = 'count'; harness.visible = ['total', 'success', 'processing', 'failed']; harness.configs = []; vi.clearAllMocks() })
 
 describe('Merchant TrendChart integration', () => {
   it('uses Line inside Merchant UI with four visible series and no legacy SVG or table', () => {
@@ -79,6 +80,17 @@ describe('Merchant TrendChart integration', () => {
     expect(harness.query).not.toHaveBeenCalled()
   })
 
+  it('shows the three default status lines and keeps optional Total in exact accessible data', () => {
+    harness.visible = ['success', 'processing', 'failed', 'uncategorized']
+    const html = renderToStaticMarkup(<TrendChart view={view()} />)
+    expect(legend(html)).not.toContain('Jami')
+    expect(legend(html)).not.toContain('Tasniflanmagan')
+    expect(legend(html)).toContain('Muvaffaqiyatli')
+    expect(legend(html)).toContain('Jarayonda')
+    expect(legend(html)).toContain('Muvaffaqiyatsiz')
+    expect(html).toContain('Jami: Soni:')
+    expect(harness.configs.at(-1)!.data).toHaveLength(6)
+  })
   it('switches modes and hides/restores series locally, preserving state across date data changes', () => {
     click('Summa')
     toggleSeries('total')
@@ -94,7 +106,7 @@ describe('Merchant TrendChart integration', () => {
     expect(legend(html)).toContain('Muvaffaqiyatli (9 007 199 254 740 993.01 UZS)')
     expect(legend(html)).not.toContain('Muvaffaqiyatli (1)')
     toggleSeries('total')
-    expect(harness.visible).toEqual(ALL_TREND_SERIES)
+    expect(harness.visible).toEqual(['total', 'success', 'processing', 'failed'])
     click('Soni')
     expect(harness.mode).toBe('count')
     const countHtml = renderToStaticMarkup(<TrendChart view={updated} />)
@@ -120,7 +132,7 @@ describe('Merchant TrendChart integration', () => {
   it.each([['HOUR', 'Soatlik'], ['DAY', 'Kunlik'], ['WEEK', 'Haftalik'], ['MONTH', 'Oylik'], ['YEAR', 'Yillik']] as const)('displays %s grouping as read-only %s', (chartGroupBy, label) => {
     const base = view()
     const data: DashboardView = { ...base, chartGroupBy, buckets: chartGroupBy === 'HOUR'
-      ? base.buckets.map((bucket, index) => ({ ...bucket, periodKind: 'hour', label: `01.10.2026 ${14 + index}:00`,
+      ? base.buckets.map((bucket, index) => ({ ...completedCoverage(`2026-10-01T${14 + index}:00:00+05:00`, `2026-10-01T${15 + index}:00:00+05:00`), ...bucket, periodKind: 'hour', label: `01.10.2026 ${14 + index}:00`,
         periodStart: `2026-10-01T${14 + index}:00:00+05:00`, periodEnd: `2026-10-01T${15 + index}:00:00+05:00` }))
       : base.buckets }
     const indicator = find(TrendChart({ view: data }), (element) => element.type === 'p' && Children.toArray(element.props.children as ReactNode).includes('Guruhlash: '))!
@@ -130,7 +142,7 @@ describe('Merchant TrendChart integration', () => {
   })
 
   it('keeps date controls and contained feedback while withholding an unavailable plot', () => {
-    const html = renderToStaticMarkup(<TrendChart view={view()} plotUnavailable rangeControls={<button>Dashboard davri</button>} feedback={<p role="status">Grafik yuklanmoqda</p>} />)
+    const html = renderToStaticMarkup(<TrendChart view={view()} plotUnavailable granularityControls={<button>Dashboard davri</button>} feedback={<p role="status">Grafik yuklanmoqda</p>} />)
     expect(html).toContain('Dashboard davri')
     expect(html).toContain('Grafik yuklanmoqda')
     expect(html).not.toContain('data-plot="line"')

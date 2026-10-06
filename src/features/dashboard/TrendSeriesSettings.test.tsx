@@ -14,21 +14,21 @@ function inputs(node: ReactNode): ReactElement<Record<string, unknown>>[] {
 }
 
 describe('Merchant chart series settings', () => {
-  it('has a named compact trigger and four labeled checked native checkboxes by default', () => {
+  it('has a named compact trigger and five labeled checked native checkboxes by default', () => {
     expect(renderToStaticMarkup(<TrendSeriesSettings visible={ALL_TREND_SERIES} onToggle={() => {}} />))
       .toContain('aria-label="Grafik qatorlarini sozlash"')
     const html = renderToStaticMarkup(<TrendSeriesSettingsList visible={ALL_TREND_SERIES} onToggle={() => {}} />)
-    expect(html.match(/type="checkbox"/g)).toHaveLength(4)
-    expect(html.match(/checked=""/g)).toHaveLength(4)
-    for (const label of ['Jami', 'Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz']) expect(html).toContain(label)
+    expect(html.match(/type="checkbox"/g)).toHaveLength(5)
+    expect(html.match(/checked=""/g)).toHaveLength(5)
+    for (const label of ['Jami', 'Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz', 'Tasniflanmagan']) expect(html).toContain(label)
   })
 
   it('routes checkbox changes to the stable ID and explains the disabled final checkbox', () => {
     const onToggle = vi.fn()
     const tree = TrendSeriesSettingsList({ visible: ['success'], onToggle })
     const checkboxes = inputs(tree)
-    expect(checkboxes.map((input) => input.props.checked)).toEqual([false, true, false, false])
-    expect(checkboxes.map((input) => input.props.disabled)).toEqual([false, true, false, false])
+    expect(checkboxes.map((input) => input.props.checked)).toEqual([false, true, false, false, false])
+    expect(checkboxes.map((input) => input.props.disabled)).toEqual([false, true, false, false, false])
     const change = checkboxes[0]!.props.onChange as () => void
     change()
     expect(onToggle).toHaveBeenCalledWith('total')
@@ -36,4 +36,12 @@ describe('Merchant chart series settings', () => {
     expect(html).toContain('aria-describedby="series-help"')
     expect(html).toContain('Kamida bitta qator tanlangan bo‘lishi kerak.')
   })
+})
+
+it('excludes unavailable Uncategorized from the settings while preserving the Total option', () => {
+  const html = renderToStaticMarkup(<TrendSeriesSettingsList visible={['success', 'processing', 'failed']}
+    available={['total', 'success', 'processing', 'failed']} onToggle={() => {}} />)
+  expect(html).not.toContain('Tasniflanmagan')
+  expect(html).toContain('Jami')
+  expect(html.match(/type="checkbox"/g)).toHaveLength(4)
 })
