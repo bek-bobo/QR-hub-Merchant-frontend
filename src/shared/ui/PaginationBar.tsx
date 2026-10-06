@@ -1,11 +1,17 @@
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { cn } from 'cn'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
+import { Select } from '@/components/ui/select'
+import type { PageSize } from '@/shared/contracts/merchant-read'
 import {
+  DEFAULT_PAGE_SIZE,
   PAGINATION_ELLIPSIS,
   createPaginationWindow,
 } from '@/shared/pagination'
+
+const pageSizes: readonly PageSize[] = [10, 20, 25, 50]
+const pageButtonClasses = 'size-9 rounded-lg border-border/80 bg-surface text-sm font-medium text-text-primary hover:border-primary/30 hover:bg-brand-soft/50 sm:size-10 sm:text-base'
 
 export interface PaginationBarProps {
   readonly ariaLabel: string
@@ -13,6 +19,8 @@ export interface PaginationBarProps {
   readonly totalPages: number
   readonly totalItems: number
   readonly onPageChange: (page: number) => void
+  readonly pageSize?: number
+  readonly onPageSizeChange?: (size: PageSize) => void
   readonly disabled?: boolean
   readonly showTotal?: boolean
   readonly totalLabel?: ReactNode
@@ -25,6 +33,8 @@ export function PaginationBar({
   totalPages,
   totalItems,
   onPageChange,
+  pageSize = DEFAULT_PAGE_SIZE,
+  onPageSizeChange,
   disabled = false,
   showTotal = true,
   totalLabel,
@@ -38,7 +48,7 @@ export function PaginationBar({
     <nav
       aria-label={ariaLabel}
       className={cn(
-        'flex min-w-0 flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center',
+        'flex min-w-0 flex-col gap-2 border-t pt-3 sm:flex-row sm:items-center',
         showTotal ? 'sm:justify-between' : 'sm:justify-end',
         className,
       )}
@@ -53,25 +63,27 @@ export function PaginationBar({
           ? `${currentPage + 1}-sahifa, jami ${totalPages} sahifa`
           : 'Sahifalar mavjud emas'}
       </span>
-      <div className="flex min-w-0 flex-wrap items-center justify-center gap-1 sm:justify-end">
+      <div data-slot="pagination-controls" className="flex min-w-0 max-w-full flex-wrap items-center justify-center gap-2 rounded-2xl border border-border/70 bg-surface p-2 shadow-[0_8px_30px_-16px_rgba(16,24,40,0.18)] sm:justify-end sm:px-3">
+        <div className="flex min-w-0 flex-wrap items-center justify-center gap-1.5 sm:gap-2">
         <Button
           type="button"
           variant="outline"
           size="icon-lg"
+          className={pageButtonClasses}
           aria-label="Oldingi sahifa"
           disabled={previousDisabled}
           onClick={() => {
             if (!previousDisabled) onPageChange(currentPage - 1)
           }}
         >
-          <ChevronLeftIcon aria-hidden="true" />
+          <ChevronLeftIcon aria-hidden="true" className="size-4 sm:size-5" />
         </Button>
 
         {pages.map((item, index) => item === PAGINATION_ELLIPSIS ? (
           <span
             key={`${item}-${index}`}
             aria-hidden="true"
-            className="flex size-9 shrink-0 items-center justify-center text-text-secondary"
+            className="flex size-9 shrink-0 items-center justify-center text-lg tracking-widest text-text-secondary/50 sm:size-10"
           >
             …
           </span>
@@ -79,8 +91,9 @@ export function PaginationBar({
           <Button
             key={item}
             type="button"
-            variant={item === currentPage ? 'default' : 'outline'}
+            variant="outline"
             size="icon-lg"
+            className={cn(pageButtonClasses, item === currentPage && 'border-primary bg-brand-soft/70 font-semibold text-primary hover:border-primary hover:bg-brand-soft')}
             aria-label={`${item + 1}-sahifa`}
             aria-current={item === currentPage ? 'page' : undefined}
             disabled={disabled}
@@ -94,14 +107,32 @@ export function PaginationBar({
           type="button"
           variant="outline"
           size="icon-lg"
+          className={pageButtonClasses}
           aria-label="Keyingi sahifa"
           disabled={nextDisabled}
           onClick={() => {
             if (!nextDisabled) onPageChange(currentPage + 1)
           }}
         >
-          <ChevronRightIcon aria-hidden="true" />
+          <ChevronRightIcon aria-hidden="true" className="size-4 sm:size-5" />
         </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span aria-hidden="true" className="h-6 w-px bg-border/80" />
+          <div className="relative">
+            <Select aria-label="Sahifadagi yozuvlar soni" value={pageSize}
+              disabled={disabled || !onPageSizeChange}
+              className="h-9 w-28 appearance-none rounded-lg border-border/80 bg-surface pl-3 pr-8 text-base text-text-primary sm:h-10 sm:w-32 md:text-base"
+              onChange={(event) => {
+                const size = pageSizes.find((option) => option === Number(event.target.value))
+                if (!disabled && size !== undefined) onPageSizeChange?.(size)
+              }}>
+              {!pageSizes.includes(pageSize as PageSize) ? <option value={pageSize}>{pageSize} / sah.</option> : null}
+              {pageSizes.map((size) => <option key={size} value={size}>{size} / sah.</option>)}
+            </Select>
+            <ChevronDownIcon aria-hidden="true" className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-text-secondary" />
+          </div>
+        </div>
       </div>
     </nav>
   )

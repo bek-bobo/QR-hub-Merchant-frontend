@@ -1,4 +1,4 @@
-import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { Children, isValidElement, type ChangeEvent, type ReactElement, type ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { PaginationBar } from './PaginationBar'
@@ -6,6 +6,7 @@ import { PaginationBar } from './PaginationBar'
 interface ActionProps {
   readonly 'aria-label'?: string
   readonly onClick?: () => void
+  readonly onChange?: (event: ChangeEvent<HTMLSelectElement>) => void
   readonly children?: ReactNode
 }
 
@@ -34,6 +35,42 @@ function findAction(node: ReactNode, ariaLabel: string): ReactElement<ActionProp
 }
 
 describe('PaginationBar', () => {
+  it('renders the controlled page size with the existing supported sizes', () => {
+    const html = renderToString(<PaginationBar ariaLabel="Natija sahifalari"
+      currentPage={0} totalPages={14} totalItems={140} pageSize={10}
+      onPageChange={() => undefined} onPageSizeChange={() => undefined} />)
+
+    expect(html).toContain('aria-label="Sahifadagi yozuvlar soni"')
+    expect(html).toContain('<option value="10" selected="">10 / sah.</option>')
+    for (const size of [20, 25, 50]) expect(html).toContain(`<option value="${size}">${size} / sah.</option>`)
+  })
+
+  it('sends supported size changes through their own callback and ignores invalid values', () => {
+    const onPageChange = vi.fn()
+    const onPageSizeChange = vi.fn()
+    const props = { ariaLabel: 'Natija sahifalari', currentPage: 5,
+      totalPages: 14, totalItems: 140, pageSize: 10, onPageChange, onPageSizeChange }
+    const select = findAction(PaginationBar(props), 'Sahifadagi yozuvlar soni')
+    const event = (value: string) => ({ target: { value } }) as ChangeEvent<HTMLSelectElement>
+
+    select.props.onChange?.(event('25'))
+    select.props.onChange?.(event('100'))
+    findAction(PaginationBar({ ...props, disabled: true }), 'Sahifadagi yozuvlar soni')
+      .props.onChange?.(event('50'))
+
+    expect(onPageSizeChange.mock.calls).toEqual([[25]])
+    expect(onPageChange).not.toHaveBeenCalled()
+  })
+
+  it('disables size selection when disabled or no size callback is supplied', () => {
+    const props = { ariaLabel: 'Natija sahifalari', currentPage: 0,
+      totalPages: 1, totalItems: 10, onPageChange: () => undefined }
+    for (const html of [renderToString(<PaginationBar {...props} />),
+      renderToString(<PaginationBar {...props} disabled onPageSizeChange={() => undefined} />)]) {
+      expect(html).toMatch(/<select[^>]*aria-label="Sahifadagi yozuvlar soni"[^>]*disabled=""/)
+    }
+  })
+
   it('shows the authoritative total and accessible single-page state', () => {
     const html = renderToString(<PaginationBar ariaLabel="Terminal sahifalari"
       currentPage={0} totalPages={1} totalItems={47} onPageChange={() => undefined} />)

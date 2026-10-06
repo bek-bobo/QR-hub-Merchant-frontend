@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { ChevronDownIcon } from 'lucide-react'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { readQueryPolicy } from '@/app/read/read-runtime'
 import { readKeys } from '@/shared/api/read-keys'
@@ -211,14 +212,18 @@ export function CreateQrContent({
   return <div className={embedded ? 'space-y-4' : resultKind === 'confirmed' ? 'mx-auto max-w-5xl space-y-4' : 'mx-auto max-w-2xl space-y-4'}>
     {!embedded ? <PageHeader title="Dinamik QR yaratish" description="Summa UZSda kiritiladi." /> : null}
     {!result && !controllerState.closed ? <CreateFormShell embedded={embedded}>
-      <form className="space-y-4" onSubmit={submit}>
+      <form className={embedded ? 'space-y-6 [&_label]:text-base [&_label]:font-semibold [&_p[id$="-help"]]:mt-2.5 [&_p[id$="-help"]]:text-sm sm:[&_label]:text-lg sm:[&_p[id$="-help"]]:text-base' : 'space-y-4'} onSubmit={submit}>
         <FormField id="create-qr-terminal" label="Terminal">
-          {(controlProps) => <Select {...controlProps} value={terminalId}
-            disabled={!runtime.capabilities.terminalLookup || !transport || terminals.isPending || terminals.isError}
-            onChange={(event) => setTerminalId(event.target.value)}>
-            <option value="">Terminalni tanlang</option>
-            {terminals.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </Select>}
+          {(controlProps) => <div className="relative">
+            <Select {...controlProps} value={terminalId}
+              className={embedded ? `h-[52px] appearance-none rounded-2xl bg-popover px-5 pr-12 text-base md:text-lg ${terminalId ? 'text-text-primary' : 'text-text-secondary'}` : undefined}
+              disabled={!runtime.capabilities.terminalLookup || !transport || terminals.isPending || terminals.isError}
+              onChange={(event) => setTerminalId(event.target.value)}>
+              <option value="">Terminalni tanlang</option>
+              {terminals.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+            </Select>
+            {embedded ? <ChevronDownIcon aria-hidden="true" className="pointer-events-none absolute right-4 top-1/2 size-5 -translate-y-1/2 text-text-primary" /> : null}
+          </div>}
         </FormField>
         {!runtime.capabilities.terminalLookup ? <p role="status" className="text-sm">Terminal ro‘yxatiga ruxsat mavjud emas.</p> : null}
         {runtime.capabilities.terminalLookup && !transport ? <p role="status" className="text-sm">Terminal ro‘yxati hozir mavjud emas.</p> : null}
@@ -235,7 +240,8 @@ export function CreateQrContent({
             </span> : null}
           </>}
           errorText={amountInput && bounds && !amountValid ? 'Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting.' : undefined}>
-          {(controlProps) => <MoneyInput {...controlProps} value={amountInput} onValueChange={setAmountInput} />}
+          {(controlProps) => <MoneyInput {...controlProps} value={amountInput} onValueChange={setAmountInput}
+            className={embedded ? 'h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg' : undefined} />}
         </FormField>
         {!currencyAllowed ? <p role="status" className="text-sm">Valyuta ro‘yxatiga ruxsat mavjud emas.</p> : null}
         {currencyAllowed && !transport ? <p role="status" className="text-sm">Valyuta ro‘yxati hozir mavjud emas.</p> : null}
@@ -243,8 +249,11 @@ export function CreateQrContent({
         {currencies.isError ? <p role="alert" className="text-sm text-destructive">Valyuta ro‘yxatini yuklab bo‘lmadi.</p> : null}
         {currencies.data && !currencyCode ?
           <p role="alert" className="text-sm text-destructive">UZS valyutasi mavjud emas.</p> : null}
-        <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-          <Button type="submit" className="w-full sm:w-auto sm:min-w-36" disabled={!canSubmit}>QR yaratish</Button>
+        <div className={embedded ? 'mt-9! flex flex-col-reverse gap-3 border-t border-border/70 pt-6 sm:flex-row sm:justify-end' : 'flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end'}>
+          {embedded && onClose ? <Button type="button" variant="outline"
+            className="h-14 w-full rounded-2xl bg-popover px-7 text-base font-semibold text-text-secondary sm:w-auto sm:min-w-44 sm:text-lg"
+            disabled={controllerState.outcome.kind === 'pending'} onClick={onClose}>Bekor qilish</Button> : null}
+          <Button type="submit" className={embedded ? 'h-14 w-full rounded-2xl px-7 text-base font-semibold sm:w-auto sm:min-w-44 sm:text-lg' : 'w-full sm:w-auto sm:min-w-36'} disabled={!canSubmit}>QR yaratish</Button>
         </div>
         {actionMessage ? <p role="status" className="text-sm">{actionMessage}</p> : null}
       </form>

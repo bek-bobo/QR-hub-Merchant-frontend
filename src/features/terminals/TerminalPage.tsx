@@ -72,6 +72,7 @@ export function TerminalPage() {
       onViewDetails={setDetailsRow}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       quickFilters={<TerminalQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
         onApply={(search) => setApplied((current) => applyTerminalQuickSearch(current, search))} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">

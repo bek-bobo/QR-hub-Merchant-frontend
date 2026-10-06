@@ -6,7 +6,7 @@ import type { ReadRegistration } from '@/app/read/createLiveReadApi'
 import { changeP5Page, type P5Filters as P5FilterValues } from '@/shared/contracts/p5-filters'
 import type { LookupState } from '@/shared/contracts/management-filters'
 import type { P5Row } from '@/shared/contracts/p5-read'
-import type { Page } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize } from '@/shared/contracts/merchant-read'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
@@ -51,7 +51,7 @@ function ResetControllerView({ controller, onRetry }: { readonly controller: P5R
 
 function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onResetView,
   resetUnavailableMessage, pending, error, data, columnOrder, visibleColumnIds,
-  onRetry, onPageChange }: {
+  onRetry, onPageChange, onPageSizeChange }: {
   readonly queryKey: readonly unknown[]
   readonly onResetView: (view: P5ResetView) => void
   readonly runtime: ReturnType<typeof useReadRuntime>
@@ -65,6 +65,7 @@ function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onReset
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange: (size: PageSize) => void
 }) {
   const queryClient = useQueryClient()
   const currentRow = (deviceId: string): P5Row | null => {
@@ -94,7 +95,7 @@ function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onReset
   }
   return <P5Results blocked={false} pending={pending} error={error} data={data}
     columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
-    onRetry={onRetry} onPageChange={onPageChange}
+    onRetry={onRetry} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange}
     resetAvailable={resetAvailable} resetUnavailableMessage={resetUnavailableMessage} onReset={requestReset} />
 }
 
@@ -238,10 +239,12 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
     {visibleData ? <ScopedP5Results key={JSON.stringify(listOptions.queryKey)} queryKey={listOptions.queryKey} onResetView={(view) => setResetView((current) => ({ ...view, notificationId: (current?.notificationId ?? 0) + 1 }))} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       resetUnavailableMessage={resetUnavailableMessage}
       columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
-      onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />
+      onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))}
+      onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))} />
       : <P5Results blocked={blocked} pending={list.isPending} error={list.error} data={blocked || list.isError ? undefined : list.data}
         columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
-        onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))} />}
+        onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))}
+        onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))} />}
     {resetView?.queryKey === JSON.stringify(listOptions.queryKey)
       ? <ResetControllerView key={resetView.notificationId} controller={resetView.controller} onRetry={resetView.retry} /> : null}
   </div>

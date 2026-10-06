@@ -91,6 +91,7 @@ export function StaticQrPage() {
       visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => ({ ...current, page }))}
+      onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       onViewQr={setSelectedQrRow}
       onViewDetails={setSelectedDetailsRow}
       quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}

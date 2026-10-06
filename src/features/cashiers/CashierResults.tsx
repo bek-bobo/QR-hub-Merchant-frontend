@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
-import type { Page } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize } from '@/shared/contracts/merchant-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { CashierTerminalsDialog, type CashierTerminalsMode } from './CashierTerminalsDialog'
 import { CashierActionsMenu } from './CashierActionsMenu'
@@ -35,6 +35,7 @@ interface CashierResultsProps {
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange?: (size: PageSize) => void
   readonly onSelect: (row: CashierRow) => void
   readonly onAssign?: (row: CashierRow) => void
   readonly onSelectUnassign?: (row: CashierRow) => void
@@ -64,7 +65,7 @@ function resolveColumns(
 }
 
 export function CashierResults({ blocked, pending, error, data, selected,
-  columnOrder, visibleColumnIds, onRetry, onPageChange, onSelect, onClose,
+  columnOrder, visibleColumnIds, onRetry, onPageChange, onPageSizeChange, onSelect, onClose,
   headerActions, quickFilters, assignSurface, onUnassign, unassignSurface,
   onAssign, onSelectUnassign, terminalMode = 'view' }: CashierResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
@@ -115,9 +116,9 @@ export function CashierResults({ blocked, pending, error, data, selected,
       </div>}
         {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
           totalPages={data.totalPages} totalItems={data.totalElements}
-          totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+          totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta kassir`}
           className="cashier-pagination border-t-0 pt-0"
-          onPageChange={onPageChange} /> : null}
+          onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
       </CardContent>
     </Card>
     {selected ? <CashierTerminalsDialog key={`${selected.id}:${terminalMode}`} cashier={selected} mode={terminalMode} onClose={onClose}

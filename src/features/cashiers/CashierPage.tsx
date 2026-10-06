@@ -13,7 +13,7 @@ import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, clearManagementFilters, type CashierListFilters, type LookupState } from '@/shared/contracts/management-filters'
 import type { CashierRow } from '@/shared/contracts/management-read'
-import type { Page, ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize, ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
 import { applyCashierAdvancedDraft, applyCashierQuickSearch, reconcileCashierAdvancedDraft, cashierParentState, cashierSelectionKey, createCashierTarget, createDefaultCashierFilters, resolveCashierTarget, type CashierAdvancedDraft, type CashierTarget, type MerchantLookupState } from './page-state'
 import { CashierAdvancedFilterFields, CashierQuickSearch } from './CashierFilterControls'
 import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
@@ -32,7 +32,7 @@ function terminalLookupState(enabled: boolean, error: boolean, data: readonly Te
 }
 
 function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurrentScope,
-  columnOrder, visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters }: {
+  columnOrder, visibleColumnIds, onRetry, onPageChange, onPageSizeChange, headerActions, quickFilters }: {
   readonly data: Page<CashierRow>
   readonly scope: ReadScope
   readonly resultKey: readonly unknown[]
@@ -42,6 +42,7 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange: (size: PageSize) => void
   readonly headerActions: ReactNode
   readonly quickFilters: ReactNode
 }) {
@@ -72,7 +73,7 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
   }
   return <CashierResults blocked={false} pending={false} error={false} data={data} selected={selected}
     columnOrder={columnOrder} visibleColumnIds={visibleColumnIds}
-    onRetry={onRetry} onPageChange={onPageChange}
+    onRetry={onRetry} onPageChange={onPageChange} onPageSizeChange={onPageSizeChange}
     headerActions={headerActions}
     quickFilters={quickFilters}
     terminalMode={terminalMode}
@@ -223,10 +224,12 @@ export function CashierPage() {
     {visibleData ? <ScopedCashierResults key={cashierSelectionKey(listOptions.queryKey, visibleData)} data={visibleData} scope={runtime.scope} resultKey={listOptions.queryKey} dataUpdatedAt={list.dataUpdatedAt} getCurrentScope={runtime.getCurrentScope}
       columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       headerActions={renderHeaderActions()} quickFilters={renderQuickSearch()} />
       : <CashierResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data} selected={null}
         columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
         onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+        onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
         onSelect={() => undefined} onClose={() => undefined} headerActions={renderHeaderActions()} quickFilters={renderQuickSearch()} />}
     {createOpen ? <CreateCashierDialog key={JSON.stringify(createScope)} onClose={() => setCreateScope(null)}
       onCloseAutoFocus={(event) => {

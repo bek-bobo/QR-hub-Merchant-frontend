@@ -3,7 +3,7 @@ import { MonitorIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
-import type { Page } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
@@ -35,6 +35,7 @@ interface TerminalResultsProps {
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange?: (size: PageSize) => void
   readonly headerActions?: ReactNode
   readonly quickFilters?: ReactNode
   readonly onViewQr: (row: TerminalRow) => void
@@ -58,7 +59,7 @@ function resolveColumns(
 }
 
 export function TerminalResults({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters, onViewQr, onViewDetails }: TerminalResultsProps) {
+  visibleColumnIds, onRetry, onPageChange, onPageSizeChange, headerActions, quickFilters, onViewQr, onViewDetails }: TerminalResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
   const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
@@ -106,9 +107,9 @@ export function TerminalResults({ blocked, pending, error, data, columnOrder,
       </div>}
       {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
         totalPages={data.totalPages} totalItems={data.totalElements}
-        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta Terminal`}
         className="terminal-pagination border-t-0 pt-1"
-        onPageChange={onPageChange} /> : null}
+        onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
     </CardContent>
   </Card>
 }

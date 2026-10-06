@@ -412,9 +412,10 @@ export function DynamicQrPage({
               <PaginationBar ariaLabel="Dinamik QR sahifalari"
                 currentPage={list.data.page} totalPages={list.data.totalPages}
                 totalItems={list.data.totalElements}
-                totalLabel={`Jami ${list.data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+                totalLabel={`Jami ${list.data.totalElements.toLocaleString('uz-UZ')} ta QR`}
                 className="dynamic-qr-pagination border-0 pt-2"
-                onPageChange={goToPage} />
+                onPageChange={goToPage} pageSize={list.data.size}
+                onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))} />
             ) : null}
           </CardContent>
         </Card>

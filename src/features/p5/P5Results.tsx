@@ -5,7 +5,7 @@ import { P5DetailsSheet } from './P5DetailsSheet'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { isSafeApiError } from '@/shared/api/errors'
-import type { Page } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize } from '@/shared/contracts/merchant-read'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
@@ -38,6 +38,7 @@ interface P5ResultsProps {
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange?: (size: PageSize) => void
   readonly resetAvailable?: boolean
   readonly resetUnavailableMessage?: string | undefined
   readonly onReset?: (row: P5Row) => void
@@ -60,7 +61,7 @@ function resolveColumns(
 }
 
 export function P5Results({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, resetAvailable = false,
+  visibleColumnIds, onRetry, onPageChange, onPageSizeChange, resetAvailable = false,
   resetUnavailableMessage, onReset }: P5ResultsProps) {
   const [action, setAction] = useState<{ readonly kind: 'qr' | 'details'; readonly row: P5Row } | null>(null)
   const actionRow = action && data?.content.includes(action.row) ? action.row : null
@@ -110,9 +111,9 @@ export function P5Results({ blocked, pending, error, data, columnOrder,
         </TableScrollRegion>}
     <PaginationBar ariaLabel="P5 qurilmalari sahifalari" currentPage={data.page}
       totalPages={data.totalPages} totalItems={data.totalElements}
-      totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+      totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta qurilma`}
       className="p5-pagination border-t-0 pt-1"
-      onPageChange={onPageChange} />
+      onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} />
     <P5QrDialog row={action?.kind === 'qr' ? actionRow : null} onOpenChange={(open) => { if (!open) setAction(null) }} />
     <P5DetailsSheet row={action?.kind === 'details' ? actionRow : null} onOpenChange={(open) => { if (!open) setAction(null) }}
       onViewQr={(loadedRow) => setAction({ kind: 'qr', row: loadedRow })} />

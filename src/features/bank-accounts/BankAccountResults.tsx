@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
-import type { Page } from '@/shared/contracts/merchant-read'
+import type { Page, PageSize } from '@/shared/contracts/merchant-read'
 import type { BankAccountRow } from '@/shared/contracts/management-read'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import { PaginationBar } from '@/shared/ui/PaginationBar'
@@ -35,6 +35,7 @@ interface BankAccountResultsProps {
   readonly visibleColumnIds: readonly string[]
   readonly onRetry: () => void
   readonly onPageChange: (page: number) => void
+  readonly onPageSizeChange?: (size: PageSize) => void
   readonly headerActions?: ReactNode
   readonly quickFilters?: ReactNode
 }
@@ -56,7 +57,7 @@ function resolveColumns(
 }
 
 export function BankAccountResults({ blocked, pending, error, data, columnOrder,
-  visibleColumnIds, onRetry, onPageChange, headerActions, quickFilters }: BankAccountResultsProps) {
+  visibleColumnIds, onRetry, onPageChange, onPageSizeChange, headerActions, quickFilters }: BankAccountResultsProps) {
   const columns = resolveColumns(columnOrder, visibleColumnIds)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], 0)
   const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
@@ -90,9 +91,9 @@ export function BankAccountResults({ blocked, pending, error, data, columnOrder,
       </div>}
       {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
         totalPages={data.totalPages} totalItems={data.totalElements}
-        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta yozuv`}
+        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta Bank hisoblari`}
         className="bank-account-pagination border-t-0 pt-2"
-        onPageChange={onPageChange} /> : null}
+        onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
     </CardContent>
   </Card>
 }

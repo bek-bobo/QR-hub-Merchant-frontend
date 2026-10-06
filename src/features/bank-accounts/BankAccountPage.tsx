@@ -80,6 +80,7 @@ export function BankAccountPage() {
       visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
+      onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       quickFilters={<BankAccountQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={applySearch} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
         <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
