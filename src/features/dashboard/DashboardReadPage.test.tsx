@@ -182,3 +182,8 @@ describe('Dashboard filter placement and query coordination', () => {
     expect(observations.recent[0]?.terminalId).toBe('owned-terminal')
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

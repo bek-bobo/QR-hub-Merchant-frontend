@@ -1,6 +1,6 @@
 import { TrendPlotViewport } from './TrendPlotViewport'
 import { useMerchantPlotTheme } from './plot-theme'
-import { useState, type ReactNode } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { ChartNoAxesColumnIncreasingIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
-import { availableTrendSeries, visibleTrendSeries, createTrendPlotConfig, TREND_GROUP_LABELS, TREND_SERIES, type TrendMode } from './trend-presentation'
+import { availableTrendSeries, visibleTrendSeries, createTrendPlotConfig, trendPlotData, trendInteractionKey, TREND_GROUP_LABELS, TREND_SERIES, type TrendMode } from './trend-presentation'
 import { TrendSeriesSettings } from './TrendSeriesSettings'
 import { useTrendSeriesPreferences } from './useTrendSeriesPreferences'
 
@@ -25,11 +25,21 @@ interface TrendChartProps {
 
 export function TrendChart({ view, granularityControls, periodLabel, feedback, plotUnavailable = false }: TrendChartProps) {
   const [mode, setMode] = useState<TrendMode>('count')
-  const available = availableTrendSeries(view)
+  const { buckets, chartGroupBy } = view
+  const uncategorizedCount = view.metrics.uncategorized.count
+  const available = useMemo(() => availableTrendSeries({ buckets, metrics: { uncategorized: { count: uncategorizedCount } } }), [buckets, uncategorizedCount])
   const preferences = useTrendSeriesPreferences(undefined, available)
   const visible = visibleTrendSeries(preferences.visible, available)
   const toggle = preferences.toggle
   const theme = useMerchantPlotTheme()
+  // A tiny canonical series string is a dependency, not an array identity.
+  const seriesKey = visible.join(',')
+  const prepared = useMemo(() => {
+    const selected = TREND_SERIES.map(({ key }) => key).filter((key) => seriesKey.split(',').includes(key))
+    const data = plotUnavailable ? [] : trendPlotData({ buckets, chartGroupBy }, mode, selected, available)
+    return { data, available, selected, interactionKey: trendInteractionKey(buckets, chartGroupBy, mode, selected, data) }
+  }, [buckets, chartGroupBy, mode, seriesKey, available, plotUnavailable])
+  const config = useMemo(() => theme && !plotUnavailable && buckets.length ? createTrendPlotConfig({ buckets, chartGroupBy }, mode, prepared.selected, theme, 720, prepared) : null, [buckets, chartGroupBy, mode, theme, prepared, plotUnavailable])
 
   return (
     <Card className="dashboard-trend min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(4)] sm:[--card-spacing:--spacing(5)]">
@@ -66,8 +76,8 @@ export function TrendChart({ view, granularityControls, periodLabel, feedback, p
           </p>
         ) : (
           <div className="min-w-0 w-full">
-            {theme ? (
-              <TrendPlotViewport config={createTrendPlotConfig(view, mode, visible, theme)} />
+            {config ? (
+              <TrendPlotViewport config={config} interactionKey={prepared.interactionKey} />
             )
               : <div className="h-80" />}
           </div>

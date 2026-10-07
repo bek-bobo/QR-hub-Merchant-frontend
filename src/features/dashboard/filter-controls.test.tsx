@@ -79,3 +79,8 @@ describe('Dashboard quick date and Terminal controls', () => {
     expect(html).not.toMatch(/<input\b|Davr presetlari|Boshlanish sanasi|Tugash sanasi|Merchant|Status|Search|Region|District|Bank/)
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

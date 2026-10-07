@@ -32,7 +32,7 @@ describe('live read API registration', () => {
     const api = createLiveReadApi({ webBaseUrl: 'https://merchant.example/qh-merchant-web-api', environment: 'production', bridge: { get } })
     await api.terminalList({ merchantId: '1', bankAccountId: '2', regionId: ' 3 ', districtId: ' 4 ', search: ' Terminal ', page: 2, size: 20 }, new AbortController().signal)
     expect(get.mock.calls[0]![0].endpoint.path).toBe('/terminals/get-all')
-    expect(get.mock.calls[0]![0].query).toEqual({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: 'Terminal', page: '2', size: '20' })
+    expect(get.mock.calls[0]![0].query).toEqual({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: ' Terminal ', page: '2', size: '20' })
   })
 
   it('rejects unavailable geography locally without entering the bridge', async () => {
@@ -51,7 +51,7 @@ describe('live read API registration', () => {
       search: ' Name ', page: 0, size: 20 }, new AbortController().signal)
     expect(get.mock.calls[0]?.[0]).toMatchObject({ endpoint: { path: '/dynamic-qrs/get-all' },
       query: { fromDate: '2026-09-01', toDate: '2026-09-15', merchantId: '1', bankAccountId: '2',
-        terminalId: 'terminal-a', status: '25', distributionStatus: '20', search: 'Name', page: '0', size: '20' } })
+        terminalId: 'terminal-a', status: '25', distributionStatus: '20', search: ' Name ', page: '0', size: '20' } })
   })
   it('routes stats through the protected bridge with only date and terminal parameters', async () => {
     const get = vi.fn().mockResolvedValue({})
@@ -118,7 +118,7 @@ describe('live read API registration', () => {
     expect(request.query).toEqual({
       fromDate: '2026-09-01',
       toDate: '2026-09-15',
-      search: 'terminal',
+      search: '  terminal  ',
       status: '0',
       page: '0',
       size: '10',
@@ -134,7 +134,7 @@ describe('live read API registration', () => {
     await runtime.terminalList({ merchantId: '2', bankAccountId: '3', search: ' A ', page: 0, size: 10 }, signal)
     await runtime.bankAccountLookup('2', signal)
     await runtime.terminalsForMerchant('2', signal)
-    expect(get.mock.calls[0]?.[0]).toMatchObject({ endpoint: { path: '/terminals/get-all' }, query: { merchantId: '2', bankAccountId: '3', search: 'A', page: '0', size: '10' } })
+    expect(get.mock.calls[0]?.[0]).toMatchObject({ endpoint: { path: '/terminals/get-all' }, query: { merchantId: '2', bankAccountId: '3', search: ' A ', page: '0', size: '10' } })
     expect(get.mock.calls[1]?.[0]).toMatchObject({ endpoint: { path: '/dropdown/bank-accounts' }, query: { merchantId: '2' } })
     expect(get.mock.calls[2]?.[0]).toMatchObject({ endpoint: { path: '/dropdown/terminals' }, query: { merchantId: '2' } })
   })
@@ -144,7 +144,7 @@ describe('live read API registration', () => {
     await runtime.p5List({ merchantId: '2', terminalId: 'terminal-a', status: 0, search: ' Device ', page: 1, size: 25 }, new AbortController().signal)
     expect(get.mock.calls[0]?.[0]).toMatchObject({
       endpoint: { method: 'GET', path: '/p5/get-all' },
-      query: { merchantId: '2', terminalId: 'terminal-a', status: '0', search: 'Device', page: '1', size: '25' },
+      query: { merchantId: '2', terminalId: 'terminal-a', status: '0', search: ' Device ', page: '1', size: '25' },
     })
     expect(runtime).not.toHaveProperty('p5ResetPin')
   })

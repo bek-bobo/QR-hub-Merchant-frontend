@@ -1,3 +1,4 @@
+import { applyEffectiveSearch } from '@/shared/filters/debounced-search'
 import type {
   DateRange,
   DynamicQrFilters,
@@ -44,6 +45,12 @@ export function changeDynamicQrMerchantDraft(draft: DynamicQrAdvancedFilterDraft
   return { ...draft, merchantId, bankAccountId: undefined, terminalId: undefined }
 }
 
+export function changeDynamicQrBankDraft(draft: DynamicQrAdvancedFilterDraft, bankAccountId?: string): DynamicQrAdvancedFilterDraft {
+  const nextBank = bankAccountId?.trim() || undefined
+  if ((draft.bankAccountId?.trim() || undefined) === nextBank) return draft
+  return { ...draft, bankAccountId: nextBank, terminalId: undefined }
+}
+
 export function reconcileDynamicQrLookupDraft(
   draft: DynamicQrAdvancedFilterDraft,
   lookups: DynamicQrStructuredLookups,
@@ -56,7 +63,7 @@ export function reconcileDynamicQrLookupDraft(
   // Never reconcile against a result from another parent or a failed/in-flight request.
   if ((lookups.banks.merchantId?.trim() || undefined) === (draft.merchantId?.trim() || undefined) &&
     confirmedMissing(draft.bankAccountId, lookups.banks)) {
-    return { ...draft, bankAccountId: undefined }
+    return changeDynamicQrBankDraft(draft, undefined)
   }
   return draft
 }
@@ -98,7 +105,7 @@ export function restoreDefaultDynamicQrDateRange(
 ): DynamicQrFilters {
   return Object.freeze({
     ...current,
-    ...getTashkentDatePreset(7, instant),
+    ...getTashkentDatePreset(1, instant),
     page: 0,
   })
 }
@@ -107,7 +114,7 @@ export function applyDynamicQrSearchQuickFilter(
   current: DynamicQrFilters,
   search: string,
 ): DynamicQrFilters {
-  return Object.freeze({ ...current, search: search.trim(), page: 0 })
+  return applyEffectiveSearch(current, search)
 }
 
 export function applyDynamicQrAdvancedFilters(

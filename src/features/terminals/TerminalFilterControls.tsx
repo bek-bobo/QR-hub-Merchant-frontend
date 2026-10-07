@@ -10,11 +10,10 @@ import { changeTerminalMerchantDraft, changeTerminalRegionDraft, type TerminalAd
 interface QuickSearchProps {
   readonly searchDraft: string
   readonly onDraftChange: (search: string) => void
-  readonly onApply: (search: string) => void
 }
 
-export function TerminalQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
-  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onApply(searchDraft) }
+export function TerminalQuickSearch({ searchDraft, onDraftChange }: QuickSearchProps) {
+  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault() }
   return <form className="relative w-full min-w-0 sm:w-[28rem]" role="search" onSubmit={submit}>
     <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
     <Input type="text" enterKeyHint="search" value={searchDraft} className="h-10 rounded-xl bg-surface pl-10 pr-9 text-sm"
@@ -22,7 +21,7 @@ export function TerminalQuickSearch({ searchDraft, onDraftChange, onApply }: Qui
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"
       className="absolute right-1 top-1/2 -translate-y-1/2" aria-label="Qidiruvni tozalash"
-      onClick={() => { onDraftChange(''); onApply('') }}><XIcon aria-hidden="true" /></Button> : null}
+      onClick={() => onDraftChange('')}><XIcon aria-hidden="true" /></Button> : null}
     <button type="submit" className="sr-only" aria-label="Qidiruvni qo‘llash">Qidiruvni qo‘llash</button>
   </form>
 }

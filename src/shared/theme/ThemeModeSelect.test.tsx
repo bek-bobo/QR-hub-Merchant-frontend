@@ -21,12 +21,10 @@ describe('ThemeModeSelect', () => {
 
       expect(html).toContain('<label')
       expect(html).toContain('Ko‘rinish')
-      expect(html).toContain('<select')
+      expect(html).toContain('role="combobox"')
       expect(html).toContain('data-slot="select"')
-      expect(html).toContain(`value="${mode}" selected=""`)
-      expect(html).toContain('>Light</option>')
-      expect(html).toContain('>Dark</option>')
-      expect(html).toContain('>System</option>')
+      expect(html).toContain('data-size="compact"')
+      expect(html).toContain(`>${{ light: 'Light', dark: 'Dark', system: 'System' }[mode]}</span>`)
     },
   )
 

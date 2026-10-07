@@ -139,7 +139,7 @@ export function createCancelQrController(deps: CancelQrControllerDependencies) {
         if (scope) {
           const refresh = await invalidateAfterConfirmed({ result, isCurrent,
             invalidate: () => deps.invalidateConfirmed!(scope) })
-          if (isCurrent()) setState({ ...state, refresh: refresh === 'failed' ? 'failed' : 'updated' })
+          if (isCurrent()) setState({ ...state, refresh: refresh === 'failed' ? 'failed' : refresh === 'updated' ? 'updated' : 'idle' })
         }
       }
       return result

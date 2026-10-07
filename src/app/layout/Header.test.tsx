@@ -1,3 +1,4 @@
+// @vitest-environment happy-dom
 import { createRef } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { MemoryRouter } from 'react-router'
@@ -30,7 +31,13 @@ describe('Header', () => {
     expect(html).toContain('aria-controls="live-mobile-navigation"')
     expect(html).toContain('Merchant User')
     expect(html).toContain('Ko‘rinish')
-    expect(html).toContain('value="system" selected=""')
+    const host = document.createElement('div')
+    host.innerHTML = html
+    const themeSelect = host.querySelector<HTMLButtonElement>('[role="combobox"]')!
+    expect(themeSelect.closest('label')?.textContent).toContain('Ko‘rinish')
+    expect(themeSelect.textContent).toBe('System')
+    expect(themeSelect.getAttribute('aria-expanded')).toBe('false')
+    expect(themeSelect.disabled).toBe(false)
     expect(html).toContain('Chiqish')
   })
 

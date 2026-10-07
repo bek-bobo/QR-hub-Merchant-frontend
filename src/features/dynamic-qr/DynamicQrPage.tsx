@@ -1,3 +1,4 @@
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
@@ -150,6 +151,9 @@ export function DynamicQrPage({
   }))
   const [searchDraft, setSearchDraft] = useState(initialFilters.search)
   const [applied, setApplied] = useState<DynamicQrFilters>(initialFilters)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
+  })
   const [createOpen, setCreateOpen] = useState(false)
   const [selectedQrRow, setSelectedQrRow] = useState<DynamicQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<DynamicQrRow | null>(null)
@@ -173,8 +177,18 @@ export function DynamicQrPage({
     }
   }
 
+  function resetDrawerDraft() {
+    setAdvancedDraft(advancedDraftFromFilters({}))
+    setFilterMessage(null)
+  }
+
+  function syncDrawerDraft(open: boolean) {
+    setAdvancedDraft(advancedDraftFromFilters(open ? applied : {}))
+    setFilterMessage(null)
+  }
+
   function clearFilters() {
-    const next = createDefaultDynamicQrFilters(initialInstant ?? new Date())
+    const next = createDefaultDynamicQrFilters()
     setAdvancedDraft(advancedDraftFromFilters(next))
     setFilterMessage(null)
     setDateDraft({ fromDate: next.fromDate, toDate: next.toDate })
@@ -188,16 +202,12 @@ export function DynamicQrPage({
   }
 
   function restoreQuickDateRange() {
-    const defaults = createDefaultDynamicQrFilters(initialInstant ?? new Date())
+    const defaults = createDefaultDynamicQrFilters()
     const range = { fromDate: defaults.fromDate, toDate: defaults.toDate }
     setDateDraft(range)
     setApplied((current) => applyDynamicQrDateQuickFilter(current, range) ?? current)
   }
 
-  function applyQuickSearch(search: string) {
-    setSearchDraft(search.trim())
-    setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
-  }
 
   function goToPage(page: number) {
     setApplied((current) => changeDynamicQrPage(current, page))
@@ -207,7 +217,8 @@ export function DynamicQrPage({
     return (
       <FilterDrawer
         onApply={applyFilters}
-        onReset={clearFilters}
+        onReset={resetDrawerDraft}
+        onOpenChange={syncDrawerDraft}
         triggerSize="sm"
         triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm"
       >
@@ -230,7 +241,6 @@ export function DynamicQrPage({
           onRangeApply={applyQuickDateRange}
           onRangeReset={restoreQuickDateRange}
           onSearchDraftChange={setSearchDraft}
-          onSearchApply={applyQuickSearch}
         />
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
           <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact showIcon

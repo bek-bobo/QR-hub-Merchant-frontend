@@ -30,7 +30,7 @@ import {
 } from '@/components/ui/table'
 import { formatPreviewTiyin } from './format'
 import type { PreviewQrRow } from './model'
-import { presentQrStatus } from './presenters'
+import { presentQrStatus } from '@/shared/presentation/qr-status'
 
 const statusOptions = [
   { code: 0, label: 'Yangi' },

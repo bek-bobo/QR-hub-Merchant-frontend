@@ -8,13 +8,11 @@ import type { LookupSelectState } from '@/shared/ui/lookup-select-state'
 interface QuickSearchProps {
   readonly searchDraft: string
   readonly onDraftChange: (search: string) => void
-  readonly onApply: (search: string) => void
 }
 
-export function BankAccountQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
+export function BankAccountQuickSearch({ searchDraft, onDraftChange }: QuickSearchProps) {
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onApply(searchDraft)
   }
   return <form className="relative w-full min-w-0 sm:w-[25rem]" role="search" onSubmit={submit}>
     <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
@@ -24,7 +22,7 @@ export function BankAccountQuickSearch({ searchDraft, onDraftChange, onApply }: 
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"
       className="absolute right-1 top-1/2 -translate-y-1/2" aria-label="Qidiruvni tozalash"
-      onClick={() => { onDraftChange(''); onApply('') }}><XIcon aria-hidden="true" /></Button> : null}
+      onClick={() => onDraftChange('')}><XIcon aria-hidden="true" /></Button> : null}
     <button type="submit" className="sr-only" aria-label="Qidiruvni qo‘llash">Qidiruvni qo‘llash</button>
   </form>
 }

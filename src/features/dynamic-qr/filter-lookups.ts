@@ -3,7 +3,7 @@ import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ManagementOption } from '@/shared/contracts/management-read'
 import type { TerminalOption } from '@/shared/contracts/merchant-read'
 import { getTerminalFilterState } from './page-state'
-import { changeDynamicQrMerchantDraft, getDynamicQrStructuredState, reconcileDynamicQrLookupDraft, type DynamicQrAdvancedFilterDraft, type FilterLookupEvidence } from './quick-filters'
+import { changeDynamicQrBankDraft, changeDynamicQrMerchantDraft, getDynamicQrStructuredState, reconcileDynamicQrLookupDraft, type DynamicQrAdvancedFilterDraft, type FilterLookupEvidence } from './quick-filters'
 import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
 
 interface LookupResult {
@@ -89,7 +89,7 @@ export function advancedFilterFieldProps(
     banksDisabled: bankLookupState !== 'ready',
     terminalsDisabled: !available(lookups.draftEvidence.terminals),
     onMerchantChange: (id?: string) => onChange(changeDynamicQrMerchantDraft(reconciled, id)),
-    onBankAccountChange: (id?: string) => onChange({ ...reconciled, bankAccountId: id }),
+    onBankAccountChange: (id?: string) => onChange(changeDynamicQrBankDraft(reconciled, id)),
     onTerminalChange: (id?: string) => onChange({ ...reconciled, terminalId: id }),
     onStatusChange: (status: DynamicQrAdvancedFilterDraft['status']) => onChange({ ...reconciled, status }),
     onDistributionStatusChange: (status: DynamicQrAdvancedFilterDraft['distributionStatus']) => onChange({ ...reconciled, distributionStatus: status }),

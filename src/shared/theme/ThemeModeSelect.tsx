@@ -41,7 +41,7 @@ export function ThemeModeSelect({ compact = false }: ThemeModeSelectProps) {
   return (
     <label className="flex min-w-0 shrink items-center">
       <span className="sr-only">Ko‘rinish</span>
-      <Select
+      <Select size="compact"
         value={mode}
         className="w-auto min-w-0 max-w-[6.75rem] shrink px-2 text-xs sm:text-sm"
         onChange={(event) =>

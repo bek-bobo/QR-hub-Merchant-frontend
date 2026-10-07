@@ -13,7 +13,6 @@ interface DynamicQrQuickFiltersProps {
   readonly onRangeApply: (range: DateRange) => void
   readonly onRangeReset: () => void
   readonly onSearchDraftChange: (search: string) => void
-  readonly onSearchApply: (search: string) => void
 }
 
 export function DynamicQrQuickFilters({
@@ -24,11 +23,9 @@ export function DynamicQrQuickFilters({
   onRangeApply,
   onRangeReset,
   onSearchDraftChange,
-  onSearchApply,
 }: DynamicQrQuickFiltersProps) {
   function submitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onSearchApply(searchDraft)
   }
 
   return (
@@ -38,6 +35,7 @@ export function DynamicQrQuickFilters({
         onDraftChange={onRangeDraftChange}
         onApply={onRangeApply}
         onReset={onRangeReset}
+        resetLabel="Bugungi kun"
       />
       <form className="dynamic-qr-search relative min-w-0 sm:w-80" role="search" onSubmit={submitSearch}>
         <SearchIcon
@@ -62,7 +60,6 @@ export function DynamicQrQuickFilters({
             aria-label="Qidiruvni tozalash"
             onClick={() => {
               onSearchDraftChange('')
-              onSearchApply('')
             }}
           >
             <XIcon aria-hidden="true" />

@@ -7,7 +7,6 @@ import {
   getTashkentDatePreset,
   isValidDateRange,
 } from '@/shared/filters/date-range'
-import type { StatusTone } from '@/shared/presentation/status-tone'
 
 export function applyDashboardFilters(
   draft: DashboardFilters,
@@ -53,28 +52,4 @@ export function reconcileDashboard(view: Pick<DashboardView, 'metrics'> & Partia
         view.pie.processing.amount.minorUnits === processing.amount.minorUnits &&
         view.pie.failed.amount.minorUnits === failed.amount.minorUnits && view.pie.uncategorized.amount.minorUnits === uncategorized.amount.minorUnits)),
   })
-}
-
-export interface QrStatusPresentation {
-  readonly label: string
-  readonly tone: StatusTone
-}
-
-export function presentQrStatus(statusCode: number): QrStatusPresentation {
-  switch (statusCode) {
-    case 0:
-      return { label: 'Yangi', tone: 'info' }
-    case 5:
-      return { label: 'Muddati o‘tgan', tone: 'error' }
-    case 10:
-      return { label: 'Jarayonda', tone: 'warning' }
-    case 20:
-      return { label: 'Bekor qilingan', tone: 'error' }
-    case 25:
-      return { label: 'Rad etilgan', tone: 'error' }
-    case 50:
-      return { label: 'Muvaffaqiyatli', tone: 'success' }
-    default:
-      return { label: 'Noma’lum', tone: 'neutral' }
-  }
 }

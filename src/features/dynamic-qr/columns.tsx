@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { presentQrStatus } from '@/features/dashboard/presenters'
+import { presentQrStatus } from '@/shared/presentation/qr-status'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'

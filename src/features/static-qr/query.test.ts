@@ -59,7 +59,7 @@ describe('static QR safe read boundary', () => {
     const read = setup({ filters: applied })
     await read.options.queryFn({ signal: new AbortController().signal })
     expect(read.received()).toMatchObject({ endpoint: endpoints.staticQrs,
-      query: { merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'QR-1', page: '2', size: '20' } })
+      query: { merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: '  QR-1  ', page: '2', size: '20' } })
     expect(read.options.queryKey).toEqual(readKeys.staticQrs(scope, applied.terminalId, applied.page, applied.size, applied))
     const blocked = setup({ filters: applied, terminalConfirmed: false })
     await expect(blocked.options.queryFn({ signal: new AbortController().signal })).rejects.toThrow()

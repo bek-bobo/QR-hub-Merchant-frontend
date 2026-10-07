@@ -3,7 +3,16 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createActionRegistry } from '@/shared/api/one-dispatch-action'
 import { deferred } from '@/test/auth-fakes'
+import { useReadRuntime } from '@/app/read/useReadRuntime'
+import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
+import { useQueryClient } from '@tanstack/react-query'
 import { CreateCashierContent } from './CreateCashierContent'
+
+// This direct-call suite mocks React hooks; keep it on the option/value contract.
+// The real Radix form is exercised by CreateForms.lifecycle.test.tsx.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))
 
 const harness = vi.hoisted(() => ({
   index: 0,
@@ -13,6 +22,17 @@ const harness = vi.hoisted(() => ({
 }))
 const scope = { source: 'live' as const, sessionScopeId: 'session-a', accessRevision: 1 }
 const options = [{ id: 'terminal-1', name: 'Terminal A' }]
+
+// Keep this direct-call suite focused on form contracts. The live composition
+// hook executes through real React mounting in the lifecycle suite.
+vi.mock('./live-create-cashier', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./live-create-cashier')>()
+  return { ...actual, useLiveCashierCreateAdapter: () => {
+    const current = { runtime: useReadRuntime(), auth: useProtectedReadContext(),
+      queryClient: useQueryClient(), transport: { request: harness.request } }
+    return actual.createLiveCashierCreateAdapter(() => current, scope)
+  } }
+})
 
 // Exercise form callbacks with the real controller, without a browser or network.
 vi.mock('react', async (importOriginal) => {
@@ -30,7 +50,8 @@ vi.mock('react', async (importOriginal) => {
 })
 vi.mock('@tanstack/react-query', () => ({
   useQuery: () => ({ data: options, isPending: false, isError: false }),
-  useQueryClient: () => ({ getQueryState: () => ({ status: 'success', isInvalidated: false, data: options }), invalidateQueries: harness.invalidate }),
+  useQueryClient: () => ({ getQueryState: () => ({ status: 'success', isInvalidated: false, data: options }),
+    getQueryCache: () => ({ findAll: () => [] }), invalidateQueries: harness.invalidate }),
 }))
 vi.mock('@/app/read/useReadRuntime', () => ({ useReadRuntime: () => ({
   scope, getCurrentScope: () => scope, actionRegistry: harness.registry,

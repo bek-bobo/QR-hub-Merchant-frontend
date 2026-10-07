@@ -96,3 +96,8 @@ describe('Cashier structured drawer', () => {
     expect(renderFields({ appliedTerminalId: undefined }).html).not.toContain(notice)
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

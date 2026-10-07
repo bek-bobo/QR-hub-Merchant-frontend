@@ -6,7 +6,7 @@ import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
-import { presentQrStatus } from './presenters'
+import { presentQrStatus } from '@/shared/presentation/qr-status'
 
 export const DASHBOARD_RECENT_QR_TABLE_KEY = 'dashboardRecentQr'
 

@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { invalidateConfirmedQueries, type ConfirmedReadRefresh } from '@/shared/api/confirmed-refresh'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 type ReadAccess = { readonly dynamicQrRead: boolean; readonly dashboardRead: boolean }
 
@@ -10,8 +11,8 @@ export function shouldInvalidateAfterCancel(queryKey: readonly unknown[], scope:
     (queryKey[3] === 'dashboard' && access.dashboardRead)
 }
 
-export async function invalidateConfirmedCancelReads(client: QueryClient, scope: ReadScope, access: ReadAccess): Promise<void> {
-  await client.invalidateQueries({
+export async function invalidateConfirmedCancelReads(client: QueryClient, scope: ReadScope, access: ReadAccess): Promise<ConfirmedReadRefresh> {
+  return invalidateConfirmedQueries(client, {
     predicate: (query) => shouldInvalidateAfterCancel(query.queryKey, scope, access),
   })
 }

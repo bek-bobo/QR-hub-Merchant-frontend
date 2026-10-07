@@ -1,7 +1,7 @@
 import { CoinsIcon, FileTextIcon, LandmarkIcon, LinkIcon, MonitorIcon, QrCodeIcon, StoreIcon } from 'lucide-react'
 import { DetailsBody, DetailsDialogShell, DetailsSectionCard, DetailsFieldRow, DetailsStatusBadge, DetailsCopyField, DetailsPrimaryAction } from '@/shared/ui/DetailsDialog'
 import { useState } from 'react'
-import { presentQrStatus } from '@/features/dashboard/presenters'
+import { presentQrStatus } from '@/shared/presentation/qr-status'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
 import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'

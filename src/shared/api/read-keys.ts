@@ -30,7 +30,7 @@ function dynamicQrFiltersKey(filters: DynamicQrFilters) {
         filters.toDate,
         filters.terminalId?.trim() || null,
         filters.status ?? null,
-        filters.search.trim(),
+        filters.search,
         filters.page,
         filters.size,
         filters.merchantId?.trim() || null,
@@ -50,9 +50,9 @@ export const readKeys = {
     terminals: (scope: ReadScope) =>
         [...scopeKey(scope), 'terminal-lookup'] as const,
     terminalList: (scope: ReadScope, filters: TerminalListFilters) =>
-        [...scopeKey(scope), 'terminal-list', filters.merchantId?.trim() || null, filters.bankAccountId?.trim() || null, filters.search.trim(), filters.page, filters.size, filters.regionId?.trim() || null, filters.districtId?.trim() || null] as const,
+        [...scopeKey(scope), 'terminal-list', filters.merchantId?.trim() || null, filters.bankAccountId?.trim() || null, filters.search, filters.page, filters.size, filters.regionId?.trim() || null, filters.districtId?.trim() || null] as const,
     bankAccountList: (scope: ReadScope, filters: BankAccountListFilters) =>
-        [...scopeKey(scope), 'bank-account-list', filters.merchantId?.trim() || null, filters.search.trim(), filters.page, filters.size] as const,
+        [...scopeKey(scope), 'bank-account-list', filters.merchantId?.trim() || null, filters.search, filters.page, filters.size] as const,
     cashierList: (scope: ReadScope, filters: CashierListFilters) =>
         [...scopeKey(scope), 'cashier-list', filters.merchantId?.trim() || null, filters.terminalId?.trim() || null, filters.search.trim(), filters.page, filters.size] as const,
     merchantLookup: (scope: ReadScope) =>
@@ -62,14 +62,14 @@ export const readKeys = {
     regionLookup: (scope: ReadScope) => [...scopeKey(scope), 'region-lookup'] as const,
     districtLookup: (scope: ReadScope, regionId?: string) => [...scopeKey(scope), 'district-lookup', regionId?.trim() || null] as const,
     p5List: (scope: ReadScope, filters: P5Filters) =>
-        [...scopeKey(scope), 'p5-list', filters.merchantId?.trim() || null, filters.terminalId?.trim() || null, filters.status ?? null, filters.search.trim(), filters.page, filters.size] as const,
+        [...scopeKey(scope), 'p5-list', filters.merchantId?.trim() || null, filters.terminalId?.trim() || null, filters.status ?? null, filters.search, filters.page, filters.size] as const,
     terminalsForMerchant: (scope: ReadScope, merchantId?: string) =>
         !merchantId?.trim() ? [...scopeKey(scope), 'terminal-lookup'] as const : [...scopeKey(scope), 'terminal-lookup', merchantId.trim()] as const,
     staticQrs: (scope: ReadScope, terminalId: string | undefined, page: number, size: number,
         filters?: Pick<StaticQrListFilters, 'merchantId' | 'regionId' | 'districtId' | 'search'>) =>
         [...scopeKey(scope), 'static-qrs', terminalId?.trim() || null, page, size,
             filters?.merchantId?.trim() || null, filters?.regionId?.trim() || null,
-            filters?.districtId?.trim() || null, filters?.search.trim() || ''] as const,
+            filters?.districtId?.trim() || null, filters?.search ?? ''] as const,
     currencies: (scope: ReadScope) =>
         [...scopeKey(scope), 'currencies'] as const,
 }

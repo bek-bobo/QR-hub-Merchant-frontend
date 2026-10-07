@@ -21,7 +21,7 @@ export const ALL_TREND_SERIES: readonly TrendSeriesKey[] = TREND_SERIES.map(({ k
 export const DEFAULT_TREND_SERIES: readonly TrendSeriesKey[] = ['success', 'processing', 'failed', 'uncategorized']
 type TrendView = Pick<DashboardView, 'buckets'> & Partial<Pick<DashboardView, 'metrics' | 'chartGroupBy'>>
 
-export function availableTrendSeries(view: TrendView): readonly TrendSeriesKey[] {
+export function availableTrendSeries(view: Pick<TrendView, 'buckets'> & { readonly metrics?: { readonly uncategorized: { readonly count: number } } }): readonly TrendSeriesKey[] {
   const unknown = (view.metrics?.uncategorized.count ?? 0) > 0 ||
     view.buckets.some(({ values }) => values.uncategorized.count > 0 || BigInt(values.uncategorized.amount.minorUnits) > 0n)
   return ALL_TREND_SERIES.filter((key) => key !== 'uncategorized' || unknown)
@@ -83,9 +83,10 @@ export interface TrendPlotDatum {
 }
 
 // Approximate numbers only at the engine boundary; tooltips retain exact money.
-export function trendPlotData(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[] = DEFAULT_TREND_SERIES): TrendPlotDatum[] {
-  const selected = visibleTrendSeries(visible, availableTrendSeries(view))
-  return view.buckets.flatMap((bucket, index) => TREND_SERIES.filter(({ key }) => selected.includes(key)).map((item) => {
+export function trendPlotData(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[] = DEFAULT_TREND_SERIES, available = availableTrendSeries(view)): TrendPlotDatum[] {
+  const selected = visibleTrendSeries(visible, available)
+  const series = TREND_SERIES.filter(({ key }) => selected.includes(key))
+  return view.buckets.flatMap((bucket, index) => series.map((item) => {
     const raw = bucket.values[item.key]
     const observedValue = mode === 'amount' ? Number(raw.amount.minorUnits) / 10 ** raw.amount.scale : raw.count
     if (!Number.isFinite(observedValue)) throw safeContractError()
@@ -99,9 +100,21 @@ export function trendPlotData(view: TrendView, mode: TrendMode, visible: readonl
 export function trendTooltipItem(datum: TrendPlotDatum) {
   return { name: datum.type, value: datum.exactValue }
 }
-export function createTrendPlotConfig(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[], theme: MerchantPlotTheme, width = 720): LineConfig {
-  const data = trendPlotData(view, mode, visible)
-  const available = TREND_SERIES.filter(({ key }) => availableTrendSeries(view).includes(key))
+// Ordered boundaries identify keyboard positions. Changed displayed content
+// resets safely rather than leaving an asynchronously updated tooltip stale.
+// Build this alongside prepared data, not by comparing whole views each render.
+export function trendInteractionKey(buckets: readonly DashboardBucket[], group: DashboardView['chartGroupBy'], mode: TrendMode, visible: readonly TrendSeriesKey[], data: readonly TrendPlotDatum[]) {
+  const field = (value: string) => `${value.length}:${value}`
+  const boundaries = buckets.map((bucket) => `${field(bucket.periodKind)}${field(bucket.periodStart)}${field(bucket.periodEnd)}`)
+  const content = data.map((datum) => `${field(datum.exactValue)}${field(datum.coverage)}${field(String(datum.partial))}`)
+  return [group, mode, ...visible, ...boundaries, ...content].map(field).join('')
+}
+
+export function createTrendPlotConfig(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[], theme: MerchantPlotTheme, width = 720,
+  prepared?: { readonly data: TrendPlotDatum[]; readonly available: readonly TrendSeriesKey[] }): LineConfig {
+  const availableKeys = prepared?.available ?? availableTrendSeries(view)
+  const data = prepared?.data ?? trendPlotData(view, mode, visible, availableKeys)
+  const available = TREND_SERIES.filter(({ key }) => availableKeys.includes(key))
   const maximum = data.reduce((max, datum) => Math.max(max, datum.value ?? 0), 0)
   const scale: LineConfig['scale'] = {
     x: { type: 'point', domain: view.buckets.map((_, index) => String(index)), range: [0.02, 0.98] },

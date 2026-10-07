@@ -1,3 +1,4 @@
+import { applyEffectiveSearch } from '@/shared/filters/debounced-search'
 import { safeContractError } from '@/shared/api/errors'
 import { applyManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
 import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
@@ -15,7 +16,7 @@ export function bankAccountParentState(merchantId: string | undefined, lookup: M
 
 export function applyBankAccountDraft(draft: BankAccountListFilters, merchantIds?: readonly string[]): BankAccountListFilters {
   if (draft.merchantId && !merchantIds?.includes(draft.merchantId)) throw safeContractError()
-  return applyManagementFilters(draft)
+  return { ...applyManagementFilters(draft), search: draft.search }
 }
 
 export type BankAccountMerchantDraft = Pick<BankAccountListFilters, 'merchantId'>
@@ -29,7 +30,5 @@ export function applyBankAccountMerchantDraft(
 }
 
 export function applyBankAccountQuickSearch(applied: BankAccountListFilters, search: string): BankAccountListFilters {
-  const normalized = search.trim()
-  if (applied.search === normalized && applied.page === 0) return applied
-  return { ...applied, search: normalized, page: 0 }
+  return applyEffectiveSearch(applied, search)
 }

@@ -1,3 +1,4 @@
+import { applyEffectiveSearch } from '@/shared/filters/debounced-search'
 import { safeContractError } from '@/shared/api/errors'
 import { applyManagementFilters, dependentReadGate, toTerminalListQuery, type DependentLookupGateInput, type TerminalListFilters } from '@/shared/contracts/management-filters'
 import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
@@ -19,7 +20,7 @@ export function applyTerminalDraft(draft: TerminalListFilters, input: { readonly
   if (draft.districtId && (!draft.regionId || dependentReadGate({ appliedParentId: draft.regionId,
     appliedChildId: draft.districtId, ...input.district, lookupState: input.district?.lookupState ?? 'unavailable' }) !== 'ready')) throw safeContractError()
   toTerminalListQuery(draft)
-  return applyManagementFilters(draft, { bank: input.bank })
+  return { ...applyManagementFilters(draft, { bank: input.bank }), search: draft.search }
 }
 
 export type TerminalAdvancedDraft = Pick<TerminalListFilters, 'merchantId' | 'bankAccountId' | 'regionId' | 'districtId'>
@@ -57,9 +58,7 @@ export function applyTerminalAdvancedDraft(applied: TerminalListFilters, draft: 
 }
 
 export function applyTerminalQuickSearch(applied: TerminalListFilters, search: string): TerminalListFilters {
-  const normalized = search.trim()
-  if (applied.search === normalized && applied.page === 0) return applied
-  return { ...applied, search: normalized, page: 0 }
+  return applyEffectiveSearch(applied, search)
 }
 
 export function resetTerminalFilters(filters: TerminalListFilters): TerminalListFilters {

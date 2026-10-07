@@ -15,6 +15,8 @@ export function P5ResetDialog({ state, onCancel, onConfirm, onAcknowledgeUnknown
   const intent = state.intent
   const pending = state.outcome.kind === 'pending'
   const confirmed = state.outcome.kind === 'confirmed'
+  const unknown = state.outcome.kind === 'unknown'
+  const rejected = state.outcome.kind === 'rejected'
   const failed = state.outcome.kind === 'unknown' || state.outcome.kind === 'rejected' || state.outcome.kind === 'not-sent'
   return <>
     {state.dialogOpen && intent ? <DetailsDialogShell icon={KeyRoundIcon} title="PINni tiklash"
@@ -35,11 +37,14 @@ export function P5ResetDialog({ state, onCancel, onConfirm, onAcknowledgeUnknown
     </DetailsDialogShell> : null}
     {(confirmed || failed) && intent ? <ResultToast
       tone={confirmed ? 'success' : 'error'}
-      title={confirmed ? "Reset OTP jo'natildi" : 'Reset OTP yuborilmadi'}
+      title={confirmed ? "Reset OTP jo'natildi" : unknown ? 'Reset natijasini tasdiqlab bo‘lmadi'
+        : rejected ? 'PIN reset rad etildi' : 'PIN reset so‘rovi yuborilmadi'}
       description={confirmed
         ? `${intent.deviceId} qurilmasi uchun reset OTP yuborildi. Kodni P5 qurilmaga kiriting.`
-        : `${intent.deviceId} qurilmasi uchun reset OTP yuborishda xatolik yuz berdi. Qayta urinib ko‘ring.`}
-      detail={state.outcome.kind === 'unknown' ? 'Natija tasdiqlanmadi. Takrorlash yangi reset so‘rovini yuboradi.'
+        : unknown ? `${intent.deviceId}: So‘rov yuborilgan bo‘lishi mumkin, lekin server natijasini tasdiqlab bo‘lmadi. Yangi reset yuborishdan oldin joriy holatni tekshiring.`
+          : rejected ? `${intent.deviceId} qurilmasi uchun PIN reset so‘rovi server tomonidan rad etildi.`
+            : `${intent.deviceId} qurilmasi uchun PIN reset so‘rovi yuborilmadi. Qayta urinishdan oldin sessiya va ruxsatlarni tekshiring.`}
+      detail={unknown ? 'Takrorlash yangi reset so‘rovini yuboradi.'
         : state.refresh === 'failed' ? 'Ro‘yxatni yangilab bo‘lmadi. Yangilash tugmasini bosing.' : undefined}
       action={failed ? { label: state.outcome.kind === 'unknown' ? 'Yangi resetni tasdiqlash' : 'Qayta urinish', onClick: onAcknowledgeUnknown } : undefined}
     /> : null}

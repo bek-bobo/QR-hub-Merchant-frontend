@@ -1,20 +1,10 @@
 import { useState, useSyncExternalStore } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
-import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
-import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
-import { safeHttpError } from '@/shared/api/errors'
-import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
-import { endpoints } from '@/shared/contracts/endpoints'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import type { Page, ReadScope } from '@/shared/contracts/merchant-read'
-import { invalidateCurrentCashierLists } from './create-cashier'
-import { createUnassignTerminalController, resolveCurrentUnassignTarget, type UnassignPort, type UnassignTarget } from './unassign-terminal'
-
-function sameScope(left: ReadScope, right: ReadScope): boolean {
-  return left.source === right.source && left.sessionScopeId === right.sessionScopeId && left.accessRevision === right.accessRevision
-}
+import { createUnassignTerminalController, type UnassignTarget } from './unassign-terminal'
+import { useLiveUnassignTerminalAdapter } from './live-unassign-terminal'
 
 interface UnassignTerminalPanelProps {
   readonly target: UnassignTarget
@@ -22,72 +12,22 @@ interface UnassignTerminalPanelProps {
   readonly resultKey: readonly unknown[]
   readonly dataUpdatedAt: number
   readonly scope: ReadScope
-  readonly isSelected: () => boolean
+  readonly getSelectedTarget: () => UnassignTarget | null
   readonly onRefresh: () => void
   readonly onCancel: () => void
   readonly onConfirmed: () => void
 }
 
-export function UnassignTerminalPanel({ target, resultData, resultKey, dataUpdatedAt, scope, isSelected, onRefresh, onCancel, onConfirmed }: UnassignTerminalPanelProps) {
+export function UnassignTerminalPanel({ target, resultData, resultKey, dataUpdatedAt, scope, getSelectedTarget, onRefresh, onCancel, onConfirmed }: UnassignTerminalPanelProps) {
   const runtime = useReadRuntime()
-  const { getCurrentScope } = runtime
-  const queryClient = useQueryClient()
-  const { getSessionSnapshot, protectedMutation } = useProtectedReadContext()
   const [message, setMessage] = useState<string | null>(null)
-  const base = validateWebBaseUrl(import.meta.env.VITE_WEB_API_BASE_URL, import.meta.env.DEV ? 'development' : 'production')
-  const [transport] = useState(() => base.kind === 'valid' ? createHttpTransport({ service: 'web', baseUrl: base.value }) : null)
-
-  const currentTarget = (): UnassignTarget | null => {
-    const session = getSessionSnapshot()
-    const state = queryClient.getQueryState<Page<CashierRow>>(resultKey)
-    return isSelected() ? resolveCurrentUnassignTarget({
-      target, resultData, currentData: state?.status === 'success' ? state.data : undefined,
-      dataUpdatedAt, currentUpdatedAt: state?.dataUpdatedAt, invalidated: state?.isInvalidated ?? true,
-      scope, currentScope: getCurrentScope(),
-      canRead: session.phase === 'authenticated' && session.profile.permissions.includes('GET_CASHIERS'),
-      canUnassign: session.phase === 'authenticated' && session.profile.permissions.includes('UNASSIGN_TERMINAL'),
-    }) : null
-  }
-  const [port] = useState<UnassignPort | null>(() => transport ? {
-    async unassign(query, intentScope) {
-      let dispatched = false
-      const result = await protectedMutation(async ({ accessToken, signal }) => {
-        const current = currentTarget()
-        if (!current || !sameScope(intentScope, getCurrentScope()) ||
-          current.cashier.id !== query.cashierId || current.terminal.id !== query.terminalId || signal.aborted) {
-          throw new ActionNotDispatchedError()
-        }
-        dispatched = true
-        const response = await transport.request({ endpoint: endpoints.unassignCashierTerminal,
-          credential: { kind: 'bearer', accessToken }, query, signal })
-        if (!response.ok) throw safeHttpError(response.status)
-        if (response.status !== 200) throw new Error('Unassign response was not confirmed.')
-        return response.body
-      })
-      if (result.status === 'success') return result.data
-      if (!dispatched) throw new ActionNotDispatchedError()
-      throw new Error('Dispatched unassign outcome is unknown.')
-    },
-  } : null)
+  const adapter = useLiveUnassignTerminalAdapter({ target, resultData, resultKey, dataUpdatedAt, scope, onConfirmed, getSelectedTarget })
   const [controller] = useState(() => runtime.actionRegistry.getOrCreate(
     `cashier.unassign:${scope.source}:${scope.sessionScopeId}:${scope.accessRevision}:${JSON.stringify(resultKey)}:${dataUpdatedAt}:${target.cashier.id}:${target.terminal.id}`,
-    () => createUnassignTerminalController({
-      currentScope: getCurrentScope,
-      currentTarget,
-      canUnassign: () => {
-        const session = getSessionSnapshot()
-        return session.phase === 'authenticated' && session.profile.permissions.includes('UNASSIGN_TERMINAL')
-      },
-      port: () => port,
-      invalidateConfirmed: async (intentScope) => {
-        if (!sameScope(intentScope, getCurrentScope())) return
-        onConfirmed()
-        await invalidateCurrentCashierLists(queryClient, intentScope, true)
-      },
-    }),
+    () => createUnassignTerminalController(adapter),
   ))
   const state = useSyncExternalStore(controller.subscribe, controller.getState, controller.getState)
-  const current = currentTarget()
+  const current = adapter.currentTarget()
   if (!current) return null
   if (!controller.isCurrentSelection()) return <p role="status">Oldingi tanlov endi amal qilmaydi. Kassirlar ro‘yxatini yangilang.</p>
 
@@ -97,7 +37,7 @@ export function UnassignTerminalPanel({ target, resultData, resultKey, dataUpdat
       return
     }
     void controller.submit().then((result) => {
-      if (result.kind === 'not-sent' && currentTarget()) setMessage(result.reason)
+      if (result.kind === 'not-sent' && adapter.currentTarget()) setMessage(result.reason)
     })
   }
 

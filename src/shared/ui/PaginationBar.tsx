@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { cn } from 'cn'
 import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/button'
@@ -120,9 +120,9 @@ export function PaginationBar({
         <div className="flex items-center gap-2">
           <span aria-hidden="true" className="h-6 w-px bg-border/80" />
           <div className="relative">
-            <Select aria-label="Sahifadagi yozuvlar soni" value={pageSize}
+            <Select size="compact" aria-label="Sahifadagi yozuvlar soni" value={pageSize}
               disabled={disabled || !onPageSizeChange}
-              className="h-9 w-28 appearance-none rounded-lg border-border/80 bg-surface pl-3 pr-8 text-base text-text-primary sm:h-10 sm:w-32 md:text-base"
+              className="h-9 w-28 rounded-lg border-border/80 bg-surface px-3 text-base text-text-primary sm:h-10 sm:w-32 md:text-base"
               onChange={(event) => {
                 const size = pageSizes.find((option) => option === Number(event.target.value))
                 if (!disabled && size !== undefined) onPageSizeChange?.(size)
@@ -130,7 +130,6 @@ export function PaginationBar({
               {!pageSizes.includes(pageSize as PageSize) ? <option value={pageSize}>{pageSize} / sah.</option> : null}
               {pageSizes.map((size) => <option key={size} value={size}>{size} / sah.</option>)}
             </Select>
-            <ChevronDownIcon aria-hidden="true" className="pointer-events-none absolute right-2.5 top-1/2 size-4 -translate-y-1/2 text-text-secondary" />
           </div>
         </div>
       </div>

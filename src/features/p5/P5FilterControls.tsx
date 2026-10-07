@@ -8,17 +8,17 @@ import { FilterFieldCard } from '@/shared/ui/FilterFieldCard'
 import type { LookupSelectState } from '@/shared/ui/lookup-select-state'
 import { changeP5AdvancedMerchant, isP5StatusDraftValid, resolveP5StatusDraft, type P5AdvancedDraft, type P5StatusDraft } from './page-state'
 
-export function P5QuickSearch({ searchDraft, onDraftChange, onApply }: {
-  readonly searchDraft: string; readonly onDraftChange: (search: string) => void; readonly onApply: (search: string) => void
+export function P5QuickSearch({ searchDraft, onDraftChange }: {
+  readonly searchDraft: string; readonly onDraftChange: (search: string) => void
 }) {
-  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onApply(searchDraft) }
+  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault() }
   return <form className="relative w-full min-w-0 lg:w-[min(100%,32rem)]" role="search" onSubmit={submit}>
     <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
     <Input type="text" enterKeyHint="search" value={searchDraft} className="h-11 rounded-xl bg-surface pl-12 pr-10 text-sm"
       aria-label="Qurilma ID yoki terminal nomi bo‘yicha qidirish" placeholder="Qurilma ID yoki terminal nomi"
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm" className="absolute right-1 top-1/2 -translate-y-1/2"
-      aria-label="Qidiruvni tozalash" onClick={() => { onDraftChange(''); onApply('') }}><XIcon aria-hidden="true" /></Button> : null}
+      aria-label="Qidiruvni tozalash" onClick={() => onDraftChange('')}><XIcon aria-hidden="true" /></Button> : null}
     <button type="submit" className="sr-only" aria-label="Qidiruvni qo‘llash">Qidiruvni qo‘llash</button>
   </form>
 }

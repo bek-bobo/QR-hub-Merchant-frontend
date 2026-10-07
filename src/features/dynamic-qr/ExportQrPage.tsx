@@ -1,3 +1,4 @@
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { createDefaultDynamicQrFilters } from './page-state'
@@ -22,6 +23,9 @@ export function ExportQrPage() {
   const [dateDraft, setDateDraft] = useState(() => ({ fromDate: initial.fromDate, toDate: initial.toDate }))
   const [searchDraft, setSearchDraft] = useState(initial.search)
   const [applied, setApplied] = useState<DynamicQrFilters>(initial)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
+  })
   const [revision, setRevision] = useState(0)
   const [message, setMessage] = useState<string | null>(null)
   const lookups = useDynamicQrFilterLookups(advancedDraft, applied)
@@ -43,12 +47,13 @@ export function ExportQrPage() {
     return true
   }
 
-  function clear() {
-    setAdvancedDraft(advancedDraftFromFilters(initial))
-    setDateDraft({ fromDate: initial.fromDate, toDate: initial.toDate })
-    setSearchDraft('')
-    setApplied(initial)
-    setRevision((current) => current + 1)
+  function resetDrawerDraft() {
+    setAdvancedDraft(advancedDraftFromFilters({}))
+    setMessage(null)
+  }
+
+  function syncDrawerDraft(open: boolean) {
+    setAdvancedDraft(advancedDraftFromFilters(open ? applied : {}))
     setMessage(null)
   }
 
@@ -57,21 +62,22 @@ export function ExportQrPage() {
     setApplied((current) => applyDynamicQrDateQuickFilter(current, range) ?? current)
   }
 
-  function applySearch(search: string) {
-    setSearchDraft(search.trim())
-    setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
+  function restoreQuickDateRange() {
+    const { fromDate, toDate } = createDefaultDynamicQrFilters()
+    applyDate({ fromDate, toDate })
   }
+
 
   return <div className="mx-auto min-w-0 max-w-7xl space-y-4">
     <PageHeader title="Dinamik QR XLSX eksporti" />
     <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
       <DynamicQrQuickFilters range={dateDraft} searchDraft={searchDraft}
         onRangeDraftChange={setDateDraft} onRangeApply={applyDate}
-        onRangeReset={() => applyDate({ fromDate: initial.fromDate, toDate: initial.toDate })}
-        onSearchDraftChange={setSearchDraft} onSearchApply={applySearch} />
+        onRangeReset={restoreQuickDateRange}
+        onSearchDraftChange={setSearchDraft} />
       <div className="flex min-w-0 flex-wrap items-center gap-2 lg:justify-end">
         <ExportButton applied={applied} terminalValid={lookups.appliedFilterState === 'valid'} intentRevision={revision} compact />
-        <FilterDrawer onApply={apply} onReset={clear} triggerSize="sm">
+        <FilterDrawer onApply={apply} onReset={resetDrawerDraft} onOpenChange={syncDrawerDraft} triggerSize="sm">
           <ExportQrFilters {...advancedFilterFieldProps(lookups, advancedDraft, setAdvancedDraft)} />
           {lookups.merchants.isError || lookups.draftBanks.isError || lookups.draftTerminals.isError
             ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>Qayta urinish</Button> : null}

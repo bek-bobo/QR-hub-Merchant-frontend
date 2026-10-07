@@ -48,13 +48,19 @@ function find(node: unknown, predicate: (element: ReactElement<Record<string, un
   if (predicate(node)) return node
   return find(node.props.children, predicate)
 }
+function chartTree(data: DashboardView) {
+  let tree: ReturnType<typeof TrendChart> | undefined
+  function Capture() { tree = TrendChart({ view: data }); return tree }
+  renderToStaticMarkup(<Capture />)
+  return tree
+}
 function click(label: string) {
-  const button = find(TrendChart({ view: view() }), (element) => element.props['aria-label'] === label || element.props.children === label)!
+  const button = find(chartTree(view()), (element) => element.props['aria-label'] === label || element.props.children === label)!
   const handler = button.props.onClick as () => void
   handler()
 }
 function toggleSeries(key: TrendSeriesKey) {
-  const settings = find(TrendChart({ view: view() }), (element) => typeof element.props.onToggle === 'function')!
+  const settings = find(chartTree(view()), (element) => typeof element.props.onToggle === 'function')!
   const toggle = settings.props.onToggle as (key: TrendSeriesKey) => void
   toggle(key)
 }
@@ -72,7 +78,7 @@ describe('Merchant TrendChart integration', () => {
     expect(html).toMatch(/aria-pressed="true"[^>]*>Soni/)
     expect(html).not.toMatch(/<table|Batafsil ma’lumotlar|min-width|overflow-x-auto/)
     // Inspect only Merchant's own tree: nested Lucide components may render SVG.
-    expect(find(TrendChart({ view: view() }), (element) => element.type === 'svg')).toBeUndefined()
+    expect(find(chartTree(view()), (element) => element.type === 'svg')).toBeUndefined()
     for (const label of ['Jami', 'Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz']) expect(legend(html)).toContain(label)
     expect(legend(html)).not.toContain('<button')
     expect(html).toContain('Grafik qatorlarini sozlash')
@@ -135,7 +141,7 @@ describe('Merchant TrendChart integration', () => {
       ? base.buckets.map((bucket, index) => ({ ...completedCoverage(`2026-10-01T${14 + index}:00:00+05:00`, `2026-10-01T${15 + index}:00:00+05:00`), ...bucket, periodKind: 'hour', label: `01.10.2026 ${14 + index}:00`,
         periodStart: `2026-10-01T${14 + index}:00:00+05:00`, periodEnd: `2026-10-01T${15 + index}:00:00+05:00` }))
       : base.buckets }
-    const indicator = find(TrendChart({ view: data }), (element) => element.type === 'p' && Children.toArray(element.props.children as ReactNode).includes('Guruhlash: '))!
+    const indicator = find(chartTree(data), (element) => element.type === 'p' && Children.toArray(element.props.children as ReactNode).includes('Guruhlash: '))!
     expect(indicator.props.onClick).toBeUndefined()
     const html = renderToStaticMarkup(<TrendChart view={data} />)
     expect(html).toContain(`Guruhlash: ${label}`)

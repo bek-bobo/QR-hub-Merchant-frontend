@@ -6,7 +6,7 @@ import { createP5AdvancedDraft } from './page-state'
 describe('P5 quick search', () => {
   it('renders one custom clear for populated text and none when empty', () => {
     for (const searchDraft of ['device', '']) {
-      const html = renderToStaticMarkup(<P5QuickSearch searchDraft={searchDraft} onDraftChange={vi.fn()} onApply={vi.fn()} />)
+      const html = renderToStaticMarkup(<P5QuickSearch searchDraft={searchDraft} onDraftChange={vi.fn()} />)
       expect(html).toContain('placeholder="Qurilma ID yoki terminal nomi"')
       expect(html).toContain('type="text"')
       expect(html).toMatch(/enterkeyhint="search"/i)
@@ -14,19 +14,20 @@ describe('P5 quick search', () => {
       expect(html.match(/aria-label="Qidiruvni tozalash"/g) ?? []).toHaveLength(searchDraft ? 1 : 0)
     }
   })
-  it('keeps typing draft-only and retains explicit Enter and clear apply', () => {
-    const onDraftChange = vi.fn(); const onApply = vi.fn()
-    const form = P5QuickSearch({ searchDraft: 'device', onDraftChange, onApply })
-    form.props.children[1].props.onChange({ target: { value: 'new' } })
-    expect(onDraftChange).toHaveBeenCalledWith('new')
-    expect(onApply).not.toHaveBeenCalled()
+  it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
+    let searchDraft = 'old'
+    const onDraftChange = vi.fn((search: string) => { searchDraft = search })
+    const render = () => P5QuickSearch({ searchDraft, onDraftChange })
+    render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
+    expect(searchDraft).toBe('  AbC!  ')
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
     const preventDefault = vi.fn()
-    form.props.onSubmit({ preventDefault })
+    render().props.onSubmit({ preventDefault })
     expect(preventDefault).toHaveBeenCalledOnce()
-    expect(onApply).toHaveBeenCalledWith('device')
-    form.props.children[2].props.onClick()
-    expect(onDraftChange).toHaveBeenLastCalledWith('')
-    expect(onApply).toHaveBeenLastCalledWith('')
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
+    render().props.children[2].props.onClick()
+    expect(searchDraft).toBe('')
+    expect(onDraftChange).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -78,3 +79,8 @@ describe('P5 structured filters', () => {
     expect(incomplete).toContain('p5-custom-status-error')
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

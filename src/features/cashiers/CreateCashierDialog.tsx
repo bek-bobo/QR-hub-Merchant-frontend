@@ -1,6 +1,6 @@
 import { useCallback, useState, type ComponentProps } from 'react'
 import { Dialog } from 'radix-ui'
-import { XIcon } from 'lucide-react'
+import { UserRoundIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CreateCashierContent } from './CreateCashierContent'
 
@@ -15,18 +15,26 @@ export function CreateCashierDialog({ onClose, onCloseAutoFocus }: {
   return <Dialog.Root open onOpenChange={changeOpen}>
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/45 supports-backdrop-filter:backdrop-blur-xs" />
-      <Dialog.Content onCloseAutoFocus={onCloseAutoFocus} className="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border bg-popover text-popover-foreground shadow-2xl"
+      <Dialog.Content onCloseAutoFocus={onCloseAutoFocus} className="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-[43rem] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-[1.5rem] border border-border/70 bg-popover text-popover-foreground shadow-2xl"
         onEscapeKeyDown={(event) => { if (pending) event.preventDefault() }}
         onPointerDownOutside={(event) => { if (pending) event.preventDefault() }}>
-        <header className="shrink-0 border-b px-4 py-4 pr-14 sm:px-6">
-          <Dialog.Title className="text-xl font-semibold text-text-primary">Yangi kassir</Dialog.Title>
-          <Dialog.Description className="mt-1 text-sm text-text-secondary">F.I.Sh., telefon va terminalni tanlang.</Dialog.Description>
+        <header className="relative isolate shrink-0 overflow-hidden px-5 py-6 pr-16 sm:px-8 sm:py-7 sm:pr-20">
+          <span aria-hidden="true" className="pointer-events-none absolute -right-16 top-7 -z-10 h-52 w-80 -rotate-[28deg] rounded-[50%] bg-brand-soft/60" />
+          <div className="flex min-w-0 items-center gap-4 sm:gap-7">
+            <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand sm:size-20">
+              <UserRoundIcon className="size-8 sm:size-10" />
+            </span>
+            <div className="min-w-0">
+              <Dialog.Title className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.875rem]">Yangi kassir</Dialog.Title>
+              <Dialog.Description className="mt-1.5 text-sm leading-6 text-text-secondary sm:text-base">F.I.Sh., telefon va terminalni tanlang.</Dialog.Description>
+            </div>
+          </div>
         </header>
         <Dialog.Close asChild>
-          <Button type="button" variant="ghost" size="icon-sm" className="absolute right-4 top-4" disabled={pending} aria-label="Yopish"><XIcon aria-hidden="true" /></Button>
+          <Button type="button" variant="ghost" size="icon-sm" className="absolute right-5 top-5 size-10 rounded-full bg-brand-soft text-brand hover:bg-brand-soft/80 sm:right-8 sm:top-7" disabled={pending} aria-label="Yopish"><XIcon aria-hidden="true" /></Button>
         </Dialog.Close>
-        <div className="min-h-0 min-w-0 overflow-y-auto px-4 py-5 [overflow-wrap:anywhere] sm:px-6">
-          <CreateCashierContent onConfirmed={onClose} onPendingChange={setPending} />
+        <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-5 pb-6 pt-5 [overflow-wrap:anywhere] sm:px-8 sm:pt-6">
+          <CreateCashierContent onConfirmed={onClose} onPendingChange={setPending} onCancel={() => changeOpen(false)} />
         </div>
       </Dialog.Content>
     </Dialog.Portal>

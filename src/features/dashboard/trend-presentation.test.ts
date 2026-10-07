@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DashboardBucket } from '@/shared/contracts/merchant-read'
-import { DEFAULT_TREND_SERIES, availableTrendSeries, createTrendPlotConfig, toggleTrendSeries, trendPlotData, trendTooltipItem, trendAxisLabel, trendTickFilter, trendPeriodTitle } from './trend-presentation'
+import { DEFAULT_TREND_SERIES, availableTrendSeries, createTrendPlotConfig, toggleTrendSeries, trendPlotData, trendInteractionKey, trendTooltipItem, trendAxisLabel, trendTickFilter, trendPeriodTitle } from './trend-presentation'
 import { readMerchantPlotTheme } from './plot-theme'
 import { completedCoverage, dashboardZero } from './test-fixtures'
 const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
@@ -10,6 +10,33 @@ function bucket(label = 'backend'): DashboardBucket {
     values: { total: metric(99, '900719925474099301'), success: metric(3, '12345'), processing: metric(1, '1'), failed: metric(7, '8000000'), uncategorized: dashboardZero } }
 }
 describe('Final transaction chart presentation', () => {
+  it('F09 standalone config scans availability once rather than once per candidate series', () => {
+    let reads = 0
+    const buckets = Array.from({ length: 12 }, () => {
+      const original = bucket()
+      return { ...original, get values() { reads += 1; return original.values } }
+    })
+    const config = createTrendPlotConfig({ buckets }, 'count', DEFAULT_TREND_SERIES, theme)
+    expect(config.data).toHaveLength(36)
+    // One availability visit plus three selected datum reads per bucket.
+    expect(reads).toBe(12 * 4)
+  })
+
+  it('F09 semantic identity distinguishes exact money changes beyond Number precision', () => {
+    const original = bucket()
+    const next = { ...original, values: { ...original.values,
+      total: { ...original.values.total, amount: { ...original.values.total.amount, minorUnits: '900719925474099302' } } } }
+    const identity = (value: DashboardBucket) => trendInteractionKey([value], 'DAY', 'amount', ['total'], trendPlotData({ buckets: [value] }, 'amount', ['total']))
+    expect(Number(original.values.total.amount.minorUnits)).toBe(Number(next.values.total.amount.minorUnits))
+    expect(identity(original)).not.toBe(identity(next))
+    expect(identity(structuredClone(original))).toBe(identity(original))
+  })
+
+  it.each(['PARTIAL', 'FUTURE'] as const)('F09 resets on changed %s coverage content', (coverage) => {
+    const original = bucket(), next = { ...original, coverage }
+    const identity = (value: DashboardBucket) => trendInteractionKey([value], 'DAY', 'count', DEFAULT_TREND_SERIES, trendPlotData({ buckets: [value] }, 'count'))
+    expect(identity(original)).not.toBe(identity(next))
+  })
   it('disables permanent point marks and configures native shared active markers with subtle status areas', () => {
     const config = createTrendPlotConfig({ buckets: [bucket()] }, 'count', DEFAULT_TREND_SERIES, theme)
     expect(config.point).toBeUndefined()

@@ -26,7 +26,7 @@ describe('read query keys', () => {
       const variant = { ...filters, ...change }
       expect(readKeys.staticQrs(scope, variant.terminalId, variant.page, variant.size, variant)).not.toEqual(baseline)
     }
-    expect(readKeys.staticQrs(scope, ' T-Exact ', 0, 20, { ...filters, merchantId: ' 1 ', regionId: ' 3 ', districtId: ' 4 ', search: ' QR ' })).toEqual(baseline)
+    expect(readKeys.staticQrs(scope, ' T-Exact ', 0, 20, { ...filters, merchantId: ' 1 ', regionId: ' 3 ', districtId: ' 4 ', search: ' QR ' })).not.toEqual(baseline)
     const rowVariant = { ...filters, status: 0, fromDate: 'date', bankAccountId: '9' }
     expect(readKeys.staticQrs(scope, filters.terminalId, 0, 20, rowVariant)).toEqual(baseline)
     expect(isReadQueryKey(baseline)).toBe(true)
@@ -116,7 +116,7 @@ describe('read query keys', () => {
     expect(baseline).not.toEqual(readKeys.bankAccountList(scope, { ...filters, merchantId: '3' }))
     expect(baseline).not.toEqual(readKeys.bankAccountList(scope, { ...filters, page: 1 }))
     expect(baseline).not.toEqual(readKeys.bankAccountList(scope, { ...filters, size: 10 }))
-    expect(baseline).toEqual(readKeys.bankAccountList(scope, { ...filters, search: ' Bank ' }))
+    expect(baseline).not.toEqual(readKeys.bankAccountList(scope, { ...filters, search: ' Bank ' }))
   })
   it('retains Cashier merchant, terminal, search, page and size in list identity', () => {
     const filters = { merchantId: '2', terminalId: 't1', search: 'Cashier', page: 0, size: 20 } as const
@@ -140,3 +140,4 @@ describe('read query keys', () => {
     expect(isReadQueryKey(baseline)).toBe(true)
   })
 })
+

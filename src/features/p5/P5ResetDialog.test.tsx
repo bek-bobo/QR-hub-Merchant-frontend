@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react'
 import { renderToString } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
+import { QueryClient, QueryObserver } from '@tanstack/react-query'
 import { P5ResetDialog } from './P5ResetDialog'
-import { createLiveP5ResetPort, createP5ResetController, type P5ResetState } from './p5-reset'
+import { createLiveP5ResetPort, createP5ResetController, invalidateCurrentP5Lists, type P5ResetState } from './p5-reset'
 import type { P5Row } from '@/shared/contracts/p5-read'
 
 vi.mock('radix-ui', async (importOriginal) => {
@@ -57,14 +58,21 @@ describe('P5 reset dialog', () => {
   it.each(['rejected', 'unknown', 'not-sent'] as const)('shows safe destructive feedback and explicit retry for %s', (kind) => {
     const html = render({ dialogOpen: false, intent, outcome: { kind, reason: 'raw technical secret' }, refresh: 'idle' })
     expect(html).toContain('role="alert"')
-    expect(html).toContain('Reset OTP yuborilmadi')
+    expect(html).toContain(kind === 'unknown' ? 'Reset natijasini tasdiqlab bo‘lmadi'
+      : kind === 'rejected' ? 'PIN reset rad etildi' : 'PIN reset so‘rovi yuborilmadi')
     expect(html).toContain('bg-status-error-indicator')
     expect(html).not.toContain('raw technical secret')
     expect(html).not.toContain("Reset OTP jo'natildi")
-    expect(html).toContain('00AbC qurilmasi uchun reset OTP yuborishda xatolik yuz berdi.')
+    expect(html).toContain(kind === 'unknown' ? 'So‘rov yuborilgan bo‘lishi mumkin, lekin server natijasini tasdiqlab bo‘lmadi.'
+      : kind === 'rejected' ? '00AbC qurilmasi uchun PIN reset so‘rovi server tomonidan rad etildi.'
+        : '00AbC qurilmasi uchun PIN reset so‘rovi yuborilmadi.')
     expect(html).toContain('fixed right-4 top-4')
     expect(html).toContain('Bildirishnomani yopish')
-    if (kind === 'unknown') expect(html).toContain('Takrorlash yangi reset so‘rovini yuboradi')
+    if (kind === 'unknown') {
+      expect(html).toContain('Yangi resetni tasdiqlash')
+      expect(html).toContain('Yangi reset yuborishdan oldin joriy holatni tekshiring.')
+      for (const misleading of ['OTP yuborilmadi', 'so‘rov yuborilmadi', 'reset amalga oshmadi']) expect(html).not.toContain(misleading)
+    }
     else expect(html).toContain('Qayta urinish')
   })
 })
@@ -94,11 +102,37 @@ describe('P5 reset envelope to toast', () => {
     expect(controller.request(row)).toBe(true)
     await controller.confirm()
     const html = render(controller.getState())
-    expect(html).toContain(success ? "Reset OTP jo'natildi" : 'Reset OTP yuborilmadi')
+    expect(html).toContain(success ? "Reset OTP jo'natildi" : controller.getState().outcome.kind === 'rejected'
+      ? 'PIN reset rad etildi' : 'Reset natijasini tasdiqlab bo‘lmadi')
     expect(html).toContain(row.deviceId)
     expect(html).not.toContain(success ? 'Reset OTP yuborilmadi' : "Reset OTP jo'natildi")
     expect(html).not.toContain('java.lang.Exception')
     expect(html).not.toContain('internal.example')
     expect(html).not.toContain('private transport detail')
   })
+})
+
+it('shows confirmed reset and actual refresh failure without claiming reset failure', async () => {
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const key = ['live', 'a', 1, 'p5-list']
+  client.setQueryData(key, {})
+  const observer = new QueryObserver(client, { queryKey: key, staleTime: Infinity,
+    queryFn: async () => { throw Error('read failure') }, retry: false })
+  const unsubscribe = observer.subscribe(() => undefined)
+  const row: P5Row = { deviceId: intent.deviceId, deviceStatus: 0, description: null, terminalName: 'T', terminalId: 't',
+    terminalType: 'P5', merchantName: 'M', staticQrId: null, staticQrLink: null, staticQrStatus: null, createdAt: '2026-10-06T10:00:00' }
+  const port = { reset: async () => ({ success: true, data: null }) }
+  const controller = createP5ResetController({ currentScope: () => intent.scope, canRead: () => true, canReset: () => true,
+    currentRow: () => row, port: () => port, invalidateConfirmed: () => invalidateCurrentP5Lists(client, intent.scope, true) })
+  try {
+    controller.request(row)
+    await controller.confirm()
+    expect(controller.getState().outcome.kind).toBe('confirmed')
+    expect(controller.getState().refresh).toBe('failed')
+    const html = render(controller.getState())
+    expect(html).toContain("Reset OTP jo'natildi")
+    expect(html).toContain('Ro‘yxatni yangilab bo‘lmadi.')
+    expect(html).not.toContain('Reset OTP yuborilmadi')
+    expect(html).not.toContain('PIN reset rad etildi')
+  } finally { unsubscribe(); client.clear() }
 })

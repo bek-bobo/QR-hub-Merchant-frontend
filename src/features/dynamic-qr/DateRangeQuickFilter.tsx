@@ -1,22 +1,31 @@
-import { useState } from 'react'
+import { useState, useSyncExternalStore, type ReactNode } from 'react'
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from 'lucide-react'
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
 import type { DateRange } from '@/shared/contracts/merchant-read'
+import { getTashkentDatePreset } from '@/shared/filters/date-range'
 import {
   buildCalendarMonth,
   calendarMonthForRange,
+  formatCalendarMonthLabel,
+  getCalendarPreviewRange,
   selectCalendarRangeDate,
   shiftCalendarMonth,
 } from './date-range-calendar'
 
 const weekdays = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'] as const
 
-const monthFormatter = new Intl.DateTimeFormat('uz-UZ', {
-  timeZone: 'UTC',
-  month: 'short',
-  year: 'numeric',
-})
+// Match the md breakpoint that exposes the second month panel.
+const twoPanelQuery = '(min-width: 768px)'
+function subscribeToPanelLayout(onChange: () => void) {
+  const query = window.matchMedia(twoPanelQuery)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+function readTwoPanelLayout() {
+  return window.matchMedia(twoPanelQuery).matches
+}
+function singlePanelLayout() { return false }
 
 const dayFormatter = new Intl.DateTimeFormat('uz-UZ', {
   timeZone: 'UTC',
@@ -32,19 +41,32 @@ function utcDate(value: string): Date {
 function CalendarMonth({
   month,
   selection,
+  preview,
+  today,
   onSelect,
+  onHover,
   className,
+  otherVisibleMonth,
+  navigation,
 }: {
   readonly month: string
   readonly selection: DateRange
+  readonly preview: DateRange | null
+  readonly today: string
   readonly onSelect: (date: string) => void
+  readonly onHover: (date: string | null) => void
   readonly className?: string
+  readonly otherVisibleMonth?: string
+  readonly navigation: ReactNode
 }) {
   return (
-    <section className={className} aria-label={monthFormatter.format(utcDate(month))}>
-      <h3 className="mb-3 text-center text-sm font-semibold text-text-primary">
-        {monthFormatter.format(utcDate(month))}
-      </h3>
+    <section className={className} aria-label={formatCalendarMonthLabel(month)}>
+      <div className="relative mb-3 flex h-8 items-center justify-center">
+        <h3 className="text-center text-sm font-semibold text-text-primary">
+          {formatCalendarMonthLabel(month)}
+        </h3>
+        {navigation}
+      </div>
       <div className="grid grid-cols-7 gap-1 text-center">
         {weekdays.map((weekday) => (
           <span key={weekday} className="py-1 text-xs text-text-secondary" aria-hidden="true">
@@ -52,28 +74,45 @@ function CalendarMonth({
           </span>
         ))}
         {buildCalendarMonth(month).map((day) => {
-          const endpoint = day.date === selection.fromDate || day.date === selection.toDate
+          const canonical = day.inMonth || day.date.slice(0, 7) !== otherVisibleMonth?.slice(0, 7)
+          const endpoint = canonical && (day.date === selection.fromDate || day.date === selection.toDate)
           const inRange = Boolean(
-            selection.toDate &&
+            canonical && selection.toDate &&
             day.date >= selection.fromDate &&
             day.date <= selection.toDate,
           )
+          const previewEndpoint = Boolean(canonical && preview && (day.date === preview.fromDate || day.date === preview.toDate))
+          const inPreview = Boolean(canonical && preview && day.date >= preview.fromDate && day.date <= preview.toDate)
+          const previewState = !inPreview ? undefined
+            : day.date === preview!.fromDate && day.date === preview!.toDate ? 'same-day'
+              : day.date === preview!.fromDate ? 'start'
+                : day.date === preview!.toDate ? 'end' : 'in-range'
+          const showTodayRing = canonical && day.date === today && !endpoint && !inRange && !inPreview
           return (
             <button
               key={day.date}
               type="button"
               aria-label={dayFormatter.format(utcDate(day.date))}
               aria-pressed={endpoint}
+              aria-current={canonical && day.date === today ? 'date' : undefined}
+              data-calendar-date={day.date}
+              data-preview={previewState}
               className={`size-8 rounded-md text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-brand ${
                 endpoint
                   ? 'bg-primary text-primary-foreground'
-                  : inRange
-                    ? 'bg-brand-soft text-text-primary hover:bg-brand-soft/80'
-                    : day.inMonth
-                      ? 'text-text-primary hover:bg-muted'
-                      : 'text-text-secondary/45 hover:bg-muted'
-              }`}
+                  : previewEndpoint
+                    ? 'bg-brand-soft text-text-primary ring-1 ring-inset ring-brand/50'
+                    : inRange || inPreview
+                      ? 'bg-brand-soft text-text-primary hover:bg-brand-soft/80'
+                      : day.inMonth
+                        ? 'text-text-primary hover:bg-muted'
+                        : 'text-text-secondary/45 hover:bg-muted'
+              } ${showTodayRing ? 'ring-1 ring-inset ring-brand/40' : ''}`}
               onClick={() => onSelect(day.date)}
+              onPointerEnter={(event) => {
+                if (event.pointerType === 'mouse') onHover(day.date)
+              }}
+              onPointerLeave={() => onHover(null)}
             >
               {day.day}
             </button>
@@ -102,9 +141,28 @@ export function DateRangeQuickFilter({
   onReset,
 }: DateRangeQuickFilterProps) {
   const [open, setOpen] = useState(false)
+  const twoPanels = useSyncExternalStore(subscribeToPanelLayout, readTwoPanelLayout, singlePanelLayout)
   const [visibleMonth, setVisibleMonth] = useState(() => calendarMonthForRange(value))
+  const [hoveredDate, setHoveredDate] = useState<{ fromDate: string; date: string } | null>(null)
+  // Discard hover when a consumer replaces the draft; it belongs to that first date only.
+  if (hoveredDate && (!open || value.toDate || hoveredDate.fromDate !== value.fromDate)) {
+    setHoveredDate(null)
+  }
+  const preview = open && hoveredDate?.fromDate === value.fromDate
+    ? getCalendarPreviewRange(value, hoveredDate.date) : null
+  const today = getTashkentDatePreset(1).fromDate
+
+  function hoverDate(date: string | null) {
+    setHoveredDate(open && value.fromDate && !value.toDate && date ? { fromDate: value.fromDate, date } : null)
+  }
+
+  function navigateMonth(offset: number) {
+    setHoveredDate(null)
+    setVisibleMonth((month) => shiftCalendarMonth(month, offset))
+  }
 
   function selectDate(date: string) {
+    setHoveredDate(null)
     const next = selectCalendarRangeDate(value, date)
     onDraftChange(next)
     if (next.toDate) {
@@ -117,6 +175,7 @@ export function DateRangeQuickFilter({
     <PopoverPrimitive.Root
       open={open}
       onOpenChange={(nextOpen) => {
+        setHoveredDate(null)
         if (nextOpen) {
           setVisibleMonth(calendarMonthForRange(value))
         }
@@ -146,34 +205,61 @@ export function DateRangeQuickFilter({
           collisionPadding={16}
           className="z-50 w-[min(calc(100vw-2rem),42rem)] rounded-xl border bg-popover p-3 text-popover-foreground shadow-lg outline-none sm:p-4"
         >
-          <div className="mb-3 flex items-center justify-between">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Oldingi oy"
-              onClick={() => setVisibleMonth((month) => shiftCalendarMonth(month, -1))}
-            >
-              <ChevronLeftIcon aria-hidden="true" />
-            </Button>
-            <p className="text-xs text-text-secondary">Sana oralig‘ini tanlang</p>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label="Keyingi oy"
-              onClick={() => setVisibleMonth((month) => shiftCalendarMonth(month, 1))}
-            >
-              <ChevronRightIcon aria-hidden="true" />
-            </Button>
-          </div>
           <div className="grid gap-6 md:grid-cols-2">
-            <CalendarMonth month={visibleMonth} selection={value} onSelect={selectDate} />
+            <CalendarMonth
+              month={visibleMonth}
+              selection={value}
+              preview={preview}
+              today={today}
+              otherVisibleMonth={twoPanels ? shiftCalendarMonth(visibleMonth, 1) : undefined}
+              onSelect={selectDate}
+              onHover={hoverDate}
+              navigation={
+                <>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Oldingi oy"
+                    className="absolute left-0"
+                    onClick={() => navigateMonth(-1)}
+                  >
+                    <ChevronLeftIcon aria-hidden="true" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label="Keyingi oy"
+                    className="absolute right-0 md:hidden"
+                    onClick={() => navigateMonth(1)}
+                  >
+                    <ChevronRightIcon aria-hidden="true" />
+                  </Button>
+                </>
+              }
+            />
             <CalendarMonth
               month={shiftCalendarMonth(visibleMonth, 1)}
               selection={value}
+              preview={preview}
+              today={today}
               onSelect={selectDate}
+              onHover={hoverDate}
               className="hidden md:block"
+              otherVisibleMonth={visibleMonth}
+              navigation={
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Keyingi oy"
+                  className="absolute right-0"
+                  onClick={() => navigateMonth(1)}
+                >
+                  <ChevronRightIcon aria-hidden="true" />
+                </Button>
+              }
             />
           </div>
           <div className="mt-3 flex justify-end border-t pt-3">
@@ -182,6 +268,7 @@ export function DateRangeQuickFilter({
               variant="ghost"
               size="sm"
               onClick={() => {
+                setHoveredDate(null)
                 onReset()
                 setOpen(false)
               }}

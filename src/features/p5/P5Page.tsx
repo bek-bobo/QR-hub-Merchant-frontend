@@ -1,4 +1,5 @@
-import { useState, useSyncExternalStore } from 'react'
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -25,7 +26,7 @@ import {
 } from './page-state'
 import { P5Results } from './P5Results'
 import { P5ResetDialog } from './P5ResetDialog'
-import { createP5ResetController, invalidateCurrentP5Lists, p5ResetIntentKey, type P5ResetPort } from './p5-reset'
+import { createP5ResetController, invalidateCurrentP5Lists, p5ResetIntentKey, type P5ResetControllerDependencies, type P5ResetPort } from './p5-reset'
 import { p5Columns } from './columns'
 import { P5AdvancedFilterFields, P5QuickSearch } from './P5FilterControls'
 import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
@@ -49,13 +50,13 @@ function ResetControllerView({ controller, onRetry }: { readonly controller: P5R
     onAcknowledgeUnknown={onRetry} />
 }
 
-function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onResetView,
+function ScopedP5Results({ queryKey, runtime, resetDependencies, resetAvailable, onResetView,
   resetUnavailableMessage, pending, error, data, columnOrder, visibleColumnIds,
   onRetry, onPageChange, onPageSizeChange }: {
   readonly queryKey: readonly unknown[]
   readonly onResetView: (view: P5ResetView) => void
   readonly runtime: ReturnType<typeof useReadRuntime>
-  readonly resetPort: P5ResetPort | null
+  readonly resetDependencies: P5ResetControllerDependencies
   readonly resetAvailable: boolean
   readonly resetUnavailableMessage: string | undefined
   readonly pending: boolean
@@ -67,22 +68,10 @@ function ScopedP5Results({ queryKey, runtime, resetPort, resetAvailable, onReset
   readonly onPageChange: (page: number) => void
   readonly onPageSizeChange: (size: PageSize) => void
 }) {
-  const queryClient = useQueryClient()
-  const currentRow = (deviceId: string): P5Row | null => {
-    const current = queryClient.getQueryState<Page<P5Row>>(queryKey)
-    if (current?.status !== 'success' || current.isInvalidated) return null
-    const matches = current.data?.content.filter((row) => row.deviceId === deviceId) ?? []
-    return matches.length === 1 ? matches[0] : null
-  }
+  const { currentRow } = resetDependencies
   function requestReset(row: P5Row) {
-    const controller = runtime.actionRegistry.getOrCreate(p5ResetIntentKey(runtime.scope, row.deviceId), () => createP5ResetController({
-      currentScope: runtime.getCurrentScope,
-      canRead: () => runtime.capabilities.p5List,
-      canReset: () => runtime.capabilities.p5ResetPin,
-      currentRow,
-      port: () => resetAvailable ? resetPort : null,
-      invalidateConfirmed: (scope) => invalidateCurrentP5Lists(queryClient, scope, runtime.capabilities.p5List),
-    }))
+    const controller = runtime.actionRegistry.getOrCreate(p5ResetIntentKey(runtime.scope, row.deviceId),
+      () => createP5ResetController(resetDependencies))
     const showReset = () => onResetView({ controller, queryKey: JSON.stringify(queryKey), retry: () => {
       const deviceId = controller.getState().intent?.deviceId
       const current = deviceId ? currentRow(deviceId) : null
@@ -106,6 +95,9 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
   const [draft, setDraft] = useState<P5AdvancedDraft>(() => createP5AdvancedDraft())
   const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<P5FilterValues>(createDefaultP5Filters)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyP5QuickSearch(current, search))
+  })
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'p5Devices',
@@ -160,6 +152,32 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
   const visibleData = !blocked && !list.isPending && !list.isError && runtime.capabilities.p5List ? list.data : undefined
   const resetReady = (resetRegistration ?? runtime.readiness.p5Reset).kind === 'configured'
   const resetAvailable = runtime.capabilities.p5ResetPin && resetReady && Boolean(resetPort)
+  const queryClient = useQueryClient()
+  const evidence = { runtime, queryKey: listOptions.queryKey, visibleData, resetAvailable, resetPort }
+  const evidenceRef = useRef<typeof evidence | null>(null)
+  // This page outlives query-keyed result components. Only committed evidence may authorize a reset.
+  useLayoutEffect(() => {
+    evidenceRef.current = evidence
+    return () => { evidenceRef.current = null }
+  })
+  const [resetDependencies] = useState<P5ResetControllerDependencies>(() => ({
+    currentScope: () => evidenceRef.current?.runtime.getCurrentScope() ?? runtime.getCurrentScope(),
+    canRead: () => evidenceRef.current?.runtime.capabilities.p5List ?? false,
+    canReset: () => evidenceRef.current?.runtime.capabilities.p5ResetPin ?? false,
+    port: () => evidenceRef.current?.resetAvailable ? evidenceRef.current.resetPort : null,
+    currentRow: (deviceId) => {
+      const active = evidenceRef.current
+      if (!active?.visibleData) return null
+      const scope = active.runtime.getCurrentScope()
+      if (scope.source !== active.runtime.scope.source || scope.sessionScopeId !== active.runtime.scope.sessionScopeId ||
+        scope.accessRevision !== active.runtime.scope.accessRevision) return null
+      const current = queryClient.getQueryState<Page<P5Row>>(active.queryKey)
+      if (current?.status !== 'success' || current.isInvalidated || current.data !== active.visibleData) return null
+      const matches = current.data.content.filter((row) => row.deviceId === deviceId)
+      return matches.length === 1 ? matches[0] : null
+    },
+    invalidateConfirmed: (scope) => invalidateCurrentP5Lists(queryClient, scope, evidenceRef.current?.runtime.capabilities.p5List ?? false),
+  }))
 
   function applyFilters(): boolean {
     try {
@@ -178,10 +196,12 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
   }
 
   function resetFilters() {
-    const next = createDefaultP5Filters()
-    setDraft(createP5AdvancedDraft(next))
-    setSearchDraft('')
-    setApplied(next)
+    setDraft(createP5AdvancedDraft())
+    setValidationMessage(null)
+  }
+
+  function syncDrawerDraft(open: boolean) {
+    setDraft(createP5AdvancedDraft(open ? applied : undefined))
     setValidationMessage(null)
   }
 
@@ -194,12 +214,9 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
 
   return <div className="mx-auto min-w-0 max-w-[96rem] space-y-5">
     <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-      <P5QuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={(search) => {
-        setSearchDraft(search.trim())
-        setApplied((current) => applyP5QuickSearch(current, search))
-      }} />
+      <P5QuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} />
       <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm"
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} onOpenChange={syncDrawerDraft} triggerSize="sm"
           triggerClassName="h-11 gap-2 rounded-xl bg-muted/30 px-4 text-sm"
           applyDisabled={!isP5StatusDraftValid(draft.statusDraft)}>
           <P5Filters
@@ -236,7 +253,7 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
         />
       </div>
     </div>
-    {visibleData ? <ScopedP5Results key={JSON.stringify(listOptions.queryKey)} queryKey={listOptions.queryKey} onResetView={(view) => setResetView((current) => ({ ...view, notificationId: (current?.notificationId ?? 0) + 1 }))} runtime={runtime} resetPort={resetPort} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
+    {visibleData ? <ScopedP5Results key={JSON.stringify(listOptions.queryKey)} queryKey={listOptions.queryKey} onResetView={(view) => setResetView((current) => ({ ...view, notificationId: (current?.notificationId ?? 0) + 1 }))} runtime={runtime} resetDependencies={resetDependencies} resetAvailable={resetAvailable} pending={false} error={null} data={visibleData}
       resetUnavailableMessage={resetUnavailableMessage}
       columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
       onRetry={() => void list.refetch()} onPageChange={(page) => setApplied((current) => changeP5Page(current, page))}

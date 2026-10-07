@@ -1,3 +1,4 @@
+import { Select } from '@/components/ui/select'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router'
 import { Button } from '@/components/ui/button'
@@ -174,20 +175,20 @@ function StaticScenarioView({ scenario }: { readonly scenario: StaticScenario })
     <p className="text-sm">QR ko‘rinishi kontrakt tasdiqlangach mavjud bo‘ladi. Status kodi xom raqam.</p>
     <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end">
       <label className="text-sm">Terminal
-        <select className="block rounded-lg border bg-surface p-2" disabled={!lookupAvailable}
+        <Select disabled={!lookupAvailable}
           value={draft} onChange={(event) => setDraft(event.target.value)}>
           <option value="">Barcha terminallar</option>
           {lookupAvailable ? <option value={d4StaticTerminal.id}>{d4StaticTerminal.name}</option> : null}
-        </select>
+        </Select>
       </label>
       <Button type="button" disabled={Boolean(draft) && !lookupAvailable}
         onClick={() => { const next = applyStaticTerminal(filters, draft, lookup); if (next) setFilters(next) }}>Qo‘llash</Button>
       <Button type="button" variant="outline" onClick={() => { setDraft(''); setFilters(clearStaticTerminal(filters)) }}>Tozalash</Button>
       <label className="text-sm">Sahifa hajmi
-        <select className="block rounded-lg border bg-surface p-2" value={filters.size}
+        <Select size="compact" value={filters.size}
           onChange={(event) => setFilters(changePreviewStaticPageSize(filters, event.target.value))}>
           <option value="10">10</option><option value="25">25</option><option value="50">50</option>
-        </select>
+        </Select>
       </label>
       {scenario === 'STATIC_TERMINAL_LOST' ? <Button type="button" variant="outline"
         disabled={!lookupAvailable} onClick={() => setLookupAvailable(false)}>Terminal tasdig‘ini yo‘qotish</Button> : null}

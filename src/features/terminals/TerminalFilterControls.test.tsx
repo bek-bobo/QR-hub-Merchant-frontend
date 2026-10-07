@@ -1,12 +1,10 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
-import type { TerminalListFilters } from '@/shared/contracts/management-filters'
 import { TerminalAdvancedFilterFields, TerminalQuickSearch } from './TerminalFilterControls'
-import { applyTerminalQuickSearch, createDefaultTerminalFilters } from './page-state'
 
 describe('Terminal inline quick search', () => {
   it('renders the exact search scope, text input, Enter hint and exactly one custom clear action', () => {
-    const html = renderToStaticMarkup(<TerminalQuickSearch searchDraft="Terminal" onDraftChange={vi.fn()} onApply={vi.fn()} />)
+    const html = renderToStaticMarkup(<TerminalQuickSearch searchDraft="Terminal" onDraftChange={vi.fn()} />)
     expect(html).toContain('placeholder="Terminal nomi yoki ID"')
     expect(html).toContain('type="text"')
     expect(html).toMatch(/enterkeyhint="search"/i)
@@ -14,27 +12,24 @@ describe('Terminal inline quick search', () => {
     expect(html).toContain('role="search"')
     expect(html.match(/aria-label="Qidiruvni tozalash"/g)).toHaveLength(1)
     expect(html).toContain('aria-label="Qidiruvni qo‘llash"')
-    expect(renderToStaticMarkup(<TerminalQuickSearch searchDraft="" onDraftChange={vi.fn()} onApply={vi.fn()} />))
+    expect(renderToStaticMarkup(<TerminalQuickSearch searchDraft="" onDraftChange={vi.fn()} />))
       .not.toContain('aria-label="Qidiruvni tozalash"')
   })
 
-  it('keeps typing local then applies Enter and clear preserving all applied structured filters', () => {
-    let applied: TerminalListFilters = { ...createDefaultTerminalFilters(), merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: 'old', page: 3 }
+  it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
-    const onApply = vi.fn((search: string) => { applied = applyTerminalQuickSearch(applied, search) })
-    const render = () => TerminalQuickSearch({ searchDraft, onDraftChange, onApply })
-    render().props.children[1].props.onChange({ target: { value: '  Terminal A  ' } })
-    expect(onApply).not.toHaveBeenCalled()
-    expect(applied.search).toBe('old')
+    const render = () => TerminalQuickSearch({ searchDraft, onDraftChange })
+    render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
+    expect(searchDraft).toBe('  AbC!  ')
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
     const preventDefault = vi.fn()
     render().props.onSubmit({ preventDefault })
     expect(preventDefault).toHaveBeenCalledOnce()
-    expect(applied).toMatchObject({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: 'Terminal A', page: 0, size: 20 })
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
     render().props.children[2].props.onClick()
     expect(searchDraft).toBe('')
-    expect(onApply).toHaveBeenLastCalledWith('')
-    expect(applied).toMatchObject({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: '', page: 0, size: 20 })
+    expect(onDraftChange).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -84,3 +79,8 @@ describe('Terminal structured drawer', () => {
     expect(renderFields({ draft: {}, bankState: 'empty' }).selects[1]).toContain('Bank hisobi mavjud emas')
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

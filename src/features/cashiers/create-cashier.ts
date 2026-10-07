@@ -1,4 +1,5 @@
 import { ActionNotDispatchedError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
+import { invalidateConfirmedQueries, type ConfirmedReadRefresh } from '@/shared/api/confirmed-refresh'
 import type { ReadScope, TerminalOption } from '@/shared/contracts/merchant-read'
 import { normalizeUzbekPhoneWire } from '@/shared/presentation/phone'
 import type { QueryClient } from '@tanstack/react-query'
@@ -69,9 +70,9 @@ function scopeId(scope: ReadScope): string {
   return JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision])
 }
 
-export async function invalidateCurrentCashierLists(queryClient: QueryClient, scope: ReadScope, canRead: boolean): Promise<void> {
-  if (!canRead) return
-  await queryClient.invalidateQueries({ predicate: (query) => {
+export async function invalidateCurrentCashierLists(queryClient: QueryClient, scope: ReadScope, canRead: boolean): Promise<ConfirmedReadRefresh> {
+  if (!canRead) return 'skipped'
+  return invalidateConfirmedQueries(queryClient, { predicate: (query) => {
     const key = query.queryKey
     return key.length >= 4 && key[0] === scope.source && key[1] === scope.sessionScopeId &&
       key[2] === scope.accessRevision && key[3] === 'cashier-list'

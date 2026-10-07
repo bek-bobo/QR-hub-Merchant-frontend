@@ -14,6 +14,7 @@ import { TableColumnPreferenceList } from '@/shared/ui/TableColumnPreferences'
 import { RecentQrPanel } from './DashboardReadPage'
 import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardRecentQrTable } from './DashboardRecentQrTable'
+import { dynamicQrColumns } from '@/features/dynamic-qr/columns'
 
 const navigation = vi.hoisted(() => ({ state: undefined as unknown }))
 
@@ -140,6 +141,23 @@ function findElement(node: ReactNode, predicate: (element: ReactElement<Record<s
 }
 
 describe('Dashboard recent QR async presentation', () => {
+  it.each([[25, 'Rad etilgan', 'error'], [777, 'Noma’lum', 'neutral']] as const)(
+    'preserves QR status %s across dashboard, dynamic table, details and display consumers', (statusCode, label, tone) => {
+      const row = decode({ statusCode })
+      const before = JSON.stringify(row)
+      for (const columns of [dashboardRecentQrColumns, dynamicQrColumns]) {
+        const html = renderToStaticMarkup(<>{columns.find(({ id }) => id === 'status')!.renderCell(row)}</>)
+        expect(html).toContain(label)
+        expect(html).toContain(`status-${tone}`)
+        expect(html).not.toContain(String(statusCode))
+      }
+      expect(renderToStaticMarkup(<DynamicQrDetailsContent row={row} onViewQr={() => undefined} />)).toContain(label)
+      const presentation = findElement(QrDisplayDialog({ row, onOpenChange: () => undefined }), (element) => element.type === QrPresentation)!
+      expect(presentation.props.statusLabel).toBe(label)
+      expect(presentation.props.statusTone).toBe(tone)
+      expect(JSON.stringify(row)).toBe(before)
+    },
+  )
   it.each([undefined, 'terminal-1'])('preserves view-all dates and optional terminal %s', (terminalId) => {
     const filters = { fromDate: '2026-09-30', toDate: '2026-10-01',
       ...(terminalId ? { terminalId } : {}) }

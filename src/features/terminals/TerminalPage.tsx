@@ -1,3 +1,4 @@
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
@@ -9,7 +10,7 @@ import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { changeManagementPage, type TerminalListFilters } from '@/shared/contracts/management-filters'
 import type { TerminalRow } from '@/shared/contracts/management-read'
-import { applyTerminalAdvancedDraft, applyTerminalQuickSearch, createDefaultTerminalFilters, resetTerminalFilters, type TerminalAdvancedDraft } from './page-state'
+import { applyTerminalAdvancedDraft, applyTerminalQuickSearch, createDefaultTerminalFilters, type TerminalAdvancedDraft } from './page-state'
 import { TerminalAdvancedFilterFields, TerminalQuickSearch } from './TerminalFilterControls'
 import { useTerminalFilterLookups } from './filter-lookups'
 import { terminalColumns } from './columns'
@@ -24,6 +25,9 @@ export function TerminalPage() {
   const [draft, setDraft] = useState<TerminalAdvancedDraft>({})
   const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<TerminalListFilters>(createDefaultTerminalFilters)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyTerminalQuickSearch(current, search))
+  })
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'terminals',
@@ -54,10 +58,13 @@ export function TerminalPage() {
   }
 
   function resetFilters() {
-    const next = resetTerminalFilters(applied)
     setDraft({})
-    setSearchDraft('')
-    setApplied(next)
+    setValidationMessage(null)
+  }
+
+  function syncDrawerDraft(open: boolean) {
+    setDraft(open ? { merchantId: applied.merchantId, bankAccountId: applied.bankAccountId,
+      regionId: applied.regionId, districtId: applied.districtId } : {})
     setValidationMessage(null)
   }
 
@@ -73,10 +80,9 @@ export function TerminalPage() {
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
-      quickFilters={<TerminalQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
-        onApply={(search) => setApplied((current) => applyTerminalQuickSearch(current, search))} />}
+      quickFilters={<TerminalQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} onOpenChange={syncDrawerDraft} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
           <TerminalAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
           {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}

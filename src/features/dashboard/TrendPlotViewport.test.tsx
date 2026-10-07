@@ -5,6 +5,7 @@ import { TrendPlotViewport } from './TrendPlotViewport'
 vi.mock('react', async (importOriginal) => ({ ...await importOriginal<typeof import('react')>(),
   useRef: (current: unknown) => ({ current }), useState: (value: unknown) => [value, vi.fn()],
   useEffect: () => undefined, useCallback: (callback: unknown) => callback,
+  useMemo: (prepare: () => unknown) => prepare(),
 }))
 function findRenderer(node: ReactNode): ReactElement<Record<string, unknown>> | undefined {
   for (const child of Children.toArray(node)) {
@@ -16,7 +17,7 @@ function findRenderer(node: ReactNode): ReactElement<Record<string, unknown>> | 
 }
 describe('Native active bucket keyboard interaction', () => {
   it('uses the library tooltip for arrows, Home, End and dismisses markers on Escape/blur', () => {
-    const tree = TrendPlotViewport({ config: { scale: { x: { domain: ['0', '1', '2'] } } } })
+    const tree = TrendPlotViewport({ interactionKey: "fixture", config: { scale: { x: { domain: ['0', '1', '2'] } } } })
     const ready = findRenderer(tree)!.props.onReady as (plot: unknown) => void
     const emit = vi.fn()
     ready({ chart: { emit } })
@@ -34,7 +35,7 @@ describe('Native active bucket keyboard interaction', () => {
   })
   it('does not emit a tooltip for an empty canonical domain', () => {
     const config: LineConfig = { scale: { x: { domain: [] } } }
-    const tree = TrendPlotViewport({ config }), emit = vi.fn()
+    const tree = TrendPlotViewport({ config, interactionKey: "empty" }), emit = vi.fn()
     ;(findRenderer(tree)!.props.onReady as (plot: unknown) => void)({ chart: { emit } })
     tree.props.onKeyDown({ key: 'ArrowRight', preventDefault: vi.fn() })
     expect(emit).not.toHaveBeenCalled()

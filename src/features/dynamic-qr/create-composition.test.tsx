@@ -47,7 +47,7 @@ describe('shared Create QR composition', () => {
     expect(pageSource).toContain('<CreateQrContent {...props} />')
     expect(pageSource).not.toContain('createCreateQrController')
     expect(dialogSource).not.toContain('createCreateQrController')
-    expect(contentSource).toContain('createCreateQrController({')
+    expect(contentSource).toContain('createCreateQrController(')
   })
 
   it('keeps amount examples and dynamic limits inside the associated help before the error', () => {

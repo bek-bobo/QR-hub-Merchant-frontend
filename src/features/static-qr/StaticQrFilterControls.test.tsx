@@ -1,38 +1,34 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 import { StaticQrAdvancedFilterFields, StaticQrQuickSearch } from './StaticQrFilterControls'
-import { applyStaticQrQuickSearch, type StaticQrFilters } from './page-state'
 
 describe('Static QR inline search', () => {
   it('renders QR ID scope, Enter hint and exactly one custom X on a text input', () => {
-    const html = renderToStaticMarkup(<StaticQrQuickSearch searchDraft="QR-1" onDraftChange={vi.fn()} onApply={vi.fn()} />)
+    const html = renderToStaticMarkup(<StaticQrQuickSearch searchDraft="QR-1" onDraftChange={vi.fn()} />)
     expect(html).toContain('placeholder="QR ID bo‘yicha"')
     expect(html).toContain('type="text"')
     expect(html).toMatch(/enterkeyhint="search"/i)
     expect(html).not.toContain('type="search"')
     expect(html).not.toContain('terminal nomi')
     expect(html.match(/aria-label="Qidiruvni tozalash"/g)).toHaveLength(1)
-    expect(renderToStaticMarkup(<StaticQrQuickSearch searchDraft="" onDraftChange={vi.fn()} onApply={vi.fn()} />))
+    expect(renderToStaticMarkup(<StaticQrQuickSearch searchDraft="" onDraftChange={vi.fn()} />))
       .not.toContain('aria-label="Qidiruvni tozalash"')
   })
 
-  it('keeps typing local, submits on Enter and immediately applies empty search on clear', () => {
-    let applied: StaticQrFilters = { merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'old', page: 2, size: 20 }
+  it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
-    const onApply = vi.fn((search: string) => { applied = applyStaticQrQuickSearch(applied, search) })
-    const render = () => StaticQrQuickSearch({ searchDraft, onDraftChange, onApply })
-    render().props.children[1].props.onChange({ target: { value: '  QR-1  ' } })
-    expect(onApply).not.toHaveBeenCalled()
-    expect(applied.search).toBe('old')
+    const render = () => StaticQrQuickSearch({ searchDraft, onDraftChange })
+    render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
+    expect(searchDraft).toBe('  AbC!  ')
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
     const preventDefault = vi.fn()
     render().props.onSubmit({ preventDefault })
     expect(preventDefault).toHaveBeenCalledOnce()
-    expect(applied).toEqual({ merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'QR-1', page: 0, size: 20 })
+    expect(onDraftChange).toHaveBeenCalledTimes(1)
     render().props.children[2].props.onClick()
     expect(searchDraft).toBe('')
-    expect(onApply).toHaveBeenLastCalledWith('')
-    expect(applied).toEqual({ merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: '', page: 0, size: 20 })
+    expect(onDraftChange).toHaveBeenCalledTimes(2)
   })
 })
 
@@ -82,3 +78,8 @@ describe('Static QR advanced drawer', () => {
     expect(renderFields({ draft: {}, terminalState: 'empty' }).selects[1]).toContain('Terminal mavjud emas')
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

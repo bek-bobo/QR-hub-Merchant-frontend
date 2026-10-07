@@ -10,11 +10,10 @@ import { changeStaticMerchantDraft, changeStaticRegionDraft, type StaticQrAdvanc
 interface QuickSearchProps {
   readonly searchDraft: string
   readonly onDraftChange: (search: string) => void
-  readonly onApply: (search: string) => void
 }
 
-export function StaticQrQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
-  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault(); onApply(searchDraft) }
+export function StaticQrQuickSearch({ searchDraft, onDraftChange }: QuickSearchProps) {
+  function submit(event: FormEvent<HTMLFormElement>) { event.preventDefault() }
   return <form className="relative w-full min-w-0 sm:w-[min(100%,24rem)]" role="search" onSubmit={submit}>
     <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
     <Input type="text" enterKeyHint="search" value={searchDraft} className="h-10 rounded-xl bg-surface pl-12 pr-10 text-sm"
@@ -22,7 +21,7 @@ export function StaticQrQuickSearch({ searchDraft, onDraftChange, onApply }: Qui
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"
       className="absolute right-1 top-1/2 -translate-y-1/2" aria-label="Qidiruvni tozalash"
-      onClick={() => { onDraftChange(''); onApply('') }}><XIcon aria-hidden="true" /></Button> : null}
+      onClick={() => onDraftChange('')}><XIcon aria-hidden="true" /></Button> : null}
     <button type="submit" className="sr-only" aria-label="Qidiruvni qo‘llash">Qidiruvni qo‘llash</button>
   </form>
 }

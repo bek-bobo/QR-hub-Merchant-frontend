@@ -3,6 +3,11 @@ import { renderToString } from 'react-dom/server'
 import { ReadRuntimeContext, type ReadRuntimeContextValue } from '@/app/read/useReadRuntime'
 import { ExportQrFilters, ExportQrPage } from './ExportQrPage'
 
+// Assert feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))
+
 vi.mock('@tanstack/react-query', () => ({
   useQuery: (options: { enabled: boolean }) => options.enabled
     ? { data: [{ id: 'terminal-a', name: 'Terminal A' }], isPending: false, isError: false }

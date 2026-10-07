@@ -17,7 +17,7 @@ function optionalText(value: string | undefined): string | undefined { return va
 function base(filters: Pick<ManagementFilters, 'search' | 'page' | 'size'>): Record<string, string> {
   if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 20, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
   const query: Record<string, string> = { page: String(filters.page), size: String(filters.size) }
-  const search = optionalText(filters.search)
+  const search = filters.search
   if (search) query.search = search
   return query
 }
@@ -59,7 +59,7 @@ export function toBankAccountListQuery(filters: BankAccountListFilters): Readonl
   return Object.freeze(query)
 }
 export function toCashierListQuery(filters: CashierListFilters): Readonly<Record<string, string>> {
-  const query = base(filters)
+  const query = base({ ...filters, search: filters.search.trim() })
   const merchantId = optionalLongId(filters.merchantId)
   const terminalId = optionalText(filters.terminalId)
   if (merchantId) query.merchantId = merchantId

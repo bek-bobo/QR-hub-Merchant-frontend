@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { invalidateConfirmedQueries, type ConfirmedReadRefresh } from '@/shared/api/confirmed-refresh'
 import { ActionBusinessRejectionError, ActionNotDispatchedError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
 import { safeHttpError } from '@/shared/api/errors'
 import type { HttpTransport } from '@/shared/api/http'
@@ -117,9 +118,9 @@ export function createLiveP5ResetPort(input: {
   })
 }
 
-export async function invalidateCurrentP5Lists(queryClient: QueryClient, scope: ReadScope, canRead: boolean): Promise<void> {
-  if (!canRead) return
-  await queryClient.invalidateQueries({ predicate: (query) => {
+export async function invalidateCurrentP5Lists(queryClient: QueryClient, scope: ReadScope, canRead: boolean): Promise<ConfirmedReadRefresh> {
+  if (!canRead) return 'skipped'
+  return invalidateConfirmedQueries(queryClient, { predicate: (query) => {
     const key = query.queryKey
     return key.length >= 4 && key[0] === scope.source && key[1] === scope.sessionScopeId &&
       key[2] === scope.accessRevision && key[3] === 'p5-list'
@@ -131,6 +132,7 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
   let stopAction: (() => void) | null = null
   let capturedRow: P5Row | null = null
   let capturedPort: P5ResetPort | null = null
+  let dispatchStarted = false
   const inactiveState: P5ResetState = { dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' }
   let state: P5ResetState = inactiveState
   const listeners = new Set<() => void>()
@@ -140,8 +142,9 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
     const current = deps.currentRow(capturedRow.deviceId)
     return current && current.deviceId === capturedRow.deviceId && isP5ResetEligible(current) ? current : null
   }
-  const stillCurrent = (scope: ReadScope) => sameScope(scope, deps.currentScope()) && deps.canRead() && deps.canReset() &&
-    deps.port() === capturedPort && Boolean(currentTarget())
+  const authorized = (scope: ReadScope) => sameScope(scope, deps.currentScope()) && deps.canRead() && deps.canReset() &&
+    deps.port() === capturedPort
+  const stillCurrent = (scope: ReadScope) => authorized(scope) && Boolean(currentTarget())
   const clear = () => {
     action?.invalidate()
     stopAction?.()
@@ -149,19 +152,23 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
     stopAction = null
     capturedRow = null
     capturedPort = null
+    dispatchStarted = false
     setState({ dialogOpen: false, intent: null, outcome: { kind: 'idle' }, refresh: 'idle' })
   }
   return {
     getState: (): P5ResetState => state.intent === null || (sameScope(state.intent.scope, deps.currentScope()) &&
       deps.canRead() && deps.canReset() && deps.port() === capturedPort &&
-      (state.outcome.kind === 'confirmed' || stillCurrent(state.intent.scope)))
+      (dispatchStarted || state.outcome.kind === 'confirmed' || stillCurrent(state.intent.scope)))
       ? state : inactiveState,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener) } },
     request(row: P5Row): boolean {
       if (action) {
         if (state.intent?.deviceId !== row.deviceId || !stillCurrent(state.intent.scope)) return false
-        setState({ ...state, dialogOpen: true })
-        return true
+        if (state.outcome.kind === 'idle') {
+          if (deps.currentRow(row.deviceId) !== row) return false
+          if (capturedRow !== row) clear() // Replace undispatched evidence, never a pending/unknown intent.
+          else { setState({ ...state, dialogOpen: true }); return true }
+        } else { setState({ ...state, dialogOpen: true }); return true }
       }
       const current = deps.currentRow(row.deviceId)
       const port = deps.port()
@@ -173,14 +180,17 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
       capturedRow = row
       capturedPort = port
       const intent: P5ResetIntent = Object.freeze({ deviceId: row.deviceId, description: row.description, terminalName: row.terminalName, scope })
-      const permitted = () => stillCurrent(scope)
+      const canDispatch = () => stillCurrent(scope)
+      const permitted = () => dispatchStarted ? authorized(scope) : canDispatch()
       action = createOneDispatchAction<void>({
         currentScope: () => scopeKey(deps.currentScope()),
         permitted,
         prepare: async () => Boolean(await (deps.prepare?.() ?? Promise.resolve(true))) && permitted(),
         dispatch: async () => {
-          if (!permitted()) throw new ActionNotDispatchedError()
-          decodeP5ResetSuccess(await port.reset(request, scope, permitted))
+          if (!canDispatch()) throw new ActionNotDispatchedError()
+          dispatchStarted = true
+          // Protected-session preflight still checks current evidence immediately before transport.
+          decodeP5ResetSuccess(await port.reset(request, scope, canDispatch))
         },
       })
       stopAction = action.subscribe(() => {
@@ -196,8 +206,8 @@ export function createP5ResetController(deps: P5ResetControllerDependencies) {
       const result = await action.run()
       if (result.kind !== 'stale') setState({ ...state, dialogOpen: false })
       if (result.kind === 'confirmed') {
-        const refresh = await invalidateAfterConfirmed({ result, isCurrent: () => stillCurrent(intent.scope), invalidate: () => deps.invalidateConfirmed(intent.scope) })
-        if (stillCurrent(intent.scope)) setState({ ...state, refresh: refresh === 'failed' ? 'failed' : 'updated' })
+        const refresh = await invalidateAfterConfirmed({ result, isCurrent: () => authorized(intent.scope), invalidate: () => deps.invalidateConfirmed(intent.scope) })
+        if (authorized(intent.scope)) setState({ ...state, refresh: refresh === 'failed' ? 'failed' : refresh === 'updated' ? 'updated' : 'idle' })
       }
       return result
     },

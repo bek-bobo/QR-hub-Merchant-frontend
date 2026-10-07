@@ -10,6 +10,7 @@ import {
 import { Header } from '@/app/layout/Header'
 import { LiveShellLayout } from '@/app/layout/LiveShellLayout'
 import { LiveRouteStatus } from '@/app/LiveRouteStatus'
+import { AppRecoveryBoundary } from '@/app/AppRecoveryBoundary'
 import {
   decideLiveFeatureRoute,
   isLiveRouteAccessible,
@@ -393,29 +394,31 @@ function LiveNotFoundRoute() {
 
 export function LiveRouter() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginRoute />} />
-        <Route path="/account" element={<AccountRoute />} />
-        <Route
-          path={liveFeatureRouteDefinitions.dashboard.path}
-          element={<DashboardRoute />}
-        />
-        <Route
-          path={liveFeatureRouteDefinitions.dynamicQr.path}
-          element={<DynamicQrRoute />}
-        />
-        <Route path={liveFeatureRouteDefinitions.staticQr.path} element={<StaticQrRoute />} />
-        <Route path={liveFeatureRouteDefinitions.terminals.path} element={<TerminalRoute />} />
-        <Route path={liveFeatureRouteDefinitions.bankAccounts.path} element={<BankAccountRoute />} />
-        <Route path={liveFeatureRouteDefinitions.cashiers.path} element={<CashierRoute />} />
-        <Route path="/cashiers/new" element={<CreateCashierRoute />} />
-        <Route path={liveFeatureRouteDefinitions.devices.path} element={<DevicesRoute />} />
-        <Route path="/dynamic-qrs/new" element={<CreateQrRoute />} />
-        <Route path="/dynamic-qrs/export" element={<ExportQrRoute />} />
-        <Route path="/403" element={<ForbiddenRoute />} />
-        <Route path="*" element={<LiveNotFoundRoute />} />
-      </Routes>
-    </BrowserRouter>
+    <AppRecoveryBoundary>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginRoute />} />
+          <Route path="/account" element={<AccountRoute />} />
+          <Route
+            path={liveFeatureRouteDefinitions.dashboard.path}
+            element={<DashboardRoute />}
+          />
+          <Route
+            path={liveFeatureRouteDefinitions.dynamicQr.path}
+            element={<DynamicQrRoute />}
+          />
+          <Route path={liveFeatureRouteDefinitions.staticQr.path} element={<StaticQrRoute />} />
+          <Route path={liveFeatureRouteDefinitions.terminals.path} element={<TerminalRoute />} />
+          <Route path={liveFeatureRouteDefinitions.bankAccounts.path} element={<BankAccountRoute />} />
+          <Route path={liveFeatureRouteDefinitions.cashiers.path} element={<CashierRoute />} />
+          <Route path="/cashiers/new" element={<CreateCashierRoute />} />
+          <Route path={liveFeatureRouteDefinitions.devices.path} element={<DevicesRoute />} />
+          <Route path="/dynamic-qrs/new" element={<CreateQrRoute />} />
+          <Route path="/dynamic-qrs/export" element={<ExportQrRoute />} />
+          <Route path="/403" element={<ForbiddenRoute />} />
+          <Route path="*" element={<LiveNotFoundRoute />} />
+        </Routes>
+      </BrowserRouter>
+    </AppRecoveryBoundary>
   )
 }

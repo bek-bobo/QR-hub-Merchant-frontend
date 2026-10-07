@@ -1,3 +1,4 @@
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -11,7 +12,7 @@ import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
-import { applyStaticQrAdvancedDraft, applyStaticQrQuickSearch, clearStaticTerminal,
+import { applyStaticQrAdvancedDraft, applyStaticQrQuickSearch,
   defaultStaticFilters, type StaticQrAdvancedDraft, type StaticQrFilters } from './page-state'
 import { StaticQrAdvancedFilterFields, StaticQrQuickSearch } from './StaticQrFilterControls'
 import { useStaticQrFilterLookups } from './filter-lookups'
@@ -30,6 +31,9 @@ export function StaticQrPage() {
   const [searchDraft, setSearchDraft] = useState('')
   const [validationMessage, setValidationMessage] = useState<string | null>(null)
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyStaticQrQuickSearch(current, search))
+  })
   const [selectedQrRow, setSelectedQrRow] = useState<StaticQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<StaticQrRow | null>(null)
   const columnPreferences = useTableColumnPreferences({
@@ -66,8 +70,12 @@ export function StaticQrPage() {
 
   function resetFilters() {
     setDraft({})
-    setSearchDraft('')
-    setApplied((current) => clearStaticTerminal(current))
+    setValidationMessage(null)
+  }
+
+  function syncDrawerDraft(open: boolean) {
+    setDraft(open ? { merchantId: applied.merchantId, terminalId: applied.terminalId,
+      regionId: applied.regionId, districtId: applied.districtId } : {})
     setValidationMessage(null)
   }
 
@@ -94,12 +102,12 @@ export function StaticQrPage() {
       onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       onViewQr={setSelectedQrRow}
       onViewDetails={setSelectedDetailsRow}
-      quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
-        onApply={(search) => setApplied((current) => applyStaticQrQuickSearch(current, search))} />}
+      quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-3 sm:justify-end">
         <FilterDrawer
           onApply={applyFilters}
           onReset={resetFilters}
+          onOpenChange={syncDrawerDraft}
           triggerSize="sm"
           triggerClassName="h-10 gap-2 rounded-xl border-brand/60 bg-brand-soft/40 px-5 text-sm text-brand hover:bg-brand-soft hover:text-brand aria-expanded:bg-brand-soft aria-expanded:text-brand"
         >

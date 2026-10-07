@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { UserPlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -55,6 +55,23 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
   const selectedEpochRef = useRef(0)
   const [assignNotice, setAssignNotice] = useState<string | null>(null)
   const [unassignSelection, setUnassignSelection] = useState<{ target: UnassignTarget; epoch: number } | null>(null)
+  const unassignSelectionRef = useRef<typeof unassignSelection>(null)
+  // Retained controllers read this owner, rather than a panel's captured epoch.
+  const getSelectedUnassignTarget = useCallback(() => {
+    const selection = unassignSelectionRef.current
+    return selection && selectedCashierRef.current === selection.target.cashier &&
+      selectedEpochRef.current === selection.epoch ? selection.target : null
+  }, [])
+  useEffect(() => () => {
+    selectedEpochRef.current++
+    selectedCashierRef.current = null
+    unassignSelectionRef.current = null
+  }, [])
+  function clearUnassignSelection() {
+    selectedEpochRef.current++
+    unassignSelectionRef.current = null
+    setUnassignSelection(null)
+  }
   const [unassignNotice, setUnassignNotice] = useState<string | null>(null)
   const candidate = resolveCashierTarget(selectedTarget, scope, data.content, true)
   const selected = (terminalMode === 'assign' && !canAssign) || (terminalMode === 'unassign' && !canUnassign)
@@ -63,11 +80,10 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
     ? unassignSelection.target : null
   function openTerminals(row: CashierRow, mode: CashierTerminalsMode) {
     if ((mode === 'assign' && !canAssign) || (mode === 'unassign' && (!canUnassign || !row.terminals.length))) return
-    selectedEpochRef.current++
     selectedCashierRef.current = row
     setAssignNotice(null)
     setUnassignNotice(null)
-    setUnassignSelection(null)
+    clearUnassignSelection()
     setTerminalMode(mode)
     setSelectedTarget(createCashierTarget(row, getCurrentScope()))
   }
@@ -80,15 +96,15 @@ function ScopedCashierResults({ data, scope, resultKey, dataUpdatedAt, getCurren
     onSelect={(row) => openTerminals(row, 'view')}
     onAssign={canAssign ? (row) => openTerminals(row, 'assign') : undefined}
     onSelectUnassign={canUnassign ? (row) => openTerminals(row, 'unassign') : undefined}
-    onClose={() => { selectedEpochRef.current++; selectedCashierRef.current = null; setAssignNotice(null); setUnassignNotice(null); setUnassignSelection(null); setSelectedTarget(null) }}
+    onClose={() => { selectedCashierRef.current = null; setAssignNotice(null); setUnassignNotice(null); clearUnassignSelection(); setSelectedTarget(null) }}
     onUnassign={terminalMode === 'unassign' && selected !== null && canUnassign
-      ? (terminal) => { selectedEpochRef.current++; selectedCashierRef.current = selected; setUnassignNotice(null); setUnassignSelection({ target: { cashier: selected, terminal }, epoch: selectedEpochRef.current }) } : undefined}
+      ? (terminal) => { selectedEpochRef.current++; selectedCashierRef.current = selected; setUnassignNotice(null); const selection = { target: { cashier: selected, terminal }, epoch: selectedEpochRef.current }; unassignSelectionRef.current = selection; setUnassignSelection(selection) } : undefined}
     unassignSurface={terminalMode === 'unassign' && selected !== null && canUnassign
       ? <>{unassignNotice === selected.id ? <p role="status">Terminalni ajratish so‘rovi tasdiqlandi. Joriy faol biriktirishlar yangilangach tekshiriladi.</p> : null}
         {currentUnassign ? <UnassignTerminalPanel key={JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision, resultKey, dataUpdatedAt, currentUnassign.cashier.id, currentUnassign.terminal.id, currentUnassign.cashier.terminals.indexOf(currentUnassign.terminal)])}
         target={currentUnassign} resultData={data} resultKey={resultKey} dataUpdatedAt={dataUpdatedAt} scope={scope}
-        isSelected={() => selectedCashierRef.current === currentUnassign.cashier && selectedEpochRef.current === unassignSelection?.epoch}
-        onRefresh={onRetry} onCancel={() => setUnassignSelection(null)} onConfirmed={() => setUnassignNotice(selected.id)} /> : null}</> : null}
+        getSelectedTarget={getSelectedUnassignTarget}
+        onRefresh={onRetry} onCancel={clearUnassignSelection} onConfirmed={() => setUnassignNotice(selected.id)} /> : null}</> : null}
     assignSurface={terminalMode === 'assign' && selected !== null && canAssign
       ? <>{assignNotice === selected.id ? <p role="status">Terminallar biriktirildi. Faol biriktirishlar ro‘yxati yangilangach tekshiriladi.</p> : null}
         <AssignTerminalsPanel key={JSON.stringify([scope.source, scope.sessionScopeId, scope.accessRevision, resultKey, dataUpdatedAt, selected.id])}

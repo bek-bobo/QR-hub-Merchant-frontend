@@ -1,3 +1,4 @@
+import { applyEffectiveSearch } from '@/shared/filters/debounced-search'
 import { safeContractError } from '@/shared/api/errors'
 import { applyP5Filters, toP5ListQuery, type P5Filters } from '@/shared/contracts/p5-filters'
 import type { DependentLookupGateInput } from '@/shared/contracts/management-filters'
@@ -48,8 +49,7 @@ export function applyP5AdvancedDraft(applied: P5Filters, draft: P5AdvancedDraft,
 }
 
 export function applyP5QuickSearch(applied: P5Filters, search: string): P5Filters {
-  const normalized = search.trim()
-  return applied.search === normalized && applied.page === 0 ? applied : { ...applied, search: normalized, page: 0 }
+  return applyEffectiveSearch(applied, search)
 }
 
 export type MerchantLookupState =
