@@ -61,6 +61,20 @@ describe('Header', () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1)
     expect(html).toContain('>Dinamik QRlar</h1>')
     expect(html).toContain('truncate')
+    expect(html).not.toContain('<img')
+    expect(html).toContain('lg:border-l')
+  })
+
+  it('places an optional decorative icon between navigation and the accessible page heading', () => {
+    const html = renderToStaticMarkup(<Header title="Statik QRlar" titleAsHeading
+      onOpenNavigation={vi.fn()} titleIcon={<span className="bg-brand-soft size-9"><img src="/qrhub-favicon.svg" alt="" /></span>} />)
+    const host = document.createElement('div'); host.innerHTML = html
+    const icon = host.querySelector('img')!
+    expect(host.querySelectorAll('img')).toHaveLength(1)
+    expect(icon.closest('[aria-hidden="true"]')).not.toBeNull()
+    expect(host.querySelector('h1')?.textContent).toBe('Statik QRlar')
+    expect(html.indexOf('Navigatsiyani ochish')).toBeLessThan(html.indexOf('<img'))
+    expect(html.indexOf('<img')).toBeLessThan(html.indexOf('<h1'))
   })
 
   it('uses the avatar as the accessible profile menu trigger and keeps identity in its tooltip', () => {

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { Page, PageSize } from '@/shared/contracts/merchant-read'
@@ -63,14 +63,11 @@ export function BankAccountResults({ blocked, pending, error, data, columnOrder,
   const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
 
   return <Card className="min-w-0 gap-5 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(6)]" aria-busy={pending}>
-    <CardHeader className="flex flex-col gap-4">
-      <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Bank hisoblari ro‘yxati</CardTitle>
-      <div className="flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
+    <CardContent className="min-w-0 space-y-4">
+      {quickFilters || headerActions ? <div className="mb-5 flex w-full min-w-0 flex-wrap items-center justify-between gap-3">
         {quickFilters}
         {headerActions}
-      </div>
-    </CardHeader>
-    <CardContent className="min-w-0 space-y-4">
+      </div> : null}
       {blocked ? <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
         : pending ? <LoadingState title="Bank hisoblari yuklanmoqda" />
           : error ? <ErrorState onRetry={onRetry} />

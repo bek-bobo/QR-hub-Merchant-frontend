@@ -1,6 +1,5 @@
 import { useRef, type ReactNode } from 'react'
-import { UsersIcon } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState, ErrorState, LoadingState } from '@/shared/ui/AsyncState'
 import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-read'
@@ -75,19 +74,11 @@ export function CashierResults({ blocked, pending, error, data, selected,
 
   return <div className="min-w-0 space-y-4">
     <Card className="min-w-0 gap-4 rounded-2xl border border-border/70 pt-4 shadow-sm ring-0 sm:pt-5 [--card-spacing:--spacing(5)] sm:[--card-spacing:--spacing(6)]" aria-busy={pending}>
-      <CardHeader className="flex flex-col gap-5 sm:flex-row sm:items-start">
-        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-brand-soft text-brand">
-          <UsersIcon className="size-7" aria-hidden="true" />
-        </div>
-        <div className="min-w-0 flex-1 space-y-3">
-          <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Kassirlar ro‘yxati</CardTitle>
-          <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
-            {quickFilters}
-            {headerActions}
-          </div>
-        </div>
-      </CardHeader>
       <CardContent className="min-w-0 space-y-4">
+        {quickFilters || headerActions ? <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+          {quickFilters}
+          {headerActions}
+        </div> : null}
         {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
           : pending ? <LoadingState title="Kassirlar yuklanmoqda" />
             : error ? <ErrorState onRetry={onRetry} />

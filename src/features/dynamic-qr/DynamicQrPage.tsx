@@ -2,14 +2,12 @@ import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
-import { CreditCardIcon, InfoIcon, PercentIcon, PlusIcon, ScanLineIcon, type LucideIcon } from 'lucide-react'
+import { CreditCardIcon, InfoIcon, PercentIcon, PlusIcon, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from '@/components/ui/card'
 import type {
   DynamicQrFilters,
@@ -290,23 +288,6 @@ export function DynamicQrPage({
     )
   }
 
-  function renderListHeader() {
-    return (
-      <CardHeader className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <div className="flex min-w-0 items-center gap-4.5">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-            <ScanLineIcon className="size-7" aria-hidden="true" />
-          </span>
-          <div className="min-w-0">
-            <CardTitle className="text-xl font-bold tracking-tight sm:text-2xl">Dinamik QR ro‘yxati</CardTitle>
-            <p className="mt-0.5 text-sm leading-5 text-text-secondary">Yaratilgan dinamik QR kodlar va ularning holati</p>
-          </div>
-        </div>
-        {renderTableHeaderActions()}
-      </CardHeader>
-    )
-  }
-
   if (runtime.readiness.dynamicQr.kind === 'unavailable') {
     return (
       <ErrorState
@@ -362,16 +343,16 @@ export function DynamicQrPage({
 
       {filterState === 'checking' ? (
         <Card className={listCardClassName}>
-          {renderListHeader()}
           <CardContent className="space-y-4 text-sm text-text-secondary">
+            {renderTableHeaderActions()}
             {renderQuickFilters()}
             <p>Tanlangan filtrlar tekshirilmoqda.</p>
           </CardContent>
         </Card>
       ) : filterState === 'invalid' ? (
         <Card className={listCardClassName}>
-          {renderListHeader()}
           <CardContent className="space-y-3">
+            {renderTableHeaderActions()}
             {renderQuickFilters()}
             <div>
               <p className="font-medium text-text-primary">
@@ -386,8 +367,8 @@ export function DynamicQrPage({
         </Card>
       ) : (
         <Card className={listCardClassName} aria-busy={list.isFetching}>
-          {renderListHeader()}
           <CardContent className="min-w-0 space-y-4.5">
+            {renderTableHeaderActions()}
             {renderQuickFilters()}
             {list.isPending ? (
               <ListSkeleton />

@@ -26,6 +26,10 @@ describe('terminal results', () => {
     expect(html).toContain('flex-wrap')
     expect(html).toContain('overflow-x-auto')
     expect(html).not.toContain('bg-red-')
+    expect(html).not.toContain('>Terminallar<')
+    expect(html).not.toContain('Terminallar ro‘yxati')
+    expect(html).not.toContain('lucide-monitor')
+    expect(html).not.toContain('data-slot="card-header"')
   })
   it('preserves duplicate rows, shows the server total and presents unknown status neutrally', () => {
     const html = render()

@@ -81,8 +81,9 @@ describe('production cancel list gate', () => {
   it('renders the compact table toolbar without the removed helper copy', () => {
     const html = pageWith(['GET_DYNAMIC_QRS'])
 
-    expect(html).toContain('Dinamik QR ro‘yxati')
-    expect(html).toContain('Yaratilgan dinamik QR kodlar va ularning holati')
+    expect(html).not.toContain('>Dinamik QR ro‘yxati<')
+    expect(html).not.toContain('Yaratilgan dinamik QR kodlar va ularning holati')
+    expect(html).not.toContain('lucide-scan-line')
     expect(html).toContain('placeholder="Terminal nomi bo‘yicha qidirish"')
     expect(html).toContain('Filtrlar')
     expect(html).toContain('Jadval ustunlari')

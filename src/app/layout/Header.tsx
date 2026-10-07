@@ -1,4 +1,4 @@
-import type { Ref } from 'react'
+import type { ReactNode, Ref } from 'react'
 import { LogOutIcon, MenuIcon } from 'lucide-react'
 import { Link } from 'react-router'
 import { DropdownMenu as Menu } from 'radix-ui'
@@ -8,6 +8,7 @@ import { ThemeModeSelect } from '@/shared/theme/ThemeModeSelect'
 interface HeaderProps {
   title?: string
   titleAsHeading?: boolean
+  titleIcon?: ReactNode
   onOpenNavigation?: () => void
   navigationOpen?: boolean
   navigationControls?: string
@@ -24,6 +25,7 @@ interface HeaderProps {
 export function Header({
   title,
   titleAsHeading = false,
+  titleIcon,
   onOpenNavigation,
   navigationOpen = false,
   navigationControls,
@@ -61,9 +63,14 @@ export function Header({
             <MenuIcon className="size-6" aria-hidden="true" />
           </Button>
         ) : null}
+        {title && titleIcon ? (
+          <span aria-hidden="true" className="shrink-0 lg:border-l lg:border-border lg:pl-5">
+            {titleIcon}
+          </span>
+        ) : null}
         {title ? (
           titleAsHeading ? (
-            <h1 className="min-w-0 truncate text-lg font-semibold tracking-tight text-text-primary sm:text-xl lg:border-l lg:border-border lg:pl-5">
+            <h1 className={`min-w-0 truncate text-lg font-semibold tracking-tight text-text-primary sm:text-xl ${titleIcon ? '' : 'lg:border-l lg:border-border lg:pl-5'}`}>
               {title}
             </h1>
           ) : (

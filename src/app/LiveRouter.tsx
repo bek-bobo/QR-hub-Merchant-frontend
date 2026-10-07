@@ -1,4 +1,5 @@
 import { lazy, Suspense, type ReactNode } from 'react'
+import { LandmarkIcon, MonitorIcon, ScanLineIcon, UsersIcon } from 'lucide-react'
 import {
   BrowserRouter,
   Link,
@@ -53,9 +54,11 @@ function FullPageLoading() {
 function LiveShell({
   children,
   pageTitle,
+  pageIcon,
 }: {
   children: ReactNode
   pageTitle?: string
+  pageIcon?: ReactNode
 }) {
   const access = useAccessContext()
   const runtime = useReadRuntime()
@@ -70,6 +73,7 @@ function LiveShell({
       header={(navigation) => (
         <Header
           title={pageTitle}
+          titleIcon={pageIcon}
           titleAsHeading={Boolean(pageTitle)}
           navigationOpen={navigation.open}
           navigationControls={navigation.controls}
@@ -203,10 +207,12 @@ function LiveFeatureRoute({
   feature,
   children,
   pageTitle,
+  pageIcon,
 }: {
   feature: LiveFeatureRouteName
   children: ReactNode
   pageTitle?: string
+  pageIcon?: ReactNode
 }) {
   const access = useAccessContext()
   const { sessionPhase } = useAuth()
@@ -250,7 +256,7 @@ function LiveFeatureRoute({
   }
 
   return (
-    <LiveShell pageTitle={pageTitle}>
+    <LiveShell pageTitle={pageTitle} pageIcon={pageIcon}>
       {children}
     </LiveShell>
   )
@@ -271,6 +277,11 @@ function DynamicQrRoute() {
     <LiveFeatureRoute
       feature="dynamicQr"
       pageTitle="Dinamik QRlar"
+      pageIcon={
+        <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
+          <ScanLineIcon className="size-5" aria-hidden="true" />
+        </span>
+      }
     >
       <Suspense fallback={<LoadingState title="Dinamik QRlar sahifasi yuklanmoqda" />}><DynamicQrPage initialState={location.state} /></Suspense>
     </LiveFeatureRoute>
@@ -278,19 +289,35 @@ function DynamicQrRoute() {
 }
 
 function StaticQrRoute() {
-  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar"><Suspense fallback={<LoadingState title="Statik QRlar sahifasi yuklanmoqda" />}><StaticQrPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar" pageIcon={
+    <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft">
+      <img src={`${import.meta.env.BASE_URL}qrhub-favicon.svg`} alt="" className="size-5" />
+    </span>
+  }><Suspense fallback={<LoadingState title="Statik QRlar sahifasi yuklanmoqda" />}><StaticQrPage /></Suspense></LiveFeatureRoute>
 }
 
 function TerminalRoute() {
-  return <LiveFeatureRoute feature="terminals" pageTitle="Terminallar"><Suspense fallback={<LoadingState title="Terminallar sahifasi yuklanmoqda" />}><TerminalPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="terminals" pageTitle="Terminallar" pageIcon={
+    <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
+      <MonitorIcon className="size-5" aria-hidden="true" />
+    </span>
+  }><Suspense fallback={<LoadingState title="Terminallar sahifasi yuklanmoqda" />}><TerminalPage /></Suspense></LiveFeatureRoute>
 }
 
 function BankAccountRoute() {
-  return <LiveFeatureRoute feature="bankAccounts" pageTitle="Bank hisoblari"><Suspense fallback={<LoadingState title="Bank hisoblari sahifasi yuklanmoqda" />}><BankAccountPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="bankAccounts" pageTitle="Bank hisoblari" pageIcon={
+    <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
+      <LandmarkIcon className="size-5" aria-hidden="true" />
+    </span>
+  }><Suspense fallback={<LoadingState title="Bank hisoblari sahifasi yuklanmoqda" />}><BankAccountPage /></Suspense></LiveFeatureRoute>
 }
 
 function CashierRoute() {
-  return <LiveFeatureRoute feature="cashiers" pageTitle="Kassirlar"><Suspense fallback={<LoadingState title="Kassirlar sahifasi yuklanmoqda" />}><CashierPage /></Suspense></LiveFeatureRoute>
+  return <LiveFeatureRoute feature="cashiers" pageTitle="Kassirlar" pageIcon={
+    <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
+      <UsersIcon className="size-5" aria-hidden="true" />
+    </span>
+  }><Suspense fallback={<LoadingState title="Kassirlar sahifasi yuklanmoqda" />}><CashierPage /></Suspense></LiveFeatureRoute>
 }
 
 function CreateCashierRoute() {

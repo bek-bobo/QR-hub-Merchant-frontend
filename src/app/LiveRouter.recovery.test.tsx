@@ -122,6 +122,14 @@ describe('F10 live route recovery with real React/router/auth provider', () => {
     expect(h.host.textContent).toContain('Terminallar sahifasi yuklanmoqda')
     expect(h.host.querySelector('aside')).not.toBeNull()
     expect(h.host.querySelector('header')).not.toBeNull()
+    const header = h.host.querySelector('header')!
+    expect(header.querySelector('h1')?.textContent).toBe('Terminallar')
+    expect(header.querySelectorAll('span.size-9 .lucide-monitor')).toHaveLength(1)
+    const icon = header.querySelector('span.size-9 .lucide-monitor')!
+    expect(icon.getAttribute('aria-hidden')).toBe('true')
+    expect(icon.classList.contains('size-5')).toBe(true)
+    expect(icon.parentElement?.classList.contains('size-9')).toBe(true)
+    expect(h.host.querySelector('main .lucide-monitor')).toBeNull()
     expect(h.host.querySelector('[role="alert"]')).toBeNull()
     await act(async () => route.resolveImport!())
     expect(h.host.textContent).toContain('Loaded terminal route')

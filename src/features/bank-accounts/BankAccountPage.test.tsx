@@ -50,7 +50,10 @@ describe('BankAccountPage column settings integration', () => {
 
     const html = renderToString(createElement(BankAccountPage))
 
-    expect(html).toContain('>Bank hisoblari ro‘yxati<')
+    expect(html).not.toContain('>Bank hisoblari ro‘yxati<')
+    expect(html).toContain('>Filtrlar</button>')
+    expect(html.match(/aria-label="Yangilash"/g)).toHaveLength(1)
+    expect(html).toContain('aria-label="Bank hisoblari sahifalari"')
     expect(html.match(/aria-label="Nomi, bank, hisob raqami yoki STIR bo‘yicha qidirish"/g)).toHaveLength(1)
     expect(html).toContain('placeholder="Nomi, bank, hisob raqami yoki STIR"')
     expect(html.indexOf('placeholder="Nomi, bank, hisob raqami yoki STIR"')).toBeLessThan(html.indexOf('>Filtrlar</button>'))
