@@ -33,7 +33,7 @@ vi.mock('./queries', () => ({
     },
   }),
 }))
-vi.mock('./ExportButton', () => ({ ExportButton: () => null }))
+vi.mock('./ExportButton', () => ({ ExportButton: () => <button>XLSX</button> }))
 
 function pageWith(permissions: string[]) {
   return renderToString(<MemoryRouter><AccessProvider value={{ kind: 'authenticated', permissions: new Set(permissions) }}>
@@ -66,16 +66,25 @@ describe('production cancel list gate', () => {
 
   it('shows a create modal trigger rather than navigation only with CREATE_DYNAMIC_QR', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])
-    expect(html).toContain('Yangi QR yaratish')
+    expect(html).toContain('>Yangi QR</button>')
     expect(html).not.toContain('href="/dynamic-qrs/new"')
-    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('Yangi QR yaratish')
+    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('>Yangi QR</button>')
   })
 
-  it('renders primary controls before the secondary quick-filter actions', () => {
+  it('renders the toolbar controls in the requested order', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])
-    expect(html.indexOf('Yangi QR yaratish')).toBeLessThan(html.indexOf('aria-label="Jadval ustunlarini sozlash"'))
-    expect(html.indexOf('aria-label="Jadval ustunlarini sozlash"')).toBeLessThan(html.indexOf('aria-label="Yangilash"'))
-    expect(html.indexOf('aria-label="Yangilash"')).toBeLessThan(html.indexOf('Filtrlar'))
+    const controls = [
+      'aria-label="Sana oralig‘ini tanlash"',
+      'aria-label="Terminal nomi bo‘yicha qidirish"',
+      '>XLSX</button>',
+      'Filtrlar',
+      '>Yangi QR</button>',
+      'aria-label="Jadval ustunlarini sozlash"',
+      'aria-label="Yangilash"',
+    ]
+    const positions = controls.map((control) => html.indexOf(control))
+    positions.forEach((position) => expect(position).toBeGreaterThan(-1))
+    expect(positions).toEqual([...positions].sort((left, right) => left - right))
   })
 
   it('renders the compact table toolbar without the removed helper copy', () => {

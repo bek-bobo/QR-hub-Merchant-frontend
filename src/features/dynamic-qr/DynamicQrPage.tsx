@@ -230,7 +230,7 @@ export function DynamicQrPage({
 
   function renderQuickFilters() {
     return (
-      <div className="flex min-w-0 flex-col gap-3 xl:flex-row xl:items-start xl:justify-between">
+      <div className="dynamic-qr-toolbar flex min-w-0 flex-wrap items-center gap-2">
         <DynamicQrQuickFilters
           range={dateDraft}
           searchDraft={searchDraft}
@@ -240,11 +240,10 @@ export function DynamicQrPage({
           onRangeReset={restoreQuickDateRange}
           onSearchDraftChange={setSearchDraft}
         />
-        <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact showIcon
-            className="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm" />
-          {renderFilterDrawer()}
-        </div>
+        <ExportButton applied={applied} terminalValid={filterState === 'valid'} compact showIcon
+          className="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm" />
+        {renderFilterDrawer()}
+        {renderTableHeaderActions()}
       </div>
     )
   }
@@ -255,7 +254,7 @@ export function DynamicQrPage({
         {can(access, 'dynamicQr.create', false) ? (
           <Button type="button" size="sm" className="h-10 gap-2 rounded-xl px-4 text-sm" onClick={() => setCreateOpen(true)}>
             <PlusIcon className="size-4" aria-hidden="true" />
-            Yangi QR yaratish
+            Yangi QR
           </Button>
         ) : null}
         <div className="flex min-w-0 items-center gap-2">
@@ -344,7 +343,6 @@ export function DynamicQrPage({
       {filterState === 'checking' ? (
         <Card className={listCardClassName}>
           <CardContent className="space-y-4 text-sm text-text-secondary">
-            {renderTableHeaderActions()}
             {renderQuickFilters()}
             <p>Tanlangan filtrlar tekshirilmoqda.</p>
           </CardContent>
@@ -352,7 +350,6 @@ export function DynamicQrPage({
       ) : filterState === 'invalid' ? (
         <Card className={listCardClassName}>
           <CardContent className="space-y-3">
-            {renderTableHeaderActions()}
             {renderQuickFilters()}
             <div>
               <p className="font-medium text-text-primary">
@@ -368,7 +365,6 @@ export function DynamicQrPage({
       ) : (
         <Card className={listCardClassName} aria-busy={list.isFetching}>
           <CardContent className="min-w-0 space-y-4.5">
-            {renderTableHeaderActions()}
             {renderQuickFilters()}
             {list.isPending ? (
               <ListSkeleton />
