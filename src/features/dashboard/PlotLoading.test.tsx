@@ -117,7 +117,7 @@ describe('local plot loading boundaries', () => {
     const theme = dark ? 'classicDark' : 'classic'
     expect(renderer.line.mock.calls[0]![0]).toMatchObject({ theme, height: 320, legend: false,
       scale: { color: { range: ['blue', 'green', 'orange', 'red'] } },
-      shapeField: 'line' })
+      shapeField: 'smooth' })
     expect(renderer.pie.mock.calls[0]![0]).toMatchObject({ theme, height: 208, legend: false,
       innerRadius: 0.72, scale: { color: { range: ['green', 'orange', 'red'] } } })
   })

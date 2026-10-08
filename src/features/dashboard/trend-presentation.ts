@@ -133,12 +133,13 @@ export function createTrendPlotConfig(view: TrendView, mode: TrendMode, visible:
   }
   return {
     data, autoFit: true, height: 320, theme: theme.dark ? 'classicDark' : 'classic',
-    xField: 'bucket', yField: 'value', colorField: 'type', shapeField: 'line',
-    style: { lineWidth: 2.5 }, zIndex: 1,
+    xField: 'bucket', yField: 'value', colorField: 'type', shapeField: 'smooth',
+    // Native Cartesian smooth shapes use monotone-X curves without overshoot.
+    style: { lineWidth: 2.5, connect: false }, zIndex: 1,
     // No permanent point mark; the native tooltip interaction owns active markers.
     // Explicit auxiliary axis/scale prevents G2 retaining a previous mode's domain.
-    area: { data: data.filter(({ key }) => key !== 'total'), shapeField: 'area', tooltip: false, zIndex: 0, scale, axis,
-      style: { fillOpacity: 0.07, strokeOpacity: 0, lineWidth: 0 } },
+    area: { data: data.filter(({ key }) => key !== 'total'), shapeField: 'smooth', tooltip: false, zIndex: 0, scale, axis,
+      style: { fillOpacity: 0.07, strokeOpacity: 0, lineWidth: 0, connect: false } },
     scale, axis, legend: false,
     tooltip: { title: (datum: TrendPlotDatum) => `${datum.title}${datum.coverage === 'FUTURE' ? ' · Hali kuzatilmagan' : datum.partial ? ' · Qisman davr' : ''}`,
       items: [(datum: TrendPlotDatum) => ({ ...trendTooltipItem(datum), color: trendSeriesColor(datum.key, theme) })] },

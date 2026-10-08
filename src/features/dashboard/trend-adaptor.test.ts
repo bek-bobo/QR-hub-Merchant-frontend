@@ -24,6 +24,8 @@ type AdaptorOptions = Parameters<typeof adaptor>[0]['options']
 // Only the generated mark fields inspected below, rather than the upstream
 // union that also permits callback children and non-cartesian specifications.
 interface TrendTestMark {
+  readonly encode?: { readonly shape?: string }
+  readonly style?: { readonly connect?: boolean }
   readonly type?: string
   readonly zIndex?: number
   readonly data?: readonly TrendPlotDatum[]
@@ -47,6 +49,25 @@ function adapt(config: LineConfig): TrendTestSpec {
 }
 
 describe('trend configuration through the installed Line adaptor', () => {
+  it.each(['count', 'amount'] as const)('keeps smooth line/area shapes and canonical zeros/null gaps in %s mode', (mode) => {
+    const selected = buckets.map((bucket, index) => index === 2 ? { ...bucket, coverage: 'FUTURE' as const } : bucket)
+    const before = JSON.stringify(selected)
+    const config = createTrendPlotConfig({ buckets: selected }, mode, ['success', 'processing', 'failed'], theme)
+    const spec = adapt(config)
+    expect(spec.children?.map(({ type }) => type)).toEqual(['line', 'area'])
+    for (const mark of spec.children!) {
+      expect(mark.encode?.shape).toBe('smooth')
+      expect(mark.style?.connect).toBe(false)
+      const data = mark.data ?? spec.data!
+      expect(data).toHaveLength(9)
+      expect(data.filter(({ bucket }) => bucket === '1').map(({ value }) => value)).toEqual([0, 0, 0])
+      expect(data.filter(({ bucket }) => bucket === '2').map(({ value }) => value)).toEqual([null, null, null])
+      expect(data.filter(({ bucket }) => bucket === '0').map(({ value }) => value)).toEqual(mode === 'count'
+        ? [170, 30, 100] : [4000000, 1000000, 600000])
+      expect(mark.scale?.x?.domain).toEqual(['0', '1', '2'])
+    }
+    expect(JSON.stringify(selected)).toBe(before)
+  })
   it('does not leak generated children into props on Strict Mode replay', () => {
     const config = createTrendPlotConfig({ buckets }, 'count', ALL_TREND_SERIES, theme)
     const before = JSON.stringify(config)

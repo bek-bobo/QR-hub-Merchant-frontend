@@ -40,9 +40,9 @@ describe('Final transaction chart presentation', () => {
   it('disables permanent point marks and configures native shared active markers with subtle status areas', () => {
     const config = createTrendPlotConfig({ buckets: [bucket()] }, 'count', DEFAULT_TREND_SERIES, theme)
     expect(config.point).toBeUndefined()
-    expect(config).toMatchObject({ shapeField: 'line', legend: false, style: { lineWidth: 2.5 },
+    expect(config).toMatchObject({ shapeField: 'smooth', legend: false, style: { lineWidth: 2.5, connect: false },
       interaction: { tooltip: { marker: true, shared: true, series: true, wait: 0, trailing: false, crosshairsX: true, style: { markerR: 4 } } } })
-    expect(config.area).toMatchObject({ zIndex: 0, tooltip: false, style: { fillOpacity: 0.07, strokeOpacity: 0 } })
+    expect(config.area).toMatchObject({ shapeField: 'smooth', zIndex: 0, tooltip: false, style: { fillOpacity: 0.07, strokeOpacity: 0, connect: false } })
     expect((config.data as ReturnType<typeof trendPlotData>).map(({ type }) => type)).toEqual(['Muvaffaqiyatli', 'Jarayonda', 'Muvaffaqiyatsiz'])
     expect(config.children).toBeUndefined()
   })
