@@ -3,6 +3,7 @@ import { act, type ComponentProps } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { AccessProvider } from '@/shared/auth/AccessContext'
+import type { DynamicQrFilters } from '@/shared/contracts/merchant-read'
 import type { ResultToast } from '@/shared/ui/ResultToast'
 import { ExportButton } from './ExportButton'
 import { toDynamicQrExportQuery } from './export-filters'
@@ -36,7 +37,7 @@ vi.mock('@/shared/ui/ResultToast', () => ({
   },
 }))
 
-const applied = { fromDate: '2026-10-05', toDate: '2026-10-08', search: 'Terminal', page: 0, size: 20 }
+const applied = { fromDate: '2026-10-05', toDate: '2026-10-08', search: 'Terminal', page: 0, size: 20 } satisfies DynamicQrFilters
 let root: Root
 let host: HTMLDivElement
 beforeEach(async () => {
@@ -64,6 +65,10 @@ async function download() {
 
 it('dispatches success through the shared toast only after browser handoff, with unchanged export parameters', async () => {
   const file = { blob: new Blob(['xlsx']), filename: 'dynamic-qrs.xlsx' }
+  state.handoff.mockImplementation(() => {
+    expect(state.toast).not.toHaveBeenCalled()
+    return () => {}
+  })
   state.getXlsx.mockResolvedValue(file)
   await download()
   expect(state.getXlsx).toHaveBeenCalledWith(expect.objectContaining({ query: toDynamicQrExportQuery(applied) }), expect.any(AbortSignal))
@@ -82,4 +87,15 @@ it('dispatches the existing failure copy through the same shared toast placement
     tone: 'error', title: 'XLSX yuklab bo‘lmadi. Filtrlarni tekshirib, qayta urinib ko‘ring.', placement: 'below-header',
   }))
   expect(host.textContent).not.toContain('XLSX yuklab bo‘lmadi.')
+})
+
+it('reports handoff failure as an error without dispatching success', async () => {
+  state.getXlsx.mockResolvedValue({ blob: new Blob(['xlsx']), filename: 'dynamic-qrs.xlsx' })
+  state.handoff.mockImplementation(() => { throw new Error('Browser handoff failed') })
+  await download()
+  expect(state.handoff).toHaveBeenCalledTimes(1)
+  expect(state.toast).toHaveBeenCalledWith(expect.objectContaining({
+    tone: 'error', title: 'XLSX yuklab bo‘lmadi. Filtrlarni tekshirib, qayta urinib ko‘ring.', placement: 'below-header',
+  }))
+  expect(state.toast.mock.calls.some(([props]) => props.tone === 'success')).toBe(false)
 })

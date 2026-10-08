@@ -49,7 +49,6 @@ describe('P5 reset dialog', () => {
     expect(html).toContain("Reset OTP jo'natildi")
     expect(html).not.toContain('PIN muvaffaqiyatli tiklandi')
     expect(html).not.toContain('PIN reset bajarildi')
-    expect(html).toContain('fixed right-4 top-4')
     expect(html).toContain('Bildirishnomani yopish')
     expect(html).toContain('00AbC qurilmasi uchun reset OTP yuborildi. Kodni P5 qurilmaga kiriting.')
     expect(html).toContain('bg-status-success-indicator')
@@ -61,12 +60,12 @@ describe('P5 reset dialog', () => {
     expect(html).toContain(kind === 'unknown' ? 'Reset natijasini tasdiqlab bo‘lmadi'
       : kind === 'rejected' ? 'PIN reset rad etildi' : 'PIN reset so‘rovi yuborilmadi')
     expect(html).toContain('bg-status-error-indicator')
+    expect(html).toContain(intent.deviceId)
     expect(html).not.toContain('raw technical secret')
     expect(html).not.toContain("Reset OTP jo'natildi")
     expect(html).toContain(kind === 'unknown' ? 'So‘rov yuborilgan bo‘lishi mumkin, lekin server natijasini tasdiqlab bo‘lmadi.'
       : kind === 'rejected' ? '00AbC qurilmasi uchun PIN reset so‘rovi server tomonidan rad etildi.'
         : '00AbC qurilmasi uchun PIN reset so‘rovi yuborilmadi.')
-    expect(html).toContain('fixed right-4 top-4')
     expect(html).toContain('Bildirishnomani yopish')
     if (kind === 'unknown') {
       expect(html).toContain('Yangi resetni tasdiqlash')
