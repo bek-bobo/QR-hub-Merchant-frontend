@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { useId, useState } from 'react'
 import {
   ArrowDownIcon,
@@ -61,6 +62,7 @@ export function TableColumnPreferenceList({
   onToggleVisibility,
   canHide,
 }: TableColumnPreferenceListProps) {
+  const { message } = useMessages('common')
   const itemById = new Map(items.map((item) => [item.id, item] as const))
   const hiddenIds = new Set(hidden)
   const orderedItems = order.flatMap((id) => {
@@ -105,7 +107,7 @@ export function TableColumnPreferenceList({
               <button
                 type="button"
                 draggable
-                aria-label={`${item.label} ustunini ko‘chirish`}
+                aria-label={message('table.move', { label: item.label })}
                 className={cn(
                   'flex size-8 shrink-0 cursor-grab items-center justify-center rounded-lg text-muted-foreground outline-none hover:bg-muted hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 active:cursor-grabbing',
                   draggedColumnId === item.id && 'cursor-grabbing',
@@ -126,7 +128,7 @@ export function TableColumnPreferenceList({
               <input
                 type="checkbox"
                 className="size-6 shrink-0 rounded-md accent-primary outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label={`${item.label} ustuni ko‘rinishi`}
+                aria-label={message('table.visibility', { label: item.label })}
                 checked={!hiddenIds.has(item.id)}
                 disabled={!item.hideable || (!hiddenIds.has(item.id) && !canHide(item.id))}
                 onChange={() => onToggleVisibility(item.id)}
@@ -145,7 +147,7 @@ export function TableColumnPreferenceList({
                 size="icon"
                 className="size-10 rounded-xl bg-surface"
                 disabled={!item.reorderable || index === 0}
-                aria-label={`${item.label} ustunini chapga — ro‘yxatda yuqoriga ko‘chirish`}
+                aria-label={message('table.moveUp', { label: item.label })}
                 onClick={() => onMoveUp(item.id)}
               >
                 <ArrowUpIcon aria-hidden="true" className="size-5" />
@@ -156,7 +158,7 @@ export function TableColumnPreferenceList({
                 size="icon"
                 className="size-10 rounded-xl bg-surface"
                 disabled={!item.reorderable || index === orderedItems.length - 1}
-                aria-label={`${item.label} ustunini o‘ngga — ro‘yxatda pastga ko‘chirish`}
+                aria-label={message('table.moveDown', { label: item.label })}
                 onClick={() => onMoveDown(item.id)}
               >
                 <ArrowDownIcon aria-hidden="true" className="size-5" />
@@ -177,13 +179,19 @@ export function TableColumnPreferenceReset({
 }: {
   readonly onReset: () => void
 }) {
+  const { message } = useMessages('common')
   return (
     <Button type="button" variant="outline" className="h-auto min-h-12 min-w-0 flex-1 gap-2 rounded-xl bg-surface px-3 py-3 text-sm whitespace-normal sm:text-base" onClick={onReset}>
       <RotateCcwIcon aria-hidden="true" className="size-5" />
-      Standart tartibga qaytarish
+      {message('table.reset')}
     </Button>
   )
 }
+
+type ColumnAnnouncement =
+  | { readonly kind: 'moved'; readonly columnId: string; readonly position: number }
+  | { readonly kind: 'shown' | 'hidden'; readonly columnId: string }
+  | { readonly kind: 'restored' }
 
 interface TableColumnPreferencesProps {
   readonly tableLabel: string
@@ -192,6 +200,7 @@ interface TableColumnPreferencesProps {
   readonly hidden: readonly string[]
   readonly iconOnly?: boolean
   readonly triggerLabel?: string
+  readonly triggerAccessibleName?: 'visible' | 'settings'
   readonly triggerClassName?: string
   readonly onMoveUp: (columnId: string) => void
   readonly onMoveDown: (columnId: string) => void
@@ -207,7 +216,8 @@ export function TableColumnPreferences({
   order,
   hidden,
   iconOnly = false,
-  triggerLabel = 'Jadval ustunlari',
+  triggerLabel,
+  triggerAccessibleName = triggerLabel === undefined ? 'visible' : 'settings',
   triggerClassName,
   onMoveUp,
   onMoveDown,
@@ -216,18 +226,28 @@ export function TableColumnPreferences({
   canHide,
   onReset,
 }: TableColumnPreferencesProps) {
-  const [announcement, setAnnouncement] = useState('')
+  const { message } = useMessages('common')
+  const [announcement, setAnnouncement] = useState<ColumnAnnouncement | null>(null)
   const [draggedColumnId, setDraggedColumnId] = useState<string | null>(null)
   const [dropTargetId, setDropTargetId] = useState<string | null>(null)
   const tooltipId = useId()
   const itemById = new Map(items.map((item) => [item.id, item] as const))
+
+  const announcedLabel = announcement && announcement.kind !== 'restored'
+    ? itemById.get(announcement.columnId)?.label : undefined
+  const announcementText = announcement?.kind === 'restored' ? message('table.restored')
+    : announcement && announcedLabel !== undefined
+      ? announcement.kind === 'moved'
+        ? message('table.moved', { label: announcedLabel, position: announcement.position })
+        : message(announcement.kind === 'shown' ? 'table.shown' : 'table.hidden', { label: announcedLabel })
+      : ''
 
   function announceMove(columnId: string, offset: -1 | 1) {
     const currentIndex = order.indexOf(columnId)
     const nextIndex = currentIndex + offset
     const item = itemById.get(columnId)
     if (!item || currentIndex < 0 || nextIndex < 0 || nextIndex >= order.length) return
-    setAnnouncement(`${item.label} ustuni ${nextIndex + 1}-o‘ringa ko‘chirildi.`)
+    setAnnouncement({ kind: 'moved', columnId, position: nextIndex + 1 })
   }
 
   function handleMoveUp(columnId: string) {
@@ -244,7 +264,7 @@ export function TableColumnPreferences({
     onReset()
     setDraggedColumnId(null)
     setDropTargetId(null)
-    setAnnouncement('Standart ustun tartibi va ko‘rinishi tiklandi.')
+    setAnnouncement({ kind: 'restored' })
   }
 
   function handleDragStart(columnId: string) {
@@ -266,7 +286,7 @@ export function TableColumnPreferences({
     const targetIndex = order.indexOf(targetId)
     onMove(columnId, targetId)
     if (item && targetIndex >= 0) {
-      setAnnouncement(`${item.label} ustuni ${targetIndex + 1}-o‘ringa ko‘chirildi.`)
+      setAnnouncement({ kind: 'moved', columnId, position: targetIndex + 1 })
     }
   }
 
@@ -274,11 +294,7 @@ export function TableColumnPreferences({
     const item = itemById.get(columnId)
     if (!item) return
     onToggleVisibility(columnId)
-    setAnnouncement(
-      hidden.includes(columnId)
-        ? `${item.label} ustuni ko‘rsatildi.`
-        : `${item.label} ustuni yashirildi.`,
-    )
+    setAnnouncement({ kind: hidden.includes(columnId) ? 'shown' : 'hidden', columnId })
   }
 
   return (
@@ -289,12 +305,12 @@ export function TableColumnPreferences({
             type="button"
             variant="outline"
             size={iconOnly ? 'icon-sm' : 'sm'}
-            aria-label={iconOnly || triggerLabel !== 'Jadval ustunlari' ? 'Jadval ustunlarini sozlash' : undefined}
+            aria-label={iconOnly || triggerAccessibleName === 'settings' ? message('table.settings') : undefined}
             aria-describedby={iconOnly ? tooltipId : undefined}
             className={triggerClassName}
           >
             <Columns3Icon aria-hidden="true" />
-            {iconOnly ? null : triggerLabel}
+            {iconOnly ? null : (triggerLabel ?? message('table.trigger'))}
           </Button>
         </SheetTrigger>
         {iconOnly ? (
@@ -303,7 +319,7 @@ export function TableColumnPreferences({
             role="tooltip"
             className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
           >
-            Ustunlar
+            {message('table.columns')}
           </span>
         ) : null}
       </div>
@@ -314,9 +330,9 @@ export function TableColumnPreferences({
         className="min-h-0 gap-0 overflow-hidden rounded-l-3xl border-border bg-surface p-0 shadow-xl data-[side=right]:w-full data-[side=right]:sm:max-w-[35rem]"
       >
         <SheetHeader className="column-preferences-header relative shrink-0 overflow-hidden px-5 pb-6 pt-14 text-left sm:px-7 sm:pb-4 sm:pt-6">
-          <SheetTitle className="relative pr-9 text-xl font-semibold leading-7">{tableLabel} jadvali ustunlari</SheetTitle>
+          <SheetTitle className="relative pr-9 text-xl font-semibold leading-7">{message('table.title', { table: tableLabel })}</SheetTitle>
           <SheetDescription className="relative mt-2 text-sm leading-6 sm:text-base">
-            Jadvalda ko‘rsatiladigan ustunlarni tanlang va ularning tartibini o‘zgartiring.
+            {message('table.description')}
           </SheetDescription>
           <SheetClose asChild>
             <Button
@@ -324,7 +340,7 @@ export function TableColumnPreferences({
               variant="ghost"
               size="icon"
               className="absolute right-5 top-5 size-11 rounded-2xl border border-border bg-background/70 sm:right-7 sm:top-4"
-              aria-label="Ustun sozlamalarini yopish"
+              aria-label={message('table.close')}
             >
               <XIcon aria-hidden="true" />
             </Button>
@@ -336,7 +352,7 @@ export function TableColumnPreferences({
             items={items}
             order={order}
             hidden={hidden}
-            announcement={announcement}
+            announcement={announcementText}
             onMoveUp={handleMoveUp}
             onMoveDown={handleMoveDown}
             draggedColumnId={draggedColumnId}
@@ -355,7 +371,7 @@ export function TableColumnPreferences({
           <SheetClose asChild>
             <Button type="button" className="h-auto min-h-12 gap-2 rounded-xl px-4 py-3 text-sm shadow-sm sm:px-6 sm:text-base">
               <CheckIcon aria-hidden="true" className="size-5" />
-              Tayyor
+              {message('actions.done')}
             </Button>
           </SheetClose>
         </SheetFooter>

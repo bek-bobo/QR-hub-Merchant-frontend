@@ -1,3 +1,6 @@
+import { LocaleSelect } from '@/shared/i18n/LocaleSelect'
+import type { MessageCatalog } from '@/shared/i18n/generated'
+import { useMessages } from '@/shared/i18n/useMessages'
 import { lazy, Suspense, type ReactNode } from 'react'
 import { LandmarkIcon, MonitorIcon, ScanLineIcon, UsersIcon } from 'lucide-react'
 import {
@@ -19,7 +22,7 @@ import {
   type LiveFeatureRoute as LiveFeatureRouteName,
 } from '@/app/live-route-policy'
 import { buildLiveLoginLandingContext, resolveLoginLanding } from '@/app/login-landing'
-import { getVisibleLiveNavigationItems } from '@/app/navigation'
+import { getVisibleLiveNavigationItems, presentNavigationItems } from '@/app/navigation'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { resolveLiveRootRoute } from '@/app/root-route'
 import { LoginPage } from '@/features/auth/LoginPage'
@@ -39,12 +42,13 @@ const CashierPage = lazy(() => import('@/features/cashiers/CashierPage').then((m
 const P5Page = lazy(() => import('@/features/p5/P5Page').then((module) => ({ default: module.P5Page })))
 
 function FullPageLoading() {
+  const { message } = useMessages('shell')
   return (
     <main className="flex min-h-dvh items-center justify-center bg-workspace px-4">
       <div className="w-full max-w-lg">
         <LoadingState
-          title="Sessiya tekshirilmoqda"
-          description="Profil ma’lumotlari xavfsiz tarzda yuklanmoqda."
+          title={message('routes.sessionLoading')}
+          description={message('routes.sessionDescription')}
         />
       </div>
     </main>
@@ -60,13 +64,15 @@ function LiveShell({
   pageTitle?: string
   pageIcon?: ReactNode
 }) {
+  const messages = useMessages('shell')
+  const { message } = messages
   const access = useAccessContext()
   const runtime = useReadRuntime()
   const { actions, pending, profile } = useAuth()
-  const visibleItems = getVisibleLiveNavigationItems(access, runtime.readiness)
+  const visibleItems = presentNavigationItems(getVisibleLiveNavigationItems(access, runtime.readiness), messages)
   const identityLabel =
-    profile?.fullname?.trim() ||
-    (profile?.phone ? `+${profile.phone}` : 'Merchant foydalanuvchi')
+    profile?.fullname?.trim() ? profile.fullname :
+    (profile?.phone ? `+${profile.phone}` : message('header.user'))
 
   return (
     <LiveShellLayout
@@ -121,6 +127,7 @@ function LoginRoute() {
 }
 
 function AccountRoute() {
+  const { message } = useMessages('shell')
   const access = useAccessContext()
   const { sessionPhase } = useAuth()
   const runtime = useReadRuntime()
@@ -152,54 +159,50 @@ function AccountRoute() {
   }
 
   return (
-    <LiveShell pageTitle="Hisob">
-      <Suspense fallback={<LoadingState title="Hisob sahifasi yuklanmoqda" />}><AccountPage /></Suspense>
+    <LiveShell pageTitle={message('navigation.account')}>
+      <Suspense fallback={<LoadingState title={message('routes.accountLoading')} />}><AccountPage /></Suspense>
     </LiveShell>
   )
 }
 
 const featurePresentation = {
   dashboard: {
-    unavailableTitle: 'Dashboard hozircha sozlanmagan',
-    unavailableDescription:
-      'Dashboard funksiyasi ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.dashboardTitle',
+    unavailableDescription: 'unavailable.dashboardDescription',
   },
   dynamicQr: {
-    unavailableTitle: 'Dinamik QR ro‘yxati hozircha sozlanmagan',
-    unavailableDescription:
-      'Dinamik QR ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.dynamicQrTitle',
+    unavailableDescription: 'unavailable.dynamicQrDescription',
   },
   exportQr: {
-    unavailableTitle: 'XLSX eksport hozircha sozlanmagan',
-    unavailableDescription:
-      'XLSX eksport ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.exportQrTitle',
+    unavailableDescription: 'unavailable.exportQrDescription',
   },
   staticQr: {
-    unavailableTitle: 'Statik QR ro‘yxati hozircha sozlanmagan',
-    unavailableDescription:
-      'Statik QR ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.staticQrTitle',
+    unavailableDescription: 'unavailable.staticQrDescription',
   },
   terminals: {
-    unavailableTitle: 'Terminal ro‘yxati hozircha sozlanmagan',
-    unavailableDescription: 'Terminal ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.terminalsTitle',
+    unavailableDescription: 'unavailable.terminalsDescription',
   },
   bankAccounts: {
-    unavailableTitle: 'Bank hisoblari ro‘yxati hozircha sozlanmagan',
-    unavailableDescription: 'Bank hisoblari ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.bankAccountsTitle',
+    unavailableDescription: 'unavailable.bankAccountsDescription',
   },
   cashiers: {
-    unavailableTitle: 'Kassirlar ro‘yxati hozircha sozlanmagan',
-    unavailableDescription: 'Kassirlar ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.cashiersTitle',
+    unavailableDescription: 'unavailable.cashiersDescription',
   },
   devices: {
-    unavailableTitle: 'P5 qurilmalari ro‘yxati hozircha sozlanmagan',
-    unavailableDescription: 'P5 qurilmalari ro‘yxati ushbu muhitda hozircha mavjud emas.',
+    unavailableTitle: 'unavailable.devicesTitle',
+    unavailableDescription: 'unavailable.devicesDescription',
   },
 } as const satisfies Record<
   LiveFeatureRouteName,
   {
-    readonly unavailableTitle: string
-    readonly unavailableDescription: string
+    readonly unavailableTitle: keyof MessageCatalog['shell']
+    readonly unavailableDescription: keyof MessageCatalog['shell']
   }
 >
 
@@ -224,6 +227,7 @@ function LiveFeatureRoute({
     registrations: runtime.readiness,
   })
   const presentation = featurePresentation[feature]
+  const { message } = useMessages('shell')
 
   if (decision === 'pending') {
     return <FullPageLoading />
@@ -248,8 +252,8 @@ function LiveFeatureRoute({
       <LiveShell>
         <LiveRouteStatus
           kind="unavailable"
-          title={presentation.unavailableTitle}
-          description={presentation.unavailableDescription}
+          title={message(presentation.unavailableTitle)}
+          description={message(presentation.unavailableDescription)}
         />
       </LiveShell>
     )
@@ -263,61 +267,67 @@ function LiveFeatureRoute({
 }
 
 function DashboardRoute() {
+  const { message } = useMessages('shell')
   return (
-    <LiveFeatureRoute feature="dashboard" pageTitle="Dashboard">
-      <Suspense fallback={<LoadingState title="Dashboard sahifasi yuklanmoqda" />}><DashboardReadPage /></Suspense>
+    <LiveFeatureRoute feature="dashboard" pageTitle={message('navigation.dashboard')}>
+      <Suspense fallback={<LoadingState title={message('routes.dashboardLoading')} />}><DashboardReadPage /></Suspense>
     </LiveFeatureRoute>
   )
 }
 
 function DynamicQrRoute() {
+  const { message } = useMessages('shell')
   const location = useLocation()
 
   return (
     <LiveFeatureRoute
       feature="dynamicQr"
-      pageTitle="Dinamik QRlar"
+      pageTitle={message('navigation.dynamicQr')}
       pageIcon={
         <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
           <ScanLineIcon className="size-5" aria-hidden="true" />
         </span>
       }
     >
-      <Suspense fallback={<LoadingState title="Dinamik QRlar sahifasi yuklanmoqda" />}><DynamicQrPage initialState={location.state} /></Suspense>
+      <Suspense fallback={<LoadingState title={message('routes.dynamicQrLoading')} />}><DynamicQrPage initialState={location.state} /></Suspense>
     </LiveFeatureRoute>
   )
 }
 
 function StaticQrRoute() {
-  return <LiveFeatureRoute feature="staticQr" pageTitle="Statik QRlar" pageIcon={
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="staticQr" pageTitle={message('navigation.staticQr')} pageIcon={
     <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft">
       <img src={`${import.meta.env.BASE_URL}qrhub-favicon.svg`} alt="" className="size-5" />
     </span>
-  }><Suspense fallback={<LoadingState title="Statik QRlar sahifasi yuklanmoqda" />}><StaticQrPage /></Suspense></LiveFeatureRoute>
+  }><Suspense fallback={<LoadingState title={message('routes.staticQrLoading')} />}><StaticQrPage /></Suspense></LiveFeatureRoute>
 }
 
 function TerminalRoute() {
-  return <LiveFeatureRoute feature="terminals" pageTitle="Terminallar" pageIcon={
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="terminals" pageTitle={message('navigation.terminals')} pageIcon={
     <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
       <MonitorIcon className="size-5" aria-hidden="true" />
     </span>
-  }><Suspense fallback={<LoadingState title="Terminallar sahifasi yuklanmoqda" />}><TerminalPage /></Suspense></LiveFeatureRoute>
+  }><Suspense fallback={<LoadingState title={message('routes.terminalsLoading')} />}><TerminalPage /></Suspense></LiveFeatureRoute>
 }
 
 function BankAccountRoute() {
-  return <LiveFeatureRoute feature="bankAccounts" pageTitle="Bank hisoblari" pageIcon={
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="bankAccounts" pageTitle={message('navigation.bankAccounts')} pageIcon={
     <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
       <LandmarkIcon className="size-5" aria-hidden="true" />
     </span>
-  }><Suspense fallback={<LoadingState title="Bank hisoblari sahifasi yuklanmoqda" />}><BankAccountPage /></Suspense></LiveFeatureRoute>
+  }><Suspense fallback={<LoadingState title={message('routes.bankAccountsLoading')} />}><BankAccountPage /></Suspense></LiveFeatureRoute>
 }
 
 function CashierRoute() {
-  return <LiveFeatureRoute feature="cashiers" pageTitle="Kassirlar" pageIcon={
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="cashiers" pageTitle={message('navigation.cashiers')} pageIcon={
     <span className="flex size-9 items-center justify-center rounded-xl bg-brand-soft text-brand">
       <UsersIcon className="size-5" aria-hidden="true" />
     </span>
-  }><Suspense fallback={<LoadingState title="Kassirlar sahifasi yuklanmoqda" />}><CashierPage /></Suspense></LiveFeatureRoute>
+  }><Suspense fallback={<LoadingState title={message('routes.cashiersLoading')} />}><CashierPage /></Suspense></LiveFeatureRoute>
 }
 
 function CreateCashierRoute() {
@@ -325,10 +335,12 @@ function CreateCashierRoute() {
 }
 
 function DevicesRoute() {
-  return <LiveFeatureRoute feature="devices" pageTitle="P5 qurilmalari"><Suspense fallback={<LoadingState title="P5 qurilmalari sahifasi yuklanmoqda" />}><P5Page /></Suspense></LiveFeatureRoute>
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="devices" pageTitle={message('navigation.devices')}><Suspense fallback={<LoadingState title={message('routes.devicesLoading')} />}><P5Page /></Suspense></LiveFeatureRoute>
 }
 
 function CreateQrRoute() {
+  const { message } = useMessages('shell')
   const access = useAccessContext()
   const { sessionPhase } = useAuth()
   const runtime = useReadRuntime()
@@ -341,14 +353,16 @@ function CreateQrRoute() {
     access,
     registrations: runtime.readiness,
   })) return <Navigate to="/403" replace />
-  return <LiveShell><Suspense fallback={<LoadingState title="QR yaratish sahifasi yuklanmoqda" />}><CreateQrPage /></Suspense></LiveShell>
+  return <LiveShell><Suspense fallback={<LoadingState title={message('routes.createQrLoading')} />}><CreateQrPage /></Suspense></LiveShell>
 }
 
 function ExportQrRoute() {
-  return <LiveFeatureRoute feature="exportQr"><Suspense fallback={<LoadingState title="XLSX eksport sahifasi yuklanmoqda" />}><ExportQrPage /></Suspense></LiveFeatureRoute>
+  const { message } = useMessages('shell')
+  return <LiveFeatureRoute feature="exportQr"><Suspense fallback={<LoadingState title={message('routes.exportLoading')} />}><ExportQrPage /></Suspense></LiveFeatureRoute>
 }
 
 function ForbiddenRoute() {
+  const { message } = useMessages('shell')
   const { sessionPhase } = useAuth()
 
   if (sessionPhase === 'bootstrapping' || sessionPhase === 'terminating') {
@@ -363,14 +377,15 @@ function ForbiddenRoute() {
     <LiveShell>
       <LiveRouteStatus
         kind="forbidden"
-        title="Ruxsat mavjud emas"
-        description="Bu bo‘lim uchun tasdiqlangan ruxsat topilmadi. Chiqish amali bundan qat’i nazar mavjud."
+        title={message('routes.forbidden')}
+        description={message('routes.forbiddenDescription')}
       />
     </LiveShell>
   )
 }
 
 function LiveNotFoundRoute() {
+  const { message } = useMessages('shell')
   const { sessionPhase } = useAuth()
   const access = useAccessContext()
   const runtime = useReadRuntime()
@@ -403,17 +418,15 @@ function LiveNotFoundRoute() {
       <section className="w-full max-w-lg rounded-xl border bg-surface p-6 shadow-sm">
         <p className="text-sm font-medium text-brand">404</p>
         <h1 className="mt-2 text-2xl font-semibold text-text-primary">
-          Sahifa topilmadi
-        </h1>
+          {message('routes.notFound')}</h1>
         <p className="mt-2 text-text-secondary">
-          Bu manzil live merchant doirasida mavjud emas.
-        </p>
+          {message('routes.notFoundDescription')}</p>
         <Link
           to={destination}
           className="mt-5 inline-flex rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
         >
-          Xavfsiz sahifaga qaytish
-        </Link>
+          {message('routes.returnSafe')}</Link>
+        <div className="mt-4"><LocaleSelect /></div>
       </section>
     </main>
   )

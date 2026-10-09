@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, type ComponentProps } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import type { DynamicQrFilters } from '@/shared/contracts/merchant-read'

@@ -1,0 +1,81 @@
+{
+  "status": {
+    "active": "Active",
+    "unknown": "Unknown"
+  },
+  "table": {
+    "actions": "Actions",
+    "label": "Terminal table",
+    "pages": "Terminal pages",
+    "total": "Total terminals: {{countText}}"
+  },
+  "filters": {
+    "unconfirmed": "Applied filter is unconfirmed",
+    "allMerchants": "All merchants",
+    "noMerchants": "No merchants available",
+    "merchantsFailed": "Unable to load merchants",
+    "allRegions": "All regions",
+    "noRegions": "No regions available",
+    "regionsFailed": "Unable to load regions",
+    "allDistricts": "All districts",
+    "noDistricts": "No districts available for this region",
+    "districtsFailed": "Unable to load districts",
+    "chooseRegion": "Select a region first",
+    "invalid": "The selected merchant, bank account, region or district is unconfirmed. Update or clear the filter.",
+    "reselect": "Reselect and apply the merchant, bank account, region or district, or clear the filter.",
+    "allBanks": "All bank accounts",
+    "noMerchantBanks": "No bank accounts available for this merchant",
+    "noBanks": "No bank accounts available",
+    "banksFailed": "Unable to load bank accounts"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "terminalId": "Terminal ID",
+    "status": "Status",
+    "terminalType": "Terminal type",
+    "merchantId": "Merchant ID",
+    "region": "Region",
+    "regionId": "Region ID",
+    "district": "District",
+    "districtId": "District ID",
+    "name": "Name",
+    "bank": "Bank account",
+    "bankId": "Bank account ID",
+    "mcc": "MCC",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "address": "Address",
+    "phones": "Phone numbers",
+    "qrId": "Static QR ID",
+    "qrLink": "Static QR link"
+  },
+  "page": {
+    "terminals": "Terminals",
+    "noAccess": "Permission to view terminals is unavailable.",
+    "unavailable": "Terminal integration is not configured"
+  },
+  "search": {
+    "label": "Search by terminal name or ID",
+    "placeholder": "Terminal name or ID"
+  },
+  "states": {
+    "loading": "Loading terminals",
+    "failed": "Unable to display terminals",
+    "empty": "No terminals found."
+  },
+  "details": {
+    "main": "Main information",
+    "location": "Location",
+    "contact": "Contact",
+    "qr": "Static QR",
+    "title": "Terminal details"
+  },
+  "actions": {
+    "viewQr": "View static QR",
+    "details": "Details"
+  },
+  "display": {
+    "noLink": "No safe static QR link is available for this terminal.",
+    "unavailable": "No safe static QR link is available."
+  }
+}

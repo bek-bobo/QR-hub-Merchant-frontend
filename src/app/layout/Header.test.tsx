@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { createRef } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
 import { ThemeContext } from '@/shared/theme/ThemeContext'
@@ -35,7 +35,7 @@ describe('Header', () => {
     host.innerHTML = html
     const themeSelect = host.querySelector<HTMLButtonElement>('[role="combobox"]')!
     expect(themeSelect.closest('label')?.textContent).toContain('Ko‘rinish')
-    expect(themeSelect.textContent).toBe('System')
+    expect(themeSelect.textContent).toBe('Tizim')
     expect(themeSelect.getAttribute('aria-expanded')).toBe('false')
     expect(themeSelect.disabled).toBe(false)
     expect(html).toContain('Chiqish')
@@ -105,8 +105,11 @@ describe('Header', () => {
     expect(html).toContain('aria-label="Ko‘rinish: Tungi. Keyingi rejimga o‘tish"')
     expect(html).not.toContain('aria-label="Chiqish"')
     expect(html).not.toContain('lucide-log-out')
-    expect(html.match(/<button\b/g)).toHaveLength(2)
-    expect(html).not.toContain('<select')
+    expect(html.match(/<button\b/g)).toHaveLength(3)
+    expect(html.match(/data-locale-trigger/g)).toHaveLength(1)
+    expect(html).not.toMatch(/<select\b/)
+    expect(html).toContain('aria-label="Til"')
+    expect(html).not.toContain('role="combobox"')
     expect(html).not.toContain('>Chiqish</button>')
   })
 })

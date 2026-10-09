@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { InfoIcon, MinusIcon } from 'lucide-react'
 import { RowActionMenu, RowActionItem, RowActionSeparator } from './RowActionMenu'

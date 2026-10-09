@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { Select, type SelectChangeEvent } from '@/components/ui/select'
 import { PaginationBar } from './PaginationBar'
@@ -38,9 +39,9 @@ function findAction(node: ReactNode, ariaLabel: string): ReactElement<ActionProp
 
 describe('PaginationBar', () => {
   it('renders the controlled page size with the existing supported sizes', () => {
-    const tree = PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 0,
+    const tree = captureWithLocale(() => PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 0,
       totalPages: 14, totalItems: 140, pageSize: 10,
-      onPageChange: () => undefined, onPageSizeChange: () => undefined })
+      onPageChange: () => undefined, onPageSizeChange: () => undefined }))
     const control = findAction(tree, 'Sahifadagi yozuvlar soni')
     expect(control.type).toBe(Select)
     const select = control
@@ -65,12 +66,12 @@ describe('PaginationBar', () => {
     const onPageSizeChange = vi.fn()
     const props = { ariaLabel: 'Natija sahifalari', currentPage: 5,
       totalPages: 14, totalItems: 140, pageSize: 10, onPageChange, onPageSizeChange }
-    const select = findAction(PaginationBar(props), 'Sahifadagi yozuvlar soni')
+    const select = findAction(captureWithLocale(() => PaginationBar(props)), 'Sahifadagi yozuvlar soni')
     const event = (value: string): SelectChangeEvent => ({ target: { value }, currentTarget: { value } })
 
     select.props.onChange?.(event('25'))
     select.props.onChange?.(event('100'))
-    findAction(PaginationBar({ ...props, disabled: true }), 'Sahifadagi yozuvlar soni')
+    findAction(captureWithLocale(() => PaginationBar({ ...props, disabled: true })), 'Sahifadagi yozuvlar soni')
       .props.onChange?.(event('50'))
 
     expect(onPageSizeChange.mock.calls).toEqual([[25]])
@@ -132,8 +133,8 @@ describe('PaginationBar', () => {
 
   it('sends zero-based targets for previous, numbered, and next actions', () => {
     const onPageChange = vi.fn()
-    const tree = PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 5,
-      totalPages: 13, totalItems: 128, onPageChange })
+    const tree = captureWithLocale(() => PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 5,
+      totalPages: 13, totalItems: 128, onPageChange }))
 
     findAction(tree, 'Oldingi sahifa').props.onClick?.()
     findAction(tree, '13-sahifa').props.onClick?.()

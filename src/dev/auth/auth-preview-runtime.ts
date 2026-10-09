@@ -1,3 +1,4 @@
+import type { LogoutFeedback } from '@/shared/auth/feedback'
 import { safeAbortedError } from '@/shared/api/errors'
 import type { AuthContextValue, AuthActions } from '@/shared/auth/useAuth'
 import { LoginController, type LoginSnapshot } from '@/shared/auth/login-controller'
@@ -77,7 +78,7 @@ class ControllerAuthPreviewRuntime implements AuthPreviewRuntime {
   private controlPending = false
   private controlRevision = 0
   private statusMessage: string | null = null
-  private logoutMessage: string | null = null
+  private logoutMessage: LogoutFeedback | null = null
   private disposed = false
 
   constructor(scenario: AuthPreviewScenario, cache: SessionCache) {
@@ -242,11 +243,10 @@ class ControllerAuthPreviewRuntime implements AuthPreviewRuntime {
     }
 
     this.login.restart()
-    this.logoutMessage =
-      result.status === 'remote-confirmed'
-        ? 'Preview sessiyasidan chiqildi.'
-        : 'Bu oynadan chiqildi. Synthetic sessiya yopilganini tasdiqlab bo‘lmadi.'
-    this.finishControl(revision, this.logoutMessage)
+    this.logoutMessage = result.status === 'remote-confirmed' ? null : 'remoteUnconfirmed'
+    this.finishControl(revision, result.status === 'remote-confirmed'
+      ? 'Preview sessiyasidan chiqildi.'
+      : 'Bu oynadan chiqildi. Synthetic sessiya yopilganini tasdiqlab bo‘lmadi.')
   }
 
   restartLogin(): void {

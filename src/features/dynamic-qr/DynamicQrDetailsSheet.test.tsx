@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { DynamicQrDetailsContent } from './DynamicQrDetailsSheet'
 

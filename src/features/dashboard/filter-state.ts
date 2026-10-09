@@ -5,7 +5,7 @@ export interface DashboardFilterState {
   readonly dateDraft: DateRange
   readonly terminalDraft?: string
   readonly applied: DashboardFilters
-  readonly validationMessage: string | null
+  readonly validationMessage: 'invalidRange' | null
   readonly requestedGranularity: DashboardGranularity
 }
 
@@ -54,7 +54,7 @@ export function dashboardFilterReducer(
         return { ...state, dateDraft: action.range, applied, requestedGranularity: datesChanged ? 'AUTO' : state.requestedGranularity,
           terminalDraft: applied.terminalId, validationMessage: null }
       } catch {
-        return { ...state, dateDraft: action.range, validationMessage: 'Sana oralig‘ini to‘g‘ri kiriting.' }
+        return { ...state, dateDraft: action.range, validationMessage: 'invalidRange' }
       }
     case 'apply-terminal': {
       const terminalId = state.terminalDraft?.trim() || undefined

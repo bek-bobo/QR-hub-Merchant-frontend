@@ -1,3 +1,6 @@
+import { createDashboardPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
+const presentation = createDashboardPresentation('uz', localeMessages('dashboard'))
 import { describe, expect, it } from 'vitest'
 import { decodeDashboardResponse } from './contract'
 import { ALL_TREND_SERIES, createTrendPlotConfig, trendPlotData } from './trend-presentation'
@@ -83,11 +86,11 @@ describe('dashboard read contract', () => {
     expect(() => decodeDashboardResponse(payload('MINUTE', '2026-10-01'))).toThrow()
     const decoded = decodeDashboardResponse(payload('HOUR', '2026-10-01T14:00:00+05:00', '2026-10-01T15:00:00+05:00'))
     const original = JSON.stringify(decoded)
-    const data = trendPlotData(decoded, 'count', ALL_TREND_SERIES)
+    const data = trendPlotData(presentation, decoded, 'count', ALL_TREND_SERIES)
     expect(data).toHaveLength(4)
     expect(data.every((datum) => datum.period === '01.10.2026 14:00')).toBe(true)
     const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
-    const config = createTrendPlotConfig(decoded, 'count', ALL_TREND_SERIES, theme)
+    const config = createTrendPlotConfig(presentation, decoded, 'count', ALL_TREND_SERIES, theme)
     const tooltip = config.tooltip as { title: (datum: typeof data[number]) => string }
     const title = tooltip.title
     expect(title(data[0]!)).toContain('14:00 ≤ vaqt < 15:00')

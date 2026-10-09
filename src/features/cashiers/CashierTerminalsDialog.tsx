@@ -1,3 +1,4 @@
+import { useCashierPresentation } from './presentation'
 import type { ComponentProps, ReactNode } from 'react'
 import { Dialog } from 'radix-ui'
 import { MonitorIcon, UsersRoundIcon, XIcon } from 'lucide-react'
@@ -7,7 +8,6 @@ import type { CashierRow, CashierTerminal } from '@/shared/contracts/management-
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { formatUzbekPhoneDisplay } from '@/shared/presentation/phone'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
-import { presentCashierTerminalStatus } from './status-presentation'
 import { DetailsBody, DetailsDialogShell, DetailsFieldRow, DetailsSectionCard, DetailsStatusBadge } from '@/shared/ui/DetailsDialog'
 
 export type CashierTerminalsMode = 'view' | 'assign' | 'unassign'
@@ -40,7 +40,8 @@ function CashierIdentity({ cashier, compact = false }: { readonly cashier: Cashi
 }
 
 function TerminalStatusBadge({ terminal }: { readonly terminal: CashierTerminal }) {
-  const status = presentCashierTerminalStatus(terminal.statusCode)
+  const p = useCashierPresentation()
+  const status = p.assignmentStatus(terminal.statusCode)
   return <Badge variant="outline" className={`gap-2 rounded-full px-3 py-1 ${statusToneClasses[status.tone].badge}`}>
     <span aria-hidden="true" className={`size-2 rounded-full ${statusToneClasses[status.tone].indicator}`} />
     {status.label}
@@ -48,6 +49,7 @@ function TerminalStatusBadge({ terminal }: { readonly terminal: CashierTerminal 
 }
 
 function TerminalCard({ terminal, onUnassign }: { readonly terminal: CashierTerminal; readonly onUnassign?: ((terminal: CashierTerminal) => void) | undefined }) {
+  const p = useCashierPresentation()
   return <li className="min-w-0 rounded-xl border border-border/70 bg-card p-4 shadow-sm">
     <div className="flex min-w-0 flex-wrap items-center gap-4">
       <span aria-hidden="true" className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
@@ -55,55 +57,54 @@ function TerminalCard({ terminal, onUnassign }: { readonly terminal: CashierTerm
       </span>
       <div className="min-w-0 flex-1 space-y-1">
         <p className="font-semibold text-text-primary">{terminal.name}</p>
-        <div className="text-xs text-text-secondary">Terminal ID:
-          <MetadataId value={terminal.id} variant="secondary" className="mt-1 max-w-none whitespace-normal break-all overflow-visible text-clip" />
+        <div className="text-xs text-text-secondary">{p.message('details.terminalId')}<MetadataId value={terminal.id} variant="secondary" className="mt-1 max-w-none whitespace-normal break-all overflow-visible text-clip" />
         </div>
       </div>
       <div className="flex shrink-0 flex-col items-end gap-3 border-l border-border/70 pl-4">
         <TerminalStatusBadge terminal={terminal} />
         {onUnassign ? <Button type="button" variant="outline" size="sm"
           className="border-destructive/40 bg-destructive/5 text-destructive hover:bg-destructive/10 hover:text-destructive"
-          aria-label={`${terminal.name} (${terminal.id}) terminalini ajratish`}
-          onClick={() => onUnassign(terminal)}>Ajratish</Button> : null}
+          aria-label={p.message('actions.unassignLabel', { name: terminal.name, id: terminal.id })}
+          onClick={() => onUnassign(terminal)}>{p.message('actions.unassignShort')}</Button> : null}
       </div>
     </div>
   </li>
 }
 
 export function CashierTerminalsContent({ cashier, mode = 'view', assignSurface, onUnassign, unassignSurface }: CashierTerminalsContentProps) {
+  const p = useCashierPresentation()
   if (mode === 'view') return <DetailsBody>
-    <DetailsSectionCard title="Kassir" icon={UsersRoundIcon}>
-      <DetailsFieldRow label="Kassir"><CashierIdentity cashier={cashier} /></DetailsFieldRow>
+    <DetailsSectionCard title={p.message('fields.cashier')} icon={UsersRoundIcon}>
+      <DetailsFieldRow label={p.message('fields.cashier')}><CashierIdentity cashier={cashier} /></DetailsFieldRow>
     </DetailsSectionCard>
-    <section aria-label="Faol terminal biriktirishlari" className="space-y-3">
+    <section aria-label={p.message('details.active')} className="space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold uppercase text-text-primary">Biriktirilgan terminallar</h3>
-        <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-text-primary">{cashier.terminals.length} ta terminal</span>
+        <h3 className="text-sm font-semibold uppercase text-text-primary">{p.message('details.assigned')}</h3>
+        <span className="rounded-full bg-brand-soft px-3 py-1 text-xs font-medium text-text-primary">{p.message('details.total', { countText: p.number(cashier.terminals.length) })}</span>
       </div>
       {cashier.terminals.length === 0
-        ? <p role="status" className="rounded-2xl border border-dashed p-6 text-center text-sm text-text-secondary">Bu kassirga terminal biriktirilmagan.</p>
+        ? <p role="status" className="rounded-2xl border border-dashed p-6 text-center text-sm text-text-secondary">{p.message('details.empty')}</p>
         : <ul className="space-y-3">{cashier.terminals.map((terminal, index) => <li key={`${terminal.id}-${index}`}>
           <DetailsSectionCard title={terminal.name} icon={MonitorIcon}>
-            <DetailsFieldRow label="Terminal ID"><MetadataId value={terminal.id} className="max-w-none whitespace-normal break-all overflow-visible text-clip" /></DetailsFieldRow>
-            <DetailsFieldRow label="Holat"><DetailsStatusBadge status={presentCashierTerminalStatus(terminal.statusCode)} /></DetailsFieldRow>
+            <DetailsFieldRow label={p.message('fields.terminalId')}><MetadataId value={terminal.id} className="max-w-none whitespace-normal break-all overflow-visible text-clip" /></DetailsFieldRow>
+            <DetailsFieldRow label={p.message('fields.status')}><DetailsStatusBadge status={p.assignmentStatus(terminal.statusCode)} /></DetailsFieldRow>
           </DetailsSectionCard>
         </li>)}</ul>}
     </section>
   </DetailsBody>
   return <div className="min-h-0 min-w-0 space-y-4 overflow-y-auto px-5 py-5 [overflow-wrap:anywhere] sm:px-8">
     {mode !== 'assign' ? <CashierIdentity cashier={cashier} /> : null}
-    {mode === 'assign' ? assignSurface : <section aria-label="Faol terminal biriktirishlari" className="space-y-3">
+    {mode === 'assign' ? assignSurface : <section aria-label={p.message('details.active')} className="space-y-3">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
         <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-text-secondary">
           <MonitorIcon className="size-4" aria-hidden="true" />
-          {mode === 'unassign' ? 'Ajratiladigan terminal' : 'Biriktirilgan terminallar'}
+          {mode === 'unassign' ? p.message('details.unassignTarget') : p.message('details.assigned')}
         </h3>
       </div>
       {cashier.terminals.length === 0
         ? <div role="status" className="rounded-xl border border-dashed bg-muted/30 p-6 text-center text-sm text-text-secondary">
           <MonitorIcon className="mx-auto mb-3 size-8" aria-hidden="true" />
-          Bu kassirga terminal biriktirilmagan.
-        </div>
+          {p.message('details.empty')}</div>
         : <ul className="space-y-3">{cashier.terminals.map((terminal, index) =>
           <TerminalCard key={`${terminal.id}-${index}`} terminal={terminal}
             onUnassign={mode === 'unassign' ? onUnassign : undefined} />)}</ul>}
@@ -116,9 +117,10 @@ export function CashierTerminalsDialog({ cashier, mode = 'view', onClose, onClos
   readonly onClose: () => void
   readonly onCloseAutoFocus?: ComponentProps<typeof Dialog.Content>['onCloseAutoFocus']
 }) {
-  const title = mode === 'assign' ? 'Terminal qo‘shish' : mode === 'unassign' ? 'Terminal ajratish' : 'Biriktirilgan terminallar'
-  const subtitle = mode === 'unassign' ? 'Ushbu terminalni kassirdan ajratishingiz mumkin.'
-    : 'Ushbu kassirga hozirda biriktirilgan faol terminallar ro‘yxati.'
+  const p = useCashierPresentation()
+  const title = mode === 'assign' ? p.message('actions.assign') : mode === 'unassign' ? p.message('actions.unassign') : p.message('details.assigned')
+  const subtitle = mode === 'unassign' ? p.message('details.unassignHelp')
+    : p.message('details.description')
   if (mode === 'view') return <DetailsDialogShell title={title} subtitle={subtitle} icon={UsersRoundIcon}
     onCloseAutoFocus={onCloseAutoFocus} onOpenChange={(open) => { if (!open) onClose() }}>
     <CashierTerminalsContent cashier={cashier} mode={mode} {...contentProps} />
@@ -142,7 +144,7 @@ export function CashierTerminalsDialog({ cashier, mode = 'view', onClose, onClos
           </div>
         </header>
         <Dialog.Close asChild>
-          <Button type="button" variant="outline" size="icon-sm" className="absolute right-5 top-5 z-10 rounded-full bg-card/80" aria-label="Yopish">
+          <Button type="button" variant="outline" size="icon-sm" className="absolute right-5 top-5 z-10 rounded-full bg-card/80" aria-label={p.common('actions.close')}>
             <XIcon aria-hidden="true" />
           </Button>
         </Dialog.Close>

@@ -1,5 +1,5 @@
 import { Children, isValidElement } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { captureWithLocale, renderToStaticMarkup } from '@/test/locale-fixture'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createActionRegistry } from '@/shared/api/one-dispatch-action'
 import { deferred } from '@/test/auth-fakes'
@@ -7,6 +7,7 @@ import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { useProtectedReadContext } from '@/shared/api/ProtectedReadContext'
 import { useQueryClient } from '@tanstack/react-query'
 import { CreateCashierContent } from './CreateCashierContent'
+import { CashierCreateAdapterContext } from './cashier-create-adapter'
 
 // This direct-call suite mocks React hooks; keep it on the option/value contract.
 // The real Radix form is exercised by CreateForms.lifecycle.test.tsx.
@@ -42,7 +43,10 @@ vi.mock('react', async (importOriginal) => {
       const index = harness.index++
       return [index < 4 ? harness.fields[index] : typeof initial === 'function' ? initial() : initial, vi.fn()]
     },
-    useContext: () => null,
+    // Keep the direct form's adapter seam null, but let rendered shared UI read
+    // its real locale provider. Domain callbacks and state mocks stay intact.
+    useContext: (context: unknown) => context === CashierCreateAdapterContext
+      ? null : actual.useContext(context as Parameters<typeof actual.useContext>[0]),
     useMemo: (factory: () => unknown) => factory(),
     useEffect: () => undefined,
     useSyncExternalStore: (_subscribe: unknown, snapshot: () => unknown) => snapshot(),
@@ -84,9 +88,12 @@ afterEach(() => { vi.unstubAllEnvs(); harness.registry?.invalidateAll() })
 
 function form(onConfirmed = vi.fn()) {
   harness.index = 0
-  let tree = CreateCashierContent({ onConfirmed, onPendingChange: vi.fn() })
-  // Follow the adapter composition to exercise the same shared form callbacks.
-  while (typeof tree.type === 'function') tree = tree.type(tree.props)
+  const tree = captureWithLocale(() => {
+    let current = CreateCashierContent({ onConfirmed, onPendingChange: vi.fn() })
+    // Follow the adapter composition while remaining inside the real provider.
+    while (typeof current.type === 'function') current = current.type(current.props)
+    return current
+  })
   const node = Children.toArray(tree.props.children).find((child) => isValidElement(child) && child.type === 'form')
   if (!isValidElement<{ onSubmit: (event: { preventDefault: () => void }) => Promise<void> }>(node)) throw new Error('Expected create form')
   return { tree, submit: () => node.props.onSubmit({ preventDefault: vi.fn() }), onConfirmed }

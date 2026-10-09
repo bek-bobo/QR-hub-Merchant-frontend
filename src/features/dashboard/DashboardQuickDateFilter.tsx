@@ -1,3 +1,4 @@
+import { useDashboardPresentation } from './presentation'
 import { Button } from '@/components/ui/button'
 import { DateRangeQuickFilter } from '@/features/dynamic-qr/DateRangeQuickFilter'
 import type { DateRange } from '@/shared/contracts/merchant-read'
@@ -15,22 +16,23 @@ interface DashboardQuickDateFilterProps {
 
 export function DashboardQuickDateFilter({ range, initialInstant, validationMessage, onDraftChange,
   onRangeComplete, onPreset, onReset }: DashboardQuickDateFilterProps) {
+  const p = useDashboardPresentation()
   return <div className="min-w-0 space-y-2">
-    <div className="flex min-w-0 flex-wrap items-center gap-2" aria-label="Dashboard sana filtri">
-      <DateRangeQuickFilter value={range} onDraftChange={onDraftChange}
+    <div className="flex min-w-0 flex-wrap items-center gap-2" aria-label={p.message('filters.dates')}>
+      <DateRangeQuickFilter value={range} presentation={p} onDraftChange={onDraftChange}
         onApply={onRangeComplete} onReset={onReset} />
-      <div className="flex flex-wrap gap-2" aria-label="Davr presetlari">
+      <div className="flex flex-wrap gap-2" aria-label={p.message('filters.presets')}>
         {([1, 7, 30] as const).map((days) => {
           const preset = getTashkentDatePreset(days, initialInstant ?? new Date())
           const selected = range.fromDate === preset.fromDate && range.toDate === preset.toDate
           return <Button key={days} type="button" variant="outline" size="sm" aria-pressed={selected}
             className="h-9 rounded-xl bg-surface px-4 aria-pressed:border-brand/20 aria-pressed:bg-brand-soft aria-pressed:text-brand"
             onClick={() => onPreset(days)}>
-            {days} kun
+            {p.message('filters.preset', {count: days})}
           </Button>
         })}
       </div>
     </div>
-    {validationMessage ? <p role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
+    {validationMessage ? <p role="alert" className="text-sm text-destructive">{p.message('filters.invalid')}</p> : null}
   </div>
 }

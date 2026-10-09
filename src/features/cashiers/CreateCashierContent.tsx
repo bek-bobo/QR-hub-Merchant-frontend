@@ -1,3 +1,5 @@
+import { describeCashierFeedback, type CashierFeedback } from './feedback'
+import { useCashierPresentation } from './presentation'
 import { useContext, useEffect, useState, useSyncExternalStore, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -35,11 +37,12 @@ function LiveCreateCashierContent(props: CreateCashierCallbacks) {
 function CashierCreateForm({ adapter, onConfirmed, onPendingChange, onCancel }: CreateCashierCallbacks & {
   readonly adapter: CashierCreateAdapter
 }) {
+  const p = useCashierPresentation()
   const runtime = useReadRuntime()
   const [fullname, setFullname] = useState('')
   const [phone, setPhone] = useState('')
   const [selectedTerminalId, setSelectedTerminalId] = useState('')
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<CashierFeedback | null>(null)
   const lookupOptions = runtime.queries.terminalLookupOptions()
   const terminals = useQuery(lookupOptions)
   const currentOptions = adapter.currentTerminalOptions
@@ -62,11 +65,11 @@ function CashierCreateForm({ adapter, onConfirmed, onPendingChange, onCancel }: 
     terminalIds: selectedTerminalId ? [selectedTerminalId] : [],
   }
   const validRequest = buildCashierCreateRequest(draft, currentOptions())
-  const lookupReason = !runtime.capabilities.terminalLookup ? 'Terminal tanlash uchun ruxsat mavjud emas.'
-    : !lookupOptions.enabled ? 'Terminal tanlash integratsiyasi mavjud emas.'
-      : terminals.isError ? 'Terminallarni yuklab bo‘lmadi.'
-        : terminals.isPending ? 'Terminallar yuklanmoqda.'
-          : !currentOptions() ? 'Terminal tanlovi qayta tasdiqlanishi kerak.' : null
+  const lookupReason = !runtime.capabilities.terminalLookup ? 'lookup.denied'
+    : !lookupOptions.enabled ? 'lookup.unavailable'
+      : terminals.isError ? 'lookup.failed'
+        : terminals.isPending ? 'lookup.loading'
+          : !currentOptions() ? 'lookup.unconfirmed' : null
   const canSubmit = Boolean(validRequest) && !lookupReason && canCreate && outcome.kind === 'idle'
 
   useEffect(() => { onPendingChange(outcome.kind === 'pending') }, [onPendingChange, outcome.kind])
@@ -77,7 +80,7 @@ function CashierCreateForm({ adapter, onConfirmed, onPendingChange, onCancel }: 
     const result = await controller.submit(draft)
     onPendingChange(false)
     if (!sameScope(runtime.scope, runtime.getCurrentScope())) return
-    if (result.kind === 'not-sent') setMessage(result.reason)
+    if (result.kind === 'not-sent') setMessage(describeCashierFeedback(result.reason))
     if (result.kind === 'confirmed') onConfirmed()
   }
 
@@ -91,14 +94,14 @@ function CashierCreateForm({ adapter, onConfirmed, onPendingChange, onCancel }: 
 
   return <div className="min-w-0 space-y-5">
       <form className="space-y-6" onSubmit={submit}>
-        <label className="block space-y-1.5 text-base font-medium text-text-primary">F.I.Sh.<Input className="h-[52px] rounded-xl bg-popover px-5 text-base font-normal md:text-base" placeholder="F.I.Sh. ni kiriting" value={fullname} onChange={(event) => setFullname(event.target.value)} autoComplete="name" /></label>
+        <label className="block space-y-1.5 text-base font-medium text-text-primary">{p.message('fields.fullname')}<Input className="h-[52px] rounded-xl bg-popover px-5 text-base font-normal md:text-base" placeholder={p.message('create.namePlaceholder')} value={fullname} onChange={(event) => setFullname(event.target.value)} autoComplete="name" /></label>
         <FormField
           id="cashier-phone"
-          label="Telefon"
+          label={p.message('fields.phone')}
           className="[&_label]:text-base [&_p[id$='-help']]:text-sm"
-          helpText="9 ta mahalliy raqamni kiriting."
+          helpText={p.message('create.phoneHelp')}
           errorText={phone.length > 0 && !phoneWire
-            ? 'Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.'
+            ? p.message('create.phoneInvalid')
             : undefined}
         >
           {(controlProps) => (
@@ -114,28 +117,27 @@ function CashierCreateForm({ adapter, onConfirmed, onPendingChange, onCancel }: 
             </div>
           )}
         </FormField>
-        <label className="block space-y-1.5 text-base font-medium text-text-primary">Terminal
-          <Select className="h-14 rounded-2xl bg-popover px-5 text-base" value={selectedTerminalId} disabled={!terminals.data || !currentOptions()}
+        <label className="block space-y-1.5 text-base font-medium text-text-primary">{p.message('fields.terminal')}<Select className="h-14 rounded-2xl bg-popover px-5 text-base" value={selectedTerminalId} disabled={!terminals.data || !currentOptions()}
             onChange={(event) => setSelectedTerminalId(event.target.value)}>
-            <option value="">Terminalni tanlang</option>
+            <option value="">{p.message('create.chooseTerminal')}</option>
             {terminals.data && currentOptions() ? terminals.data.map((terminal) =>
               <option key={terminal.id} value={terminal.id}>{terminal.name}</option>) : null}
           </Select>
         </label>
-        {lookupReason ? <p role="status" className="text-sm text-text-secondary">{lookupReason}</p> : null}
+        {lookupReason ? <p role="status" className="text-sm text-text-secondary">{p.message(lookupReason)}</p> : null}
         {!validRequest && !lookupReason ? <p role="status" className="text-sm text-text-secondary"></p> : null}
-        {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
+        {message ? <p role="alert" className="text-sm text-destructive">{p.feedback(message)}</p> : null}
         <div className="flex flex-col-reverse gap-3 border-t border-border/70 pt-6 sm:flex-row sm:justify-end">
-          {onCancel ? <Button type="button" variant="outline" className="h-14 rounded-xl bg-popover px-8 text-base font-semibold" disabled={outcome.kind === 'pending'} onClick={onCancel}>Bekor qilish</Button> : null}
-          <Button type="submit" className="h-14 rounded-xl px-8 text-base font-semibold" disabled={!canSubmit}>Kassir yaratish</Button>
+          {onCancel ? <Button type="button" variant="outline" className="h-14 rounded-xl bg-popover px-8 text-base font-semibold" disabled={outcome.kind === 'pending'} onClick={onCancel}>{p.common('actions.cancel')}</Button> : null}
+          <Button type="submit" className="h-14 rounded-xl px-8 text-base font-semibold" disabled={!canSubmit}>{p.message('create.submit')}</Button>
         </div>
       </form>
-    {outcome.kind === 'pending' ? <p role="status">Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.</p> : null}
-    {outcome.kind === 'unknown' ? <section role="alert" className="space-y-2 rounded-lg border p-4"><h3 className="font-semibold">Holat noma’lum</h3>
-      <p>{canReadList ? 'Kassir yaratilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassirlar ro‘yxatini tekshiring.' : 'Kassir yaratilgan bo‘lishi mumkin. Takroriy yuborish yangi kassir yaratishi mumkin.'}</p>
-      <Button type="button" onClick={freshIntent}>Yangi intent</Button>
+    {outcome.kind === 'pending' ? <p role="status">{p.message('create.pending')}</p> : null}
+    {outcome.kind === 'unknown' ? <section role="alert" className="space-y-2 rounded-lg border p-4"><h3 className="font-semibold">{p.message('create.unknown')}</h3>
+      <p>{canReadList ? p.message('create.checkFirst') : p.message('create.duplicateRisk')}</p>
+      <Button type="button" onClick={freshIntent}>{p.message('create.newIntent')}</Button>
     </section> : null}
-    {outcome.kind === 'rejected' ? <section role="alert"><p>{outcome.reason}</p><Button type="button" onClick={freshIntent}>Yangi intent</Button></section> : null}
-    {outcome.kind === 'not-sent' ? <p role="alert">{outcome.reason}</p> : null}
+    {outcome.kind === 'rejected' ? <section role="alert"><p>{p.message('feedback.rejected')}</p><Button type="button" onClick={freshIntent}>{p.message('create.newIntent')}</Button></section> : null}
+    {outcome.kind === 'not-sent' ? <p role="alert">{p.feedback(describeCashierFeedback(outcome.reason))}</p> : null}
   </div>
 }

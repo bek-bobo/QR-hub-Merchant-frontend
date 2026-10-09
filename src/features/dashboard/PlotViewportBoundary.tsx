@@ -1,3 +1,4 @@
+import { useDashboardPresentation } from './presentation'
 import { Component, Suspense, type ReactNode } from 'react'
 
 interface PlotViewportBoundaryProps {
@@ -7,6 +8,8 @@ interface PlotViewportBoundaryProps {
 
 // Keep renderer failures and loading inside the visual viewport. Controls and
 // accessible summaries remain owned by the synchronous Merchant components.
+function PlotFailure() { const p = useDashboardPresentation(); return <>{p.message('trend.failed')}</> }
+
 export class PlotViewportBoundary extends Component<PlotViewportBoundaryProps, { failed: boolean }> {
   state = { failed: false }
 
@@ -19,7 +22,7 @@ export class PlotViewportBoundary extends Component<PlotViewportBoundaryProps, {
       return <div className="relative">
         {this.props.fallback}
         <p className="absolute inset-0 flex items-center justify-center p-4 text-center text-sm text-text-secondary">
-          Grafikni yuklab bo‘lmadi.
+          <PlotFailure />
         </p>
       </div>
     }

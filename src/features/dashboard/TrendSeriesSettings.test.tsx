@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { TrendSeriesSettings, TrendSeriesSettingsList } from './TrendSeriesSettings'
 import { ALL_TREND_SERIES } from './trend-presentation'
@@ -25,7 +26,7 @@ describe('Merchant chart series settings', () => {
 
   it('routes checkbox changes to the stable ID and explains the disabled final checkbox', () => {
     const onToggle = vi.fn()
-    const tree = TrendSeriesSettingsList({ visible: ['success'], onToggle })
+    const tree = captureWithLocale(() => TrendSeriesSettingsList({ visible: ['success'], onToggle }))
     const checkboxes = inputs(tree)
     expect(checkboxes.map((input) => input.props.checked)).toEqual([false, true, false, false, false])
     expect(checkboxes.map((input) => input.props.disabled)).toEqual([false, true, false, false, false])

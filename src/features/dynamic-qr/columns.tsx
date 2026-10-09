@@ -1,9 +1,8 @@
+import type { DynamicQrPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { presentQrStatus } from '@/shared/presentation/qr-status'
 import type { DynamicQrRow } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
-import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
@@ -16,10 +15,10 @@ interface DynamicQrColumnDefinition<Id extends string = string>
   readonly renderCell: (row: DynamicQrRow) => ReactNode
 }
 
-const dynamicQrColumnDefinitions = [
+export function createDynamicQrColumns(p: DynamicQrPresentation) { return [
   {
     id: 'merchant',
-    label: 'Merchant',
+    label: p.message('table.merchant'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -27,15 +26,15 @@ const dynamicQrColumnDefinitions = [
   },
   {
     id: 'createdAt',
-    label: 'Yaratilgan vaqt',
+    label: p.message('table.createdAt'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: DynamicQrRow) => formatOffsetlessDateTime(row.createdAt),
+    renderCell: (row: DynamicQrRow) => p.wallTime(row.createdAt),
   },
   {
     id: 'terminal',
-    label: 'Terminal',
+    label: p.message('table.terminal'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -43,7 +42,7 @@ const dynamicQrColumnDefinitions = [
   },
   {
     id: 'qrId',
-    label: 'QR ID',
+    label: p.message('table.qrId'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -51,7 +50,7 @@ const dynamicQrColumnDefinitions = [
   },
   {
     id: 'amount',
-    label: 'Summa',
+    label: p.message('table.amount'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -61,12 +60,12 @@ const dynamicQrColumnDefinitions = [
   },
   {
     id: 'status',
-    label: 'Status',
+    label: p.message('table.status'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: DynamicQrRow) => {
-      const status = presentQrStatus(row.statusCode)
+      const status = p.status(row.statusCode)
       return (
         <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} gap-1.5 rounded-full px-2.5 py-1 font-medium`}>
           <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
@@ -77,21 +76,19 @@ const dynamicQrColumnDefinitions = [
   },
   {
     id: 'rrn',
-    label: 'RRN',
+    label: p.message('table.rrn'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: DynamicQrRow) => presentNullableCell(row.rrn),
   },
 ] as const satisfies readonly DynamicQrColumnDefinition[]
+}
 
 export type DynamicQrColumnId =
-  (typeof dynamicQrColumnDefinitions)[number]['id']
+  ReturnType<typeof createDynamicQrColumns>[number]['id']
 export type DynamicQrColumn = DynamicQrColumnDefinition & {
   readonly id: DynamicQrColumnId
 }
 
-export const dynamicQrColumns: readonly DynamicQrColumn[] = dynamicQrColumnDefinitions
-
-export const DYNAMIC_QR_DEFAULT_COLUMN_ORDER: readonly DynamicQrColumnId[] =
-  dynamicQrColumns.map((column) => column.id)
+export const DYNAMIC_QR_DEFAULT_COLUMN_ORDER: readonly DynamicQrColumnId[] = ['merchant', 'createdAt', 'terminal', 'qrId', 'amount', 'status', 'rrn']

@@ -1,5 +1,5 @@
 import { Children, isValidElement, type ComponentProps, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createLiveReadApi } from '@/app/read/createLiveReadApi'
@@ -270,7 +270,7 @@ describe('Dashboard rendered date controls to read requests', () => {
     expect(() => renderPage()).not.toThrow()
     flow.controls!.onRangeComplete(range)
     expect(flow.state!.applied).toBe(applied)
-    expect(flow.state!.validationMessage).toBe('Sana oralig‘ini to‘g‘ri kiriting.')
+    expect(flow.state!.validationMessage).toBe('invalidRange')
     const html = renderPage()
     expect(dataQueries().map(({ queryKey }) => queryKey)).toEqual(keys)
     expect(html).toContain('Sana oralig‘ini to‘g‘ri kiriting.')

@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, StrictMode, useState, type ReactNode } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { Dialog } from 'radix-ui'
 import { chooseSelectOption, openSelect } from '@/test/select-interaction'

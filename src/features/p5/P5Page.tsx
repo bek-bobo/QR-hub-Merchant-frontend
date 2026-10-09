@@ -1,3 +1,4 @@
+import { useP5Presentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -27,7 +28,7 @@ import {
 import { P5Results } from './P5Results'
 import { P5ResetDialog } from './P5ResetDialog'
 import { createP5ResetController, invalidateCurrentP5Lists, p5ResetIntentKey, type P5ResetControllerDependencies, type P5ResetPort } from './p5-reset'
-import { p5Columns } from './columns'
+import { createP5Columns } from './columns'
 import { P5AdvancedFilterFields, P5QuickSearch } from './P5FilterControls'
 import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
 
@@ -89,6 +90,8 @@ function ScopedP5Results({ queryKey, runtime, resetDependencies, resetAvailable,
 }
 
 export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { readonly resetPort?: P5ResetPort | null; readonly resetRegistration?: ReadRegistration } = {}) {
+  const p = useP5Presentation()
+  const p5Columns = createP5Columns(p)
   const runtime = useReadRuntime()
   const resetPort = injectedResetPort === undefined ? runtime.p5ResetPort ?? null : injectedResetPort
   const [resetView, setResetView] = useState<P5ResetView | null>(null)
@@ -98,7 +101,7 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
   useDebouncedSearch(searchDraft, applied.search, (search) => {
     setApplied((current) => applyP5QuickSearch(current, search))
   })
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [validationMessage, setValidationMessage] = useState<'invalid' | null>(null)
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'p5Devices',
     columns: p5Columns,
@@ -190,7 +193,7 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
       setValidationMessage(null)
       return true
     } catch {
-      setValidationMessage('Merchant, terminal yoki status kodi tasdiqlanmadi. Filtrlarni tekshiring yoki tozalang.')
+      setValidationMessage('invalid')
       return false
     }
   }
@@ -205,11 +208,11 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
     setValidationMessage(null)
   }
 
-  if (!runtime.capabilities.p5List) return <NoAccessState description="P5 qurilmalari ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.p5List.kind === 'unavailable') return <ErrorState title="P5 qurilmalari integratsiyasi sozlanmagan" />
+  if (!runtime.capabilities.p5List) return <NoAccessState description={p.message('page.noAccess')} />
+  if (runtime.readiness.p5List.kind === 'unavailable') return <ErrorState title={p.message('page.unavailable')} />
 
   const resetUnavailableMessage = runtime.capabilities.p5ResetPin && !resetAvailable
-    ? 'PIN reset funksiyasi hozir mavjud emas.'
+    ? p.message('reset.unavailable')
     : undefined
 
   return <div className="mx-auto min-w-0 max-w-[96rem] space-y-5">
@@ -225,13 +228,13 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
             merchants={merchants.data}
             terminalState={terminalPresentation}
             terminals={draftTerminals.data}
-            validationMessage={validationMessage}
+            validationMessage={validationMessage ? p.message('filters.invalid') : null}
             onChange={setDraft}
             onReconcileDraft={reconciledDraft !== draft ? () => setDraft(reconciledDraft) : undefined}
           />
         </FilterDrawer>
         <TableColumnPreferences
-          tableLabel="P5 qurilmalari"
+          tableLabel={p.message('page.name')}
           items={p5Columns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
@@ -246,7 +249,7 @@ export function P5Page({ resetPort: injectedResetPort, resetRegistration }: { re
         />
         <RefreshIconButton
           className="size-11 rounded-xl bg-muted/30"
-          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, { locale: p.intlLocale, timeZone: 'Asia/Tashkent' }) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}

@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { chooseSelectOption } from '@/test/select-interaction'
 import { act, type ComponentProps } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { notifyManager, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ReadRuntimeContext, type ReadRuntimeContextValue } from '@/app/read/useReadRuntime'

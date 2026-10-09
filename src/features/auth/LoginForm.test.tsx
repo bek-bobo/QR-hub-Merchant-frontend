@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Button } from '@/components/ui/button'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
@@ -23,7 +23,7 @@ function actions(remainingMs = 73000): LoginActions {
     restart: vi.fn(), getOtpRemainingMs: vi.fn(() => remainingMs) }
 }
 
-function render(phase: LoginSnapshot['phase'], port = actions(), pending = false, message?: string) {
+function render(phase: LoginSnapshot['phase'], port = actions(), pending = false, message?: LoginSnapshot['message']) {
   return renderToStaticMarkup(<AuthShell><LoginForm actions={port}
     snapshot={{ phase, flow: phase === 'reset-otp' ? 'reset' : 'login', phone: '998901234567', pending, message }} /></AuthShell>)
 }
@@ -92,9 +92,9 @@ describe('auth flow presentation', () => {
   })
 
   it.each(['phone', 'otp', 'pin', 'set-pin'] as const)('keeps pending actions disabled and preserves feedback for %s', (phase) => {
-    const html = render(phase, actions(), true, 'Serverdan kelgan xabar')
+    const html = render(phase, actions(), true, 'request')
     expect(capture.buttons.find((button) => button.type === 'submit')?.disabled).toBe(true)
-    expect(html).toContain('Serverdan kelgan xabar')
+    expect(html).toContain('So‘rovni yakunlab bo‘lmadi. Kirishni qayta boshlang.')
     expect(html).toContain('aria-invalid="true"')
   })
 })

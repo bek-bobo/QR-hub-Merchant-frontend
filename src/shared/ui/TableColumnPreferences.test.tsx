@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import {
   TableColumnPreferenceList,
@@ -134,7 +135,7 @@ describe('TableColumnPreferences', () => {
     expect(createdAtToggle).not.toContain('disabled=""')
     expect(html).not.toContain('Amallar')
 
-    const tree = TableColumnPreferenceList({
+    const tree = captureWithLocale(() => TableColumnPreferenceList({
       items,
       order: items.map((item) => item.id),
       hidden: ['createdAt'],
@@ -143,7 +144,7 @@ describe('TableColumnPreferences', () => {
       ...idleDragProps,
       onToggleVisibility,
       canHide: () => true,
-    })
+    }))
     const toggle = findElement(
       tree,
       (element) => element.type === 'input'
@@ -164,7 +165,7 @@ describe('TableColumnPreferences', () => {
     const onDragEnd = vi.fn()
     const onMove = vi.fn()
     const onToggleVisibility = vi.fn()
-    const tree = TableColumnPreferenceList({
+    const tree = captureWithLocale(() => TableColumnPreferenceList({
       items,
       order: items.map((item) => item.id),
       hidden: [],
@@ -178,7 +179,7 @@ describe('TableColumnPreferences', () => {
       onMove,
       onToggleVisibility,
       canHide: () => true,
-    })
+    }))
     const handle = findElement(
       tree,
       (element) => element.props['aria-label'] === 'Yaratilgan vaqt ustunini ko‘chirish',
@@ -219,7 +220,7 @@ describe('TableColumnPreferences', () => {
 
   it('renders and wires an explicit current-table reset action', () => {
     const onReset = vi.fn()
-    const reset = TableColumnPreferenceReset({ onReset })
+    const reset = captureWithLocale(() => TableColumnPreferenceReset({ onReset }))
     const html = renderToStaticMarkup(reset)
     expect(html).toContain('Standart tartibga qaytarish')
     expect(typeof reset.props.onClick).toBe('function')

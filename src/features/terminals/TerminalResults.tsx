@@ -1,3 +1,4 @@
+import { useTerminalPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -10,7 +11,7 @@ import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import { TerminalActionsMenu } from './TerminalActionsMenu'
 import {
   TERMINAL_DEFAULT_COLUMN_ORDER,
-  terminalColumns,
+  createTerminalColumns,
   type TerminalColumn,
   type TerminalColumnId,
 } from './columns'
@@ -42,6 +43,7 @@ interface TerminalResultsProps {
 }
 
 function resolveColumns(
+  terminalColumns: ReturnType<typeof createTerminalColumns>,
   order: readonly string[],
   visibleColumnIds: readonly string[],
 ): readonly TerminalColumn[] {
@@ -59,7 +61,9 @@ function resolveColumns(
 
 export function TerminalResults({ blocked, pending, error, data, columnOrder,
   visibleColumnIds, onRetry, onPageChange, onPageSizeChange, headerActions, quickFilters, onViewQr, onViewDetails }: TerminalResultsProps) {
-  const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const p = useTerminalPresentation()
+  const terminalColumns = createTerminalColumns(p)
+  const columns = resolveColumns(terminalColumns, columnOrder, visibleColumnIds)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
   const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
 
@@ -69,20 +73,20 @@ export function TerminalResults({ blocked, pending, error, data, columnOrder,
         {quickFilters}
         {headerActions}
       </div> : null}
-      {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant, bank hisobi, viloyat yoki tumanni qayta tanlab qo‘llang yoki filtrni tozalang." />
-        : pending ? <LoadingState title="Terminallar yuklanmoqda" />
+      {blocked ? <ErrorState title={p.message('filters.unconfirmed')} description={p.message('filters.reselect')} />
+        : pending ? <LoadingState title={p.message('states.loading')} />
           : error ? <ErrorState onRetry={onRetry} />
-            : !data ? <ErrorState title="Terminal ro‘yxatini ko‘rsatib bo‘lmadi" />
-              : data.content.length === 0 ? <EmptyState description="Terminal topilmadi." />
+            : !data ? <ErrorState title={p.message('states.failed')} />
+              : data.content.length === 0 ? <EmptyState description={p.message('states.empty')} />
                 : <div className="min-w-0">
-        <TableScrollRegion ariaLabel="Terminal jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <TableScrollRegion ariaLabel={p.message('table.label')} className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Table className="terminal-table table-fixed" style={{ minWidth: totalWidth, width: hasFlexibleColumn ? '100%' : totalWidth }}>
             <colgroup>
               {columns.map((column) => <col key={column.id} style={{ width: flexibleColumnIds.has(column.id) ? undefined : columnWidths[column.id] }} />)}
               <col style={{ width: actionsWidth }} />
             </colgroup>
             <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}
-              <TableHead className="sticky right-0 text-right">Amallar</TableHead>
+              <TableHead className="sticky right-0 text-right">{p.message('table.actions')}</TableHead>
             </TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => <TableRow key={`${row.id}-${index}`}>
               {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
@@ -93,9 +97,9 @@ export function TerminalResults({ blocked, pending, error, data, columnOrder,
           </Table>
         </TableScrollRegion>
       </div>}
-      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Terminal sahifalari" currentPage={data.page}
+      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel={p.message('table.pages')} currentPage={data.page}
         totalPages={data.totalPages} totalItems={data.totalElements}
-        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta Terminal`}
+        totalLabel={p.message('table.total', { countText: p.number(data.totalElements) })}
         className="terminal-pagination border-t-0 pt-1"
         onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
     </CardContent>

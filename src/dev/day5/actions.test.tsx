@@ -1,5 +1,5 @@
 import { useContext, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { QueryClient } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { decideLiveFeatureRoute } from '@/app/live-route-policy'

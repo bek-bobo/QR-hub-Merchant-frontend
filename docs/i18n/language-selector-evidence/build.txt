@@ -1,0 +1,80 @@
+
+> qrhub-merchant-frontend@0.0.0 build
+> npm run locales:validate && npm run i18n:boundary && npm run i18n:literals && tsc -b && vite build
+
+
+> qrhub-merchant-frontend@0.0.0 locales:validate
+> node scripts/validate-locales.mjs
+
+Locale integrity PASS: uz/ru/en — common, shell, auth, account, dashboard, dynamicQr, staticQr, terminals, bankAccounts, cashiers, p5
+
+> qrhub-merchant-frontend@0.0.0 i18n:boundary
+> node scripts/check-i18n-boundary.mjs
+
+i18n import boundary PASS
+
+> qrhub-merchant-frontend@0.0.0 i18n:literals
+> node scripts/check-i18n-literals.mjs
+
+i18n literal check PASS: 254 reachable modules, exact reviewed exceptions only
+vite v8.3.0 building client environment for production...
+transforming...
+✓ 3834 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                   2.11 kB │ gzip:   0.78 kB
+dist/assets/DashboardReadPage-6BGLW04A.css        0.68 kB │ gzip:   0.24 kB
+dist/assets/lookup-select-state-CD1vQ2eI.css      1.46 kB │ gzip:   0.69 kB
+dist/assets/index-BnDUi98i.css                  111.07 kB │ gzip:  18.08 kB
+dist/assets/active-status-CvqEm9gG.js             0.10 kB │ gzip:   0.11 kB
+dist/assets/CreateQrPage-DMmMARVN.js              0.17 kB │ gzip:   0.15 kB
+dist/assets/plus-zy4HnumZ.js                      0.18 kB │ gzip:   0.16 kB
+dist/assets/search-D5NGVUqK.js                    0.20 kB │ gzip:   0.18 kB
+dist/assets/map-pin-DWCIa8Jo.js                   0.28 kB │ gzip:   0.24 kB
+dist/assets/debounced-search-ym-Kg3Ya.js          0.30 kB │ gzip:   0.22 kB
+dist/assets/phone-Bhj37jgA.js                     0.35 kB │ gzip:   0.24 kB
+dist/assets/jsx-runtime-BtH0gOTJ.js               0.42 kB │ gzip:   0.29 kB
+dist/assets/file-text-pr6VKKBS.js                 0.67 kB │ gzip:   0.38 kB
+dist/assets/store-dlIOoDot.js                     0.70 kB │ gzip:   0.37 kB
+dist/assets/minor-DUjSPcsS.js                     0.78 kB │ gzip:   0.44 kB
+dist/assets/FormField-HROZ5nt3.js                 1.48 kB │ gzip:   0.82 kB
+dist/assets/card-DFFOmiA8.js                      1.50 kB │ gzip:   0.59 kB
+dist/assets/presentation-C-Sg5UEJ.js              1.64 kB │ gzip:   0.83 kB
+dist/assets/management-filters-DLLFX7F0.js        1.97 kB │ gzip:   0.77 kB
+dist/assets/tslib.es6-DIAKQG4k.js                 2.10 kB │ gzip:   0.96 kB
+dist/assets/RowActionMenu-CDQxUfxc.js             2.58 kB │ gzip:   1.12 kB
+dist/assets/contract-B2zM3hZj.js                  2.60 kB │ gzip:   1.06 kB
+dist/assets/ExportQrPage-fVnf4kXN.js              2.90 kB │ gzip:   1.29 kB
+dist/assets/react-dom-DEdkSy2c.js                 3.85 kB │ gzip:   1.39 kB
+dist/assets/AccountPage-jpjEo9W7.js               3.94 kB │ gzip:   1.41 kB
+dist/assets/PaginationBar-UGM41ND0.js             4.02 kB │ gzip:   1.67 kB
+dist/assets/DynamicQrActionsMenu-b3FBt9n7.js      4.91 kB │ gzip:   1.56 kB
+dist/assets/DetailsDialog-JaDGD3CT.js             5.32 kB │ gzip:   2.04 kB
+dist/assets/lookup-select-state-2DlbxFEA.js       5.89 kB │ gzip:   2.41 kB
+dist/assets/endpoints-B2isibzW.js                 7.33 kB │ gzip:   2.34 kB
+dist/assets/react-DB-4Zxce.js                     8.52 kB │ gzip:   3.28 kB
+dist/assets/BankAccountPage-BrFYbecl.js           9.47 kB │ gzip:   3.57 kB
+dist/assets/status-tone-DSlQJ3Wc.js              10.58 kB │ gzip:   3.94 kB
+dist/assets/filter-lookups-DHcE5bux.js           11.64 kB │ gzip:   4.20 kB
+dist/assets/DateRangeQuickFilter-C5WHHJ2D.js     12.19 kB │ gzip:   4.49 kB
+dist/assets/ResultToast-BVPyT_5f.js              13.55 kB │ gzip:   4.88 kB
+dist/assets/DynamicQrPage-lzM8msb8.js            16.19 kB │ gzip:   5.62 kB
+dist/assets/TerminalPage-BPMp78jG.js             17.11 kB │ gzip:   5.52 kB
+dist/assets/TableScrollRegion-Cv-oMDT_.js        17.27 kB │ gzip:   5.79 kB
+dist/assets/CreateQrContent-DijytfU1.js          18.31 kB │ gzip:   5.76 kB
+dist/assets/StaticQrPage-GBvinkC4.js             19.11 kB │ gzip:   6.27 kB
+dist/assets/P5Page-5yrH0U6Y.js                   22.56 kB │ gzip:   7.10 kB
+dist/assets/QrDisplayShell-DW_-ShZf.js           29.30 kB │ gzip:  10.95 kB
+dist/assets/button-C2VYJ1ea.js                   35.41 kB │ gzip:  14.36 kB
+dist/assets/DashboardReadPage--7J7gf7t.js        48.74 kB │ gzip:  15.04 kB
+dist/assets/CashierPage-B7DCxPM6.js              50.21 kB │ gzip:  13.30 kB
+dist/assets/date-range-Cs24yaSG.js              112.78 kB │ gzip:  37.71 kB
+dist/assets/index-Dk-XpCmk.js                   597.32 kB │ gzip: 163.20 kB
+dist/assets/PlotRenderers-B79vZTqa.js         1,459.74 kB │ gzip: 427.69 kB
+
+✓ built in 1.37s
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.

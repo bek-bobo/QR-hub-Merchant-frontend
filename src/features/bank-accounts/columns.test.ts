@@ -1,7 +1,9 @@
+import { createBankAccountPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
-import { BANK_ACCOUNT_DEFAULT_COLUMN_ORDER, bankAccountColumns } from './columns'
+import { BANK_ACCOUNT_DEFAULT_COLUMN_ORDER, createBankAccountColumns } from './columns'
 
 const expectedBusinessColumnIds = [
   'name',
@@ -120,3 +122,5 @@ describe('Bank Account column metadata and preferences', () => {
     })
   })
 })
+
+const bankAccountColumns = createBankAccountColumns(createBankAccountPresentation('uz', localeMessages('bankAccounts'), localeMessages('common')))

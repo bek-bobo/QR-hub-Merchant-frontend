@@ -1,0 +1,9 @@
+
+> qrhub-merchant-frontend@0.0.0 typecheck
+> npm run locales:validate && tsc -b --pretty false
+
+
+> qrhub-merchant-frontend@0.0.0 locales:validate
+> node scripts/validate-locales.mjs
+
+Locale integrity PASS: uz/ru/en — common, shell, auth, account, dashboard, dynamicQr, staticQr, terminals, bankAccounts, cashiers, p5

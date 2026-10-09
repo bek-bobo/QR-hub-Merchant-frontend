@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { ReadRuntimeContext, type ReadRuntimeContextValue } from '@/app/read/useReadRuntime'
 import { ExportQrFilters, ExportQrPage } from './ExportQrPage'
 

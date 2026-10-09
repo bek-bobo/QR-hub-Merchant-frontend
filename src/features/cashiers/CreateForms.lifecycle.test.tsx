@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { chooseSelectOption } from '@/test/select-interaction'
 import { act, StrictMode, useEffect, useState } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import type { createActionRegistry } from '@/shared/api/one-dispatch-action'
 import type { createCashierCreateController } from './create-cashier'
 import type { createCreateQrController } from '@/features/dynamic-qr/create-qr'

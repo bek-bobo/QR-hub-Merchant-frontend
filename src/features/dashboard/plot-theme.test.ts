@@ -1,6 +1,9 @@
+import { createDashboardPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
+const presentation = createDashboardPresentation('uz', localeMessages('dashboard'))
 import { dashboardZero } from './test-fixtures'
 import { createElement } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { applyResolvedTheme, applySystemPreference } from '@/shared/theme/theme-runtime'
 import { resolveTheme } from '@/shared/theme/theme-model'
@@ -86,11 +89,11 @@ describe('Merchant plot theme adapter', () => {
       const theme = renderTheme()!
       expect(theme.dark).toBe(resolved === 'dark')
       expect(theme.colors).toEqual(['info', 'success', 'warning', 'error'].map((status) => `--status-${status}-indicator:${theme.dark}`))
-      const config = createTrendPlotConfig({ buckets: [] }, 'count', ALL_TREND_SERIES, theme)
+      const config = createTrendPlotConfig(presentation, { buckets: [] }, 'count', ALL_TREND_SERIES, theme)
       expect(config.theme).toBe(theme.dark ? 'classicDark' : 'classic')
       expect(config.scale?.color).toMatchObject({ range: theme.colors })
       expect(config.axis).toMatchObject({ x: { lineStroke: theme.axis }, y: { gridStroke: theme.grid } })
-      const donut = createDonutPlotConfig(donutView, theme)
+      const donut = createDonutPlotConfig(presentation, donutView, theme)
       expect(donut.theme).toBe(config.theme)
       expect(donut.scale?.color).toMatchObject({ range: theme.colors.slice(1) })
       expect(donut.interaction?.tooltip).toEqual(plotTooltipInteraction(theme))

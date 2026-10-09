@@ -1,4 +1,4 @@
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'

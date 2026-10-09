@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { GranularityControl } from './GranularityControl'
 import { dashboardMetadata } from './test-fixtures'
@@ -8,7 +9,7 @@ describe('Backend granularity controls', () => {
   it('uses allowed metadata for disabled buttons and resolved metadata for selection', () => {
     const onSelect = vi.fn()
     const aggregation = { ...dashboardMetadata.aggregation, allowedGranularities: ['DAY', 'WEEK'] as const }
-    const tree = GranularityControl({ aggregation, onSelect })
+    const tree = captureWithLocale(() => GranularityControl({ aggregation, onSelect }))
     const buttons = Children.toArray(tree.props.children).filter(isValidElement) as { props: { children: ReactNode; disabled: boolean; 'aria-pressed': boolean; type: string; onClick: () => void } }[]
     expect(buttons.map(({ props }) => [props.children, props.disabled, props['aria-pressed']])).toEqual([
       ['Soat', true, false], ['Kun', false, true], ['Hafta', false, false], ['Oy', true, false], ['Yil', true, false],

@@ -1,3 +1,4 @@
+import { useTerminalPresentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -13,12 +14,14 @@ import type { TerminalRow } from '@/shared/contracts/management-read'
 import { applyTerminalAdvancedDraft, applyTerminalQuickSearch, createDefaultTerminalFilters, type TerminalAdvancedDraft } from './page-state'
 import { TerminalAdvancedFilterFields, TerminalQuickSearch } from './TerminalFilterControls'
 import { useTerminalFilterLookups } from './filter-lookups'
-import { terminalColumns } from './columns'
+import { createTerminalColumns } from './columns'
 import { TerminalResults } from './TerminalResults'
 import { TerminalQrDialog } from './TerminalQrDialog'
 import { TerminalDetailsSheet } from './TerminalDetailsSheet'
 
 export function TerminalPage() {
+  const p = useTerminalPresentation()
+  const terminalColumns = createTerminalColumns(p)
   const runtime = useReadRuntime()
   const [qrRow, setQrRow] = useState<TerminalRow | null>(null)
   const [detailsRow, setDetailsRow] = useState<TerminalRow | null>(null)
@@ -28,7 +31,7 @@ export function TerminalPage() {
   useDebouncedSearch(searchDraft, applied.search, (search) => {
     setApplied((current) => applyTerminalQuickSearch(current, search))
   })
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [validationMessage, setValidationMessage] = useState<'invalid' | null>(null)
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'terminals',
     columns: terminalColumns,
@@ -52,7 +55,7 @@ export function TerminalPage() {
       setValidationMessage(null)
       return true
     } catch {
-      setValidationMessage('Tanlangan merchant, bank hisobi, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      setValidationMessage('invalid')
       return false
     }
   }
@@ -68,8 +71,8 @@ export function TerminalPage() {
     setValidationMessage(null)
   }
 
-  if (!runtime.capabilities.terminalList) return <NoAccessState description="Terminal ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.terminalList.kind === 'unavailable') return <ErrorState title="Terminal integratsiyasi sozlanmagan" />
+  if (!runtime.capabilities.terminalList) return <NoAccessState description={p.message('page.noAccess')} />
+  if (runtime.readiness.terminalList.kind === 'unavailable') return <ErrorState title={p.message('page.unavailable')} />
 
   return <div className="mx-auto min-w-0 max-w-[96rem]">
     <TerminalResults blocked={blocked} pending={list.isPending} error={list.isError} data={list.data}
@@ -85,10 +88,10 @@ export function TerminalPage() {
         <FilterDrawer onApply={applyFilters} onReset={resetFilters} onOpenChange={syncDrawerDraft} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
           <TerminalAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
-          {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
+          {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{p.message('filters.invalid')}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences
-          tableLabel="Terminallar"
+          tableLabel={p.message('page.terminals')}
           items={terminalColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
@@ -103,7 +106,7 @@ export function TerminalPage() {
         />
         <RefreshIconButton
           className="size-10 rounded-xl bg-muted/30"
-          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, { locale: p.intlLocale, timeZone: 'Asia/Tashkent' }) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}

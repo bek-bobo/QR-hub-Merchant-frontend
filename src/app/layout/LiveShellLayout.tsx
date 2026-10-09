@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { useReducer, useRef, type ReactNode, type RefObject } from 'react'
 import { XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ export function LiveShellLayout({
   navigationItems,
   children,
 }: LiveShellLayoutProps) {
+  const { message } = useMessages('shell')
   const [mobileNavigationOpen, dispatch] = useReducer(
     reduceMobileNavigationOpen,
     false,
@@ -58,13 +60,13 @@ export function LiveShellLayout({
               <img src={`${import.meta.env.BASE_URL}qrhub-favicon.svg`} alt="" className="size-10 shrink-0" />
               <div className={collapsed ? 'sr-only' : 'min-w-0'}>
                 <div className="whitespace-nowrap text-base font-semibold tracking-tight">QRHub Merchant</div>
-                <div className="mt-1 text-xs text-sidebar-foreground/60">Merchant workspace</div>
+                <div className="mt-1 text-xs text-sidebar-foreground/60">{message('workspace')}</div>
               </div>
             </div>
           </div>
           <ShellNavigation
             items={navigationItems}
-            label="Live navigatsiya"
+            label={message('navigation.desktop')}
             collapsed={collapsed}
             className={collapsed ? undefined : 'min-h-0 flex-1 overflow-y-auto'}
           />
@@ -95,15 +97,14 @@ export function LiveShellLayout({
         <SheetHeader className="relative border-b border-sidebar-border px-5 py-5 text-left">
           <SheetTitle className="text-sidebar-foreground">QRHub Merchant</SheetTitle>
           <SheetDescription className="text-sidebar-foreground/70">
-            Merchant workspace navigatsiyasi
-          </SheetDescription>
+            {message('navigation.description')}</SheetDescription>
           <SheetClose asChild>
             <Button
               type="button"
               variant="ghost"
               size="icon"
               className="absolute right-3 top-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              aria-label="Navigatsiyani yopish"
+              aria-label={message('navigation.close')}
             >
               <XIcon aria-hidden="true" />
             </Button>
@@ -112,7 +113,7 @@ export function LiveShellLayout({
         <div className="min-h-0 flex-1 overflow-y-auto">
           <ShellNavigation
             items={navigationItems}
-            label="Mobil navigatsiya"
+            label={message('navigation.mobile')}
             onNavigate={() => dispatch({ type: 'route-selected' })}
           />
         </div>

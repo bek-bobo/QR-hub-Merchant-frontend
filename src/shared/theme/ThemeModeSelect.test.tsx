@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { ThemeContext } from './ThemeContext'
 import { ThemeModeSelect } from './ThemeModeSelect'
@@ -24,7 +24,7 @@ describe('ThemeModeSelect', () => {
       expect(html).toContain('role="combobox"')
       expect(html).toContain('data-slot="select"')
       expect(html).toContain('data-size="compact"')
-      expect(html).toContain(`>${{ light: 'Light', dark: 'Dark', system: 'System' }[mode]}</span>`)
+      expect(html).toContain(`>${{ light: 'Yorug‘', dark: 'Tungi', system: 'Tizim' }[mode]}</span>`)
     },
   )
 

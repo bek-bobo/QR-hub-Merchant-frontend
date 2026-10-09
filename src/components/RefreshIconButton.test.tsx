@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import type { ComponentProps, ReactElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,7 @@ describe('RefreshIconButton', () => {
     expect(html).toContain('Yangilangan:')
     expect(html).toContain('14:49:07')
 
-    const tree = RefreshIconButton({ updatedTime: '14:49:07', onClick }) as ReactElement<{
+    const tree = captureWithLocale(() => RefreshIconButton({ updatedTime: '14:49:07', onClick })) as ReactElement<{
       children: readonly ReactElement<ComponentProps<typeof Button>>[]
     }>
     tree.props.children[0]?.props.onClick?.({} as never)

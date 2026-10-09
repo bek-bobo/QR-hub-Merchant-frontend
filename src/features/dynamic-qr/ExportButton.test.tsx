@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { ReadRuntimeContext, type ReadRuntimeContextValue } from '@/app/read/useReadRuntime'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import type { ReadScope } from '@/shared/contracts/merchant-read'

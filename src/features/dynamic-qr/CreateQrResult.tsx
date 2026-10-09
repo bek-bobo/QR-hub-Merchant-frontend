@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { Button } from '@/components/ui/button'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import { formatMoney } from '@/shared/money/minor'
@@ -5,6 +6,7 @@ import { copyExactCreateLink, type CreateResultModel } from './create-result'
 import { QrPresentation } from './QrPresentation'
 import { QrDisplayHeader } from './QrDisplayShell'
 import { writeQrClipboardText } from './qr-presentation'
+import { describeQrActionFeedback } from './feedback'
 
 interface CreateQrResultProps {
   readonly result: CreateResultModel
@@ -21,6 +23,7 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
 }
 
 export function CreateQrResult({ result, currentScope, canCreate, onClose, onNewIntent, showHeading = true }: CreateQrResultProps) {
+  const p = useDynamicQrPresentation()
   if (!sameScope(result.scope, currentScope()) || !canCreate()) return null
 
   async function copyLink() {
@@ -38,28 +41,28 @@ export function CreateQrResult({ result, currentScope, canCreate, onClose, onNew
         terminalName={result.terminalName}
         amountLabel={formatMoney({ minorUnits: result.amountMinor, currency: result.currencyCode, scale: 2 })}
         link={result.link}
-        unavailableMessage="QR yaratildi, lekin havolani xavfsiz ko‘rsatib bo‘lmadi."
+        unavailableMessage={p.message('create.linkUnavailable')}
         onCopy={copyLink}
         footer={<>
-          {showHeading ? <Button type="button" variant="outline" onClick={onClose}>Yopish</Button> : null}
-          <Button type="button" onClick={onNewIntent}>Yangi QR</Button>
+          {showHeading ? <Button type="button" variant="outline" onClick={onClose}>{p.common('actions.close')}</Button> : null}
+          <Button type="button" onClick={onNewIntent}>{p.message('actions.new')}</Button>
         </>}
       />
     </> : result.kind === 'unknown' ? <>
       <div className="rounded-xl border bg-muted/40 p-4">
-        {showHeading ? <h3 className="text-lg font-semibold">Natija tasdiqlanmadi</h3> : null}
-        <p className="mt-2 text-sm">Qayta yuborishdan oldin holatni tekshiring.</p>
-        <p className="mt-1 text-sm text-text-secondary">Yangi urinish alohida QR yaratishi mumkin.</p>
+        {showHeading ? <h3 className="text-lg font-semibold">{p.message('create.unknown')}</h3> : null}
+        <p className="mt-2 text-sm">{p.message('create.checkFirst')}</p>
+        <p className="mt-1 text-sm text-text-secondary">{p.message('create.newRisk')}</p>
       </div>
     </> : <>
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
-        {showHeading ? <h3 className="text-lg font-semibold">QR yaratilmadi</h3> : null}
-        <p className="mt-2 text-sm">{result.reason}</p>
+        {showHeading ? <h3 className="text-lg font-semibold">{p.message('create.failed')}</h3> : null}
+        <p className="mt-2 text-sm">{result.kind === 'rejected' ? p.message('feedback.createRejected') : p.feedback(describeQrActionFeedback(result.reason))}</p>
       </div>
     </>}
     {result.kind !== 'confirmed' ? <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">
-      <Button type="button" variant="outline" onClick={onClose}>Yopish</Button>
-      <Button type="button" variant="secondary" onClick={onNewIntent}>Yangi QR</Button>
+      <Button type="button" variant="outline" onClick={onClose}>{p.common('actions.close')}</Button>
+      <Button type="button" variant="secondary" onClick={onNewIntent}>{p.message('actions.new')}</Button>
     </div> : null}
   </section>
 }

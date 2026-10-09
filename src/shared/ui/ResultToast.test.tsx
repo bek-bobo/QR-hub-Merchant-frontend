@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { afterEach, beforeEach, expect, it } from 'vitest'
 import { ResultToast } from './ResultToast'
 

@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
@@ -25,7 +26,7 @@ import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumn
 import { DynamicQrAdvancedFilterFields } from './DynamicQrAdvancedFilterFields'
 import { DynamicQrQuickFilters } from './DynamicQrQuickFilters'
 import { DynamicQrTable } from './DynamicQrTable'
-import { dynamicQrColumns } from './columns'
+import { createDynamicQrColumns } from './columns'
 import { ExportButton } from './ExportButton'
 import { CreateQrDialog } from './CreateQrDialog'
 import { QrDisplayDialog } from './QrDisplayDialog'
@@ -66,10 +67,11 @@ function initialFiltersFromState(
 }
 
 function ListSkeleton() {
+  const p = useDynamicQrPresentation()
   return (
     <div
       role="status"
-      aria-label="Dinamik QR ro‘yxati yuklanmoqda"
+      aria-label={p.message('page.loading')}
       className="space-y-3"
     >
       {Array.from({ length: 6 }, (_, index) => (
@@ -137,12 +139,14 @@ export function DynamicQrPage({
   initialState,
   initialInstant,
 }: DynamicQrPageProps) {
+  const p = useDynamicQrPresentation()
+  const dynamicQrColumns = createDynamicQrColumns(p)
   const access = useAccessContext()
   const [initialFilters] = useState(() =>
     initialFiltersFromState(initialState, initialInstant ?? new Date()),
   )
   const [advancedDraft, setAdvancedDraft] = useState<DynamicQrAdvancedFilterDraft>(() => advancedDraftFromFilters(initialFilters))
-  const [filterMessage, setFilterMessage] = useState<string | null>(null)
+  const [filterMessage, setFilterMessage] = useState<'invalid' | null>(null)
   const [dateDraft, setDateDraft] = useState(() => ({
     fromDate: initialFilters.fromDate,
     toDate: initialFilters.toDate,
@@ -170,7 +174,7 @@ export function DynamicQrPage({
       setFilterMessage(null)
       return true
     } catch {
-      setFilterMessage('Tanlangan filtrlarni tasdiqlab bo‘lmadi.')
+      setFilterMessage('invalid')
       return false
     }
   }
@@ -222,8 +226,8 @@ export function DynamicQrPage({
       >
         <DynamicQrAdvancedFilterFields {...advancedFilterFieldProps(lookups, advancedDraft, setAdvancedDraft)} />
         {lookups.merchants.isError || lookups.draftBanks.isError || lookups.draftTerminals.isError
-          ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>Qayta urinish</Button> : null}
-        {filterMessage ? <p role="alert" className="text-sm text-destructive">{filterMessage}</p> : null}
+          ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>{p.common('actions.retry')}</Button> : null}
+        {filterMessage ? <p role="alert" className="text-sm text-destructive">{p.message('filters.invalid')}</p> : null}
       </FilterDrawer>
     )
   }
@@ -234,7 +238,7 @@ export function DynamicQrPage({
         <DynamicQrQuickFilters
           range={dateDraft}
           searchDraft={searchDraft}
-          searchPlaceholder="Terminal nomi bo‘yicha qidirish"
+          searchPlaceholder={p.message('filters.search')}
           onRangeDraftChange={setDateDraft}
           onRangeApply={applyQuickDateRange}
           onRangeReset={restoreQuickDateRange}
@@ -254,12 +258,11 @@ export function DynamicQrPage({
         {can(access, 'dynamicQr.create', false) ? (
           <Button type="button" size="sm" className="h-10 gap-2 rounded-xl px-4 text-sm" onClick={() => setCreateOpen(true)}>
             <PlusIcon className="size-4" aria-hidden="true" />
-            Yangi QR
-          </Button>
+            {p.message('actions.new')}</Button>
         ) : null}
         <div className="flex min-w-0 items-center gap-2">
           <TableColumnPreferences
-            tableLabel="Dinamik QR"
+            tableLabel={p.message('page.name')}
             items={dynamicQrColumns}
             order={columnPreferences.order}
             hidden={columnPreferences.hidden}
@@ -274,7 +277,7 @@ export function DynamicQrPage({
           />
           <RefreshIconButton
             className="size-10 rounded-xl bg-muted/30"
-            updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+            updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, {locale: p.intlLocale, timeZone: 'Asia/Tashkent'}) : '—'}
             disabled={!enabled.list || list.isFetching}
             loading={list.isFetching}
             onClick={() => {
@@ -290,15 +293,15 @@ export function DynamicQrPage({
   if (runtime.readiness.dynamicQr.kind === 'unavailable') {
     return (
       <ErrorState
-        title="Dinamik QR integratsiyasi sozlanmagan"
-        description={runtime.readiness.dynamicQr.reason}
+        title={p.message('page.integration')}
+        description={p.common('states.unavailable')}
       />
     )
   }
 
   if (!runtime.capabilities.dynamicQr) {
     return (
-      <NoAccessState description="Dinamik QR ro‘yxatini ko‘rish huquqi mavjud emas." />
+      <NoAccessState description={p.message('page.noAccess')} />
     )
   }
 
@@ -306,9 +309,9 @@ export function DynamicQrPage({
     list.data && list.data.page > 0 && list.data.content.length === 0,
   )
   const statsHelper = !statsFeatureEnabled
-    ? 'Statistika hozircha mavjud emas'
+    ? p.message('stats.unavailable')
     : enabled.stats && stats.isError
-      ? 'Jami summa va xizmat haqini yuklab bo‘lmadi.'
+      ? p.message('stats.failed')
       : null
 
   return (
@@ -325,14 +328,14 @@ export function DynamicQrPage({
       }} />
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         <SummaryCard
-          title="Jami summa"
+          title={p.message('stats.total')}
           icon={CreditCardIcon}
           tone="brand"
           value={enabled.stats && stats.data ? formatMoney(stats.data.totalAmount) : '—'}
           helper={statsHelper}
         />
         <SummaryCard
-          title="Xizmat haqi"
+          title={p.message('stats.fee')}
           icon={PercentIcon}
           tone="neutral"
           value={enabled.stats && stats.data ? formatMoney(stats.data.totalServiceFeeAmount) : '—'}
@@ -344,7 +347,7 @@ export function DynamicQrPage({
         <Card className={listCardClassName}>
           <CardContent className="space-y-4 text-sm text-text-secondary">
             {renderQuickFilters()}
-            <p>Tanlangan filtrlar tekshirilmoqda.</p>
+            <p>{p.message('filters.checking')}</p>
           </CardContent>
         </Card>
       ) : filterState === 'invalid' ? (
@@ -353,13 +356,11 @@ export function DynamicQrPage({
             {renderQuickFilters()}
             <div>
               <p className="font-medium text-text-primary">
-                Tanlangan filtr endi mavjud emas
-              </p>
+                {p.message('filters.unavailable')}</p>
               <p className="mt-1 text-sm text-text-secondary">
-                Xavfsizlik sababli so‘rov barcha terminallarga avtomatik kengaytirilmadi.
-              </p>
+                {p.message('filters.noExpansion')}</p>
             </div>
-            <Button type="button" onClick={clearFilters}>Filtrni tozalash</Button>
+            <Button type="button" onClick={clearFilters}>{p.message('filters.clear')}</Button>
           </CardContent>
         </Card>
       ) : (
@@ -372,11 +373,11 @@ export function DynamicQrPage({
               <ErrorState onRetry={() => void list.refetch()} />
             ) : emptyHighPage ? (
               <EmptyState
-                title="Bu sahifada ma’lumot qolmadi"
-                description="Natijalar o‘zgargan bo‘lishi mumkin. Birinchi sahifaga qayting."
+                title={p.message('page.emptyHigh')}
+                description={p.message('page.firstHelp')}
               />
             ) : list.data && list.data.content.length === 0 ? (
-              <EmptyState description="Qo‘llangan filtrlar bo‘yicha ma’lumot topilmadi." />
+              <EmptyState description={p.message('page.empty')} />
             ) : list.data ? (
               <DynamicQrTable
                 rows={list.data.content}
@@ -389,17 +390,16 @@ export function DynamicQrPage({
 
             {emptyHighPage ? (
               <Button type="button" onClick={() => goToPage(0)}>
-                Birinchi sahifaga qaytish
-              </Button>
+                {p.message('page.first')}</Button>
             ) : null}
             {list.isRefetchError && list.data ? (
-              <p role="alert" className="text-sm text-destructive">Yangilanmadi</p>
+              <p role="alert" className="text-sm text-destructive">{p.message('page.stale')}</p>
             ) : null}
             {list.data ? (
-              <PaginationBar ariaLabel="Dinamik QR sahifalari"
+              <PaginationBar ariaLabel={p.message('page.pages')}
                 currentPage={list.data.page} totalPages={list.data.totalPages}
                 totalItems={list.data.totalElements}
-                totalLabel={`Jami ${list.data.totalElements.toLocaleString('uz-UZ')} ta QR`}
+                totalLabel={p.message('page.total', {countText: p.number(list.data.totalElements)})}
                 className="dynamic-qr-pagination border-0 pt-2"
                 onPageChange={goToPage} pageSize={list.data.size}
                 onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))} />

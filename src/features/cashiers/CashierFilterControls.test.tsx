@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { captureWithLocale, renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import type { CashierListFilters } from '@/shared/contracts/management-filters'
 import { CashierAdvancedFilterFields, CashierQuickSearch } from './CashierFilterControls'
@@ -28,7 +28,7 @@ describe('Cashier inline quick search', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
     const onApply = vi.fn((search: string) => { applied = applyCashierQuickSearch(applied, search) })
-    const render = () => CashierQuickSearch({ searchDraft, onDraftChange, onApply })
+    const render = () => captureWithLocale(() => CashierQuickSearch({ searchDraft, onDraftChange, onApply }))
     render().props.children[1].props.onChange({ target: { value: '  Cashier A  ' } })
     expect(onApply).not.toHaveBeenCalled()
     expect(applied.search).toBe('old')

@@ -1,3 +1,5 @@
+import type { MessageCatalog } from '@/shared/i18n/generated'
+import type { createMessages } from '@/shared/i18n/messages'
 import {
   LandmarkIcon,
   LayoutDashboardIcon,
@@ -17,7 +19,7 @@ import {
 } from '@/shared/auth/access'
 
 export interface NavigationItem {
-  label: string
+  labelKey: Extract<keyof MessageCatalog['shell'], `navigation.${string}`>
   path: string
   icon: LucideIcon
   capability: Capability
@@ -26,49 +28,49 @@ export interface NavigationItem {
 
 export const navigationItems = [
   {
-    label: 'Bosh sahifa',
+    labelKey: 'navigation.home',
     path: '/dashboard',
     icon: LayoutDashboardIcon,
     capability: 'dashboard.read',
     availability: 'ready',
   },
   {
-    label: 'Dinamik QR',
+    labelKey: 'navigation.dynamicQrPreview',
     path: '/dynamic-qrs',
     icon: ScanLineIcon,
     capability: 'dynamicQr.read',
     availability: 'scheduled',
   },
   {
-    label: 'Statik QR',
+    labelKey: 'navigation.staticQrPreview',
     path: '/static-qrs',
     icon: QrCodeIcon,
     capability: 'staticQr.read',
     availability: 'scheduled',
   },
   {
-    label: 'Terminallar',
+    labelKey: 'navigation.terminals',
     path: '/terminals',
     icon: MonitorIcon,
     capability: 'terminal.read',
     availability: 'scheduled',
   },
   {
-    label: 'Bank hisoblari',
+    labelKey: 'navigation.bankAccounts',
     path: '/bank-accounts',
     icon: LandmarkIcon,
     capability: 'bankAccount.read',
     availability: 'scheduled',
   },
   {
-    label: 'Kassirlar',
+    labelKey: 'navigation.cashiers',
     path: '/cashiers',
     icon: UsersIcon,
     capability: 'cashier.read',
     availability: 'scheduled',
   },
   {
-    label: 'P5 qurilmalari',
+    labelKey: 'navigation.devices',
     path: '/devices',
     icon: SmartphoneIcon,
     capability: 'p5.read',
@@ -82,7 +84,7 @@ interface LiveNavigationItem extends NavigationItem {
 
 export const liveNavigationItems = [
   {
-    label: 'Dashboard',
+    labelKey: 'navigation.dashboard',
     path: '/dashboard',
     icon: LayoutDashboardIcon,
     capability: 'dashboard.read',
@@ -90,7 +92,7 @@ export const liveNavigationItems = [
     registration: 'dashboard',
   },
   {
-    label: 'Dinamik QRlar',
+    labelKey: 'navigation.dynamicQr',
     path: '/dynamic-qrs',
     icon: ScanLineIcon,
     capability: 'dynamicQr.read',
@@ -98,22 +100,22 @@ export const liveNavigationItems = [
     registration: 'dynamicQr',
   },
   {
-    label: 'Statik QRlar', path: '/static-qrs', icon: QrCodeIcon, capability: 'staticQr.read', availability: 'ready', registration: 'dynamicQr',
+    labelKey: 'navigation.staticQr', path: '/static-qrs', icon: QrCodeIcon, capability: 'staticQr.read', availability: 'ready', registration: 'dynamicQr',
   },
   {
-    label: 'Terminallar', path: '/terminals', icon: MonitorIcon, capability: 'terminal.read', availability: 'ready', registration: 'terminalList',
+    labelKey: 'navigation.terminals', path: '/terminals', icon: MonitorIcon, capability: 'terminal.read', availability: 'ready', registration: 'terminalList',
   },
   {
-    label: 'Bank hisoblari', path: '/bank-accounts', icon: LandmarkIcon, capability: 'bankAccount.read', availability: 'ready', registration: 'bankAccountList',
+    labelKey: 'navigation.bankAccounts', path: '/bank-accounts', icon: LandmarkIcon, capability: 'bankAccount.read', availability: 'ready', registration: 'bankAccountList',
   },
   {
-    label: 'Kassirlar', path: '/cashiers', icon: UsersIcon, capability: 'cashier.read', availability: 'ready', registration: 'cashierList',
+    labelKey: 'navigation.cashiers', path: '/cashiers', icon: UsersIcon, capability: 'cashier.read', availability: 'ready', registration: 'cashierList',
   },
   {
-    label: 'P5 qurilmalari', path: '/devices', icon: SmartphoneIcon, capability: 'p5.read', availability: 'ready', registration: 'p5List',
+    labelKey: 'navigation.devices', path: '/devices', icon: SmartphoneIcon, capability: 'p5.read', availability: 'ready', registration: 'p5List',
   },
   {
-    label: 'Hisob',
+    labelKey: 'navigation.account',
     path: '/account',
     icon: UserRoundIcon,
     capability: 'profile.read',
@@ -140,4 +142,8 @@ export function getVisibleLiveNavigationItems(
   return getLiveNavigationItems(access, registrations).filter(
     (item) => item.path !== '/account',
   )
+}
+
+export function presentNavigationItems(items: readonly NavigationItem[], messages: ReturnType<typeof createMessages<'shell'>>) {
+  return items.map((item) => ({ ...item, label: messages.message(item.labelKey) }))
 }

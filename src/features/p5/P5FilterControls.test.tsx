@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup, captureWithLocale } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { P5AdvancedFilterFields, P5QuickSearch } from './P5FilterControls'
 import { createP5AdvancedDraft } from './page-state'
@@ -17,7 +17,7 @@ describe('P5 quick search', () => {
   it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
-    const render = () => P5QuickSearch({ searchDraft, onDraftChange })
+    const render = () => captureWithLocale(() => P5QuickSearch({ searchDraft, onDraftChange }))
     render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
     expect(searchDraft).toBe('  AbC!  ')
     expect(onDraftChange).toHaveBeenCalledTimes(1)

@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Button } from '@/components/ui/button'
 import { CanonicalLinkCard } from './CanonicalLinkCard'

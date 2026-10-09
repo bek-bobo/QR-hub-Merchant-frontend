@@ -1,0 +1,17 @@
+
+> qrhub-merchant-frontend@0.0.0 test
+> vitest run
+
+
+ RUN  v5.0.0 D:/QR projects/qrhub-merchant-frontend
+
+
+ Test Files  228 passed (228)
+      Tests  2133 passed (2133)
+   Start at  17:38:50
+   Duration  66.02s (import 42%, tests 36%, transform 11%, environment 10%, worker 1%)
+
+     Import  1273 modules were evaluated 4127 times · 214.40s total, 42% of tracked time
+             ~5.83s faster with isolate: false — shared modules are evaluated once per worker instead of once per file
+             learn more: https://vitest.dev/guide/improving-performance#test-isolation
+

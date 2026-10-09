@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { ErrorState, NoAccessState } from '@/shared/ui/AsyncState'
 import { PageHeader } from '@/shared/ui/PageHeader'
 
@@ -12,11 +13,12 @@ export function LiveRouteStatus({
   title,
   description,
 }: LiveRouteStatusProps) {
+  const { message } = useMessages('shell')
   return (
     <div className="mx-auto max-w-2xl space-y-4">
       <PageHeader title={title} />
       {kind === 'unavailable' ? (
-        <ErrorState title="Funksiya mavjud emas" description={description} />
+        <ErrorState title={message('routes.unavailable')} description={description} />
       ) : (
         <NoAccessState description={description} />
       )}

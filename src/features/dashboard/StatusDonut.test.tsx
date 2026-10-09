@@ -1,5 +1,8 @@
+import { createDashboardPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
+const presentation = createDashboardPresentation('uz', localeMessages('dashboard'))
 import { dashboardZero } from './test-fixtures'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
 import { StatusDonut } from './StatusDonut'
@@ -50,15 +53,15 @@ describe('StatusDonut', () => {
     const data = viewWith([1, 1, 2])
     const original = JSON.stringify(data)
     const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, true)
-    const config = createDonutPlotConfig(data, theme)
-    expect(donutPlotData(data).map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 2]])
-    expect(donutPlotData(data).map(({ exactAmount }) => exactAmount)).toEqual(['100.00 UZS', '100.00 UZS', '200.00 UZS'])
-    expect(config).toMatchObject({ angleField: 'value', colorField: 'type', innerRadius: 0.72, legend: false, label: false, theme: 'classicDark', autoFit: true })
+    const config = createDonutPlotConfig(presentation, data, theme)
+    expect(donutPlotData(presentation, data).map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 2]])
+    expect(donutPlotData(presentation, data).map(({ exactAmount }) => exactAmount)).toEqual(['100.00 UZS', '100.00 UZS', '200.00 UZS'])
+    expect(config).toMatchObject({ angleField: 'value', colorField: 'key', innerRadius: 0.72, legend: false, label: false, theme: 'classicDark', autoFit: true })
     expect(config.scale).toMatchObject({ color: { range: ['--status-success-indicator', '--status-warning-indicator', '--status-error-indicator'] } })
     expect(config.tooltip).toMatchObject({ items: [{ field: 'exactCount', name: 'Soni' }, { field: 'exactAmount', name: 'Summa' }] })
     expect(JSON.stringify(data)).toBe(original)
-    expect(donutPlotData({ ...data, metrics: { ...data.metrics, total: metric(100, '1000000') } })).toEqual([])
-    expect(donutPlotData(viewWith([0, 0, 0]))).toEqual([])
+    expect(donutPlotData(presentation, { ...data, metrics: { ...data.metrics, total: metric(100, '1000000') } })).toEqual([])
+    expect(donutPlotData(presentation, viewWith([0, 0, 0]))).toEqual([])
   })
   it('renders the authoritative status distribution as an accessible donut and legend', () => {
     const html = renderToStaticMarkup(<StatusDonut {...viewWith([1, 1, 2])} />)
@@ -184,14 +187,14 @@ describe('Uncategorized distribution', () => {
     const data = { metrics: { ...base.metrics, total: metric(4, '40000'), uncategorized: unknown },
       pie: { success: { ...base.pie.success, percent: 25.01 }, processing: { ...base.pie.processing, percent: 25.01 },
         failed: { ...base.pie.failed, percent: 25.01 }, uncategorized: unknown } }
-    const chart = donutPlotData(data)
+    const chart = donutPlotData(presentation, data)
     expect(chart.map(({ key, value }) => [key, value])).toEqual([['success', 1], ['processing', 1], ['failed', 1], ['uncategorized', 1]])
     const html = renderToStaticMarkup(<StatusDonut {...data} />)
     expect(html).toContain('Tasniflanmagan: 25,01%')
     expect(html).toContain('Jarayonda: 25,01%')
     expect(html).not.toContain('mos kelmaydi')
     const theme = readMerchantPlotTheme({ fontFamily: 'Inter', getPropertyValue: (name) => name }, false)
-    expect(createDonutPlotConfig(data, theme).scale?.color).toMatchObject({ range: [...theme.colors.slice(1), theme.secondary] })
+    expect(createDonutPlotConfig(presentation, data, theme).scale?.color).toMatchObject({ range: [...theme.colors.slice(1), theme.secondary] })
   })
 })
 

@@ -1,0 +1,19 @@
+{
+  "title": "Account information",
+  "profile": {
+    "fullName": "Full name",
+    "phone": "Phone",
+    "missing": "Not provided"
+  },
+  "actions": {
+    "refresh": "Refresh information"
+  },
+  "states": {
+    "refreshing": "Refreshing…"
+  },
+  "feedback": {
+    "changed": "Information updated.",
+    "unchanged": "Information is unchanged.",
+    "failed": "Unable to refresh information."
+  }
+}

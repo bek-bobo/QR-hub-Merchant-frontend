@@ -1,3 +1,4 @@
+import type { ProfileRefreshFeedback, LogoutFeedback } from './feedback'
 import { createContext, useContext } from 'react'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { Profile } from '@/shared/auth/model'
@@ -35,8 +36,8 @@ export interface AuthContextValue {
   readonly loginSnapshot: LoginSnapshot
   readonly pending: AuthPendingState
   readonly unavailable: boolean
-  readonly profileRefreshMessage: string | null
-  readonly logoutMessage: string | null
+  readonly profileRefreshMessage: ProfileRefreshFeedback | null
+  readonly logoutMessage: LogoutFeedback | null
   readonly actions: AuthActions
 }
 

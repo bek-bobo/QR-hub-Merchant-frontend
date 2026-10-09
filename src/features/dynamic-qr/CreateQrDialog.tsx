@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useCallback, useState } from 'react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { QrCodeIcon, XIcon } from 'lucide-react'
@@ -13,6 +14,7 @@ interface CreateQrDialogProps {
 }
 
 export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
+  const p = useDynamicQrPresentation()
   const [pending, setPending] = useState(false)
   const [resultKind, setResultKind] = useState<CreateResultModel['kind'] | null>(null)
   const changeOpen = useCallback((next: boolean) => {
@@ -42,13 +44,13 @@ export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
             </span>
             <div className="min-w-0">
               <DialogPrimitive.Title className="text-xl font-semibold tracking-tight text-text-primary sm:text-[28px] sm:leading-9">
-                {resultKind === 'unknown' ? 'Natija tasdiqlanmadi'
-                  : resultKind ? 'QR yaratilmadi' : 'Dinamik QR yaratish'}
+                {resultKind === 'unknown' ? p.message('create.unknown')
+                  : resultKind ? p.message('create.failed') : p.message('create.title')}
               </DialogPrimitive.Title>
               <DialogPrimitive.Description className="mt-1 text-sm leading-relaxed text-text-secondary sm:text-lg">
                 {resultKind
-                  ? 'Natija tafsilotlarini ko‘rib chiqing va keyingi amalni tanlang.'
-                  : 'Terminalni tanlang va summani UZSda kiriting.'}
+                  ? p.message('create.resultHelp')
+                  : p.message('create.dialogHelp')}
               </DialogPrimitive.Description>
             </div>
           </div>
@@ -57,7 +59,7 @@ export function CreateQrDialog({ open, onOpenChange }: CreateQrDialogProps) {
           <Button type="button" variant={resultKind === 'confirmed' ? 'outline' : 'ghost'}
             size="icon"
             className={resultKind === 'confirmed' ? 'absolute right-5 top-5 sm:right-7 sm:top-7 md:right-5 md:top-5' : 'absolute right-4 top-5 size-10 rounded-full bg-muted/80 text-text-primary hover:bg-muted sm:right-7 sm:top-8 sm:size-11'}
-            disabled={pending} aria-label="Yopish">
+            disabled={pending} aria-label={p.common('actions.close')}>
             <XIcon aria-hidden="true" />
           </Button>
         </DialogPrimitive.Close>

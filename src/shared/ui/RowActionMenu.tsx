@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import type { ComponentProps, ReactNode, Ref } from 'react'
 import { DropdownMenu as Menu } from 'radix-ui'
 import { MoreHorizontalIcon, type LucideIcon } from 'lucide-react'
@@ -11,12 +12,13 @@ interface RowActionMenuProps {
   readonly contentProps?: Omit<ComponentProps<typeof Menu.Content>, 'children'>
 }
 
-export function RowActionMenu({ children, label = 'Amallarni ochish', triggerRef, contentProps }: RowActionMenuProps) {
+export function RowActionMenu({ children, label, triggerRef, contentProps }: RowActionMenuProps) {
+  const { message } = useMessages('common')
   return <Menu.Root>
     <Menu.Trigger asChild>
       <Button ref={triggerRef} type="button" variant="outline" size="icon-sm"
         className="size-10 rounded-xl border-border/70 bg-muted/30 text-text-secondary hover:border-brand/25 hover:bg-brand-soft hover:text-brand focus-visible:ring-ring data-[state=open]:border-brand/25 data-[state=open]:bg-brand-soft data-[state=open]:text-brand"
-        aria-label={label}>
+        aria-label={label ?? message('actions.openMenu')}>
         <MoreHorizontalIcon className="size-4" aria-hidden="true" />
       </Button>
     </Menu.Trigger>

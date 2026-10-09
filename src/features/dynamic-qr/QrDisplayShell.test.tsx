@@ -1,6 +1,7 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactNode } from 'react'
 import { Dialog } from 'radix-ui'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { decodeDynamicQrPageResponse } from './contract'
 import { decodeStaticQrPage } from '@/features/static-qr/contract'
@@ -39,9 +40,9 @@ function countClosePrimitives(node: ReactNode): number {
 
 describe('standardized QR display dialogs', () => {
   it.each([
-    { kind: 'dynamic', dialog: QrDisplayDialog({ row: dynamic, onOpenChange: vi.fn() }),
+    { kind: 'dynamic', dialog: captureWithLocale(() => QrDisplayDialog({ row: dynamic, onOpenChange: vi.fn() })),
       id: dynamic.pkey, terminal: dynamic.terminalName, status: 'Muddati o‘tgan', tone: 'error' },
-    { kind: 'static', dialog: StaticQrDisplayDialog({ row: staticQr, onOpenChange: vi.fn() }),
+    { kind: 'static', dialog: captureWithLocale(() => StaticQrDisplayDialog({ row: staticQr, onOpenChange: vi.fn() })),
       id: staticQr.id, terminal: staticQr.terminalName, status: 'Faol', tone: 'success' },
   ])('shares the reference composition with actual $kind metadata and payload', ({ dialog, id, terminal, status, tone }) => {
     expect(dialog?.type).toBe(QrDisplayShell)
@@ -61,7 +62,7 @@ describe('standardized QR display dialogs', () => {
 
   it('delegates dismissal to Radix with only the X close control and the existing callback', () => {
     const onOpenChange = vi.fn()
-    const shell = QrDisplayShell({ children: <p>QR body</p>, onOpenChange })
+    const shell = captureWithLocale(() => QrDisplayShell({ children: <p>QR body</p>, onOpenChange }))
     expect(shell.type).toBe(Dialog.Root)
     expect(shell.props.open).toBe(true)
     expect(shell.props.onOpenChange).toBe(onOpenChange)
@@ -73,7 +74,7 @@ describe('standardized QR display dialogs', () => {
   it('does not fabricate amount metadata for Static QR or render closed rows', () => {
     const html = renderToStaticMarkup(<StaticQrDisplayDialog row={staticQr} onOpenChange={vi.fn()} />)
     expect(html).not.toContain('Summa')
-    expect(QrDisplayDialog({ row: null, onOpenChange: vi.fn() })).toBeNull()
-    expect(StaticQrDisplayDialog({ row: null, onOpenChange: vi.fn() })).toBeNull()
+    expect(captureWithLocale(() => QrDisplayDialog({ row: null, onOpenChange: vi.fn() }))).toBeNull()
+    expect(captureWithLocale(() => StaticQrDisplayDialog({ row: null, onOpenChange: vi.fn() }))).toBeNull()
   })
 })

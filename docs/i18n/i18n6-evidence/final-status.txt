@@ -1,0 +1,454 @@
+ M package-lock.json
+ M package.json
+ M src/app/AppRecoveryBoundary.tsx
+ M src/app/LiveRouteStatus.test.tsx
+ M src/app/LiveRouteStatus.tsx
+ M src/app/LiveRouter.lazy.test.tsx
+ M src/app/LiveRouter.recovery.test.tsx
+ M src/app/LiveRouter.tsx
+ M src/app/layout/AppShell.tsx
+ M src/app/layout/Header.profile-menu.test.tsx
+ M src/app/layout/Header.test.tsx
+ M src/app/layout/Header.tsx
+ M src/app/layout/LiveShellLayout.test.tsx
+ M src/app/layout/LiveShellLayout.tsx
+ M src/app/layout/ShellNavigation.test.tsx
+ M src/app/layout/Sidebar.tsx
+ M src/app/navigation.ts
+ M src/components/RefreshIconButton.test.tsx
+ M src/components/RefreshIconButton.tsx
+ M src/components/ui/select.test.tsx
+ M src/components/ui/sheet.tsx
+ M src/dev/auth/auth-preview-runtime.ts
+ M src/dev/auth/preview-device-lease.ts
+ M src/dev/day4/scenarios.test.tsx
+ M src/dev/day5/actions.test.tsx
+ M src/dev/day6/Day6AccountPreview.tsx
+ M src/features/account/AccountPage.test.tsx
+ M src/features/account/AccountPage.tsx
+ M src/features/auth/AuthPresentation.tsx
+ M src/features/auth/LoginForm.test.tsx
+ M src/features/auth/LoginForm.tsx
+ M src/features/auth/LoginPage.tsx
+ M src/features/bank-accounts/BankAccountFilterControls.test.tsx
+ M src/features/bank-accounts/BankAccountFilterControls.tsx
+ M src/features/bank-accounts/BankAccountPage.test.tsx
+ M src/features/bank-accounts/BankAccountPage.tsx
+ M src/features/bank-accounts/BankAccountResults.test.tsx
+ M src/features/bank-accounts/BankAccountResults.tsx
+ M src/features/bank-accounts/columns.test.ts
+ M src/features/bank-accounts/columns.tsx
+ M src/features/cashiers/AssignTerminalsPanel.lifecycle.test.tsx
+ M src/features/cashiers/AssignTerminalsPanel.tsx
+ M src/features/cashiers/CashierActionsMenu.test.tsx
+ M src/features/cashiers/CashierActionsMenu.tsx
+ M src/features/cashiers/CashierFilterControls.test.tsx
+ M src/features/cashiers/CashierFilterControls.tsx
+ M src/features/cashiers/CashierPage.filters.lifecycle.test.tsx
+ M src/features/cashiers/CashierPage.row-actions.test.tsx
+ M src/features/cashiers/CashierPage.test.tsx
+ M src/features/cashiers/CashierPage.tsx
+ M src/features/cashiers/CashierResults.test.tsx
+ M src/features/cashiers/CashierResults.tsx
+ M src/features/cashiers/CashierTerminalsDialog.test.tsx
+ M src/features/cashiers/CashierTerminalsDialog.tsx
+ M src/features/cashiers/CreateCashierContent.test.tsx
+ M src/features/cashiers/CreateCashierContent.tsx
+ M src/features/cashiers/CreateCashierDialog.test.tsx
+ M src/features/cashiers/CreateCashierDialog.tsx
+ M src/features/cashiers/CreateForms.lifecycle.test.tsx
+ M src/features/cashiers/UnassignTerminalPanel.lifecycle.test.tsx
+ M src/features/cashiers/UnassignTerminalPanel.tsx
+ M src/features/cashiers/columns.test.ts
+ M src/features/cashiers/columns.tsx
+ M src/features/dashboard/DashboardPageHeader.test.tsx
+ M src/features/dashboard/DashboardPageHeader.tsx
+ M src/features/dashboard/DashboardQuickDateFilter.tsx
+ M src/features/dashboard/DashboardReadPage.test.tsx
+ M src/features/dashboard/DashboardReadPage.tsx
+ M src/features/dashboard/DashboardRecentQrTable.tsx
+ M src/features/dashboard/DashboardTerminalFilter.tsx
+ M src/features/dashboard/GranularityControl.test.tsx
+ M src/features/dashboard/GranularityControl.tsx
+ M src/features/dashboard/MetricCards.test.tsx
+ M src/features/dashboard/MetricCards.tsx
+ M src/features/dashboard/MetricGrowthIndicator.tsx
+ M src/features/dashboard/PlotLoading.test.tsx
+ M src/features/dashboard/PlotViewportBoundary.tsx
+ M src/features/dashboard/StatusDonut.test.tsx
+ M src/features/dashboard/StatusDonut.tsx
+ M src/features/dashboard/TrendChart.test.tsx
+ M src/features/dashboard/TrendChart.tsx
+ M src/features/dashboard/TrendPlotViewport.lifecycle.test.tsx
+ M src/features/dashboard/TrendPlotViewport.test.tsx
+ M src/features/dashboard/TrendPlotViewport.tsx
+ M src/features/dashboard/TrendSeriesSettings.test.tsx
+ M src/features/dashboard/TrendSeriesSettings.tsx
+ M src/features/dashboard/contract.test.ts
+ M src/features/dashboard/coverage-presentation.test.ts
+ M src/features/dashboard/date-runtime-flow.test.tsx
+ M src/features/dashboard/donut-presentation.ts
+ M src/features/dashboard/filter-controls.test.tsx
+ M src/features/dashboard/filter-state.test.ts
+ M src/features/dashboard/filter-state.ts
+ M src/features/dashboard/plot-theme.test.ts
+ M src/features/dashboard/recent-qr-columns.tsx
+ M src/features/dashboard/recent-qr.test.tsx
+ M src/features/dashboard/trend-adaptor.test.ts
+ M src/features/dashboard/trend-presentation.test.ts
+ M src/features/dashboard/trend-presentation.ts
+ M src/features/dynamic-qr/BrandedQrPoster.tsx
+ M src/features/dynamic-qr/CancelQrConfirmation.test.tsx
+ M src/features/dynamic-qr/CancelQrConfirmation.tsx
+ M src/features/dynamic-qr/CanonicalLinkCard.tsx
+ M src/features/dynamic-qr/CreateQrContent.tsx
+ M src/features/dynamic-qr/CreateQrDialog.tsx
+ M src/features/dynamic-qr/CreateQrResult.tsx
+ M src/features/dynamic-qr/DateRangeQuickFilter.lifecycle.test.tsx
+ M src/features/dynamic-qr/DateRangeQuickFilter.test.tsx
+ M src/features/dynamic-qr/DateRangeQuickFilter.tsx
+ M src/features/dynamic-qr/DynamicQrActionsMenu.tsx
+ M src/features/dynamic-qr/DynamicQrAdvancedFilterFields.test.tsx
+ M src/features/dynamic-qr/DynamicQrAdvancedFilterFields.tsx
+ M src/features/dynamic-qr/DynamicQrDetailsSheet.test.tsx
+ M src/features/dynamic-qr/DynamicQrDetailsSheet.tsx
+ M src/features/dynamic-qr/DynamicQrPage.cancel.test.tsx
+ M src/features/dynamic-qr/DynamicQrPage.tsx
+ M src/features/dynamic-qr/DynamicQrQuickFilters.test.tsx
+ M src/features/dynamic-qr/DynamicQrQuickFilters.tsx
+ M src/features/dynamic-qr/DynamicQrTable.test.tsx
+ M src/features/dynamic-qr/DynamicQrTable.tsx
+ M src/features/dynamic-qr/ExportButton.feedback.test.tsx
+ M src/features/dynamic-qr/ExportButton.test.tsx
+ M src/features/dynamic-qr/ExportButton.tsx
+ M src/features/dynamic-qr/ExportQrPage.search.test.tsx
+ M src/features/dynamic-qr/ExportQrPage.test.tsx
+ M src/features/dynamic-qr/ExportQrPage.tsx
+ M src/features/dynamic-qr/PaymentQrCode.test.tsx
+ M src/features/dynamic-qr/PaymentQrCode.tsx
+ M src/features/dynamic-qr/QrCopyCards.test.tsx
+ M src/features/dynamic-qr/QrDetailsCard.tsx
+ M src/features/dynamic-qr/QrDisplayDialog.tsx
+ M src/features/dynamic-qr/QrDisplayShell.test.tsx
+ M src/features/dynamic-qr/QrDisplayShell.tsx
+ M src/features/dynamic-qr/QrPosterDownloads.test.tsx
+ M src/features/dynamic-qr/QrPosterDownloads.tsx
+ M src/features/dynamic-qr/QrPresentation.test.tsx
+ M src/features/dynamic-qr/QrPresentation.tsx
+ M src/features/dynamic-qr/columns.test.ts
+ M src/features/dynamic-qr/columns.tsx
+ M src/features/dynamic-qr/create-composition.test.tsx
+ M src/features/dynamic-qr/create-result.test.tsx
+ M src/features/dynamic-qr/filter-lookups.test.tsx
+ M src/features/p5/P5ActionsMenu.tsx
+ M src/features/p5/P5DetailsSheet.tsx
+ M src/features/p5/P5FilterControls.test.tsx
+ M src/features/p5/P5FilterControls.tsx
+ M src/features/p5/P5Page.lifecycle.test.tsx
+ M src/features/p5/P5Page.test.tsx
+ M src/features/p5/P5Page.tsx
+ M src/features/p5/P5QrDialog.tsx
+ M src/features/p5/P5ResetDialog.lifecycle.test.tsx
+ M src/features/p5/P5ResetDialog.test.tsx
+ M src/features/p5/P5ResetDialog.tsx
+ M src/features/p5/P5Results.test.tsx
+ M src/features/p5/P5Results.tsx
+ M src/features/p5/columns.test.ts
+ M src/features/p5/columns.tsx
+ M src/features/p5/row-actions-details.test.tsx
+ M src/features/static-qr/StaticQrActionsMenu.tsx
+ M src/features/static-qr/StaticQrDetailsSheet.test.tsx
+ M src/features/static-qr/StaticQrDetailsSheet.tsx
+ M src/features/static-qr/StaticQrDisplayDialog.tsx
+ M src/features/static-qr/StaticQrFilterControls.test.tsx
+ M src/features/static-qr/StaticQrFilterControls.tsx
+ M src/features/static-qr/StaticQrPage.test.tsx
+ M src/features/static-qr/StaticQrPage.tsx
+ M src/features/static-qr/StaticQrResults.test.tsx
+ M src/features/static-qr/StaticQrResults.tsx
+ M src/features/static-qr/StaticQrTable.test.tsx
+ M src/features/static-qr/StaticQrTable.tsx
+ M src/features/static-qr/columns.test.ts
+ M src/features/static-qr/columns.tsx
+ M src/features/static-qr/contract.test.ts
+ M src/features/static-qr/filter-lookups.test.tsx
+ M src/features/terminals/TerminalActionsMenu.test.tsx
+ M src/features/terminals/TerminalActionsMenu.tsx
+ M src/features/terminals/TerminalDetailsSheet.tsx
+ M src/features/terminals/TerminalFilterControls.test.tsx
+ M src/features/terminals/TerminalFilterControls.tsx
+ M src/features/terminals/TerminalPage.test.tsx
+ M src/features/terminals/TerminalPage.tsx
+ M src/features/terminals/TerminalQrDialog.tsx
+ M src/features/terminals/TerminalResults.test.tsx
+ M src/features/terminals/TerminalResults.tsx
+ M src/features/terminals/columns.test.ts
+ M src/features/terminals/columns.tsx
+ M src/features/terminals/filter-lookups.test.tsx
+ M src/features/terminals/row-actions-details.test.tsx
+ M src/main.tsx
+ M src/shared/auth/AuthProvider.tsx
+ M src/shared/auth/device-lease.ts
+ M src/shared/auth/login-controller.test.ts
+ M src/shared/auth/login-controller.ts
+ M src/shared/auth/logout-message.test.ts
+ M src/shared/auth/logout-message.ts
+ M src/shared/auth/session-controller.ts
+ M src/shared/auth/useAuth.ts
+ M src/shared/theme/ThemeModeSelect.test.tsx
+ M src/shared/theme/ThemeModeSelect.tsx
+ M src/shared/ui/AsyncState.tsx
+ M src/shared/ui/DetailsDialog.test.tsx
+ M src/shared/ui/DetailsDialog.tsx
+ M src/shared/ui/FilterDrawer.test.tsx
+ M src/shared/ui/FilterDrawer.tsx
+ M src/shared/ui/LookupFilterSelect.test.tsx
+ M src/shared/ui/LookupFilterSelect.tsx
+ M src/shared/ui/PaginationBar.test.tsx
+ M src/shared/ui/PaginationBar.tsx
+ M src/shared/ui/ResultToast.test.tsx
+ M src/shared/ui/ResultToast.tsx
+ M src/shared/ui/RowActionMenu.test.tsx
+ M src/shared/ui/RowActionMenu.tsx
+ M src/shared/ui/SystemPages.tsx
+ M src/shared/ui/TableColumnPreferences.test.tsx
+ M src/shared/ui/TableColumnPreferences.tsx
+ M src/shared/ui/UzbekPhoneInput.test.tsx
+ M src/shared/ui/UzbekPhoneInput.tsx
+ M src/shared/ui/filter-drawer-pages.lifecycle.test.tsx
+ M tsconfig.app.json
+?? .gitattributes
+?? docs/audit/I18N_ARCHITECTURE_AUDIT.md
+?? docs/audit/i18n-text-inventory.md
+?? docs/i18n/I18N_0_FOUNDATION_REPORT.md
+?? docs/i18n/I18N_1_SHARED_UI_REPORT.md
+?? docs/i18n/I18N_2_SHELL_AUTH_ACCOUNT_REPORT.md
+?? docs/i18n/I18N_3_DASHBOARD_REPORT.md
+?? docs/i18n/I18N_4_DYNAMIC_QR_REPORT.md
+?? docs/i18n/I18N_5_MANAGEMENT_REPORT.md
+?? docs/i18n/I18N_6_COMPLETENESS_REPORT.md
+?? docs/i18n/I18N_6_TRANSLATION_EXCEPTIONS.md
+?? docs/i18n/i18n6-evidence/baseline-hashes.json
+?? docs/i18n/i18n6-evidence/baseline-status.txt
+?? docs/i18n/i18n6-evidence/browser-measurements.json
+?? docs/i18n/i18n6-evidence/catalog-review.json
+?? docs/i18n/i18n6-evidence/desktop-en-login-light.jpg
+?? docs/i18n/i18n6-evidence/final-status.txt
+?? docs/i18n/i18n6-evidence/incremental-files.json
+?? docs/i18n/i18n6-evidence/mobile-en-dashboard-empty-dark.jpg
+?? docs/i18n/i18n6-evidence/mobile-ru-calendar-dark.jpg
+?? docs/i18n/i18n6-evidence/mobile-ru-login-dark.jpg
+?? docs/i18n/i18n6-evidence/mobile-ru-p5-reset-dark.jpg
+?? docs/i18n/i18n6-evidence/text-inventory.json
+?? docs/i18n/screenshots/I18N_1_desktop_ru.png
+?? docs/i18n/screenshots/I18N_1_desktop_ru_columns_keyboard.png
+?? docs/i18n/screenshots/I18N_1_mobile_en_details.png
+?? docs/i18n/screenshots/I18N_1_mobile_en_toast.png
+?? docs/i18n/screenshots/I18N_1_mobile_ru_columns.png
+?? docs/i18n/screenshots/I18N_1_mobile_ru_filters.png
+?? docs/i18n/screenshots/I18N_2_desktop_en_recovery.png
+?? docs/i18n/screenshots/I18N_2_desktop_ru_account.png
+?? docs/i18n/screenshots/I18N_2_desktop_ru_login.png
+?? docs/i18n/screenshots/I18N_2_mobile_en_login_keyboard.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_account.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_login.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_navigation.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_otp.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_profile_menu.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_recovery.png
+?? docs/i18n/screenshots/I18N_2_mobile_ru_set_pin.png
+?? docs/i18n/screenshots/I18N_3_desktop_en.png
+?? docs/i18n/screenshots/I18N_3_desktop_en_live_tooltip.png
+?? docs/i18n/screenshots/I18N_3_desktop_ru.png
+?? docs/i18n/screenshots/I18N_3_desktop_ru_calendar.png
+?? docs/i18n/screenshots/I18N_3_desktop_ru_dark.png
+?? docs/i18n/screenshots/I18N_3_desktop_ru_live_tooltip.png
+?? docs/i18n/screenshots/I18N_3_desktop_ru_tooltip.png
+?? docs/i18n/screenshots/I18N_3_desktop_uz.png
+?? docs/i18n/screenshots/I18N_3_mobile_en.png
+?? docs/i18n/screenshots/I18N_3_mobile_en_amount_tooltip.png
+?? docs/i18n/screenshots/I18N_3_mobile_en_dark.png
+?? docs/i18n/screenshots/I18N_3_mobile_en_donut.png
+?? docs/i18n/screenshots/I18N_3_mobile_en_recent.png
+?? docs/i18n/screenshots/I18N_3_mobile_ru.png
+?? docs/i18n/screenshots/I18N_3_mobile_ru_calendar.png
+?? docs/i18n/screenshots/I18N_3_mobile_ru_dark_tooltip.png
+?? docs/i18n/screenshots/I18N_3_mobile_uz.png
+?? docs/i18n/screenshots/I18N_4_desktop_en_create_draft.png
+?? docs/i18n/screenshots/I18N_4_desktop_en_dark.png
+?? docs/i18n/screenshots/I18N_4_desktop_ru_calendar.png
+?? docs/i18n/screenshots/I18N_4_desktop_ru_dark.png
+?? docs/i18n/screenshots/I18N_4_desktop_uz.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_cancel.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_create.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_details.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_filter_draft.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_menu.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_poster.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_result.png
+?? docs/i18n/screenshots/I18N_4_mobile_en_xlsx_feedback.png
+?? docs/i18n/screenshots/I18N_4_mobile_ru_calendar_dark.png
+?? docs/i18n/screenshots/I18N_4_mobile_ru_cancel.png
+?? docs/i18n/screenshots/I18N_4_mobile_ru_create.png
+?? docs/i18n/screenshots/I18N_4_mobile_ru_filters.png
+?? docs/i18n/screenshots/I18N_4_mobile_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_bankAccounts_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_bankAccounts_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_bankAccounts_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_cashiers_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_cashiers_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_cashiers_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_bankAccounts_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_bankAccounts_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_bankAccounts_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_cashiers_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_cashiers_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_cashiers_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_p5_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_p5_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_p5_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_staticQr_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_staticQr_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_staticQr_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_terminals_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_terminals_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_dark_terminals_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_p5_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_p5_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_p5_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_staticQr_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_staticQr_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_staticQr_uz.png
+?? docs/i18n/screenshots/I18N_5_desktop_terminals_en.png
+?? docs/i18n/screenshots/I18N_5_desktop_terminals_ru.png
+?? docs/i18n/screenshots/I18N_5_desktop_terminals_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_bankAccounts_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_bankAccounts_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_bankAccounts_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_cashiers_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_cashiers_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_cashiers_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_p5_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_p5_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_p5_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_staticQr_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_staticQr_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_staticQr_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_terminals_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_terminals_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_dark_terminals_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_bankAccounts_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_bankAccounts_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_bankAccounts_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_cashiers_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_cashiers_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_cashiers_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_p5_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_p5_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_p5_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_staticQr_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_staticQr_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_staticQr_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_terminals_en.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_terminals_ru.png
+?? docs/i18n/screenshots/I18N_5_mobile_light_terminals_uz.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_cashiers_filters.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_create_draft.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_p5_details.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_p5_filters.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_reset.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_staticQr_filters.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_static_details.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_static_poster.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_terminals_details.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_terminals_filters.png
+?? docs/i18n/screenshots/I18N_5_mobile_ru_unassign.png
+?? scripts/audit-i18n-catalogs.mjs
+?? scripts/check-i18n-boundary.mjs
+?? scripts/check-i18n-literals.mjs
+?? scripts/check-i18n-literals.test.mjs
+?? scripts/i18n-literal-exceptions.json
+?? scripts/i18n-release-check.mjs
+?? scripts/validate-locales.mjs
+?? src/app/i18n/bootstrap.test.tsx
+?? src/app/i18n/bootstrap.ts
+?? src/app/i18n6-hardening.test.tsx
+?? src/app/read/management.i18n.test.tsx
+?? src/app/shell-auth-account.i18n.test.tsx
+?? src/features/auth/feedback-presentation.ts
+?? src/features/bank-accounts/bank-accounts.i18n.test.tsx
+?? src/features/bank-accounts/presentation.ts
+?? src/features/cashiers/cashiers.i18n.test.tsx
+?? src/features/cashiers/feedback.ts
+?? src/features/cashiers/presentation.ts
+?? src/features/dashboard/dashboard.i18n.test.tsx
+?? src/features/dashboard/presentation.ts
+?? src/features/dynamic-qr/dynamic-qr.i18n.test.tsx
+?? src/features/dynamic-qr/dynamic-qr.locale-queries.test.tsx
+?? src/features/dynamic-qr/feedback.ts
+?? src/features/dynamic-qr/presentation.ts
+?? src/features/p5/p5.i18n.test.tsx
+?? src/features/p5/presentation.ts
+?? src/features/static-qr/presentation.ts
+?? src/features/static-qr/static-qr.i18n.test.tsx
+?? src/features/terminals/presentation.ts
+?? src/features/terminals/terminals.i18n.test.tsx
+?? src/locales/en/account.json
+?? src/locales/en/auth.json
+?? src/locales/en/bankAccounts.json
+?? src/locales/en/cashiers.json
+?? src/locales/en/common.json
+?? src/locales/en/dashboard.json
+?? src/locales/en/dynamicQr.json
+?? src/locales/en/p5.json
+?? src/locales/en/shell.json
+?? src/locales/en/staticQr.json
+?? src/locales/en/terminals.json
+?? src/locales/ru/account.json
+?? src/locales/ru/auth.json
+?? src/locales/ru/bankAccounts.json
+?? src/locales/ru/cashiers.json
+?? src/locales/ru/common.json
+?? src/locales/ru/dashboard.json
+?? src/locales/ru/dynamicQr.json
+?? src/locales/ru/p5.json
+?? src/locales/ru/shell.json
+?? src/locales/ru/staticQr.json
+?? src/locales/ru/terminals.json
+?? src/locales/uz/account.json
+?? src/locales/uz/auth.json
+?? src/locales/uz/bankAccounts.json
+?? src/locales/uz/cashiers.json
+?? src/locales/uz/common.json
+?? src/locales/uz/dashboard.json
+?? src/locales/uz/dynamicQr.json
+?? src/locales/uz/p5.json
+?? src/locales/uz/shell.json
+?? src/locales/uz/staticQr.json
+?? src/locales/uz/terminals.json
+?? src/shared/auth/feedback.ts
+?? src/shared/i18n/LocaleContext.ts
+?? src/shared/i18n/LocaleProvider.test.tsx
+?? src/shared/i18n/LocaleProvider.tsx
+?? src/shared/i18n/LocaleRecoveryNotice.tsx
+?? src/shared/i18n/LocaleSelect.tsx
+?? src/shared/i18n/catalog-validation.test.ts
+?? src/shared/i18n/emergency-copy.ts
+?? src/shared/i18n/generated.d.ts
+?? src/shared/i18n/languages.json
+?? src/shared/i18n/locale-resolution.test.ts
+?? src/shared/i18n/locale-resolution.ts
+?? src/shared/i18n/messages.ts
+?? src/shared/i18n/messages.typecheck.ts
+?? src/shared/i18n/metadata.generated.ts
+?? src/shared/i18n/namespaces.json
+?? src/shared/i18n/registry.ts
+?? src/shared/i18n/resources.ts
+?? src/shared/i18n/runtime.test.ts
+?? src/shared/i18n/runtime.ts
+?? src/shared/i18n/useLocale.ts
+?? src/shared/i18n/useMessages.ts
+?? src/shared/presentation/calendar.ts
+?? src/shared/ui/shared-ui.i18n.test.tsx
+?? src/test/locale-fixture.tsx
+?? src/test/management-i18n-fixture.tsx

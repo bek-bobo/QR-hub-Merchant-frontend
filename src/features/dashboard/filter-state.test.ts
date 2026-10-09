@@ -38,7 +38,7 @@ describe('Dashboard independent filter drafts', () => {
     const result = dashboardFilterReducer(drafted, { type: 'commit-dates', range })
     expect(result.applied).toBe(initial)
     expect(result.dateDraft).toEqual(range)
-    expect(result.validationMessage).toBe('Sana oralig‘ini to‘g‘ri kiriting.')
+    expect(result.validationMessage).toBe('invalidRange')
   })
 
   it('applies Terminal against applied dates while leaving an incomplete date draft untouched', () => {

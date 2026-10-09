@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { captureWithLocale, renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { TerminalAdvancedFilterFields, TerminalQuickSearch } from './TerminalFilterControls'
 
@@ -19,7 +19,7 @@ describe('Terminal inline quick search', () => {
   it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
-    const render = () => TerminalQuickSearch({ searchDraft, onDraftChange })
+    const render = () => captureWithLocale(() => TerminalQuickSearch({ searchDraft, onDraftChange }))
     render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
     expect(searchDraft).toBe('  AbC!  ')
     expect(onDraftChange).toHaveBeenCalledTimes(1)

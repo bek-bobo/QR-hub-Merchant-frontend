@@ -1,7 +1,9 @@
+import { createCashierPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
-import { CASHIER_DEFAULT_COLUMN_ORDER, cashierColumns } from './columns'
+import { CASHIER_DEFAULT_COLUMN_ORDER, createCashierColumns } from './columns'
 
 const expectedBusinessColumnIds = ['fullName', 'phone', 'role', 'status'] as const
 
@@ -109,3 +111,5 @@ describe('Cashier business-column metadata and preferences', () => {
     })
   })
 })
+
+const cashierColumns = createCashierColumns(createCashierPresentation('uz', localeMessages('cashiers'), localeMessages('common')))

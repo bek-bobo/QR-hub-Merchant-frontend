@@ -1,5 +1,5 @@
 import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import type { CashierResults } from './CashierResults'

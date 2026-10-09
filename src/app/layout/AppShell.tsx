@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { useState, type ReactNode } from 'react'
 import {
   Sheet,
@@ -15,6 +16,7 @@ interface AppShellProps {
 }
 
 export function AppShell({ title, children, allowDemo }: AppShellProps) {
+  const { message } = useMessages('shell')
   const [mobileNavigationOpen, setMobileNavigationOpen] = useState(false)
 
   return (
@@ -42,10 +44,9 @@ export function AppShell({ title, children, allowDemo }: AppShellProps) {
           side="left"
           className="w-[min(20rem,85vw)] gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground"
         >
-          <SheetTitle className="sr-only">Asosiy navigatsiya</SheetTitle>
+          <SheetTitle className="sr-only">{message('navigation.main')}</SheetTitle>
           <SheetDescription className="sr-only">
-            QRHub Merchant bo‘limlari
-          </SheetDescription>
+            {message('navigation.sections')}</SheetDescription>
           <Sidebar
             allowDemo={allowDemo}
             onNavigate={() => setMobileNavigationOpen(false)}

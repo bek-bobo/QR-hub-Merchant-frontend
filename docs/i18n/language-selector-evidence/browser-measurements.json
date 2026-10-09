@@ -1,0 +1,170 @@
+[
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 240.6000061035156,
+      "left": 154,
+      "right": 282,
+      "top": 107
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "header",
+    "theme": "light",
+    "width": 390
+  },
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 495.6000061035156,
+      "left": 105,
+      "right": 233,
+      "top": 362
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "auth",
+    "theme": "light",
+    "width": 390
+  },
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 307.6000061035156,
+      "left": 12,
+      "right": 140,
+      "top": 174
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "recovery",
+    "theme": "light",
+    "width": 390
+  },
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 240.6000061035156,
+      "left": 154,
+      "right": 282,
+      "top": 107
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "header",
+    "theme": "dark",
+    "width": 390
+  },
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 495.6000061035156,
+      "left": 105,
+      "right": 233,
+      "top": 362
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "auth",
+    "theme": "dark",
+    "width": 390
+  },
+  {
+    "documentWidth": 390,
+    "menu": {
+      "bottom": 307.6000061035156,
+      "left": 12,
+      "right": 140,
+      "top": 174
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "recovery",
+    "theme": "dark",
+    "width": 390
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 250.6000061035156,
+      "left": 1019,
+      "right": 1147,
+      "top": 117
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "header",
+    "theme": "light",
+    "width": 1280
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 477.6000061035156,
+      "left": 554,
+      "right": 682,
+      "top": 344
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "auth",
+    "theme": "light",
+    "width": 1280
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 307.6000061035156,
+      "left": 12,
+      "right": 140,
+      "top": 174
+    },
+    "selectedBackground": "rgb(255, 241, 242)",
+    "selectedColor": "rgb(180, 35, 50)",
+    "surface": "recovery",
+    "theme": "light",
+    "width": 1280
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 250.6000061035156,
+      "left": 1019,
+      "right": 1147,
+      "top": 117
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "header",
+    "theme": "dark",
+    "width": 1280
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 477.6000061035156,
+      "left": 554,
+      "right": 682,
+      "top": 344
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "auth",
+    "theme": "dark",
+    "width": 1280
+  },
+  {
+    "documentWidth": 1280,
+    "menu": {
+      "bottom": 307.6000061035156,
+      "left": 12,
+      "right": 140,
+      "top": 174
+    },
+    "selectedBackground": "rgb(59, 17, 24)",
+    "selectedColor": "rgb(253, 162, 155)",
+    "surface": "recovery",
+    "theme": "dark",
+    "width": 1280
+  }
+]

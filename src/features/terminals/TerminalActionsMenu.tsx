@@ -1,3 +1,4 @@
+import { useTerminalPresentation } from './presentation'
 import { InfoIcon, QrCodeIcon } from 'lucide-react'
 import { RowActionMenu, RowActionItem } from '@/shared/ui/RowActionMenu'
 import type { TerminalRow } from '@/shared/contracts/management-read'
@@ -9,12 +10,11 @@ interface TerminalActionsMenuProps {
 }
 
 export function TerminalActionsMenu({ row, onViewQr, onViewDetails }: TerminalActionsMenuProps) {
+  const p = useTerminalPresentation()
   return <RowActionMenu>
     <RowActionItem icon={QrCodeIcon} onSelect={() => onViewQr(row)}>
-      Statik QR ko‘rish
-    </RowActionItem>
+      {p.message('actions.viewQr')}</RowActionItem>
     <RowActionItem icon={InfoIcon} onSelect={() => onViewDetails(row)}>
-      Qo‘shimcha ma’lumotlar
-    </RowActionItem>
+      {p.message('actions.details')}</RowActionItem>
   </RowActionMenu>
 }

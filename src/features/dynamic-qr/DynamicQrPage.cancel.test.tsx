@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import { DynamicQrPage } from './DynamicQrPage'

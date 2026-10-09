@@ -1,5 +1,5 @@
 import { dashboardZero } from './test-fixtures'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import type { DashboardView, Metric, Outcome } from '@/shared/contracts/merchant-read'
 import { MetricCards } from './MetricCards'

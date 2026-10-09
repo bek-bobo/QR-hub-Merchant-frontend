@@ -1,6 +1,6 @@
 import { dashboardZero, dashboardMetadata, nextDate, completedCoverage } from './test-fixtures'
 import { Children, isValidElement, type ReactNode, type ReactElement } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LineConfig } from '@ant-design/plots'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
@@ -132,7 +132,7 @@ describe('Merchant TrendChart integration', () => {
     const html = renderToStaticMarkup(<TrendChart view={view()} />)
     expect(html).toContain('class="sr-only"')
     expect(html).toContain('Jami: Soni: 1, Summa: 9 007 199 254 740 993.01 UZS')
-    expect(html).toContain('B: Jami:')
+    expect(html.match(/01\.10\.2026: Jami:/g)).toHaveLength(2)
   })
 
   it.each([['HOUR', 'Soatlik'], ['DAY', 'Kunlik'], ['WEEK', 'Haftalik'], ['MONTH', 'Oylik'], ['YEAR', 'Yillik']] as const)('displays %s grouping as read-only %s', (chartGroupBy, label) => {
@@ -141,7 +141,7 @@ describe('Merchant TrendChart integration', () => {
       ? base.buckets.map((bucket, index) => ({ ...completedCoverage(`2026-10-01T${14 + index}:00:00+05:00`, `2026-10-01T${15 + index}:00:00+05:00`), ...bucket, periodKind: 'hour', label: `01.10.2026 ${14 + index}:00`,
         periodStart: `2026-10-01T${14 + index}:00:00+05:00`, periodEnd: `2026-10-01T${15 + index}:00:00+05:00` }))
       : base.buckets }
-    const indicator = find(chartTree(data), (element) => element.type === 'p' && Children.toArray(element.props.children as ReactNode).includes('Guruhlash: '))!
+    const indicator = find(chartTree(data), (element) => element.type === 'p' && Children.toArray(element.props.children as ReactNode).join('') === `Guruhlash: ${label}`)!
     expect(indicator.props.onClick).toBeUndefined()
     const html = renderToStaticMarkup(<TrendChart view={data} />)
     expect(html).toContain(`Guruhlash: ${label}`)

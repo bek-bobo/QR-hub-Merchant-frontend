@@ -1,3 +1,4 @@
+import { useStaticQrPresentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
@@ -21,15 +22,17 @@ import { StaticQrResults } from './StaticQrResults'
 import type { StaticQrRow } from './contract'
 import { StaticQrDisplayDialog } from './StaticQrDisplayDialog'
 import { StaticQrDetailsSheet } from './StaticQrDetailsSheet'
-import { staticQrColumns } from './columns'
+import { createStaticQrColumns } from './columns'
 
 export function StaticQrPage() {
+  const p = useStaticQrPresentation()
+  const staticQrColumns = createStaticQrColumns(p)
   const runtime = useReadRuntime()
   const access = useAccessContext()
   const { bridge, getSessionSnapshot } = useProtectedReadContext()
   const [draft, setDraft] = useState<StaticQrAdvancedDraft>({})
   const [searchDraft, setSearchDraft] = useState('')
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [validationMessage, setValidationMessage] = useState<'invalid' | null>(null)
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
   useDebouncedSearch(searchDraft, applied.search, (search) => {
     setApplied((current) => applyStaticQrQuickSearch(current, search))
@@ -59,7 +62,7 @@ export function StaticQrPage() {
   function applyFilters(): boolean {
     const next = applyStaticQrAdvancedDraft(applied, lookups.reconciledDraft, lookups.validation)
     if (!next) {
-      setValidationMessage('Tanlangan merchant, terminal, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      setValidationMessage('invalid')
       return false
     }
     setDraft(lookups.reconciledDraft)
@@ -79,9 +82,9 @@ export function StaticQrPage() {
     setValidationMessage(null)
   }
 
-  if (!staticReadAllowed) return <NoAccessState description="Statik QR ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title="Statik QR autentifikatsiyasi sozlanmagan" />
-  if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
+  if (!staticReadAllowed) return <NoAccessState description={p.message('page.noAccess')} />
+  if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title={p.message('page.authUnavailable')} />
+  if (!transport) return <ErrorState title={p.message('page.unavailable')} />
 
   return <div className="mx-auto min-w-0 max-w-[96rem]">
     <StaticQrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
@@ -113,14 +116,14 @@ export function StaticQrPage() {
         >
           <StaticQrAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
-          {validationMessage ? <p role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
+          {validationMessage ? <p role="alert" className="text-sm text-destructive">{p.message('filters.invalid')}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences
-          tableLabel="Statik QR"
+          tableLabel={p.message('page.name')}
           items={staticQrColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
-          triggerLabel="Ustunlar"
+          triggerLabel={p.common('table.columns')}
           triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-5 text-sm"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
@@ -131,7 +134,7 @@ export function StaticQrPage() {
         />
         <RefreshIconButton
           className="size-10 rounded-xl bg-surface"
-          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, { locale: p.intlLocale, timeZone: 'Asia/Tashkent' }) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}

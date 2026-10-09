@@ -1,0 +1,81 @@
+{
+  "status": {
+    "active": "Faol",
+    "unknown": "Noma’lum"
+  },
+  "table": {
+    "actions": "Amallar",
+    "label": "Terminal jadvali",
+    "pages": "Terminal sahifalari",
+    "total": "Jami {{countText}} ta Terminal"
+  },
+  "filters": {
+    "unconfirmed": "Qo‘llangan filtr tasdiqlanmadi",
+    "allMerchants": "Barcha merchantlar",
+    "noMerchants": "Merchant mavjud emas",
+    "merchantsFailed": "Merchantlarni yuklab bo‘lmadi",
+    "allRegions": "Barcha viloyatlar",
+    "noRegions": "Viloyat mavjud emas",
+    "regionsFailed": "Viloyatlarni yuklab bo‘lmadi",
+    "allDistricts": "Barcha tumanlar",
+    "noDistricts": "Bu viloyat uchun tuman mavjud emas",
+    "districtsFailed": "Tumanlarni yuklab bo‘lmadi",
+    "chooseRegion": "Avval viloyatni tanlang",
+    "invalid": "Tanlangan merchant, bank hisobi, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+    "reselect": "Merchant, bank hisobi, viloyat yoki tumanni qayta tanlab qo‘llang yoki filtrni tozalang.",
+    "allBanks": "Barcha bank hisoblari",
+    "noMerchantBanks": "Bu merchant uchun bank hisobi mavjud emas",
+    "noBanks": "Bank hisobi mavjud emas",
+    "banksFailed": "Bank hisoblarini yuklab bo‘lmadi"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "terminalId": "Terminal ID",
+    "status": "Holat",
+    "terminalType": "Terminal turi",
+    "merchantId": "Merchant ID",
+    "region": "Viloyat",
+    "regionId": "Viloyat ID",
+    "district": "Tuman",
+    "districtId": "Tuman ID",
+    "name": "Nomi",
+    "bank": "Bank hisobi",
+    "bankId": "Bank hisobi ID",
+    "mcc": "MCC",
+    "createdAt": "Yaratilgan",
+    "updatedAt": "Yangilangan",
+    "address": "Manzil",
+    "phones": "Telefonlar",
+    "qrId": "Statik QR ID",
+    "qrLink": "Statik QR havola"
+  },
+  "page": {
+    "terminals": "Terminallar",
+    "noAccess": "Terminal ro‘yxatini ko‘rish huquqi mavjud emas.",
+    "unavailable": "Terminal integratsiyasi sozlanmagan"
+  },
+  "search": {
+    "label": "Terminal nomi yoki ID bo‘yicha qidirish",
+    "placeholder": "Terminal nomi yoki ID"
+  },
+  "states": {
+    "loading": "Terminallar yuklanmoqda",
+    "failed": "Terminal ro‘yxatini ko‘rsatib bo‘lmadi",
+    "empty": "Terminal topilmadi."
+  },
+  "details": {
+    "main": "Asosiy",
+    "location": "Joylashuv",
+    "contact": "Aloqa",
+    "qr": "Statik QR",
+    "title": "Terminal tafsilotlari"
+  },
+  "actions": {
+    "viewQr": "Statik QR ko‘rish",
+    "details": "Qo‘shimcha ma’lumotlar"
+  },
+  "display": {
+    "noLink": "Bu terminal uchun xavfsiz Statik QR havolasi mavjud emas.",
+    "unavailable": "Xavfsiz Statik QR havolasi mavjud emas."
+  }
+}

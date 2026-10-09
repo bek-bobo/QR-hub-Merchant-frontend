@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, StrictMode, useEffect, useState } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { useScopedActionRegistry } from '@/app/read/useScopedActionRegistry'

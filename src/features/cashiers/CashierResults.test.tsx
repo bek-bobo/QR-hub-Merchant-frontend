@@ -1,5 +1,5 @@
 import { createElement, type ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { decodeCashierPage, type CashierRow } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'

@@ -1,13 +1,14 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { captureWithLocale } from '@/test/locale-fixture'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { DynamicQrQuickFilters } from './DynamicQrQuickFilters'
 
 describe('DynamicQrQuickFilters', () => {
   it('delegates typing and clear to the debounce owner; Enter only prevents navigation', () => {
     const onSearchDraftChange = vi.fn()
-    const tree = DynamicQrQuickFilters({ range: { fromDate: '2026-09-24', toDate: '2026-09-30' },
+    const tree = captureWithLocale(() => DynamicQrQuickFilters({ range: { fromDate: '2026-09-24', toDate: '2026-09-30' },
       searchDraft: 'Terminal A', onRangeDraftChange: vi.fn(), onRangeApply: vi.fn(), onRangeReset: vi.fn(),
-      onSearchDraftChange })
+      onSearchDraftChange }))
     const form = tree.props.children[1]
     const input = form.props.children[1]
     input.props.onChange({ target: { value: 'Terminal B' } })
@@ -32,8 +33,8 @@ describe('DynamicQrQuickFilters', () => {
       />,
     )
 
-    expect(html).toContain('2026-09-24')
-    expect(html).toContain('2026-09-30')
+    expect(html).toContain('24.09.2026')
+    expect(html).toContain('30.09.2026')
     expect(html).toContain('aria-label="Sana oralig‘ini tanlash"')
     expect(html).toContain('placeholder="Terminal nomi bo‘yicha"')
     expect(html).toContain('type="text"')

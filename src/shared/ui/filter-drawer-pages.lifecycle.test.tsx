@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, StrictMode, type ComponentProps, type ReactNode } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { notifyManager, QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DynamicQrPage } from '@/features/dynamic-qr/DynamicQrPage'

@@ -1,0 +1,50 @@
+{
+  "baselineFiles": 761,
+  "unchangedBaselineFiles": 753,
+  "changed": [
+    "src/app/layout/Header.tsx",
+    "src/features/dynamic-qr/dynamic-qr.i18n.test.tsx",
+    "src/features/dynamic-qr/QrPresentation.tsx",
+    "src/features/static-qr/static-qr.i18n.test.tsx",
+    "src/locales/uz/dynamicQr.json",
+    "src/locales/uz/staticQr.json",
+    "src/shared/i18n/runtime.test.ts",
+    "package.json"
+  ],
+  "removed": [],
+  "newFiles": [
+    "src/app/i18n6-hardening.test.tsx",
+    "scripts/audit-i18n-catalogs.mjs",
+    "scripts/check-i18n-literals.mjs",
+    "scripts/check-i18n-literals.test.mjs",
+    "scripts/i18n-literal-exceptions.json",
+    "scripts/i18n-release-check.mjs",
+    "docs/i18n/I18N_6_COMPLETENESS_REPORT.md",
+    "docs/i18n/I18N_6_TRANSLATION_EXCEPTIONS.md"
+  ],
+  "evidenceFiles": [
+    "docs/i18n/i18n6-evidence/baseline-hashes.json",
+    "docs/i18n/i18n6-evidence/baseline-status.txt",
+    "docs/i18n/i18n6-evidence/baseline-tests.log",
+    "docs/i18n/i18n6-evidence/browser-measurements.json",
+    "docs/i18n/i18n6-evidence/catalog-audit.log",
+    "docs/i18n/i18n6-evidence/catalog-review.json",
+    "docs/i18n/i18n6-evidence/changed-modules-final.log",
+    "docs/i18n/i18n6-evidence/contracts-switching-final.log",
+    "docs/i18n/i18n6-evidence/contracts-switching.log",
+    "docs/i18n/i18n6-evidence/desktop-en-login-light.jpg",
+    "docs/i18n/i18n6-evidence/final-diff-check.log",
+    "docs/i18n/i18n6-evidence/final-lint.log",
+    "docs/i18n/i18n6-evidence/final-status.txt",
+    "docs/i18n/i18n6-evidence/focused-final.log",
+    "docs/i18n/i18n6-evidence/focused-initial.log",
+    "docs/i18n/i18n6-evidence/incremental-files.json",
+    "docs/i18n/i18n6-evidence/mobile-en-dashboard-empty-dark.jpg",
+    "docs/i18n/i18n6-evidence/mobile-ru-calendar-dark.jpg",
+    "docs/i18n/i18n6-evidence/mobile-ru-login-dark.jpg",
+    "docs/i18n/i18n6-evidence/mobile-ru-p5-reset-dark.jpg",
+    "docs/i18n/i18n6-evidence/release-check-final.log",
+    "docs/i18n/i18n6-evidence/release-check.log",
+    "docs/i18n/i18n6-evidence/text-inventory.json"
+  ]
+}

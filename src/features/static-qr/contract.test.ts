@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createElement } from 'react'
 import { decodeStaticQrPage } from './contract'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { StaticQrTable } from './StaticQrTable'
 import { STATIC_QR_DEFAULT_COLUMN_ORDER } from './columns'
 

@@ -1,3 +1,4 @@
+import { useCashierPresentation } from './presentation'
 import { useRef, type ReactNode } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -11,7 +12,7 @@ import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
   CASHIER_DEFAULT_COLUMN_ORDER,
-  cashierColumns,
+  createCashierColumns,
   type CashierColumn,
   type CashierColumnId,
 } from './columns'
@@ -48,6 +49,7 @@ interface CashierResultsProps {
 }
 
 function resolveColumns(
+  cashierColumns: ReturnType<typeof createCashierColumns>,
   order: readonly string[],
   visibleColumnIds: readonly string[],
 ): readonly CashierColumn[] {
@@ -67,7 +69,9 @@ export function CashierResults({ blocked, pending, error, data, selected,
   columnOrder, visibleColumnIds, onRetry, onPageChange, onPageSizeChange, onSelect, onClose,
   headerActions, quickFilters, assignSurface, onUnassign, unassignSurface,
   onAssign, onSelectUnassign, terminalMode = 'view' }: CashierResultsProps) {
-  const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const p = useCashierPresentation()
+  const cashierColumns = createCashierColumns(p)
+  const columns = resolveColumns(cashierColumns, columnOrder, visibleColumnIds)
   const selectionTrigger = useRef<HTMLButtonElement | null>(null)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
   const hasFlexibleColumn = columns.some((column) => column.id === 'fullName' || column.id === 'role')
@@ -79,19 +83,19 @@ export function CashierResults({ blocked, pending, error, data, selected,
           {quickFilters}
           {headerActions}
         </div> : null}
-        {blocked ? <ErrorState title="Qo‘llangan filtr tasdiqlanmadi" description="Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang." />
-          : pending ? <LoadingState title="Kassirlar yuklanmoqda" />
+        {blocked ? <ErrorState title={p.message('filters.unconfirmed')} description={p.message('filters.reselect')} />
+          : pending ? <LoadingState title={p.message('states.loading')} />
             : error ? <ErrorState onRetry={onRetry} />
-              : !data ? <ErrorState title="Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi" />
-                : data.content.length === 0 ? <EmptyState description="Kassir topilmadi." />
+              : !data ? <ErrorState title={p.message('states.failed')} />
+                : data.content.length === 0 ? <EmptyState description={p.message('states.empty')} />
                   : <div className="min-w-0">
-        <TableScrollRegion ariaLabel="Kassirlar jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <TableScrollRegion ariaLabel={p.message('table.label')} className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Table className="cashier-table table-fixed" style={{ minWidth: totalWidth, width: hasFlexibleColumn ? '100%' : totalWidth }}>
             <colgroup>
               {columns.map((column) => <col key={column.id} style={{ width: column.id === 'fullName' || column.id === 'role' ? undefined : columnWidths[column.id] }} />)}
               <col style={{ width: actionsWidth }} />
             </colgroup>
-            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">Amallar</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">{p.message('table.actions')}</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
               return <TableRow key={`${row.id}-${index}`}>
                 {columns.map((column) => <TableCell key={column.id} className={column.cellClassName}>{column.renderCell(row)}</TableCell>)}
@@ -105,9 +109,9 @@ export function CashierResults({ blocked, pending, error, data, selected,
           </Table>
         </TableScrollRegion>
       </div>}
-        {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Kassir sahifalari" currentPage={data.page}
+        {data && !blocked && !pending && !error ? <PaginationBar ariaLabel={p.message('table.pages')} currentPage={data.page}
           totalPages={data.totalPages} totalItems={data.totalElements}
-          totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta kassir`}
+          totalLabel={p.message('table.total', { countText: p.number(data.totalElements) })}
           className="cashier-pagination border-t-0 pt-0"
           onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
       </CardContent>

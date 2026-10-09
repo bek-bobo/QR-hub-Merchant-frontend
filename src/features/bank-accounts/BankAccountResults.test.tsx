@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { decodeBankAccountPage, type BankAccountRow } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'

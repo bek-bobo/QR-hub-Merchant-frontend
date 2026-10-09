@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { captureWithLocale, renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { StaticQrAdvancedFilterFields, StaticQrQuickSearch } from './StaticQrFilterControls'
 
@@ -18,7 +18,7 @@ describe('Static QR inline search', () => {
   it('delegates raw edits and clear to the debounce owner; Enter only prevents navigation', () => {
     let searchDraft = 'old'
     const onDraftChange = vi.fn((search: string) => { searchDraft = search })
-    const render = () => StaticQrQuickSearch({ searchDraft, onDraftChange })
+    const render = () => captureWithLocale(() => StaticQrQuickSearch({ searchDraft, onDraftChange }))
     render().props.children[1].props.onChange({ target: { value: '  AbC!  ' } })
     expect(searchDraft).toBe('  AbC!  ')
     expect(onDraftChange).toHaveBeenCalledTimes(1)

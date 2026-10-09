@@ -1,0 +1,1350 @@
+[
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [],
+    "headings": [
+      "Jami summa",
+      "Xizmat haqi"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Применить поиск"
+    ],
+    "counters": [],
+    "headings": [
+      "Общая сумма",
+      "Комиссия"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Apply search"
+    ],
+    "counters": [],
+    "headings": [
+      "Total amount",
+      "Service fee"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [],
+    "headings": [
+      "Jami summa",
+      "Xizmat haqi"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "D4 static QR preview"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "D4 static QR preview"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "D4 static QR preview"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "D4 static QR preview"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Применить поиск"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Apply search"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Применить поиск"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Apply search"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [
+      "Sintetik kassirlar"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [
+      "Sintetik kassirlar"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [
+      "Sintetik kassirlar"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "headings": [
+      "Sintetik kassirlar"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Применить поиск"
+    ],
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "headings": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Apply search"
+    ],
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "headings": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [
+      "Qidiruvni qo‘llash"
+    ],
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "headings": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "Tizimga kirish"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "Вход в систему"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "Sign in"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "dark",
+    "clippedButtons": [],
+    "counters": [],
+    "headings": [
+      "Tizimga kirish"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=0cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=0merchantLookup=1bankAccountLookup=1terminalLookup=0regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "terminalList=1bankAccountList=1cashierList=1merchantLookup=1bankAccountLookup=1terminalLookup=1regionLookup=1districtLookup=0create=0assign=0unassign=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [
+      "p5List=1merchantLookup=1terminalLookup=0resetPin=0"
+    ],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "light",
+    "counters": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 390,
+    "theme": "light",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dashboard",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/read/dynamic-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day4/static-qrs",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/terminals",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/bank-accounts",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day5/cashiers",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/dev/day6/devices",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "ru",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "en",
+    "overflow": 0,
+    "unnamedButtons": 0
+  },
+  {
+    "path": "/auth",
+    "viewport": 1280,
+    "theme": "dark",
+    "clippedButtons": [],
+    "lang": "uz",
+    "overflow": 0,
+    "unnamedButtons": 0
+  }
+]

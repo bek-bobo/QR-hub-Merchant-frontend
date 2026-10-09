@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { FilterDrawer } from './FilterDrawer'
 import { createFilterDrawerHandlers } from './filter-drawer-state'

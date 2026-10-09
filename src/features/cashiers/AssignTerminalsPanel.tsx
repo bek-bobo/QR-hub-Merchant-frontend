@@ -1,3 +1,5 @@
+import { describeCashierFeedback, type CashierFeedback } from './feedback'
+import { useCashierPresentation } from './presentation'
 import { useState, useSyncExternalStore, type FormEvent } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { CircleHelpIcon, MonitorIcon } from 'lucide-react'
@@ -19,9 +21,10 @@ interface AssignTerminalsPanelProps {
 }
 
 export function AssignTerminalsPanel({ target, resultData, resultKey, dataUpdatedAt, scope, onRefresh, onConfirmed }: AssignTerminalsPanelProps) {
+  const p = useCashierPresentation()
   const runtime = useReadRuntime()
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<CashierFeedback | null>(null)
   const lookupOptions = runtime.queries.terminalLookupOptions()
   const lookup = useQuery(lookupOptions)
   const adapter = useLiveAssignTerminalsAdapter({ target, resultData, resultKey, dataUpdatedAt, scope, onConfirmed })
@@ -36,39 +39,39 @@ export function AssignTerminalsPanel({ target, resultData, resultKey, dataUpdate
   const active = new Set(row.terminals.map((terminal) => terminal.id))
   const available = lookup.data?.filter((option) => !active.has(option.id)) ?? []
   const validRequest = buildAssignTerminalsRequest(row, selectedIds, adapter.currentOptions())
-  const lookupReason = !runtime.capabilities.terminalLookup ? 'Terminal tanlash huquqi mavjud emas.'
-    : !lookupOptions.enabled ? 'Terminal tanlash integratsiyasi mavjud emas.'
-      : lookup.isError ? 'Terminallarni yuklab bo‘lmadi.'
-        : lookup.isPending ? 'Terminallar yuklanmoqda.'
-          : !adapter.currentOptions() ? 'Terminal tanlovi qayta tasdiqlanishi kerak.' : null
+  const lookupReason = !runtime.capabilities.terminalLookup ? 'lookup.assignDenied'
+    : !lookupOptions.enabled ? 'lookup.unavailable'
+      : lookup.isError ? 'lookup.failed'
+        : lookup.isPending ? 'lookup.loading'
+          : !adapter.currentOptions() ? 'lookup.unconfirmed' : null
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     void controller.submit(selectedIds).then((result) => {
-      if (result.kind === 'not-sent' && adapter.currentTarget()) setMessage(result.reason)
+      if (result.kind === 'not-sent' && adapter.currentTarget()) setMessage(describeCashierFeedback(result.reason))
     })
   }
 
-  return <section aria-label="Terminallarni qo‘shish" className="space-y-3">
-    <h4 className="text-base font-semibold text-text-primary">Terminallarni qo‘shish</h4>
-    <p className="text-sm text-text-secondary">Bu amal mavjud faol biriktirishlarni almashtirmaydi. Faqat tanlangan terminallar qo‘shiladi yoki avvalgi nofaol biriktirish qayta faollashishi mumkin.</p>
+  return <section aria-label={p.message('assign.title')} className="space-y-3">
+    <h4 className="text-base font-semibold text-text-primary">{p.message('assign.title')}</h4>
+    <p className="text-sm text-text-secondary">{p.message('assign.warning')}</p>
     <form className="space-y-3" onSubmit={submit}>
-      <fieldset className="space-y-2"><legend className="mb-2 text-sm font-medium text-text-primary">Qo‘shiladigan terminallar</legend>
+      <fieldset className="space-y-2"><legend className="mb-2 text-sm font-medium text-text-primary">{p.message('assign.options')}</legend>
         {available.map((option) => <label key={option.id} className="flex min-h-12 cursor-pointer items-center gap-3 rounded-lg border border-border/70 bg-card px-3 py-2 text-sm transition-colors hover:bg-muted/40 focus-within:border-brand focus-within:ring-2 focus-within:ring-brand/20 has-checked:border-brand/40 has-checked:bg-brand-soft/30">
           <input type="checkbox" className="size-4 shrink-0 accent-brand" checked={selectedIds.includes(option.id)} onChange={(event) => setSelectedIds((ids) => event.target.checked ? [...ids, option.id] : ids.filter((id) => id !== option.id))} />
           <span aria-hidden="true" className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-soft text-brand"><MonitorIcon className="size-4" /></span>
           <span className="min-w-0 break-words">{option.name}</span>
         </label>)}
       </fieldset>
-      {lookupReason ? <p role="status" className="text-sm text-text-secondary">{lookupReason}</p> : null}
-      {!validRequest && !lookupReason ? <p role="status" className="flex items-start gap-2 text-sm text-text-secondary"><CircleHelpIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />Kamida bitta hali faol bo‘lmagan joriy terminalni tanlang.</p> : null}
-      {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
-      <Button type="submit" className="min-h-10 rounded-lg px-5" disabled={!validRequest || Boolean(lookupReason) || state.outcome.kind !== 'idle'}>Tanlangan terminallarni qo‘shish</Button>
+      {lookupReason ? <p role="status" className="text-sm text-text-secondary">{p.message(lookupReason)}</p> : null}
+      {!validRequest && !lookupReason ? <p role="status" className="flex items-start gap-2 text-sm text-text-secondary"><CircleHelpIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />{p.message('assign.selectionHelp')}</p> : null}
+      {message ? <p role="alert" className="text-sm text-destructive">{p.feedback(message)}</p> : null}
+      <Button type="submit" className="min-h-10 rounded-lg px-5" disabled={!validRequest || Boolean(lookupReason) || state.outcome.kind !== 'idle'}>{p.message('assign.submit')}</Button>
     </form>
-    {state.outcome.kind === 'pending' ? <p role="status">Biriktirish yuborilmoqda.</p> : null}
-    {state.outcome.kind === 'confirmed' ? <p role="status">Terminallar biriktirildi. Faol biriktirishlar ro‘yxati yangilangach tekshiriladi.</p> : null}
-    {state.outcome.kind === 'unknown' ? <div role="alert" className="space-y-2"><p>Natija noma’lum. Ayrim terminallar biriktirilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassir terminal holatini yangilang.</p><Button type="button" variant="outline" onClick={onRefresh}>Holatni yangilash</Button></div> : null}
-    {state.outcome.kind === 'rejected' ? <p role="alert">{state.outcome.reason}</p> : null}
-    {state.outcome.kind === 'not-sent' ? <p role="alert">{state.outcome.reason}</p> : null}
+    {state.outcome.kind === 'pending' ? <p role="status">{p.message('assign.pending')}</p> : null}
+    {state.outcome.kind === 'confirmed' ? <p role="status">{p.message('assign.confirmed')}</p> : null}
+    {state.outcome.kind === 'unknown' ? <div role="alert" className="space-y-2"><p>{p.message('assign.unknown')}</p><Button type="button" variant="outline" onClick={onRefresh}>{p.message('actions.refreshStatus')}</Button></div> : null}
+    {state.outcome.kind === 'rejected' ? <p role="alert">{p.message('feedback.rejected')}</p> : null}
+    {state.outcome.kind === 'not-sent' ? <p role="alert">{p.feedback(describeCashierFeedback(state.outcome.reason))}</p> : null}
   </section>
 }

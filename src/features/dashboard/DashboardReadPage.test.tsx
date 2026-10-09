@@ -1,5 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DashboardFilters, DynamicQrFilters } from '@/shared/contracts/merchant-read'
@@ -99,7 +99,7 @@ describe('Dashboard filter placement and query coordination', () => {
     for (const instant of ['2026-10-04T09:47:32Z', '2026-10-04T09:48:12Z']) {
       observations.dataUpdatedAt = Date.parse(instant)
       expect(render()).not.toContain('Oxirgi yangilanish:')
-      expect(observations.header?.updatedAt).toBe(formatInstantTime(observations.dataUpdatedAt))
+      expect(observations.header?.updatedAt).toBe(formatInstantTime(observations.dataUpdatedAt, {timeZone: 'Asia/Tashkent'}))
     }
     observations.header?.onRefresh()
     expect(observations.dashboardRefetch).toHaveBeenCalledExactlyOnceWith()
@@ -130,8 +130,8 @@ describe('Dashboard filter placement and query coordination', () => {
     const quick = html.slice(0, drawerStart)
     const drawer = html.slice(drawerStart, html.indexOf('</section>', drawerStart))
     expect(quick).toContain('Sana oralig‘ini tanlash')
-    expect(quick).toContain('2026-09-25')
-    expect(quick).toContain('2026-10-01')
+    expect(quick).toContain('25.09.2026')
+    expect(quick).toContain('01.10.2026')
     expect(quick).not.toContain('Sanalarni qo‘llash')
     for (const days of [1, 7, 30]) expect(quick).toContain(`>${days} kun</button>`)
     expect(drawer).toContain('Barcha terminallar')

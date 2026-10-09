@@ -1,20 +1,19 @@
+import type { DashboardPresentation } from './presentation'
 import type { LineConfig } from '@ant-design/plots'
 import { safeContractError } from '@/shared/api/errors'
 import { plotTooltipInteraction, type MerchantPlotTheme } from './plot-theme'
 import type { DashboardBucket, DashboardView, Money } from '@/shared/contracts/merchant-read'
-import { formatMoney } from '@/shared/money/minor'
+
 
 export type TrendMode = 'amount' | 'count'
-export const TREND_GROUP_LABELS = {
-  HOUR: 'Soatlik', DAY: 'Kunlik', WEEK: 'Haftalik', MONTH: 'Oylik', YEAR: 'Yillik',
-} satisfies Record<DashboardView['chartGroupBy'], string>
+export const TREND_GROUP_KEYS = { HOUR: 'granularity.groupHOUR', DAY: 'granularity.groupDAY', WEEK: 'granularity.groupWEEK', MONTH: 'granularity.groupMONTH', YEAR: 'granularity.groupYEAR' } as const satisfies Record<DashboardView['chartGroupBy'], string>
 
 export const TREND_SERIES = [
-  { key: 'total', label: 'Jami', swatch: 'bg-status-info-indicator' },
-  { key: 'success', label: 'Muvaffaqiyatli', swatch: 'bg-status-success-indicator' },
-  { key: 'processing', label: 'Jarayonda', swatch: 'bg-status-warning-indicator' },
-  { key: 'failed', label: 'Muvaffaqiyatsiz', swatch: 'bg-status-error-indicator' },
-  { key: 'uncategorized', label: 'Tasniflanmagan', swatch: 'bg-status-neutral-indicator' },
+  { key: 'total', labelKey: 'metrics.total', swatch: 'bg-status-info-indicator' },
+  { key: 'success', labelKey: 'metrics.success', swatch: 'bg-status-success-indicator' },
+  { key: 'processing', labelKey: 'metrics.processing', swatch: 'bg-status-warning-indicator' },
+  { key: 'failed', labelKey: 'metrics.failed', swatch: 'bg-status-error-indicator' },
+  { key: 'uncategorized', labelKey: 'metrics.uncategorized', swatch: 'bg-status-neutral-indicator' },
 ] as const
 export type TrendSeriesKey = typeof TREND_SERIES[number]['key']
 export const ALL_TREND_SERIES: readonly TrendSeriesKey[] = TREND_SERIES.map(({ key }) => key)
@@ -39,28 +38,25 @@ export function trendSeriesColor(key: TrendSeriesKey, theme: MerchantPlotTheme) 
 }
 
 // Format the backend's local boundary directly; never apply the browser timezone.
-const shortDate = (value: string) => `${value.slice(8, 10)}.${value.slice(5, 7)}`
-const fullDate = (value: string) => `${shortDate(value)}.${value.slice(0, 4)}`
-const months = ['yan', 'fev', 'mar', 'apr', 'may', 'iyun', 'iyul', 'avg', 'sen', 'okt', 'noy', 'dek']
-export function trendAxisLabel(bucket: DashboardBucket, group: DashboardView['chartGroupBy']) {
-  const start = bucket.periodStart
-  if (group === 'HOUR') return `${shortDate(start)} ${start.slice(11, 16)}`
-  if (group === 'DAY') return shortDate(start)
-  if (group === 'WEEK') return `${shortDate(start)} haftasi`
-  if (group === 'MONTH') return `${months[Number(start.slice(5, 7)) - 1]} ${start.slice(0, 4)}`
-  return start.slice(0, 4)
+export function trendAxisLabel(p: DashboardPresentation, bucket: DashboardBucket, group: DashboardView['chartGroupBy']) {
+ const start=bucket.periodStart
+ const short=p.date(start,{day:'2-digit',month:'2-digit'})
+ if(group==='HOUR') return `${short} ${start.slice(11,16)}`
+ if(group==='DAY') return short
+ if(group==='WEEK') return p.message('dates.week',{date:short})
+ if(group==='MONTH') return p.month(start)
+ return start.slice(0,4)
 }
-export function trendPeriodTitle(bucket: DashboardBucket, group: DashboardView['chartGroupBy']) {
-  if (group === 'HOUR') {
-    const startTime = bucket.periodStart.slice(11, 16)
-    const endTime = bucket.periodEnd.slice(11, 16)
-    return bucket.periodStart.slice(0, 10) === bucket.periodEnd.slice(0, 10)
-      ? `${fullDate(bucket.periodStart)} · ${startTime} ≤ vaqt < ${endTime}`
-      : `${fullDate(bucket.periodStart)} ${startTime} ≤ vaqt < ${fullDate(bucket.periodEnd)} ${endTime}`
-  }
-  if (group === 'DAY') return fullDate(bucket.periodStart)
-  if (group === 'WEEK') return `${fullDate(bucket.periodStart)} haftasi`
-  return trendAxisLabel(bucket, group)
+export function trendPeriodTitle(p: DashboardPresentation, bucket: DashboardBucket, group: DashboardView['chartGroupBy']) {
+ if(group==='HOUR') {
+  const start=bucket.periodStart.slice(11,16), end=bucket.periodEnd.slice(11,16)
+  return bucket.periodStart.slice(0,10)===bucket.periodEnd.slice(0,10)
+   ? p.message('dates.hourSame',{date:p.date(bucket.periodStart),start,end})
+   : p.message('dates.hourAcross',{startDate:p.date(bucket.periodStart),endDate:p.date(bucket.periodEnd),start,end})
+ }
+ if(group==='DAY') return p.date(bucket.periodStart)
+ if(group==='WEEK') return p.message('dates.week',{date:p.date(bucket.periodStart)})
+ return trendAxisLabel(p,bucket,group)
 }
 export function trendTickFilter(count: number, width = 720) {
   const budget = Math.max(2, Math.floor(width / 100))
@@ -83,22 +79,22 @@ export interface TrendPlotDatum {
 }
 
 // Approximate numbers only at the engine boundary; tooltips retain exact money.
-export function trendPlotData(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[] = DEFAULT_TREND_SERIES, available = availableTrendSeries(view)): TrendPlotDatum[] {
+export function trendPlotData(p: DashboardPresentation, view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[] = DEFAULT_TREND_SERIES, available = availableTrendSeries(view)): TrendPlotDatum[] {
   const selected = visibleTrendSeries(visible, available)
   const series = TREND_SERIES.filter(({ key }) => selected.includes(key))
   return view.buckets.flatMap((bucket, index) => series.map((item) => {
     const raw = bucket.values[item.key]
     const observedValue = mode === 'amount' ? Number(raw.amount.minorUnits) / 10 ** raw.amount.scale : raw.count
     if (!Number.isFinite(observedValue)) throw safeContractError()
-    return { bucket: String(index), period: bucket.label, title: trendPeriodTitle(bucket, view.chartGroupBy ?? 'DAY'),
-      key: item.key, type: item.label, value: bucket.coverage === 'FUTURE' ? null : observedValue,
+    return { bucket: String(index), period: bucket.label, title: trendPeriodTitle(p, bucket, view.chartGroupBy ?? 'DAY'),
+      key: item.key, type: p.label(item.key), value: bucket.coverage === 'FUTURE' ? null : observedValue,
       count: raw.count, amount: raw.amount, coverage: bucket.coverage, partial: bucket.partial || bucket.coverage === 'PARTIAL',
-      interval: `${bucket.periodStart} ≤ vaqt < ${bucket.periodEnd}`,
-      exactValue: bucket.coverage === 'FUTURE' ? 'Hali kuzatilmagan' : mode === 'amount' ? formatMoney(raw.amount) : raw.count.toLocaleString('uz-UZ') }
+      interval: p.message('dates.interval', { start: bucket.periodStart, end: bucket.periodEnd }),
+      exactValue: bucket.coverage === 'FUTURE' ? p.message('trend.future') : mode === 'amount' ? p.money(raw.amount) : p.number(raw.count) }
   }))
 }
 export function trendTooltipItem(datum: TrendPlotDatum) {
-  return { name: datum.type, value: datum.exactValue }
+  return { name: datum.type, value: datum.exactValue, seriesKey: datum.key }
 }
 // Ordered boundaries identify keyboard positions. Changed displayed content
 // resets safely rather than leaving an asynchronously updated tooltip stale.
@@ -106,34 +102,34 @@ export function trendTooltipItem(datum: TrendPlotDatum) {
 export function trendInteractionKey(buckets: readonly DashboardBucket[], group: DashboardView['chartGroupBy'], mode: TrendMode, visible: readonly TrendSeriesKey[], data: readonly TrendPlotDatum[]) {
   const field = (value: string) => `${value.length}:${value}`
   const boundaries = buckets.map((bucket) => `${field(bucket.periodKind)}${field(bucket.periodStart)}${field(bucket.periodEnd)}`)
-  const content = data.map((datum) => `${field(datum.exactValue)}${field(datum.coverage)}${field(String(datum.partial))}`)
+  const content = data.map((datum) => `${field(datum.amount.minorUnits)}${field(String(datum.count))}${field(datum.coverage)}${field(String(datum.partial))}`)
   return [group, mode, ...visible, ...boundaries, ...content].map(field).join('')
 }
 
-export function createTrendPlotConfig(view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[], theme: MerchantPlotTheme, width = 720,
+export function createTrendPlotConfig(p: DashboardPresentation, view: TrendView, mode: TrendMode, visible: readonly TrendSeriesKey[], theme: MerchantPlotTheme, width = 720,
   prepared?: { readonly data: TrendPlotDatum[]; readonly available: readonly TrendSeriesKey[] }): LineConfig {
   const availableKeys = prepared?.available ?? availableTrendSeries(view)
-  const data = prepared?.data ?? trendPlotData(view, mode, visible, availableKeys)
+  const data = prepared?.data ?? trendPlotData(p, view, mode, visible, availableKeys)
   const available = TREND_SERIES.filter(({ key }) => availableKeys.includes(key))
   const maximum = data.reduce((max, datum) => Math.max(max, datum.value ?? 0), 0)
   const scale: LineConfig['scale'] = {
     x: { type: 'point', domain: view.buckets.map((_, index) => String(index)), range: [0.02, 0.98] },
     y: { domainMin: 0, domainMax: mode === 'count' ? Math.max(4, Math.ceil(maximum / 4) * 4) : maximum || 1, tickCount: 5, nice: true },
-    color: { domain: available.map(({ label }) => label), range: available.map(({ key }) => trendSeriesColor(key, theme)) },
+    color: { domain: available.map(({ key }) => key), range: available.map(({ key }) => trendSeriesColor(key, theme)) },
   }
   const axis: LineConfig['axis'] = {
     x: { title: false, labelFill: theme.secondary, labelFontSize: 12, line: true, lineStroke: theme.axis, tick: false,
       tickFilter: trendTickFilter(view.buckets.length, width), labelAutoRotate: false,
       labelAutoHide: true,
-      labelFormatter: (value: string) => view.buckets[Number(value)] ? trendAxisLabel(view.buckets[Number(value)]!, view.chartGroupBy ?? 'DAY') : value },
+      labelFormatter: (value: string) => view.buckets[Number(value)] ? trendAxisLabel(p, view.buckets[Number(value)]!, view.chartGroupBy ?? 'DAY') : value },
     y: { title: false, labelFill: theme.secondary, labelFontSize: 12, grid: true, gridStroke: theme.grid,
       gridStrokeOpacity: 0.35, gridLineDash: [3, 3], line: false, tick: false,
-      labelFormatter: (value: number) => Number(value).toLocaleString('uz-UZ', mode === 'amount'
+      labelFormatter: (value: number) => p.number(Number(value), mode === 'amount'
         ? { maximumFractionDigits: 2, notation: 'compact' } : { maximumFractionDigits: 0 }) },
   }
   return {
     data, autoFit: true, height: 320, theme: theme.dark ? 'classicDark' : 'classic',
-    xField: 'bucket', yField: 'value', colorField: 'type', shapeField: 'smooth',
+    xField: 'bucket', yField: 'value', colorField: 'key', shapeField: 'smooth',
     // Native Cartesian smooth shapes use monotone-X curves without overshoot.
     style: { lineWidth: 2.5, connect: false }, zIndex: 1,
     // No permanent point mark; the native tooltip interaction owns active markers.
@@ -141,10 +137,10 @@ export function createTrendPlotConfig(view: TrendView, mode: TrendMode, visible:
     area: { data: data.filter(({ key }) => key !== 'total'), shapeField: 'smooth', tooltip: false, zIndex: 0, scale, axis,
       style: { fillOpacity: 0.07, strokeOpacity: 0, lineWidth: 0, connect: false } },
     scale, axis, legend: false,
-    tooltip: { title: (datum: TrendPlotDatum) => `${datum.title}${datum.coverage === 'FUTURE' ? ' · Hali kuzatilmagan' : datum.partial ? ' · Qisman davr' : ''}`,
+    tooltip: { title: (datum: TrendPlotDatum) => datum.coverage === 'FUTURE' || datum.partial ? p.message('trend.coverageTitle', { title: datum.title, coverage: p.message(datum.coverage === 'FUTURE' ? 'trend.future' : 'trend.partial') }) : datum.title,
       items: [(datum: TrendPlotDatum) => ({ ...trendTooltipItem(datum), color: trendSeriesColor(datum.key, theme) })] },
     interaction: { tooltip: { shared: true, series: true, wait: 0, trailing: false, crosshairsX: true, crosshairsY: false, marker: true,
-      sort: (item: { name: string }) => TREND_SERIES.findIndex(({ label }) => label === item.name),
+      sort: (item: { seriesKey: TrendSeriesKey }) => ALL_TREND_SERIES.indexOf(item.seriesKey),
       ...plotTooltipInteraction(theme, true), style: { markerR: 4, markerLineWidth: 2, markerStroke: theme.surface,
         crosshairsStroke: theme.axis, crosshairsLineWidth: 1, crosshairsStrokeOpacity: 0.6 } } },
   }

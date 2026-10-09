@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import type { StaticQrRow } from './contract'
 import { STATIC_QR_DEFAULT_COLUMN_ORDER } from './columns'

@@ -1,0 +1,362 @@
+[
+  {
+    "file": "src/app/layout/Header.tsx",
+    "surface": "jsx-expression",
+    "text": "M",
+    "category": "DEV/test-only text",
+    "reason": "Demo identity branch only when onLogout is absent; LiveShellLayout always provides onLogout.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/app/layout/Header.tsx",
+    "surface": "jsx-text",
+    "text": "Demo Store",
+    "category": "DEV/test-only text",
+    "reason": "Demo identity branch only when onLogout is absent; LiveShellLayout always provides onLogout.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/app/layout/LiveShellLayout.tsx",
+    "surface": "jsx-text",
+    "text": "QRHub Merchant",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/auth/AuthPresentation.tsx",
+    "surface": "jsx-text",
+    "text": "QRHub",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/auth/AuthPresentation.tsx",
+    "surface": "jsx-text",
+    "text": "Merchant",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/auth/LoginForm.tsx",
+    "surface": "attribute:placeholder",
+    "text": "XX XXX XX XX",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/auth/LoginForm.tsx",
+    "surface": "attribute:aria-label",
+    "text": "PIN",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/cashiers/CreateCashierContent.tsx",
+    "surface": "attribute:placeholder",
+    "text": "XX XXX XX XX",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/cashiers/status-presentation.ts",
+    "surface": "property:label",
+    "text": "Faol",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/cashiers/status-presentation.ts",
+    "surface": "property:label",
+    "text": "Faol emas",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/cashiers/status-presentation.ts",
+    "surface": "property:label",
+    "text": "Noma’lum",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/dynamic-qr/DateRangeQuickFilter.tsx",
+    "surface": "attribute:aria-label",
+    "text": "Grafik sana oralig‘ini tanlash:",
+    "category": "Already guarded localized text",
+    "reason": "Every production caller (DashboardQuickDateFilter/DynamicQrQuickFilters) supplies a reactive guarded presentation; these optional legacy fallbacks are not used by live callers.",
+    "owner": "dynamicQr/dashboard",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/dynamic-qr/DateRangeQuickFilter.tsx",
+    "surface": "attribute:aria-label",
+    "text": "Sana oralig‘ini tanlash",
+    "category": "Already guarded localized text",
+    "reason": "Every production caller (DashboardQuickDateFilter/DynamicQrQuickFilters) supplies a reactive guarded presentation; these optional legacy fallbacks are not used by live callers.",
+    "owner": "dynamicQr/dashboard",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/dynamic-qr/DateRangeQuickFilter.tsx",
+    "surface": "attribute:aria-label",
+    "text": "Oldingi oy",
+    "category": "Already guarded localized text",
+    "reason": "Every production caller (DashboardQuickDateFilter/DynamicQrQuickFilters) supplies a reactive guarded presentation; these optional legacy fallbacks are not used by live callers.",
+    "owner": "dynamicQr/dashboard",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/dynamic-qr/DateRangeQuickFilter.tsx",
+    "surface": "attribute:aria-label",
+    "text": "Keyingi oy",
+    "category": "Already guarded localized text",
+    "reason": "Every production caller (DashboardQuickDateFilter/DynamicQrQuickFilters) supplies a reactive guarded presentation; these optional legacy fallbacks are not used by live callers.",
+    "owner": "dynamicQr/dashboard",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/dynamic-qr/ExportButton.tsx",
+    "surface": "jsx-text",
+    "text": "XLSX",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/p5/page-state.ts",
+    "surface": "property:label",
+    "text": "Faol",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/p5/page-state.ts",
+    "surface": "property:label",
+    "text": "Faol emas / administrator belgisi",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/features/p5/page-state.ts",
+    "surface": "property:label",
+    "text": "Holat noma’lum",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/i18n/metadata.generated.ts",
+    "surface": "property:\"title\"",
+    "text": "title",
+    "category": "Technical identifiers/constants",
+    "reason": "Generated parameter-name descriptor, not rendered copy.",
+    "owner": "i18n",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/active-status.ts",
+    "surface": "property:label",
+    "text": "Faol",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/active-status.ts",
+    "surface": "property:label",
+    "text": "Noma’lum",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Yangi",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Muddati o‘tgan",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Jarayonda",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Bekor qilingan",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Rad etilgan",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Muvaffaqiyatli",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/presentation/qr-status.ts",
+    "surface": "property:label",
+    "text": "Noma’lum",
+    "category": "Already guarded localized text",
+    "reason": "All production consumers replace label through their namespace presentation adapter; classifier semantics and tones are retained. Legacy labels support existing direct domain tests/DEV UI.",
+    "owner": "feature presentation",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "QRHub Merchant",
+    "category": "Technical identifiers/constants",
+    "reason": "Brand, standard acronym or invariant phone mask; does not form grammatical prose.",
+    "owner": "shared UI",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Bu sahifaga ruxsat yo‘q",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Ko‘rish huquqini demo boshqaruvidan tiklashingiz mumkin.",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Demo boshqaruviga qaytish",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Sahifa topilmadi",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Bu manzil Day 01 preview doirasida mavjud emas.",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  },
+  {
+    "file": "src/shared/ui/SystemPages.tsx",
+    "surface": "jsx-text",
+    "text": "Bosh sahifaga qaytish",
+    "category": "DEV/test-only text",
+    "reason": "ForbiddenPage/NotFoundPage are imported only by DEV AppRouter; LiveRoot imports IntegrationUnavailablePage from the same module.",
+    "owner": "shell",
+    "disposition": "Retain; exact exception reviewed in I18N.6",
+    "releaseBlocking": false
+  }
+]

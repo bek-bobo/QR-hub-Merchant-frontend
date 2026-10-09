@@ -1,0 +1,43 @@
+{
+  "status": {
+    "active": "Faol",
+    "unknown": "Noma’lum"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "status": "Holat",
+    "name": "Nomi",
+    "bank": "Bank",
+    "account": "Hisob raqami",
+    "mfo": "MFO",
+    "tin": "STIR",
+    "contract": "Shartnoma"
+  },
+  "filters": {
+    "allMerchants": "Barcha merchantlar",
+    "noMerchants": "Merchant mavjud emas",
+    "merchantsFailed": "Merchantlarni yuklab bo‘lmadi",
+    "invalid": "Tanlangan merchant tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+    "unconfirmed": "Qo‘llangan merchant filtri tasdiqlanmadi",
+    "reselect": "Merchantni qayta tanlab qo‘llang yoki filtrni tozalang."
+  },
+  "page": {
+    "name": "Bank hisoblari",
+    "noAccess": "Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas.",
+    "unavailable": "Bank hisoblari integratsiyasi sozlanmagan"
+  },
+  "states": {
+    "loading": "Bank hisoblari yuklanmoqda",
+    "failed": "Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi",
+    "empty": "Bank hisobi topilmadi."
+  },
+  "table": {
+    "label": "Bank hisoblari jadvali",
+    "pages": "Bank hisoblari sahifalari",
+    "total": "Jami {{countText}} ta Bank hisoblari"
+  },
+  "search": {
+    "label": "Nomi, bank, hisob raqami yoki STIR bo‘yicha qidirish",
+    "placeholder": "Nomi, bank, hisob raqami yoki STIR"
+  }
+}

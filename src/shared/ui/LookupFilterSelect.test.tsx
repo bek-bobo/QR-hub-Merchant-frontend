@@ -1,6 +1,7 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 // @vitest-environment happy-dom
 import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
@@ -78,7 +79,7 @@ describe('lookup filter descriptions', () => {
   it('preserves selected values and delegates selection and clearing to the same callback', () => {
     const onChange = vi.fn()
     const props = { ...defaults, value: 'district-Exact', options: [{ id: 'district-Exact', name: 'District' }], onChange }
-    const tree = LookupFilterSelect({ ...props, state: 'ready' })
+    const tree = captureWithLocale(() => LookupFilterSelect({ ...props, state: 'ready' }))
     const select = findElement(tree, Select) as ReactElement<ComponentProps<typeof Select>>
     expect(select.props.value).toBe('district-Exact')
     expect(select.props.disabled).toBe(false)
@@ -86,11 +87,11 @@ describe('lookup filter descriptions', () => {
     expect(onChange).toHaveBeenLastCalledWith('district-Other')
     select.props.onChange?.({ target: { value: '' } } as never)
     expect(onChange).toHaveBeenLastCalledWith(undefined)
-    const blocked = LookupFilterSelect({ ...props, state: 'unavailable', hideUnavailableDescription: true })
+    const blocked = captureWithLocale(() => LookupFilterSelect({ ...props, state: 'unavailable', hideUnavailableDescription: true }))
     const clear = findElement(blocked, Button) as ReactElement<ComponentProps<typeof Button>>
     expect(clear.props['aria-label']).toBe('Tuman tanlovini tozalash')
     clear.props.onClick?.({} as never)
     expect(onChange).toHaveBeenLastCalledWith(undefined)
-    expect(findElement(LookupFilterSelect({ ...props, state: 'empty' }), Button)).toBeUndefined()
+    expect(findElement(captureWithLocale(() => LookupFilterSelect({ ...props, state: 'empty' })), Button)).toBeUndefined()
   })
 })

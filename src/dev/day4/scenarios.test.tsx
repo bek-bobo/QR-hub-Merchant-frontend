@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { createCreateQrController } from '@/features/dynamic-qr/create-qr'
 import { presentCreateResult, liveCreateLinkSchemes } from '@/features/dynamic-qr/create-result'

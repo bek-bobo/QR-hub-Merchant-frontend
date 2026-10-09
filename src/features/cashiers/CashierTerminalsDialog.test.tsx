@@ -1,8 +1,10 @@
+import { createCashierPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import type { CashierRow } from '@/shared/contracts/management-read'
-import { CASHIER_DEFAULT_COLUMN_ORDER, cashierColumns } from './columns'
+import { CASHIER_DEFAULT_COLUMN_ORDER, createCashierColumns } from './columns'
 import { CashierResults } from './CashierResults'
 import { CashierTerminalsContent, CashierTerminalsDialog } from './CashierTerminalsDialog'
 import dialogSource from './CashierTerminalsDialog.tsx?raw'
@@ -122,3 +124,5 @@ describe('cashier terminal assignment modal', () => {
     expect(pageSource).toContain('<UnassignTerminalPanel')
   })
 })
+
+const cashierColumns = createCashierColumns(createCashierPresentation('uz', localeMessages('cashiers'), localeMessages('common')))

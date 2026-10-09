@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, useState } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { P5ResetDialog } from './P5ResetDialog'
 import type { P5ResetState } from './p5-reset'

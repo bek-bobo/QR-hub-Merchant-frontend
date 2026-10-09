@@ -19,7 +19,7 @@ const accountPreviewAuth: AuthContextValue = {
   loginSnapshot: { phase: 'complete', flow: 'login', pending: false },
   pending: { login: false, profileRefresh: false, logout: false },
   unavailable: false,
-  profileRefreshMessage: 'DEV-only static profile; buttons do not call a backend.',
+  profileRefreshMessage: null,
   logoutMessage: null,
   actions: {
     startLogin: noOp,
@@ -46,6 +46,7 @@ export function Day6AccountPreview() {
         >
           P5 previewga qaytish
         </Link>
+        <p className="text-sm text-text-secondary" role="status">DEV-only static profile; buttons do not call a backend.</p>
         <AccountPage />
       </div>
     </AuthContext.Provider>

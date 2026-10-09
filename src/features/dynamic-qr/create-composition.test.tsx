@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import type { CreateQrContentProps } from './CreateQrContent'
 import contentSource from './CreateQrContent.tsx?raw'
@@ -57,16 +57,16 @@ describe('shared Create QR composition', () => {
     const terminalSection = contentSource.slice(contentSource.indexOf('<FormField id="create-qr-terminal"'), amountStart)
 
     expect(terminalSection).not.toContain('Ruxsatli oraliq:')
-    expect(terminalSection).not.toContain('Ruxsat etilgan summa:')
-    expect(amountField).toContain('label="Summa, UZS"')
+    expect(terminalSection).not.toContain("p.message('create.bounds'")
+    expect(amountField).toContain("label={p.message('create.amount')}")
     expect(amountField).toContain('helpText={<>')
-    expect(amountField).toContain('Masalan: 12 500.50 yoki 12 500,50')
-    expect(amountField).toContain('Ruxsat etilgan summa:')
-    expect(amountField).toContain("formatMinorValue({ minorUnits: String(bounds.minimum), scale: 2 })")
-    expect(amountField).toContain("formatMoney({ minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2 })")
-    expect(amountField.indexOf('Masalan:')).toBeLessThan(amountField.indexOf('Ruxsat etilgan summa:'))
-    expect(amountField.indexOf('Ruxsat etilgan summa:')).toBeLessThan(amountField.indexOf('errorText='))
-    expect(amountField).toContain('Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting.')
+    expect(amountField).toContain("p.message('create.example')")
+    expect(amountField).toContain("p.message('create.bounds'")
+    expect(amountField).toContain("formatMinorValue({minorUnits: String(bounds.minimum), scale: 2})")
+    expect(amountField).toContain("formatMoney({minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2})")
+    expect(amountField.indexOf("p.message('create.example')")).toBeLessThan(amountField.indexOf("p.message('create.bounds'"))
+    expect(amountField.indexOf("p.message('create.bounds'")).toBeLessThan(amountField.indexOf('errorText='))
+    expect(amountField).toContain("p.message('validation.amount')")
     expect(amountField).toContain('<MoneyInput {...controlProps}')
     expect(contentSource).not.toContain('Faqat raqam va bitta nuqta yoki vergul')
     expect(contentSource).not.toContain('Summa formati yoki oralig‘i noto‘g‘ri.')

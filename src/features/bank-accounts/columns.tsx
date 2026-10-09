@@ -1,7 +1,7 @@
+import type { BankAccountPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import type { BankAccountRow } from '@/shared/contracts/management-read'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
@@ -12,10 +12,11 @@ interface BankAccountColumnDefinition<Id extends string = string>
   readonly cellClassName?: string
 }
 
-const bankAccountColumnDefinitions = [
+export function createBankAccountColumns(p: BankAccountPresentation) {
+  return [
   {
     id: 'name',
-    label: 'Nomi',
+    label: p.message('fields.name'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -24,7 +25,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'bank',
-    label: 'Bank',
+    label: p.message('fields.bank'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -33,7 +34,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'accountNumber',
-    label: 'Hisob raqami',
+    label: p.message('fields.account'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -41,7 +42,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'merchant',
-    label: 'Merchant',
+    label: p.message('fields.merchant'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -50,7 +51,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'mfo',
-    label: 'MFO',
+    label: p.message('fields.mfo'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -59,7 +60,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'stir',
-    label: 'STIR',
+    label: p.message('fields.tin'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -68,7 +69,7 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'contract',
-    label: 'Shartnoma',
+    label: p.message('fields.contract'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -77,12 +78,12 @@ const bankAccountColumnDefinitions = [
   },
   {
     id: 'status',
-    label: 'Holat',
+    label: p.message('fields.status'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: BankAccountRow) => {
-      const status = presentActiveStatus(row.statusCode)
+      const status = p.status(row.statusCode)
       return (
         <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full gap-1.5 rounded-full px-2.5 py-1 font-medium whitespace-normal`}>
           <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
@@ -92,13 +93,14 @@ const bankAccountColumnDefinitions = [
     },
   },
 ] as const satisfies readonly BankAccountColumnDefinition[]
+}
 
-export type BankAccountColumnId = (typeof bankAccountColumnDefinitions)[number]['id']
+
+export type BankAccountColumnId = ReturnType<typeof createBankAccountColumns>[number]['id']
 export type BankAccountColumn = BankAccountColumnDefinition & {
   readonly id: BankAccountColumnId
 }
 
-export const bankAccountColumns: readonly BankAccountColumn[] = bankAccountColumnDefinitions
 
 export const BANK_ACCOUNT_DEFAULT_COLUMN_ORDER: readonly BankAccountColumnId[] =
-  bankAccountColumnDefinitions.map((column) => column.id)
+  ["name","bank","accountNumber","merchant","mfo","stir","contract","status"]

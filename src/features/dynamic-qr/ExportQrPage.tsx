@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
@@ -18,6 +19,7 @@ export function ExportQrFilters(props: DynamicQrAdvancedFilterFieldsProps) {
 }
 
 export function ExportQrPage() {
+  const p = useDynamicQrPresentation()
   const [initial] = useState(() => createDefaultDynamicQrFilters())
   const [advancedDraft, setAdvancedDraft] = useState<DynamicQrAdvancedFilterDraft>(() => advancedDraftFromFilters(initial))
   const [dateDraft, setDateDraft] = useState(() => ({ fromDate: initial.fromDate, toDate: initial.toDate }))
@@ -27,7 +29,7 @@ export function ExportQrPage() {
     setApplied((current) => applyDynamicQrSearchQuickFilter(current, search))
   })
   const [revision, setRevision] = useState(0)
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<'invalid' | null>(null)
   const lookups = useDynamicQrFilterLookups(advancedDraft, applied)
 
   function apply(): boolean {
@@ -37,7 +39,7 @@ export function ExportQrPage() {
       lookupError: terminalEvidence.error, terminals: lookups.draftTerminals.data,
     }, lookups.draftEvidence)
     if (result.kind !== 'applied') {
-      setMessage('Tanlangan filtrlarni tasdiqlab bo‘lmadi.')
+      setMessage('invalid')
       return false
     }
     setAdvancedDraft(advancedDraftFromFilters(result.filters))
@@ -69,7 +71,7 @@ export function ExportQrPage() {
 
 
   return <div className="mx-auto min-w-0 max-w-7xl space-y-4">
-    <PageHeader title="Dinamik QR XLSX eksporti" />
+    <PageHeader title={p.message('export.title')} />
     <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
       <DynamicQrQuickFilters range={dateDraft} searchDraft={searchDraft}
         onRangeDraftChange={setDateDraft} onRangeApply={applyDate}
@@ -80,11 +82,11 @@ export function ExportQrPage() {
         <FilterDrawer onApply={apply} onReset={resetDrawerDraft} onOpenChange={syncDrawerDraft} triggerSize="sm">
           <ExportQrFilters {...advancedFilterFieldProps(lookups, advancedDraft, setAdvancedDraft)} />
           {lookups.merchants.isError || lookups.draftBanks.isError || lookups.draftTerminals.isError
-            ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>Qayta urinish</Button> : null}
-          {message ? <p role="alert" className="text-sm text-destructive">{message}</p> : null}
+            ? <Button type="button" variant="outline" size="sm" onClick={lookups.retryDraftLookups}>{p.common('actions.retry')}</Button> : null}
+          {message ? <p role="alert" className="text-sm text-destructive">{p.message('filters.invalid')}</p> : null}
         </FilterDrawer>
       </div>
     </div>
-    {lookups.appliedFilterState === 'invalid' ? <p role="alert" className="text-sm text-destructive">Tanlangan filtrni tekshiring yoki tozalang.</p> : null}
+    {lookups.appliedFilterState === 'invalid' ? <p role="alert" className="text-sm text-destructive">{p.message('filters.checkOrClear')}</p> : null}
   </div>
 }

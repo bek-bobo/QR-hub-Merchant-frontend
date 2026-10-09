@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { useState, type ComponentProps, type ReactNode } from 'react'
 import { CheckCircle2Icon, CopyIcon, ExternalLinkIcon, XIcon, type LucideIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -30,6 +31,7 @@ export function DetailsDialogShell({ children, onOpenChange, onCloseAutoFocus, .
   readonly children: ReactNode; readonly onOpenChange: (open: boolean) => void
   readonly onCloseAutoFocus?: ComponentProps<typeof Dialog.Content>['onCloseAutoFocus']
 } & ComponentProps<typeof DetailsDialogHeader>) {
+  const { message } = useMessages('common')
   return <Dialog.Root open onOpenChange={onOpenChange}>
     <Dialog.Portal>
       <Dialog.Overlay data-slot="details-dialog-overlay" className="fixed inset-0 z-50 bg-black/40 supports-backdrop-filter:backdrop-blur-xs" />
@@ -37,7 +39,7 @@ export function DetailsDialogShell({ children, onOpenChange, onCloseAutoFocus, .
         className={cn(detailsSurfaceClasses, 'fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-[42rem] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden text-sm')}>
         <DetailsDialogHeader {...header} />
         <Dialog.Close asChild>
-          <Button type="button" variant="ghost" className={detailsCloseClasses} aria-label="Yopish"><XIcon aria-hidden="true" /></Button>
+          <Button type="button" variant="ghost" className={detailsCloseClasses} aria-label={message('actions.close')}><XIcon aria-hidden="true" /></Button>
         </Dialog.Close>
         <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain">{children}</div>
       </Dialog.Content>
@@ -77,24 +79,26 @@ export function DetailsStatusBadge({ status }: { readonly status: { readonly lab
   </span>
 }
 
-export function DetailsCopyField({ value, onCopy, copyLabel = 'Havolani nusxalash', copyable = true }: {
+export function DetailsCopyField({ value, onCopy, copyLabel, copyable = true }: {
   readonly value: string; readonly onCopy?: () => void; readonly copyLabel?: string; readonly copyable?: boolean
 }) {
-  const [feedback, setFeedback] = useState<string | null>(null)
+  const { message } = useMessages('common')
+  const resolvedCopyLabel = copyLabel ?? message('copy.link')
+  const [feedback, setFeedback] = useState<'success' | 'failed' | null>(null)
   async function copy() {
     if (onCopy) { onCopy(); return }
     try {
       if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
       await navigator.clipboard.writeText(value)
-      setFeedback('Nusxalandi.')
-    } catch { setFeedback('Nusxalab bo‘lmadi.') }
+      setFeedback('success')
+    } catch { setFeedback('failed') }
   }
   return <div className="min-w-0">
     <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/50 px-2.5 py-1">
       <span title={value} className="min-w-0 flex-1 break-all text-xs font-normal leading-5">{value}</span>
-      {copyable ? <Button type="button" variant="ghost" size="icon-sm" aria-label={copyLabel} title={copyLabel} onClick={() => void copy()}><CopyIcon aria-hidden="true" /></Button> : null}
+      {copyable ? <Button type="button" variant="ghost" size="icon-sm" aria-label={resolvedCopyLabel} title={resolvedCopyLabel} onClick={() => void copy()}><CopyIcon aria-hidden="true" /></Button> : null}
     </div>
-    {feedback ? <span role="status" className="mt-1 block text-xs text-text-secondary">{feedback}</span> : null}
+    {feedback ? <span role="status" className="mt-1 block text-xs text-text-secondary">{message(feedback === 'success' ? 'copy.success' : 'copy.failed')}</span> : null}
   </div>
 }
 

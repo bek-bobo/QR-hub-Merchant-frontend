@@ -1,7 +1,8 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ComponentProps, type ReactNode } from 'react'
 import { Dialog } from 'radix-ui'
 import { MonitorIcon } from 'lucide-react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { DetailsDialogHeader, DetailsDialogShell } from './DetailsDialog'
@@ -60,7 +61,7 @@ describe('DetailsDialogShell runtime structure', () => {
   it('retains controlled dismissal and focus restoration callbacks on Radix', () => {
     const onOpenChange = vi.fn()
     const onCloseAutoFocus = vi.fn()
-    const shell = DetailsDialogShell({ icon: MonitorIcon, title: 'Details', children: <p>Body</p>, onOpenChange, onCloseAutoFocus })
+    const shell = captureWithLocale(() => DetailsDialogShell({ icon: MonitorIcon, title: 'Details', children: <p>Body</p>, onOpenChange, onCloseAutoFocus }))
     expect(shell.type).toBe(Dialog.Root)
     expect(shell.props.open).toBe(true)
     expect(shell.props.onOpenChange).toBe(onOpenChange)

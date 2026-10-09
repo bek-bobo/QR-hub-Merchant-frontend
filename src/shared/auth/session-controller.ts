@@ -1,3 +1,4 @@
+import type { DeviceLeaseFeedback } from './feedback'
 import {
   normalizeUnknownError,
   type SafeApiError,
@@ -70,7 +71,7 @@ export type FreshSessionResult =
 
 export type RestoreSessionResult = EstablishSessionResult
   | { readonly status: 'anonymous' }
-  | { readonly status: 'lease-unavailable'; readonly message: string }
+  | { readonly status: 'lease-unavailable'; readonly message: DeviceLeaseFeedback }
 
 export type ProtectedOperationResult<T> =
   | { readonly status: 'success'; readonly data: T }

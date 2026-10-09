@@ -1,11 +1,10 @@
+import type { P5Presentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import type { P5Row } from '@/shared/contracts/p5-read'
-import { formatOffsetlessDateTime } from '@/shared/presentation/date-time'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
-import { presentP5Status } from './page-state'
 
 interface P5ColumnDefinition<Id extends string = string>
   extends TableColumnDefinition<Id> {
@@ -13,10 +12,11 @@ interface P5ColumnDefinition<Id extends string = string>
   readonly cellClassName?: string
 }
 
-const p5ColumnDefinitions = [
+export function createP5Columns(p: P5Presentation) {
+  return [
   {
     id: 'deviceId',
-    label: 'Qurilma ID',
+    label: p.message('fields.deviceId'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -24,7 +24,7 @@ const p5ColumnDefinitions = [
   },
   {
     id: 'description',
-    label: 'Tavsif',
+    label: p.message('fields.description'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -33,7 +33,7 @@ const p5ColumnDefinitions = [
   },
   {
     id: 'terminal',
-    label: 'Terminal',
+    label: p.message('fields.terminal'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -47,7 +47,7 @@ const p5ColumnDefinitions = [
   },
   {
     id: 'merchant',
-    label: 'Merchant',
+    label: p.message('fields.merchant'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -56,12 +56,12 @@ const p5ColumnDefinitions = [
   },
   {
     id: 'status',
-    label: 'Qurilma holati',
+    label: p.message('fields.status'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: P5Row) => {
-      const status = presentP5Status(row.deviceStatus)
+      const status = p.status(row.deviceStatus)
       return (
         <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full whitespace-normal rounded-full px-2.5 py-1 text-center font-medium`}>
           {status.label}
@@ -71,20 +71,21 @@ const p5ColumnDefinitions = [
   },
   {
     id: 'createdAt',
-    label: 'Yaratilgan vaqt',
+    label: p.message('fields.createdAt'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
-    renderCell: (row: P5Row) => formatOffsetlessDateTime(row.createdAt),
+    renderCell: (row: P5Row) => p.wallTime(row.createdAt),
   },
 ] as const satisfies readonly P5ColumnDefinition[]
+}
 
-export type P5ColumnId = (typeof p5ColumnDefinitions)[number]['id']
+
+export type P5ColumnId = ReturnType<typeof createP5Columns>[number]['id']
 export type P5Column = P5ColumnDefinition & {
   readonly id: P5ColumnId
 }
 
-export const p5Columns: readonly P5Column[] = p5ColumnDefinitions
 
 export const P5_DEFAULT_COLUMN_ORDER: readonly P5ColumnId[] =
-  p5ColumnDefinitions.map((column) => column.id)
+  ["deviceId","description","terminal","merchant","status","createdAt"]

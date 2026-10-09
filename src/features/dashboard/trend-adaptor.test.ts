@@ -1,3 +1,6 @@
+import { createDashboardPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
+const presentation = createDashboardPresentation('uz', localeMessages('dashboard'))
 import { nextDate, completedCoverage, dashboardZero } from './test-fixtures'
 import { describe, expect, it } from 'vitest'
 import type { LineConfig } from '@ant-design/plots'
@@ -52,7 +55,7 @@ describe('trend configuration through the installed Line adaptor', () => {
   it.each(['count', 'amount'] as const)('keeps smooth line/area shapes and canonical zeros/null gaps in %s mode', (mode) => {
     const selected = buckets.map((bucket, index) => index === 2 ? { ...bucket, coverage: 'FUTURE' as const } : bucket)
     const before = JSON.stringify(selected)
-    const config = createTrendPlotConfig({ buckets: selected }, mode, ['success', 'processing', 'failed'], theme)
+    const config = createTrendPlotConfig(presentation, { buckets: selected }, mode, ['success', 'processing', 'failed'], theme)
     const spec = adapt(config)
     expect(spec.children?.map(({ type }) => type)).toEqual(['line', 'area'])
     for (const mark of spec.children!) {
@@ -69,7 +72,7 @@ describe('trend configuration through the installed Line adaptor', () => {
     expect(JSON.stringify(selected)).toBe(before)
   })
   it('does not leak generated children into props on Strict Mode replay', () => {
-    const config = createTrendPlotConfig({ buckets }, 'count', ALL_TREND_SERIES, theme)
+    const config = createTrendPlotConfig(presentation, { buckets }, 'count', ALL_TREND_SERIES, theme)
     const before = JSON.stringify(config)
     const first = adapt(config)
     const replay = adapt(config)
@@ -89,7 +92,7 @@ describe('trend configuration through the installed Line adaptor', () => {
     ]
     let previous: ReturnType<typeof adapt>['children'] = []
     for (const [mode, visible, selected, selectedTheme] of sequence) {
-      const config = createTrendPlotConfig({ buckets: selected }, mode, visible, selectedTheme)
+      const config = createTrendPlotConfig(presentation, { buckets: selected }, mode, visible, selectedTheme)
       const spec = adapt(config)
       expect(spec.children).toHaveLength(2)
       spec.children!.forEach((mark, index) => {

@@ -1,0 +1,96 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "retry": "Retry",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "done": "Done",
+    "refresh": "Refresh",
+    "openMenu": "Open actions"
+  },
+  "states": {
+    "unavailable": "Currently unavailable.",
+    "loading": "Loading",
+    "loadingDescription": "Preparing data.",
+    "loadingOption": "Loading...",
+    "empty": "No data found",
+    "emptyDescription": "There are currently no records to display.",
+    "error": "Unable to load data",
+    "errorDescription": "Please try again shortly.",
+    "noAccess": "No viewing access",
+    "noAccessDescription": "You do not have permission to view this data."
+  },
+  "locale": {
+    "changeFailed": "Unable to change the language. Please try again.",
+    "label": "Language",
+    "selected": "Selected language: {{language}}",
+    "switching": "Changing language…"
+  },
+  "greeting": "Hello, {{name}}!",
+  "items_one": "{{count}} record",
+  "items_other": "{{count}} records",
+  "pagination": {
+    "total": "Total: {{value}}",
+    "pageSummary": "Page {{page}} of {{count}}",
+    "noPages": "No pages available",
+    "previous": "Previous page",
+    "next": "Next page",
+    "page": "Page {{page}}",
+    "pageSize": "Records per page",
+    "perPage": "{{size}} / page"
+  },
+  "toast": {
+    "viewport": "Notifications ({{hotkey}})",
+    "notification": "Notification",
+    "close": "Close notification"
+  },
+  "copy": {
+    "link": "Copy link",
+    "success": "Copied.",
+    "failed": "Unable to copy."
+  },
+  "filters": {
+    "title": "Filters",
+    "description": "Configure filters for the list.",
+    "close": "Close filters",
+    "clearSelection": "Clear selection: {{label}}"
+  },
+  "table": {
+    "trigger": "Table columns",
+    "settings": "Configure table columns",
+    "columns": "Columns",
+    "title": "Columns for {{table}}",
+    "description": "Choose which columns to display and change their order.",
+    "close": "Close column settings",
+    "move": "Move {{label}} column",
+    "visibility": "Visibility of {{label}} column",
+    "moveUp": "Move {{label}} column left — up in the list",
+    "moveDown": "Move {{label}} column right — down in the list",
+    "moved": "{{label}} column moved to position {{position}}.",
+    "shown": "{{label}} column shown.",
+    "hidden": "{{label}} column hidden.",
+    "reset": "Restore default order",
+    "restored": "Default column order and visibility restored."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "label": "Theme",
+    "current": "Theme: {{label}}",
+    "next": "Theme: {{label}}. Switch to the next mode"
+  },
+  "phone": {
+    "countryCode": "Uzbekistan telephone code: +998."
+  },
+  "refresh": {
+    "updated": "Updated: {{time}}"
+  },
+  "search": {
+    "clear": "Clear search",
+    "apply": "Apply search"
+  }
+}

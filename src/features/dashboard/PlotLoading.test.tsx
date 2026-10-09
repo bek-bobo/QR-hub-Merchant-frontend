@@ -1,6 +1,6 @@
 import { dashboardZero, dashboardMetadata, nextDate, completedCoverage } from './test-fixtures'
 import { Suspense } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { LineConfig, PieConfig } from '@ant-design/plots'
 import type { DashboardView } from '@/shared/contracts/merchant-read'
@@ -66,7 +66,7 @@ describe('local plot loading boundaries', () => {
     expect(html).not.toContain('data-dashboard-loading')
     for (const text of ['KPI content', 'Tranzaksiyalar dinamikasi', 'Guruhlash: Kunlik',
       'Dashboard davri', 'Summa', 'Soni', 'Trend qatorlari', 'Grafik qatorlarini sozlash',
-      'A: Jami: Soni: 3, Summa: 300.00 UZS', 'Statuslar taqsimoti',
+      '01.10.2026: Jami: Soni: 3, Summa: 300.00 UZS', 'Statuslar taqsimoti',
       'Muvaffaqiyat ulushi', '100.00 UZS', 'Muvaffaqiyatli:', 'Jarayonda:', 'Muvaffaqiyatsiz:']) {
       expect(html).toContain(text)
     }

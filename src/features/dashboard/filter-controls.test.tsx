@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { DateRangeQuickFilter } from '@/features/dynamic-qr/DateRangeQuickFilter'
 import { DashboardQuickDateFilter } from './DashboardQuickDateFilter'
@@ -21,9 +22,9 @@ describe('Dashboard quick date and Terminal controls', () => {
     const onRangeComplete = vi.fn()
     const onPreset = vi.fn()
     const onReset = vi.fn()
-    const element = DashboardQuickDateFilter({ range: { fromDate: '2026-09-25', toDate: '2026-10-01' },
+    const element = captureWithLocale(() => DashboardQuickDateFilter({ range: { fromDate: '2026-09-25', toDate: '2026-10-01' },
       initialInstant: new Date('2026-10-01T12:00:00Z'),
-      validationMessage: null, onDraftChange, onRangeComplete, onPreset, onReset })
+      validationMessage: null, onDraftChange, onRangeComplete, onPreset, onReset }))
     const calendar = findElement(element, (child) => child.type === DateRangeQuickFilter)!
     const complete = { fromDate: '2026-09-01', toDate: '2026-09-10' }
     const incomplete = { fromDate: '2026-09-01', toDate: '' }

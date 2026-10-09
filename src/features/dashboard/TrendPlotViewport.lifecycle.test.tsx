@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { act, StrictMode, useEffect } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, type Root } from '@/test/locale-fixture'
 import type { LineConfig } from '@ant-design/plots'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TrendPlotViewport } from './TrendPlotViewport'
@@ -177,10 +177,7 @@ async function setup(strict = false) {
   const host = document.createElement('div'); document.body.append(host)
   const caught = vi.fn()
   const root = createRoot(host, { onCaughtError: caught }); mounted.push({ root, host })
-  const render = async (next = config, interactionKey = "fixture") => { await act(async () => root.render(<>
-    <button>Surrounding controls</button>
-    {strict ? <StrictMode><TrendPlotViewport config={next} interactionKey={interactionKey} /></StrictMode> : <TrendPlotViewport config={next} interactionKey={interactionKey} />}
-  </>)) }
+  const render = async (next = config, interactionKey = "fixture") => { await act(async () => root.render(strict ? <StrictMode><button>Surrounding controls</button><TrendPlotViewport config={next} interactionKey={interactionKey} /></StrictMode> : <><button>Surrounding controls</button><TrendPlotViewport config={next} interactionKey={interactionKey} /></>)) }
   await render()
   return { host, root, caught, render }
 }

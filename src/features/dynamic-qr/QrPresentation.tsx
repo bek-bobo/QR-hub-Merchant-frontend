@@ -27,8 +27,8 @@ export function QrPresentation({ link, unavailableMessage, onCopy, footer, ...me
       <div className="min-w-0 space-y-4">
         <QrDetailsCard key={metadata.qrId} {...metadata} />
         {link.kind === 'available' ? <>
-          <CanonicalLinkCard key={original} original={link.original} onCopy={onCopy} />
-          <QrPosterDownloads key={original} poster={readyPoster} qrId={metadata.qrId} />
+          <CanonicalLinkCard key={`link:${original}`} original={link.original} onCopy={onCopy} />
+          <QrPosterDownloads key={`downloads:${original}`} poster={readyPoster} qrId={metadata.qrId} />
         </> : null}
       </div>
       {link.kind === 'available' ? <BrandedQrPoster validatedLink={link} onReady={onPosterReady} />

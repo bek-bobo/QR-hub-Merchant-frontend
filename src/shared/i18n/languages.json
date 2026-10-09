@@ -1,0 +1,5 @@
+{
+  "uz": { "nativeName": "O‘zbekcha", "intlLocale": "uz-UZ", "direction": "ltr", "aliases": ["uz", "uz-UZ", "uz-Latn", "uz-Latn-UZ"], "enabled": true },
+  "ru": { "nativeName": "Русский", "intlLocale": "ru-RU", "direction": "ltr", "aliases": ["ru", "ru-RU"], "enabled": true },
+  "en": { "nativeName": "English", "intlLocale": "en-US", "direction": "ltr", "aliases": ["en", "en-US", "en-GB"], "enabled": true }
+}

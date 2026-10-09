@@ -1,3 +1,4 @@
+import { useCashierPresentation } from './presentation'
 import { useCallback, useState, type ComponentProps } from 'react'
 import { Dialog } from 'radix-ui'
 import { UserRoundIcon, XIcon } from 'lucide-react'
@@ -8,6 +9,7 @@ export function CreateCashierDialog({ onClose, onCloseAutoFocus }: {
   readonly onClose: () => void
   readonly onCloseAutoFocus?: ComponentProps<typeof Dialog.Content>['onCloseAutoFocus']
 }) {
+  const p = useCashierPresentation()
   const [pending, setPending] = useState(false)
   const changeOpen = useCallback((open: boolean) => {
     if (!open && !pending) onClose()
@@ -25,13 +27,13 @@ export function CreateCashierDialog({ onClose, onCloseAutoFocus }: {
               <UserRoundIcon className="size-8 sm:size-10" />
             </span>
             <div className="min-w-0">
-              <Dialog.Title className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.875rem]">Yangi kassir</Dialog.Title>
-              <Dialog.Description className="mt-1.5 text-sm leading-6 text-text-secondary sm:text-base">F.I.Sh., telefon va terminalni tanlang.</Dialog.Description>
+              <Dialog.Title className="text-2xl font-semibold tracking-tight text-text-primary sm:text-[1.875rem]">{p.message('actions.new')}</Dialog.Title>
+              <Dialog.Description className="mt-1.5 text-sm leading-6 text-text-secondary sm:text-base">{p.message('create.description')}</Dialog.Description>
             </div>
           </div>
         </header>
         <Dialog.Close asChild>
-          <Button type="button" variant="ghost" size="icon-sm" className="absolute right-5 top-5 size-10 rounded-full bg-brand-soft text-brand hover:bg-brand-soft/80 sm:right-8 sm:top-7" disabled={pending} aria-label="Yopish"><XIcon aria-hidden="true" /></Button>
+          <Button type="button" variant="ghost" size="icon-sm" className="absolute right-5 top-5 size-10 rounded-full bg-brand-soft text-brand hover:bg-brand-soft/80 sm:right-8 sm:top-7" disabled={pending} aria-label={p.common('actions.close')}><XIcon aria-hidden="true" /></Button>
         </Dialog.Close>
         <div className="min-h-0 min-w-0 overflow-y-auto overscroll-contain px-5 pb-6 pt-5 [overflow-wrap:anywhere] sm:px-8 sm:pt-6">
           <CreateCashierContent onConfirmed={onClose} onPendingChange={setPending} onCancel={() => changeOpen(false)} />

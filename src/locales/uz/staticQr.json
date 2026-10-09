@@ -1,0 +1,82 @@
+{
+  "page": {
+    "name": "Statik QR",
+    "noAccess": "Statik QR ro‘yxatini ko‘rish huquqi mavjud emas.",
+    "authUnavailable": "Statik QR autentifikatsiyasi sozlanmagan",
+    "unavailable": "Statik QR integratsiyasi sozlanmagan"
+  },
+  "filters": {
+    "invalid": "Tanlangan merchant, terminal, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+    "unconfirmed": "Qo‘llangan filtr tasdiqlanmadi",
+    "reselect": "Filtrni tozalang yoki merchant, terminal, viloyat yoki tumanni qayta tanlab qo‘llang.",
+    "allMerchants": "Barcha merchantlar",
+    "noMerchants": "Merchant mavjud emas",
+    "merchantsFailed": "Merchantlarni yuklab bo‘lmadi",
+    "allTerminals": "Barcha terminallar",
+    "noMerchantTerminals": "Bu merchant uchun terminal mavjud emas",
+    "noTerminals": "Terminal mavjud emas",
+    "terminalsFailed": "Terminallarni yuklab bo‘lmadi",
+    "allRegions": "Barcha viloyatlar",
+    "noRegions": "Viloyat mavjud emas",
+    "regionsFailed": "Viloyatlarni yuklab bo‘lmadi",
+    "allDistricts": "Barcha tumanlar",
+    "noDistricts": "Bu viloyat uchun tuman mavjud emas",
+    "districtsFailed": "Tumanlarni yuklab bo‘lmadi",
+    "chooseRegion": "Avval viloyatni tanlang"
+  },
+  "search": {
+    "label": "QR ID bo‘yicha qidirish",
+    "placeholder": "QR ID bo‘yicha"
+  },
+  "states": {
+    "loading": "Statik QRlar yuklanmoqda",
+    "failed": "Statik QR ro‘yxatini ko‘rsatib bo‘lmadi",
+    "empty": "Statik QR topilmadi."
+  },
+  "table": {
+    "label": "Statik QR jadvali",
+    "pages": "Statik QR sahifalari",
+    "total": "{{countText}} ta QR topildi",
+    "actions": "Amallar"
+  },
+  "fields": {
+    "qrId": "QR ID",
+    "terminal": "Terminal",
+    "merchant": "Merchant",
+    "status": "Holat",
+    "createdAt": "Yaratilgan vaqt",
+    "updatedAt": "Yangilangan vaqt",
+    "terminalName": "Terminal nomi",
+    "terminalId": "Terminal ID",
+    "terminalType": "Terminal turi",
+    "merchantId": "Merchant ID",
+    "minimum": "Minimum summa",
+    "maximum": "Maksimum summa",
+    "region": "Viloyat",
+    "regionId": "Viloyat ID",
+    "district": "Tuman",
+    "districtId": "Tuman ID",
+    "link": "QR havola",
+    "redirect": "Yo‘naltirish URL manzili",
+    "statusCode": "Holat kodi"
+  },
+  "details": {
+    "main": "Asosiy ma’lumotlar",
+    "bounds": "Summa chegaralari",
+    "region": "Hudud",
+    "links": "Linklar",
+    "technical": "Texnik ma’lumotlar",
+    "title": "Statik QR tafsilotlari"
+  },
+  "actions": {
+    "viewQr": "QR ko‘rish",
+    "details": "Qo‘shimcha ma’lumotlar"
+  },
+  "display": {
+    "noLink": "Bu QR uchun xavfsiz kanonik havola mavjud emas."
+  },
+  "status": {
+    "active": "Faol",
+    "unknown": "Noma’lum"
+  }
+}

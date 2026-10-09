@@ -1,3 +1,4 @@
+import { useBankAccountPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -9,7 +10,7 @@ import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
   BANK_ACCOUNT_DEFAULT_COLUMN_ORDER,
-  bankAccountColumns,
+  createBankAccountColumns,
   type BankAccountColumn,
   type BankAccountColumnId,
 } from './columns'
@@ -41,6 +42,7 @@ interface BankAccountResultsProps {
 }
 
 function resolveColumns(
+  bankAccountColumns: ReturnType<typeof createBankAccountColumns>,
   order: readonly string[],
   visibleColumnIds: readonly string[],
 ): readonly BankAccountColumn[] {
@@ -58,7 +60,9 @@ function resolveColumns(
 
 export function BankAccountResults({ blocked, pending, error, data, columnOrder,
   visibleColumnIds, onRetry, onPageChange, onPageSizeChange, headerActions, quickFilters }: BankAccountResultsProps) {
-  const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const p = useBankAccountPresentation()
+  const bankAccountColumns = createBankAccountColumns(p)
+  const columns = resolveColumns(bankAccountColumns, columnOrder, visibleColumnIds)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], 0)
   const hasFlexibleColumn = columns.some((column) => flexibleColumnIds.has(column.id))
 
@@ -68,13 +72,13 @@ export function BankAccountResults({ blocked, pending, error, data, columnOrder,
         {quickFilters}
         {headerActions}
       </div> : null}
-      {blocked ? <ErrorState title="Qo‘llangan merchant filtri tasdiqlanmadi" description="Merchantni qayta tanlab qo‘llang yoki filtrni tozalang." />
-        : pending ? <LoadingState title="Bank hisoblari yuklanmoqda" />
+      {blocked ? <ErrorState title={p.message('filters.unconfirmed')} description={p.message('filters.reselect')} />
+        : pending ? <LoadingState title={p.message('states.loading')} />
           : error ? <ErrorState onRetry={onRetry} />
-            : !data ? <ErrorState title="Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi" />
-              : data.content.length === 0 ? <EmptyState description="Bank hisobi topilmadi." />
+            : !data ? <ErrorState title={p.message('states.failed')} />
+              : data.content.length === 0 ? <EmptyState description={p.message('states.empty')} />
                 : <div className="min-w-0">
-        <TableScrollRegion ariaLabel="Bank hisoblari jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+        <TableScrollRegion ariaLabel={p.message('table.label')} className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Table className="bank-account-table table-fixed" style={{ minWidth: totalWidth, width: hasFlexibleColumn ? '100%' : totalWidth }}>
             <colgroup>
               {columns.map((column) => <col key={column.id} style={{ width: flexibleColumnIds.has(column.id) ? undefined : columnWidths[column.id] }} />)}
@@ -86,9 +90,9 @@ export function BankAccountResults({ blocked, pending, error, data, columnOrder,
           </Table>
         </TableScrollRegion>
       </div>}
-      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel="Bank hisoblari sahifalari" currentPage={data.page}
+      {data && !blocked && !pending && !error ? <PaginationBar ariaLabel={p.message('table.pages')} currentPage={data.page}
         totalPages={data.totalPages} totalItems={data.totalElements}
-        totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta Bank hisoblari`}
+        totalLabel={p.message('table.total', { countText: p.number(data.totalElements) })}
         className="bank-account-pagination border-t-0 pt-2"
         onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} /> : null}
     </CardContent>

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import type { P5Row } from '@/shared/contracts/p5-read'
 import { copyExactPresentedLink, presentQrLink } from '@/features/dynamic-qr/qr-presentation'

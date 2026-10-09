@@ -1,6 +1,8 @@
 import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { LiveRoot } from '@/app/LiveRoot'
+import { bootstrapLocale } from '@/app/i18n/bootstrap'
+import { LocaleProvider } from '@/shared/i18n/LocaleProvider'
 import { resolveRuntimeMode } from '@/shared/config/runtime'
 import { ThemeProvider } from '@/shared/theme/ThemeProvider'
 import './index.css'
@@ -11,6 +13,8 @@ async function bootstrap() {
   if (!element) {
     throw new Error('Missing root element')
   }
+
+  const localeRuntime = await bootstrapLocale()
 
   let content: ReactNode = <LiveRoot />
 
@@ -25,7 +29,9 @@ async function bootstrap() {
 
   createRoot(element).render(
     <StrictMode>
-      <ThemeProvider>{content}</ThemeProvider>
+      <LocaleProvider runtime={localeRuntime}>
+        <ThemeProvider>{content}</ThemeProvider>
+      </LocaleProvider>
     </StrictMode>,
   )
 }

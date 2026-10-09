@@ -1,0 +1,122 @@
+{
+  "status": {
+    "active": "Faol",
+    "unknown": "Noma’lum",
+    "inactive": "Faol emas"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "terminal": "Terminal",
+    "terminalId": "Terminal ID",
+    "status": "Holat",
+    "fullname": "F.I.Sh.",
+    "phone": "Telefon",
+    "role": "Rol",
+    "cashier": "Kassir"
+  },
+  "filters": {
+    "allMerchants": "Barcha merchantlar",
+    "noMerchants": "Merchant mavjud emas",
+    "merchantsFailed": "Merchantlarni yuklab bo‘lmadi",
+    "allTerminals": "Barcha terminallar",
+    "noMerchantTerminals": "Bu merchant uchun terminal mavjud emas",
+    "terminalsFailed": "Terminallarni yuklab bo‘lmadi",
+    "unconfirmed": "Qo‘llangan filtr tasdiqlanmadi",
+    "invalid": "Tanlangan merchant yoki terminal tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+    "reselect": "Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang.",
+    "chooseMerchant": "Avval merchantni tanlang",
+    "membership": "Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin."
+  },
+  "table": {
+    "actions": "Amallar",
+    "label": "Kassirlar jadvali",
+    "pages": "Kassir sahifalari",
+    "total": "Jami {{countText}} ta kassir"
+  },
+  "page": {
+    "name": "Kassirlar",
+    "noAccess": "Kassirlar ro‘yxatini ko‘rish huquqi mavjud emas.",
+    "unavailable": "Kassirlar integratsiyasi sozlanmagan"
+  },
+  "states": {
+    "loading": "Kassirlar yuklanmoqda",
+    "failed": "Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi",
+    "empty": "Kassir topilmadi."
+  },
+  "search": {
+    "label": "F.I.Sh. yoki telefon bo‘yicha qidirish",
+    "placeholder": "F.I.Sh. yoki telefon"
+  },
+  "actions": {
+    "new": "Yangi kassir",
+    "create": "Yangi kassir yaratish",
+    "assign": "Terminal qo‘shish",
+    "unassign": "Terminal ajratish",
+    "unassignShort": "Ajratish",
+    "row": "{{name}} uchun amallarni ochish",
+    "activeTerminals": "Faol terminallar · {{countText}}",
+    "unassignLabel": "{{name}} ({{id}}) terminalini ajratish",
+    "refreshStatus": "Holatni yangilash"
+  },
+  "details": {
+    "active": "Faol terminal biriktirishlari",
+    "assigned": "Biriktirilgan terminallar",
+    "total": "{{countText}} ta terminal",
+    "empty": "Bu kassirga terminal biriktirilmagan.",
+    "unassignTarget": "Ajratiladigan terminal",
+    "unassignHelp": "Ushbu terminalni kassirdan ajratishingiz mumkin.",
+    "description": "Ushbu kassirga hozirda biriktirilgan faol terminallar ro‘yxati.",
+    "terminalId": "Terminal ID:"
+  },
+  "create": {
+    "description": "F.I.Sh., telefon va terminalni tanlang.",
+    "namePlaceholder": "F.I.Sh. ni kiriting",
+    "phoneHelp": "9 ta mahalliy raqamni kiriting.",
+    "phoneInvalid": "Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.",
+    "chooseTerminal": "Terminalni tanlang",
+    "submit": "Kassir yaratish",
+    "pending": "Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.",
+    "unknown": "Holat noma’lum",
+    "checkFirst": "Kassir yaratilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassirlar ro‘yxatini tekshiring.",
+    "duplicateRisk": "Kassir yaratilgan bo‘lishi mumkin. Takroriy yuborish yangi kassir yaratishi mumkin.",
+    "newIntent": "Yangi intent"
+  },
+  "lookup": {
+    "denied": "Terminal tanlash uchun ruxsat mavjud emas.",
+    "assignDenied": "Terminal tanlash huquqi mavjud emas.",
+    "unavailable": "Terminal tanlash integratsiyasi mavjud emas.",
+    "failed": "Terminallarni yuklab bo‘lmadi.",
+    "loading": "Terminallar yuklanmoqda.",
+    "unconfirmed": "Terminal tanlovi qayta tasdiqlanishi kerak."
+  },
+  "assign": {
+    "title": "Terminallarni qo‘shish",
+    "warning": "Bu amal mavjud faol biriktirishlarni almashtirmaydi. Faqat tanlangan terminallar qo‘shiladi yoki avvalgi nofaol biriktirish qayta faollashishi mumkin.",
+    "options": "Qo‘shiladigan terminallar",
+    "selectionHelp": "Kamida bitta hali faol bo‘lmagan joriy terminalni tanlang.",
+    "submit": "Tanlangan terminallarni qo‘shish",
+    "pending": "Biriktirish yuborilmoqda.",
+    "confirmed": "Terminallar biriktirildi. Faol biriktirishlar ro‘yxati yangilangach tekshiriladi.",
+    "unknown": "Natija noma’lum. Ayrim terminallar biriktirilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassir terminal holatini yangilang."
+  },
+  "unassign": {
+    "label": "Terminalni ajratishni tasdiqlash",
+    "title": "Terminalni kassirdan ajratish",
+    "confirm": "Terminalni ajratish",
+    "warning": "{{cashier}} kassirdan {{terminal}} ({{id}}) terminalining biriktirilishini olib tashlashni tasdiqlaysizmi?",
+    "stale": "Oldingi tanlov endi amal qilmaydi. Kassirlar ro‘yxatini yangilang.",
+    "pending": "Ajratish so‘rovi yuborilmoqda.",
+    "confirmed": "Terminalni ajratish so‘rovi tasdiqlandi. Joriy faol biriktirishlar yangilangach tekshiriladi.",
+    "unknown": "Natija noma’lum. Terminal allaqachon ajratilgan bo‘lishi mumkin. Qayta urinishdan oldin kassirning terminal holatini yangilang."
+  },
+  "feedback": {
+    "permission": "Ruxsat mavjud emas.",
+    "validation": "F.I.Sh., telefon va joriy terminal tanlovini tekshiring.",
+    "selection": "Joriy faol bo‘lmagan, tasdiqlangan terminallarni tanlang.",
+    "stale": "Kassir yoki faol terminal tanlovi eskirgan. Ro‘yxatni yangilang.",
+    "unavailable": "Amal hozir mavjud emas.",
+    "notSent": "Amal yuborilmadi. Sessiya va ruxsatlarni tekshiring.",
+    "rejected": "So‘rov rad etildi.",
+    "alreadySent": "Bu intent allaqachon yuborilgan. Yangi amalni alohida tanlang."
+  }
+}

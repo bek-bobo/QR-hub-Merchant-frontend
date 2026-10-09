@@ -15,6 +15,15 @@ import {
 
 const weekdays = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'] as const
 
+// Optional presentation port for consumers migrating ahead of Dynamic QR.
+// Calendar selection and layout calculations remain independent of locale.
+export interface DateRangePresentation {
+  readonly weekdays: readonly string[]
+  month(value: string): string
+  date(value: string, options?: Intl.DateTimeFormatOptions): string
+  message(key: 'dates.choose' | 'dates.previous' | 'dates.next' | 'dates.reset'): string
+}
+
 // Match the md breakpoint that exposes the second month panel.
 const twoPanelQuery = '(min-width: 768px)'
 function subscribeToPanelLayout(onChange: () => void) {
@@ -48,7 +57,9 @@ function CalendarMonth({
   className,
   otherVisibleMonth,
   navigation,
+  presentation,
 }: {
+  readonly presentation?: DateRangePresentation | undefined
   readonly month: string
   readonly selection: DateRange
   readonly preview: DateRange | null
@@ -60,15 +71,15 @@ function CalendarMonth({
   readonly navigation: ReactNode
 }) {
   return (
-    <section className={className} aria-label={formatCalendarMonthLabel(month)}>
+    <section className={className} aria-label={(presentation?.month(month) ?? formatCalendarMonthLabel(month))}>
       <div className="relative mb-3 flex h-8 items-center justify-center">
         <h3 className="text-center text-sm font-semibold text-text-primary">
-          {formatCalendarMonthLabel(month)}
+          {presentation?.month(month) ?? formatCalendarMonthLabel(month)}
         </h3>
         {navigation}
       </div>
       <div className="grid grid-cols-7 gap-1 text-center">
-        {weekdays.map((weekday) => (
+        {(presentation?.weekdays ?? weekdays).map((weekday) => (
           <span key={weekday} className="py-1 text-xs text-text-secondary" aria-hidden="true">
             {weekday}
           </span>
@@ -92,7 +103,7 @@ function CalendarMonth({
             <button
               key={day.date}
               type="button"
-              aria-label={dayFormatter.format(utcDate(day.date))}
+              aria-label={(presentation?.date(day.date, {day: 'numeric', month: 'long', year: 'numeric'}) ?? dayFormatter.format(utcDate(day.date)))}
               aria-pressed={endpoint}
               aria-current={canonical && day.date === today ? 'date' : undefined}
               data-calendar-date={day.date}
@@ -124,6 +135,7 @@ function CalendarMonth({
 }
 
 interface DateRangeQuickFilterProps {
+  readonly presentation?: DateRangePresentation
   readonly triggerLabel?: string
   readonly resetLabel?: string
   readonly value: DateRange
@@ -134,6 +146,7 @@ interface DateRangeQuickFilterProps {
 
 export function DateRangeQuickFilter({
   triggerLabel,
+  presentation,
   resetLabel = 'Standart 7 kunlik oraliq',
   value,
   onDraftChange,
@@ -187,12 +200,12 @@ export function DateRangeQuickFilter({
           type="button"
           variant="outline"
           className={triggerLabel ? 'h-8 max-w-full gap-2 px-3 font-normal' : 'h-9 w-full justify-between gap-3 px-3 font-normal sm:w-auto sm:min-w-64'}
-          aria-label={triggerLabel ? `Grafik sana oralig‘ini tanlash: ${triggerLabel}` : 'Sana oralig‘ini tanlash'}
+          aria-label={presentation?.message('dates.choose') ?? (triggerLabel ? `Grafik sana oralig‘ini tanlash: ${triggerLabel}` : 'Sana oralig‘ini tanlash')}
         >
           {triggerLabel ? <span>{triggerLabel}</span> : <span className="flex min-w-0 items-center gap-2">
-            <span>{value.fromDate}</span>
+            <span>{presentation?.date(value.fromDate) ?? value.fromDate}</span>
             <span aria-hidden="true" className="text-text-secondary">→</span>
-            <span>{value.toDate || '…'}</span>
+            <span>{value.toDate ? presentation?.date(value.toDate) ?? value.toDate : '…'}</span>
           </span>}
           <CalendarDaysIcon aria-hidden="true" className="shrink-0" />
         </Button>
@@ -207,6 +220,7 @@ export function DateRangeQuickFilter({
         >
           <div className="grid gap-6 md:grid-cols-2">
             <CalendarMonth
+              presentation={presentation}
               month={visibleMonth}
               selection={value}
               preview={preview}
@@ -220,7 +234,7 @@ export function DateRangeQuickFilter({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Oldingi oy"
+                    aria-label={presentation?.message('dates.previous') ?? 'Oldingi oy'}
                     className="absolute left-0"
                     onClick={() => navigateMonth(-1)}
                   >
@@ -230,7 +244,7 @@ export function DateRangeQuickFilter({
                     type="button"
                     variant="ghost"
                     size="icon-sm"
-                    aria-label="Keyingi oy"
+                    aria-label={presentation?.message('dates.next') ?? 'Keyingi oy'}
                     className="absolute right-0 md:hidden"
                     onClick={() => navigateMonth(1)}
                   >
@@ -240,6 +254,7 @@ export function DateRangeQuickFilter({
               }
             />
             <CalendarMonth
+              presentation={presentation}
               month={shiftCalendarMonth(visibleMonth, 1)}
               selection={value}
               preview={preview}
@@ -253,7 +268,7 @@ export function DateRangeQuickFilter({
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  aria-label="Keyingi oy"
+                  aria-label={presentation?.message('dates.next') ?? 'Keyingi oy'}
                   className="absolute right-0"
                   onClick={() => navigateMonth(1)}
                 >
@@ -274,7 +289,7 @@ export function DateRangeQuickFilter({
               }}
             >
               <RotateCcwIcon aria-hidden="true" />
-              {resetLabel}
+              {presentation?.message('dates.reset') ?? resetLabel}
             </Button>
           </div>
         </PopoverPrimitive.Content>

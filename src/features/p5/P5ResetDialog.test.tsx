@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { QueryClient, QueryObserver } from '@tanstack/react-query'
 import { P5ResetDialog } from './P5ResetDialog'

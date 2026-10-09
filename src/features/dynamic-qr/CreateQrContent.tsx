@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -15,6 +16,7 @@ import { parseCreateAmount } from './create-amount'
 import { presentCreateResult, type CreateResultModel } from './create-result'
 import { CreateQrResult } from './CreateQrResult'
 import { resolveCreateUzsCode } from './create-currency'
+import { describeQrActionFeedback, type QrActionFeedback } from './feedback'
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
   return left.source === right.source && left.sessionScopeId === right.sessionScopeId &&
@@ -30,9 +32,10 @@ export interface CreateQrContentProps {
 }
 
 function CreateFormShell({ embedded, children }: { readonly embedded: boolean; readonly children: ReactNode }) {
+  const p = useDynamicQrPresentation()
   if (embedded) return <>{children}</>
   return <Card>
-    <CardHeader><CardTitle>Yangi QR</CardTitle></CardHeader>
+    <CardHeader><CardTitle>{p.message('actions.new')}</CardTitle></CardHeader>
     <CardContent>{children}</CardContent>
   </Card>
 }
@@ -44,11 +47,12 @@ export function CreateQrContent({
   onResultModeChange,
   onClose,
 }: CreateQrContentProps = {}) {
+  const p = useDynamicQrPresentation()
   const runtime = useReadRuntime()
   const { adapter, available, currencyAllowed } = useLiveCreateQrAdapter()
   const [terminalId, setTerminalId] = useState('')
   const [amountInput, setAmountInput] = useState('')
-  const [actionMessage, setActionMessage] = useState<string | null>(null)
+  const [actionMessage, setActionMessage] = useState<QrActionFeedback | null>(null)
   const terminals = useQuery(adapter.terminalOptions())
   const currencies = useQuery(adapter.currencyOptions(currencyAllowed))
   const [controller] = useState(() => runtime.actionRegistry.getOrCreate(
@@ -91,7 +95,7 @@ export function CreateQrContent({
     }).then((result) => {
       onPendingChange?.(false)
       if (!sameScope(runtime.scope, runtime.getCurrentScope())) return
-      if (result.kind === 'not-sent' || result.kind === 'unknown') setActionMessage(result.reason)
+      if (result.kind === 'not-sent' || result.kind === 'unknown') setActionMessage(result.kind === 'unknown' ? 'unknown' : describeQrActionFeedback(result.reason))
     })
   }
 
@@ -108,55 +112,54 @@ export function CreateQrContent({
   }
 
   return <div className={embedded ? 'space-y-4' : resultKind === 'confirmed' ? 'mx-auto max-w-5xl space-y-4' : 'mx-auto max-w-2xl space-y-4'}>
-    {!embedded ? <PageHeader title="Dinamik QR yaratish" description="Summa UZSda kiritiladi." /> : null}
+    {!embedded ? <PageHeader title={p.message('create.title')} description={p.message('create.description')} /> : null}
     {!result && !controllerState.closed ? <CreateFormShell embedded={embedded}>
       <form className={embedded ? 'space-y-6 [&_label]:text-base [&_label]:font-semibold [&_p[id$="-help"]]:mt-2.5 [&_p[id$="-help"]]:text-sm sm:[&_label]:text-lg sm:[&_p[id$="-help"]]:text-base' : 'space-y-4'} onSubmit={submit}>
-        <FormField id="create-qr-terminal" label="Terminal">
+        <FormField id="create-qr-terminal" label={p.message('table.terminal')}>
           {(controlProps) => <div className="relative">
             <Select {...controlProps} value={terminalId}
               className={embedded ? `h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg ${terminalId ? 'text-text-primary' : 'text-text-secondary'}` : undefined}
               disabled={!runtime.capabilities.terminalLookup || !available || terminals.isPending || terminals.isError}
               onChange={(event) => setTerminalId(event.target.value)}>
-              <option value="">Terminalni tanlang</option>
+              <option value="">{p.message('create.chooseTerminal')}</option>
               {terminals.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
             </Select>
           </div>}
         </FormField>
-        {!runtime.capabilities.terminalLookup ? <p role="status" className="text-sm">Terminal ro‘yxatiga ruxsat mavjud emas.</p> : null}
-        {runtime.capabilities.terminalLookup && !available ? <p role="status" className="text-sm">Terminal ro‘yxati hozir mavjud emas.</p> : null}
-        {terminals.isPending && available && runtime.capabilities.terminalLookup ? <p role="status" className="text-sm">Terminallar yuklanmoqda…</p> : null}
-        {terminals.isError ? <p role="alert" className="text-sm text-destructive">Terminal ro‘yxatini yuklab bo‘lmadi.</p> : null}
-        {terminals.data?.length === 0 ? <p className="text-sm">Biriktirilgan faol terminal topilmadi.</p> : null}
-        {terminalId && terminals.data && !selected ? <p role="alert" className="text-sm text-destructive">Tanlangan terminal endi mavjud emas. Qayta tanlang.</p> : null}
-        {selected && !bounds ? <p role="alert" className="text-sm text-destructive">Bu terminal uchun summa oralig‘i mavjud emas.</p> : null}
-        <FormField id="create-qr-amount" label="Summa, UZS"
+        {!runtime.capabilities.terminalLookup ? <p role="status" className="text-sm">{p.message('create.terminalNoAccess')}</p> : null}
+        {runtime.capabilities.terminalLookup && !available ? <p role="status" className="text-sm">{p.message('create.terminalsUnavailable')}</p> : null}
+        {terminals.isPending && available && runtime.capabilities.terminalLookup ? <p role="status" className="text-sm">{p.message('create.terminalsLoading')}</p> : null}
+        {terminals.isError ? <p role="alert" className="text-sm text-destructive">{p.message('create.terminalsFailed')}</p> : null}
+        {terminals.data?.length === 0 ? <p className="text-sm">{p.message('create.terminalsEmpty')}</p> : null}
+        {terminalId && terminals.data && !selected ? <p role="alert" className="text-sm text-destructive">{p.message('create.terminalRemoved')}</p> : null}
+        {selected && !bounds ? <p role="alert" className="text-sm text-destructive">{p.message('create.boundsUnavailable')}</p> : null}
+        <FormField id="create-qr-amount" label={p.message('create.amount')}
           helpText={<>
-            Masalan: 12 500.50 yoki 12 500,50
-            {bounds ? <span className="mt-1.5 block">
-              Ruxsat etilgan summa: {formatMinorValue({ minorUnits: String(bounds.minimum), scale: 2 })} – {formatMoney({ minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2 })}
+            {p.message('create.example')}{bounds ? <span className="mt-1.5 block">
+              {p.message('create.bounds', {minimum: formatMinorValue({minorUnits: String(bounds.minimum), scale: 2}), maximum: formatMoney({minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2})})}
             </span> : null}
           </>}
-          errorText={amountInput && bounds && !amountValid ? 'Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting.' : undefined}>
+          errorText={amountInput && bounds && !amountValid ? p.message('validation.amount') : undefined}>
           {(controlProps) => <MoneyInput {...controlProps} value={amountInput} onValueChange={setAmountInput}
             className={embedded ? 'h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg' : undefined} />}
         </FormField>
-        {!currencyAllowed ? <p role="status" className="text-sm">Valyuta ro‘yxatiga ruxsat mavjud emas.</p> : null}
-        {currencyAllowed && !available ? <p role="status" className="text-sm">Valyuta ro‘yxati hozir mavjud emas.</p> : null}
-        {currencies.isPending && available && currencyAllowed ? <p role="status" className="text-sm">Valyutalar yuklanmoqda…</p> : null}
-        {currencies.isError ? <p role="alert" className="text-sm text-destructive">Valyuta ro‘yxatini yuklab bo‘lmadi.</p> : null}
+        {!currencyAllowed ? <p role="status" className="text-sm">{p.message('create.currencyNoAccess')}</p> : null}
+        {currencyAllowed && !available ? <p role="status" className="text-sm">{p.message('create.currenciesUnavailable')}</p> : null}
+        {currencies.isPending && available && currencyAllowed ? <p role="status" className="text-sm">{p.message('create.currenciesLoading')}</p> : null}
+        {currencies.isError ? <p role="alert" className="text-sm text-destructive">{p.message('create.currenciesFailed')}</p> : null}
         {currencies.data && !currencyCode ?
-          <p role="alert" className="text-sm text-destructive">UZS valyutasi mavjud emas.</p> : null}
+          <p role="alert" className="text-sm text-destructive">{p.message('create.noUzs')}</p> : null}
         <div className={embedded ? 'mt-9! flex flex-col-reverse gap-3 border-t border-border/70 pt-6 sm:flex-row sm:justify-end' : 'flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end'}>
           {embedded && onClose ? <Button type="button" variant="outline"
             className="h-14 w-full rounded-2xl bg-popover px-7 text-base font-semibold text-text-secondary sm:w-auto sm:min-w-44 sm:text-lg"
-            disabled={controllerState.outcome.kind === 'pending'} onClick={onClose}>Bekor qilish</Button> : null}
-          <Button type="submit" className={embedded ? 'h-14 w-full rounded-2xl px-7 text-base font-semibold sm:w-auto sm:min-w-44 sm:text-lg' : 'w-full sm:w-auto sm:min-w-36'} disabled={!canSubmit}>QR yaratish</Button>
+            disabled={controllerState.outcome.kind === 'pending'} onClick={onClose}>{p.common('actions.cancel')}</Button> : null}
+          <Button type="submit" className={embedded ? 'h-14 w-full rounded-2xl px-7 text-base font-semibold sm:w-auto sm:min-w-44 sm:text-lg' : 'w-full sm:w-auto sm:min-w-36'} disabled={!canSubmit}>{p.message('create.submit')}</Button>
         </div>
-        {actionMessage ? <p role="status" className="text-sm">{actionMessage}</p> : null}
+        {actionMessage ? <p role="status" className="text-sm">{p.feedback(actionMessage)}</p> : null}
       </form>
     </CreateFormShell> : null}
     {controllerState.outcome.kind === 'pending' ?
-      <p role="status">Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.</p> : null}
+      <p role="status">{p.message('create.pending')}</p> : null}
     {result && sameScope(result.scope, runtime.getCurrentScope()) ?
       <CreateQrResult result={result} currentScope={runtime.getCurrentScope}
         canCreate={adapter.canCreate}
@@ -164,10 +167,10 @@ export function CreateQrContent({
     {controllerState.closed && controllerState.intent &&
       sameScope(controllerState.intent.scope, runtime.getCurrentScope()) ?
       <section role="status" className="space-y-2 rounded-lg border bg-surface p-4">
-        <p>Natija yopildi. Bu amal QRni bekor qilmaydi.</p>
+        <p>{p.message('create.closed')}</p>
         {controllerState.outcome.kind === 'unknown' ?
-          <p className="text-sm text-text-secondary">Yangi urinish alohida QR yaratishi mumkin.</p> : null}
-        <Button type="button" variant="secondary" onClick={beginNewIntent}>Yangi QR</Button>
+          <p className="text-sm text-text-secondary">{p.message('create.newRisk')}</p> : null}
+        <Button type="button" variant="secondary" onClick={beginNewIntent}>{p.message('actions.new')}</Button>
       </section> : null}
   </div>
 }

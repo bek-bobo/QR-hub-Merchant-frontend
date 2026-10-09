@@ -1,6 +1,7 @@
+import { useDashboardPresentation } from './presentation'
 import { ArrowDownIcon, ArrowUpIcon } from 'lucide-react'
 import type { Outcome } from '@/shared/contracts/merchant-read'
-import { formatGrowth } from './presenters'
+
 
 interface MetricGrowthIndicatorProps {
   readonly label: string
@@ -9,6 +10,7 @@ interface MetricGrowthIndicatorProps {
 }
 
 export function MetricGrowthIndicator({ label, value, outcome }: MetricGrowthIndicatorProps) {
+  const p = useDashboardPresentation()
   const direction = value === null || value === 0 ? null : value > 0 ? 'up' : 'down'
   // Direction describes the numeric change; desirability depends on the metric.
   const desirability = direction === null || outcome === 'total' || outcome === 'processing'
@@ -21,14 +23,7 @@ export function MetricGrowthIndicator({ label, value, outcome }: MetricGrowthInd
     : desirability === 'unfavorable'
       ? 'text-status-error-foreground'
       : 'text-text-primary'
-  const description = value === null
-    ? 'Taqqoslash mavjud emas'
-    : direction === null
-      ? 'O‘zgarish yo‘q'
-      : `${direction === 'up' ? 'O‘sish' : 'Kamayish'}${
-        desirability === 'favorable' ? ', ijobiy o‘zgarish'
-          : desirability === 'unfavorable' ? ', salbiy o‘zgarish' : ''
-      }`
+  const description = p.message(value === null ? 'growth.unavailable' : direction === null ? 'growth.unchanged' : direction === 'up' ? desirability === 'favorable' ? 'growth.upFavorable' : desirability === 'unfavorable' ? 'growth.upUnfavorable' : 'growth.upNeutral' : desirability === 'favorable' ? 'growth.downFavorable' : desirability === 'unfavorable' ? 'growth.downUnfavorable' : 'growth.downNeutral')
   const DirectionIcon = direction === 'up' ? ArrowUpIcon : ArrowDownIcon
 
   return (
@@ -37,7 +32,7 @@ export function MetricGrowthIndicator({ label, value, outcome }: MetricGrowthInd
       <dd className={`mt-1 flex min-w-0 items-start gap-1 font-medium ${colorClass}`}>
         <span className="sr-only">{description}: </span>
         {direction ? <DirectionIcon className="size-3 shrink-0" aria-hidden="true" /> : null}
-        <span className="min-w-0 [overflow-wrap:anywhere]">{formatGrowth(value)}</span>
+        <span className="min-w-0 [overflow-wrap:anywhere]">{p.percent(value, true)}</span>
       </dd>
     </div>
   )

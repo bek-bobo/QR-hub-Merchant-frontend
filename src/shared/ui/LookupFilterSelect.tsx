@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { FilterFieldCard } from './FilterFieldCard'
@@ -18,11 +19,12 @@ interface LookupFilterSelectProps {
 }
 
 export function LookupFilterSelect({ label, value, options, state, allLabel,
-  emptyLabel, errorLabel, loadingLabel = 'Yuklanmoqda...', hideUnavailableDescription = false,
+  emptyLabel, errorLabel, loadingLabel, hideUnavailableDescription = false,
   onChange }: LookupFilterSelectProps) {
+  const { message } = useMessages('common')
   const ready = state === 'ready'
   const selected = ready && options?.some((item) => item.id === value) ? value : ''
-  const reason = state === 'loading' ? loadingLabel : state === 'empty' ? emptyLabel : errorLabel
+  const reason = state === 'loading' ? (loadingLabel ?? message('states.loadingOption')) : state === 'empty' ? emptyLabel : errorLabel
   return <FilterFieldCard>
     <label className="block min-w-0 space-y-1.5 text-sm font-medium text-text-primary">{label}
       <Select value={selected ?? ''} disabled={!ready} className={!ready ? 'text-text-secondary' : undefined}
@@ -36,6 +38,6 @@ export function LookupFilterSelect({ label, value, options, state, allLabel,
     {state === 'error' || (state === 'unavailable' && !hideUnavailableDescription)
       ? <p role="status" className="sr-only">{reason}</p> : null}
     {value && !ready && state !== 'empty' ? <Button type="button" variant="ghost" size="sm"
-      aria-label={`${label} tanlovini tozalash`} onClick={() => onChange(undefined)}>Tozalash</Button> : null}
+      aria-label={message('filters.clearSelection', { label })} onClick={() => onChange(undefined)}>{message('actions.clear')}</Button> : null}
   </FilterFieldCard>
 }

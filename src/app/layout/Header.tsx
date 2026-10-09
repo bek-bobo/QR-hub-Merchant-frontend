@@ -1,3 +1,5 @@
+import { LocaleSelect } from '@/shared/i18n/LocaleSelect'
+import { useMessages } from '@/shared/i18n/useMessages'
 import type { ReactNode, Ref } from 'react'
 import { LogOutIcon, MenuIcon } from 'lucide-react'
 import { Link } from 'react-router'
@@ -38,6 +40,9 @@ export function Header({
   logoutPending = false,
   onLogout,
 }: HeaderProps) {
+  const { message } = useMessages('shell')
+  const auth = useMessages('auth')
+  const canLogout = auth.critical('actions.logout').status === 'resolved'
   return (
     <header className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/70 bg-surface px-4 py-2 shadow-sm sm:gap-4 sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
@@ -47,7 +52,7 @@ export function Header({
             variant="outline"
             size="icon"
             className="lg:hidden"
-            aria-label="Navigatsiyani ochish"
+            aria-label={message('navigation.open')}
             aria-expanded={navigationOpen}
             aria-controls={navigationControls}
             ref={navigationTriggerRef}
@@ -58,7 +63,7 @@ export function Header({
         ) : null}
         {onToggleSidebar ? (
           <Button type="button" variant="ghost" size="icon" className="hidden size-10 lg:inline-flex"
-            aria-label={sidebarCollapsed ? 'Yon panelni ochish' : 'Yon panelni yopish'}
+            aria-label={sidebarCollapsed ? message('navigation.expand') : message('navigation.collapse')}
             aria-expanded={!sidebarCollapsed} onClick={onToggleSidebar}>
             <MenuIcon className="size-6" aria-hidden="true" />
           </Button>
@@ -83,12 +88,13 @@ export function Header({
 
       {onLogout && compactAccountControls ? (
         <div className="flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
+          <LocaleSelect />
           <ThemeModeSelect compact />
           <Menu.Root>
             <Menu.Trigger asChild>
               <button
                 type="button"
-                aria-label="Profil menyusi"
+                aria-label={message('header.profileMenu')}
                 aria-describedby="account-avatar-tooltip"
                 className="group relative flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-brand-soft text-xs font-semibold uppercase text-brand outline-none ring-offset-2 ring-offset-surface transition-shadow focus-visible:ring-2 focus-visible:ring-brand"
               >
@@ -98,7 +104,7 @@ export function Header({
                   className="pointer-events-none invisible absolute right-[calc(100%+0.5rem)] top-1/2 z-50 hidden -translate-y-1/2 whitespace-nowrap rounded-md border bg-surface px-2.5 py-2 text-right normal-case opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-visible:visible group-focus-visible:opacity-100 sm:block"
                 >
                   <span className="block max-w-48 truncate text-sm font-medium text-text-primary">
-                    {identityLabel ?? 'Merchant foydalanuvchi'}
+                    {identityLabel ?? message('header.user')}
                   </span>
                   {identitySecondary ? (
                     <span className="mt-0.5 block max-w-48 truncate text-xs text-text-secondary">
@@ -122,15 +128,15 @@ export function Header({
                   asChild
                   className="flex cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-muted data-[highlighted]:text-text-primary"
                 >
-                  <Link to="/account">Profil</Link>
+                  <Link to="/account">{message('header.profile')}</Link>
                 </Menu.Item>
                 <Menu.Item
-                  disabled={logoutPending}
-                  onSelect={onLogout}
+                  disabled={logoutPending || !canLogout}
+                  onSelect={canLogout ? onLogout : undefined}
                   className="flex cursor-default select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm text-destructive outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-destructive/10 dark:data-[highlighted]:bg-destructive/20"
                 >
                   <LogOutIcon className="size-4 shrink-0" aria-hidden="true" />
-                  Chiqish
+                  {auth.message('actions.logout')}
                 </Menu.Item>
               </Menu.Content>
             </Menu.Portal>
@@ -138,27 +144,27 @@ export function Header({
         </div>
       ) : onLogout ? (
         <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <LocaleSelect />
           <ThemeModeSelect />
           <span className="hidden max-w-52 truncate text-sm font-medium text-text-primary sm:block">
-            {identityLabel ?? 'Merchant foydalanuvchi'}
+            {identityLabel ?? message('header.user')}
           </span>
           <Button
             type="button"
             variant="outline"
             size="sm"
             className="shrink-0"
-            disabled={logoutPending}
-            onClick={onLogout}
+            disabled={logoutPending || !canLogout}
+            onClick={canLogout ? onLogout : undefined}
           >
-            {logoutPending ? 'Chiqilmoqda…' : 'Chiqish'}
+            {logoutPending ? auth.message('states.signingOut') : auth.message('actions.logout')}
           </Button>
         </div>
       ) : (
         <div className="flex shrink-0 flex-col items-end gap-1 text-right">
           <span className="text-sm font-medium text-text-primary">Demo Store</span>
           <span className="rounded-full bg-brand-soft px-2 py-0.5 text-xs font-medium text-brand">
-            Demo — namuna ma’lumotlari
-          </span>
+            {message('header.demo')}</span>
         </div>
       )}
     </header>

@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { LayoutDashboardIcon, ScanLineIcon } from 'lucide-react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
@@ -38,7 +38,7 @@ describe('LiveShellLayout', () => {
 
     const aside = html.match(/<aside\b[^>]*>[\s\S]*?<\/aside>/)?.[0]
     const shellHeader = html.match(/<header\b[^>]*>[\s\S]*?<\/header>/)?.[0]
-    const navigation = aside?.match(/<nav\b[^>]*aria-label="Live navigatsiya"[^>]*>[\s\S]*?<\/nav>/)?.[0]
+    const navigation = aside?.match(/<nav\b[^>]*aria-label="Ish maydoni navigatsiyasi"[^>]*>[\s\S]*?<\/nav>/)?.[0]
 
     expect(html.match(/<h1\b/g)).toHaveLength(1)
     expect(aside).toBeDefined()

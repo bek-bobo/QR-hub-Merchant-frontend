@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { LogOutIcon, PencilIcon, PhoneIcon, UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -10,6 +11,9 @@ import { useAuth } from '@/shared/auth/useAuth'
 import { formatUzbekPhoneDisplay } from '@/shared/presentation/phone'
 
 export function AccountPage() {
+  const { message } = useMessages('account')
+  const auth = useMessages('auth')
+  const canLogout = auth.critical('actions.logout').status === 'resolved'
   const { actions, pending, profile, profileRefreshMessage } = useAuth()
 
   if (!profile) {
@@ -25,26 +29,24 @@ export function AccountPage() {
               <UserIcon className="size-5" aria-hidden="true" />
             </span>
             <CardTitle className="min-w-0 text-xl font-semibold text-text-primary">
-              <h2 id="account-title">Hisob ma’lumotlari</h2>
+              <h2 id="account-title">{message('title')}</h2>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <dl className="grid gap-4 sm:grid-cols-2">
               <div className="relative flex min-h-22 min-w-0 flex-col justify-center rounded-xl border border-border/70 bg-muted/20 py-4 pr-18 pl-5">
                 <dt className="text-sm text-text-secondary">
-                  F.I.Sh.
-                  <span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
+                  {message('profile.fullName')}<span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
                     <UserIcon className="size-5" aria-hidden="true" />
                   </span>
                 </dt>
                 <dd className="mt-1 text-base font-semibold text-text-primary [overflow-wrap:anywhere]">
-                  {profile.fullname?.trim() || 'Ko‘rsatilmagan'}
+                  {profile.fullname?.trim() ? profile.fullname : message('profile.missing')}
                 </dd>
               </div>
               <div className="relative flex min-h-22 min-w-0 flex-col justify-center rounded-xl border border-border/70 bg-muted/20 py-4 pr-18 pl-5">
                 <dt className="text-sm text-text-secondary">
-                  Telefon
-                  <span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
+                  {message('profile.phone')}<span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
                     <PhoneIcon className="size-5" aria-hidden="true" />
                   </span>
                 </dt>
@@ -56,7 +58,7 @@ export function AccountPage() {
 
             {profileRefreshMessage ? (
               <p className="text-sm text-text-secondary" role="status" aria-live="polite">
-                {profileRefreshMessage}
+                {message(profileRefreshMessage === 'changed' ? 'feedback.changed' : profileRefreshMessage === 'unchanged' ? 'feedback.unchanged' : 'feedback.failed')}
               </p>
             ) : null}
 
@@ -70,17 +72,17 @@ export function AccountPage() {
               >
                 <PencilIcon className="size-4 text-text-secondary" aria-hidden="true" />
                 {pending.profileRefresh
-                  ? 'Yangilanmoqda…'
-                  : 'Ma’lumotni yangilash'}
+                  ? message('states.refreshing')
+                  : message('actions.refresh')}
               </Button>
               <Button
                 type="button"
                 className="h-10 gap-2.5 rounded-lg bg-brand px-6 font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover"
-                disabled={pending.logout}
-                onClick={() => void actions.logout()}
+                disabled={pending.logout || !canLogout}
+                onClick={() => { if (canLogout) void actions.logout() }}
               >
                 <LogOutIcon className="size-4" aria-hidden="true" />
-                {pending.logout ? 'Chiqilmoqda…' : 'Chiqish'}
+                {pending.logout ? auth.message('states.signingOut') : auth.message('actions.logout')}
               </Button>
             </div>
           </CardContent>

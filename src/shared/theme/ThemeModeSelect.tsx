@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
@@ -9,28 +10,29 @@ interface ThemeModeSelectProps {
 }
 
 const compactModePresentation = {
-  light: { label: 'Yorug‘', icon: SunIcon },
-  dark: { label: 'Tungi', icon: MoonIcon },
-  system: { label: 'Tizim', icon: MonitorIcon },
+  light: SunIcon,
+  dark: MoonIcon,
+  system: MonitorIcon,
 } as const
 
 export function ThemeModeSelect({ compact = false }: ThemeModeSelectProps) {
   const { mode, setMode } = useTheme()
+  const { message } = useMessages('common')
+  const labels = { light: message('theme.light'), dark: message('theme.dark'), system: message('theme.system') }
 
   if (compact) {
     const modes = ['light', 'dark', 'system'] as const
     const currentIndex = modes.indexOf(mode)
     const nextMode = modes[(currentIndex + 1) % modes.length]
-    const presentation = compactModePresentation[mode]
-    const Icon = presentation.icon
+    const Icon = compactModePresentation[mode]
 
     return (
       <Button
         type="button"
         variant="ghost"
         size="icon"
-        aria-label={`Ko‘rinish: ${presentation.label}. Keyingi rejimga o‘tish`}
-        title={`Ko‘rinish: ${presentation.label}`}
+        aria-label={message('theme.next', { label: labels[mode] })}
+        title={message('theme.current', { label: labels[mode] })}
         onClick={() => setMode(nextMode)}
       >
         <Icon aria-hidden="true" />
@@ -40,17 +42,17 @@ export function ThemeModeSelect({ compact = false }: ThemeModeSelectProps) {
 
   return (
     <label className="flex min-w-0 shrink items-center">
-      <span className="sr-only">Ko‘rinish</span>
+      <span className="sr-only">{message('theme.label')}</span>
       <Select size="compact"
         value={mode}
-        className="w-auto min-w-0 max-w-[6.75rem] shrink px-2 text-xs sm:text-sm"
+        className="w-auto min-w-0 max-w-[9rem] shrink px-2 text-xs sm:text-sm"
         onChange={(event) =>
           applyThemeModeSelection(event.target.value, setMode)
         }
       >
-        <option value="light">Light</option>
-        <option value="dark">Dark</option>
-        <option value="system">System</option>
+        <option value="light">{labels.light}</option>
+        <option value="dark">{labels.dark}</option>
+        <option value="system">{labels.system}</option>
       </Select>
     </label>
   )

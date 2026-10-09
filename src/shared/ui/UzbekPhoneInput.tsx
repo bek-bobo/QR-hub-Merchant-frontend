@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import type { ComponentProps } from 'react'
 import { cn } from '@/lib/utils'
 import { formatUzbekLocalPhone, parseUzbekPhoneInput } from '@/shared/presentation/phone'
@@ -21,6 +22,7 @@ export function UzbekPhoneInput({
   'aria-invalid': ariaInvalid,
   ...props
 }: UzbekPhoneInputProps) {
+  const { message } = useMessages('common')
   const prefixDescriptionId = id ? `${id}-prefix` : undefined
   const describedBy = [prefixDescriptionId, ariaDescribedBy]
     .filter(Boolean)
@@ -43,7 +45,7 @@ export function UzbekPhoneInput({
       </span>
       {prefixDescriptionId ? (
         <span id={prefixDescriptionId} className="sr-only">
-          O‘zbekiston telefon kodi: +998.
+          {message('phone.countryCode')}
         </span>
       ) : null}
       <input
