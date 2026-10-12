@@ -1,7 +1,7 @@
 import { LocaleSelect } from '@/shared/i18n/LocaleSelect'
 import { useMessages } from '@/shared/i18n/useMessages'
 import type { ReactNode, Ref } from 'react'
-import { LogOutIcon, MenuIcon } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, LogOutIcon, MenuIcon } from 'lucide-react'
 import { Link } from 'react-router'
 import { DropdownMenu as Menu } from 'radix-ui'
 import { Button } from '@/components/ui/button'
@@ -62,10 +62,11 @@ export function Header({
           </Button>
         ) : null}
         {onToggleSidebar ? (
-          <Button type="button" variant="ghost" size="icon" className="hidden size-10 lg:inline-flex"
+          <Button type="button" variant="ghost" size="icon"
+            className="hidden size-10 transition-colors duration-150 hover:border-brand/30 hover:bg-brand-soft! hover:text-brand! focus-visible:border-brand focus-visible:ring-brand/50 active:bg-brand/15! active:text-brand! active:not-aria-[haspopup]:translate-y-0 dark:hover:text-status-error-foreground! dark:active:bg-brand/25! dark:active:text-status-error-foreground! lg:inline-flex"
             aria-label={sidebarCollapsed ? message('navigation.expand') : message('navigation.collapse')}
             aria-expanded={!sidebarCollapsed} onClick={onToggleSidebar}>
-            <MenuIcon className="size-6" aria-hidden="true" />
+            {sidebarCollapsed ? <ChevronRightIcon className="size-6" aria-hidden="true" /> : <ChevronLeftIcon className="size-6" aria-hidden="true" />}
           </Button>
         ) : null}
         {title && titleIcon ? (

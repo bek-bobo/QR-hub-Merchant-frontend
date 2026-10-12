@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { act, StrictMode } from 'react'
+import { act, StrictMode, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { createInstance } from 'i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -11,6 +11,9 @@ import { ThemeProvider } from '@/shared/theme/ThemeProvider'
 import uzFlag from './flags/uz.svg'
 import ruFlag from './flags/ru.svg'
 import gbFlag from './flags/gb.svg'
+import { MemoryRouter } from 'react-router'
+import { Header } from '@/app/layout/Header'
+import { AuthShell } from '@/features/auth/AuthPresentation'
 
 const flagSources = { uz: uzFlag, ru: ruFlag, en: gbFlag }
 
@@ -24,7 +27,7 @@ afterEach(async () => {
   vi.restoreAllMocks(); vi.unstubAllGlobals(); localStorage.clear()
 })
 async function flush() { await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) }) }
-async function mount(locale: SupportedLocale = 'uz', mode = 'light', supplied?: LocaleRuntime) {
+async function mount(locale: SupportedLocale = 'uz', mode = 'light', supplied?: LocaleRuntime, content: ReactNode = <LocaleSelect />) {
   localStorage.setItem('qrhub:theme:v1', mode)
   const engine = createInstance()
   const runtime = supplied ?? createLocaleRuntime({ engine, storage: localStorage, root: document.documentElement })
@@ -32,7 +35,7 @@ async function mount(locale: SupportedLocale = 'uz', mode = 'light', supplied?: 
   const service = vi.spyOn(runtime, 'switchLocale')
   const host = document.createElement('div'); document.body.append(host)
   const root = createRoot(host); mounted.push({ root, host })
-  await act(async () => root.render(<StrictMode><LocaleProvider runtime={runtime}><ThemeProvider><LocaleSelect /></ThemeProvider></LocaleProvider></StrictMode>))
+  await act(async () => root.render(<StrictMode><LocaleProvider runtime={runtime}><ThemeProvider>{content}</ThemeProvider></LocaleProvider></StrictMode>))
   const trigger = host.querySelector<HTMLButtonElement>('[data-locale-trigger]')!
   return { host, trigger, runtime, engine, service }
 }
@@ -80,7 +83,25 @@ describe('shared locale pill and Radix dropdown', () => {
     expect(checked[0].className).toContain('data-[state=checked]:bg-brand-soft')
     expect(checked[0].querySelector('.lucide-check')).not.toBeNull()
     expect(document.querySelectorAll('[role=menuitemradio] .lucide-check')).toHaveLength(1)
+    expect(document.querySelector('[role=menu]')?.classList.contains('w-32')).toBe(true)
+    for (const item of options()) {
+      expect(item.classList.contains('min-h-10')).toBe(true)
+      expect(item.classList.contains('justify-between')).toBe(true)
+      expect(item.classList.contains('gap-3')).toBe(true)
+      expect(item.children).toHaveLength(item.lang === locale ? 2 : 1)
+    }
     expect(host.querySelector('[role=menu]')).toBeNull() // Portal prevents header clipping.
+  })
+  it.each(['login', 'header'] as const)('uses the compact shared menu in the %s surface', async (surface) => {
+    const content = surface === 'login' ? <AuthShell><p>Login fixture</p></AuthShell> : <MemoryRouter><Header title="Header fixture" onLogout={() => {}} compactAccountControls /></MemoryRouter>
+    const { trigger, runtime } = await mount('uz', 'light', undefined, content)
+    await open(trigger)
+    expect(options()).toHaveLength(3)
+    expect(document.querySelector('[role=menu]')?.classList.contains('w-32')).toBe(true)
+    await choose('en')
+    expect(runtime.getSnapshot().locale).toBe('en')
+    expect(localStorage.getItem('qrhub:locale:v1')).toBe('en')
+    expect(document.activeElement).toBe(trigger)
   })
   it('navigates by keyboard, switches once, closes and restores trigger focus', async () => {
     const { trigger, runtime, engine, service } = await mount()
