@@ -51,11 +51,11 @@ export function LocaleSelect() {
       <Menu.Portal>
         <Menu.Content side="bottom" align="end" sideOffset={6} collisionPadding={12} avoidCollisions
           aria-label={message('locale.label')}
-          className="z-50 w-40 max-w-[var(--radix-dropdown-menu-content-available-width)] max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto rounded-2xl border border-border/40 bg-popover p-1.5 text-popover-foreground shadow-lg outline-none">
+          className="z-50 w-32 max-w-[var(--radix-dropdown-menu-content-available-width)] max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto rounded-2xl border border-border/40 bg-popover p-1.5 text-popover-foreground shadow-lg outline-none">
           <Menu.RadioGroup value={locale} onValueChange={(value) => { void change(value) }}>
             {supportedLocales.map((code) => <Menu.RadioItem key={code} value={code} lang={code}
               aria-label={languageRegistry[code].nativeName} disabled={pending}
-              className="flex min-h-10 cursor-pointer select-none items-center justify-between gap-4 rounded-xl px-3 py-2 text-sm outline-none transition-colors data-[state=checked]:bg-brand-soft data-[state=checked]:text-primary-hover dark:data-[state=checked]:text-status-error-foreground data-[highlighted]:bg-muted data-[highlighted]:data-[state=checked]:bg-brand-soft data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+              className="flex min-h-10 cursor-pointer select-none items-center justify-between gap-3 rounded-xl px-3 py-2 text-sm outline-none transition-colors data-[state=checked]:bg-brand-soft data-[state=checked]:text-primary-hover dark:data-[state=checked]:text-status-error-foreground data-[highlighted]:bg-muted data-[highlighted]:data-[state=checked]:bg-brand-soft data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
               <span className="flex min-w-0 items-center gap-3"><LocaleFlag locale={code} /><span>{shortLabels[code]}</span></span>
               <Menu.ItemIndicator><CheckIcon className="size-4 shrink-0 text-brand dark:text-status-error-foreground" aria-hidden="true" /></Menu.ItemIndicator>
             </Menu.RadioItem>)}
