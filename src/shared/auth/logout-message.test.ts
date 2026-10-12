@@ -13,7 +13,7 @@ describe('resolveLogoutMessage', () => {
     const result: LogoutResult = { status: 'local-cleared-remote-unconfirmed' }
 
     expect(resolveLogoutMessage(result)).toBe(
-      'Bu oynadan chiqildi. Serverdagi sessiya yopilganini tasdiqlab bo‘lmadi.',
+      'remoteUnconfirmed',
     )
   })
 })

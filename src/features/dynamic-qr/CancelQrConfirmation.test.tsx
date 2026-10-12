@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { CancelQrConfirmationBody, CancelQrOutcome } from './CancelQrConfirmation'
 
 describe('cancel confirmation and outcome copy', () => {
@@ -9,7 +9,7 @@ describe('cancel confirmation and outcome copy', () => {
     expect(html).toContain('QR ni bekor qilish')
     expect(html).toContain('row/%2Bopaque')
     expect(html).toContain('to‘lov mavjudligiga ta’sir qilishi mumkin')
-    expect(html).toContain('Ortga')
+    expect(html).toContain('Bekor qilish')
     expect(html).toContain('Tasdiqlash')
     expect(html).not.toContain('qaytarib bo‘lmaydi')
   })

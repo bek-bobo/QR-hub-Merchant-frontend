@@ -6,7 +6,7 @@ describe('bank-account filter state', () => {
   it('applies only merchant/search/page/size and resets page', () => {
     const draft = { ...createDefaultBankAccountFilters(), merchantId: '2', search: '  0001 ', page: 4 }
     const applied = applyBankAccountDraft(draft, ['2'])
-    expect(toBankAccountListQuery(applied)).toEqual({ merchantId: '2', search: '0001', page: '0', size: '20' })
+    expect(toBankAccountListQuery(applied)).toEqual({ merchantId: '2', search: '  0001 ', page: '0', size: '20' })
     expect(changeManagementPage(applied, 2).page).toBe(2)
     expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, search: '', page: 0, size: 20 })
   })
@@ -24,17 +24,17 @@ describe('bank-account filter state', () => {
   it('applies and clears search while preserving the applied merchant and fixed size', () => {
     const current = { ...createDefaultBankAccountFilters(), merchantId: '2', page: 4 }
     const next = applyBankAccountQuickSearch(current, '  Bank  ')
-    expect(next).toEqual({ ...current, search: 'Bank', page: 0 })
-    expect(toBankAccountListQuery(next)).toEqual({ merchantId: '2', search: 'Bank', page: '0', size: '20' })
+    expect(next).toEqual({ ...current, search: '  Bank  ', page: 0 })
+    expect(toBankAccountListQuery(next)).toEqual({ merchantId: '2', search: '  Bank  ', page: '0', size: '20' })
     expect(toBankAccountListQuery(applyBankAccountQuickSearch(next, '  ')))
-      .toEqual({ merchantId: '2', page: '0', size: '20' })
+      .toEqual({ merchantId: '2', search: '  ', page: '0', size: '20' })
     expect(current.page).toBe(4)
   })
 
-  it('avoids repeated normalized search updates but resets an existing page', () => {
+  it('avoids repeated identical search updates and retains the existing page', () => {
     const current = { ...createDefaultBankAccountFilters(), search: 'Bank' }
-    expect(applyBankAccountQuickSearch(current, ' Bank ')).toBe(current)
-    expect(applyBankAccountQuickSearch({ ...current, page: 2 }, ' Bank ').page).toBe(0)
+    expect(applyBankAccountQuickSearch(current, 'Bank')).toBe(current)
+    expect(applyBankAccountQuickSearch({ ...current, page: 2 }, 'Bank').page).toBe(2)
   })
 
   it('applies merchant only while preserving the applied quick search', () => {

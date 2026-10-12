@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { DynamicQrFilters, TerminalOption } from '@/shared/contracts/merchant-read'
-import { presentQrStatus } from '@/features/dashboard/presenters'
+import { presentQrStatus } from '@/shared/presentation/qr-status'
 import { toDynamicQrQuery } from './filters'
 import {
   createDefaultDynamicQrFilters,
@@ -21,10 +21,10 @@ const filters: DynamicQrFilters = {
 }
 
 describe('dynamic QR page state', () => {
-  it('creates the seven-day Tashkent default without optional filters', () => {
+  it('creates the same-day Tashkent default without optional filters', () => {
     const defaults = createDefaultDynamicQrFilters(new Date('2026-09-14T20:30:00Z'))
     expect(defaults).toEqual({
-      fromDate: '2026-09-09',
+      fromDate: '2026-09-15',
       toDate: '2026-09-15',
       status: undefined,
       search: '',

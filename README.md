@@ -1,68 +1,78 @@
 # QRHub Merchant Frontend
 
-React SPA scaffold for the QRHub merchant interface. Day 01 contains an
-explicit development-only synthetic preview; live integration is fail-closed
-until external contracts are confirmed.
+React and TypeScript SPA for the QRHub merchant interface, built with Vite,
+Tailwind CSS and shadcn/Radix components. Live routes use authenticated API
+access and permission gates. Synthetic demo data is isolated to development.
 
-## Manual verification
+## Setup
 
-Run from `D:\QR projects\qrhub-merchant-frontend`:
+Use Node.js 24 (see `.nvmrc`). From the project directory:
+
+```powershell
+npm ci
+Copy-Item .env.example .env.local
+npm run dev
+```
+
+Edit `.env.local` for the intended environment. The example selects development
+demo mode and leaves API URLs empty. Set `VITE_APP_MODE=live` to exercise live
+integration locally. Environment values are supplied at build time; rebuild
+after changing deployment configuration. Do not put secrets in `VITE_*` values,
+which are included in client code.
+
+## Environment
+
+| Variable | Purpose | Requirement and behavior when absent |
+|---|---|---|
+| `VITE_APP_MODE` | Selects `demo` or `live` during development. | Optional. Only exact `demo` in development enables demo mode; absent or other values select live. Production always selects live. |
+| `VITE_AUTH_API_BASE_URL` | Base URL for the authentication API. | Required for live startup. Missing/invalid URL causes the integration-unavailable page. |
+| `VITE_WEB_API_BASE_URL` | Base URL for merchant feature APIs. | Optional for auth/account startup; required for merchant API features. Missing/invalid URL marks those integrations unavailable and prevents their live requests. |
+| `VITE_DYNAMIC_QR_STATS_ENABLED` | Enables the optional Dynamic QR aggregate stats query. | Optional; disabled unless the value is exactly `true`. Permission, valid date/filter evidence and query readiness gates still apply. |
+
+API base URLs must use HTTPS in production. Development also permits HTTP for
+`localhost` and `127.0.0.1`. Embedded credentials, query strings and fragments
+are rejected. Use the service base URL, without an individual endpoint path.
+
+## Live and development boundaries
+
+With a valid auth URL and the registered verified auth contract, `LiveRoot`
+mounts the query, auth and read providers and live router. Session restoration
+and permission gates determine which routes become available; valid
+configuration does not bypass login or access checks. A valid web API URL
+enables merchant integrations subject to those same gates.
+
+Missing/invalid auth configuration, or an unavailable auth contract
+registration, fails closed to the integration-unavailable page. Missing/invalid
+web configuration leaves auth/account startup available while merchant
+integrations show their unavailable state. Neither condition substitutes demo
+data into live mode.
+
+Demo mode loads `DemoRoot` only when Vite is running in development and
+`VITE_APP_MODE=demo`. Production builds and `npm run preview` always use live
+mode, even if demo was requested. A configured production preview can therefore
+show the live frontend; it is not required to show the unavailable page.
+
+The approved auth implementation persists access/refresh tokens and expiry
+metadata in browser localStorage for session restoration. Auth ownership uses
+the browser's Web Locks API; restoration/login fails closed when that mechanism
+is unavailable or another tab owns the session. Route/import failures show a
+safe recovery page with an explicit reload button; they do not automatically
+log the user out.
+
+## Validation and production preview
 
 ```powershell
 npm run lint
 npm run typecheck
-npm run test
+npm test -- --reporter=dot
 npm run build
-npm run dev
-```
-
-After a successful production build, stop the development server and verify
-the production boundary:
-
-```powershell
 npm run preview
 ```
 
-Production preview must show the integration-unavailable page even when the
-local environment requests demo mode.
+TypeScript strict mode is enforced for application and tooling configuration.
+The production build writes `dist`; preview serves that build locally. Set
+deployment environment variables before building. `vercel.json` rewrites SPA
+navigation to `index.html` so direct route navigation reaches the client router.
 
-Optional production bundle fixture check:
-
-```powershell
-Get-ChildItem -Path 'dist\assets' -Filter '*.js' -Recurse | Select-String -SimpleMatch 'DEMO-QR-'
-```
-
-Expected result: no match.
-
-## Scaffold notes
-
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+For deeper architecture and historical handoffs, see `docs/` and
+`QRHUB_FRONTEND_CODE_AUDIT.md`.

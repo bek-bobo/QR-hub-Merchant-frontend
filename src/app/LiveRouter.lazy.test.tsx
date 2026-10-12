@@ -1,6 +1,6 @@
 import { PassThrough } from 'node:stream'
 import type { ReactNode } from 'react'
-import { renderToPipeableStream, renderToStaticMarkup } from 'react-dom/server'
+import { renderToPipeableStream, renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SessionSnapshot } from '@/shared/auth/session-controller'
 import routerSource from './LiveRouter.tsx?raw'

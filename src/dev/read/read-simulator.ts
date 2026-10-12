@@ -7,7 +7,7 @@ import type { AccessContextValue } from '@/shared/auth/access'
 import type { Profile } from '@/shared/auth/model'
 import type {
   CountAmount,
-  DashboardBucket,
+  DashboardRequest,
   DashboardFilters,
   DashboardView,
   DynamicQrFilters,
@@ -19,6 +19,7 @@ import type {
   ReadScope,
 } from '@/shared/contracts/merchant-read'
 import { d3DynamicQrRows, d3TerminalOptions } from './read.fixture'
+import { simulateDashboardDomain } from './dashboard-analytics.fixture'
 
 export const readScenarioDefinitions = {
   RECONCILED: {
@@ -146,9 +147,10 @@ function isOutcome(row: DynamicQrRow, outcome: Exclude<Outcome, 'total'>) {
     return row.statusCode === 50
   }
   if (outcome === 'processing') {
-    return row.statusCode === 0 || row.statusCode === 10
+    return [0, 10, 15].includes(row.statusCode)
   }
-  return row.statusCode === 5 || row.statusCode === 20
+  if (outcome === 'failed') return [5, 20, 25].includes(row.statusCode)
+  return ![0, 5, 10, 15, 20, 25, 50].includes(row.statusCode)
 }
 
 function outcomeRows(
@@ -178,6 +180,7 @@ function metric(
     success: [8, 6.5],
     processing: [-4.5, -2.25],
     failed: [3, 1.75],
+    uncategorized: [null, null],
   } as const
   const [countGrowthPct, amountGrowthPct] = growth[outcome]
   return Object.freeze({
@@ -193,76 +196,8 @@ function metric(
   })
 }
 
-function zeroCountAmount(): CountAmount {
-  return Object.freeze({ count: 0, amount: money(0) })
-}
-
-function zeroMetric(): Metric {
-  return Object.freeze({
-    ...zeroCountAmount(),
-    countGrowthPct: 0,
-    amountGrowthPct: 0,
-  })
-}
-
 function percentage(count: number, total: number): number {
   return total === 0 ? 0 : Math.round((count / total) * 10_000) / 100
-}
-
-function dashboardBucket(
-  date: string,
-  rows: readonly DynamicQrRow[],
-): DashboardBucket {
-  return Object.freeze({
-    label: date,
-    periodKind: 'calendar' as const,
-    periodStart: date,
-    periodEnd: date,
-    values: Object.freeze({
-      total: countAmount(rows, 'total'),
-      success: countAmount(rows, 'success'),
-      processing: countAmount(rows, 'processing'),
-      failed: countAmount(rows, 'failed'),
-    }),
-  })
-}
-
-function zeroDashboard(filters: DashboardFilters): DashboardView {
-  const zero = zeroCountAmount()
-  return Object.freeze({
-    metrics: Object.freeze({
-      total: zeroMetric(),
-      success: zeroMetric(),
-      processing: zeroMetric(),
-      failed: zeroMetric(),
-    }),
-    pie: Object.freeze({
-      success: Object.freeze({ ...zero, percent: 0 }),
-      processing: Object.freeze({ ...zero, percent: 0 }),
-      failed: Object.freeze({ ...zero, percent: 0 }),
-    }),
-    chartGroupBy: 'DAY',
-    buckets: Object.freeze([dashboardBucket(filters.fromDate, [])]),
-  })
-}
-
-function emptyDashboard(): DashboardView {
-  const zero = zeroCountAmount()
-  return Object.freeze({
-    metrics: Object.freeze({
-      total: zeroMetric(),
-      success: zeroMetric(),
-      processing: zeroMetric(),
-      failed: zeroMetric(),
-    }),
-    pie: Object.freeze({
-      success: Object.freeze({ ...zero, percent: 0 }),
-      processing: Object.freeze({ ...zero, percent: 0 }),
-      failed: Object.freeze({ ...zero, percent: 0 }),
-    }),
-    chartGroupBy: 'DAY',
-    buckets: Object.freeze([]),
-  })
 }
 
 function matchingRows(filters: DashboardFilters) {
@@ -276,69 +211,23 @@ function matchingRows(filters: DashboardFilters) {
   })
 }
 
-function buildDashboard(
-  filters: DashboardFilters,
-  behavior: ScenarioBehavior,
-): DashboardView {
-  if (behavior === 'empty') {
-    return emptyDashboard()
-  }
-  if (behavior === 'zero-chart') {
-    return zeroDashboard(filters)
-  }
-
-  const sourceRows = matchingRows(filters)
+function buildDashboard(filters: DashboardRequest, behavior: ScenarioBehavior): DashboardView {
+  const { metadata, buckets } = simulateDashboardDomain(filters)
+  const sourceRows = behavior === 'empty' || behavior === 'zero-chart' ? [] : matchingRows(filters)
+    .filter((row) => row.createdAt < metadata.range.asOf.slice(0, 19))
   const rows = behavior === 'reconciled' || behavior === 'amount-mismatch'
-    ? sourceRows.filter((row) => [0, 5, 10, 20, 50].includes(row.statusCode))
-    : sourceRows
-  const dates = [...new Set(rows.map((row) => row.createdAt.slice(0, 10)))]
-    .sort()
-  const totals = {
-    success: countAmount(rows, 'success'),
-    processing: countAmount(rows, 'processing'),
-    failed: countAmount(rows, 'failed'),
-  }
-  const successPercent = percentage(totals.success.count, rows.length)
-  const failedPercent = percentage(totals.failed.count, rows.length)
-  const processingPercent =
-    rows.length === 0
-      ? 0
-      : Math.round((100 - successPercent - failedPercent) * 100) / 100
-
-  return Object.freeze({
-    metrics: Object.freeze({
-      total: behavior === 'amount-mismatch'
-        ? Object.freeze({ ...metric(rows, 'total', behavior),
-            amount: money(BigInt(sumAmount(rows).minorUnits) + 1n) })
-        : metric(rows, 'total', behavior),
-      success: metric(rows, 'success', behavior),
-      processing: metric(rows, 'processing', behavior),
-      failed: metric(rows, 'failed', behavior),
-    }),
-    pie: Object.freeze({
-      success: Object.freeze({
-        ...totals.success,
-        percent: successPercent,
-      }),
-      processing: Object.freeze({
-        ...totals.processing,
-        percent: processingPercent,
-      }),
-      failed: Object.freeze({
-        ...totals.failed,
-        percent: failedPercent,
-      }),
-    }),
-    chartGroupBy: 'DAY',
-    buckets: Object.freeze(
-      dates.map((date) =>
-        dashboardBucket(
-          date,
-          rows.filter((row) => row.createdAt.startsWith(date)),
-        ),
-      ),
-    ),
-  })
+    ? sourceRows.filter((row) => [0, 5, 10, 15, 20, 25, 50].includes(row.statusCode)) : sourceRows
+  const metrics = { total: metric(rows, 'total', behavior), success: metric(rows, 'success', behavior),
+    processing: metric(rows, 'processing', behavior), failed: metric(rows, 'failed', behavior), uncategorized: countAmount(rows, 'uncategorized') }
+  if (behavior === 'amount-mismatch') metrics.total = { ...metrics.total, amount: money(BigInt(metrics.total.amount.minorUnits) + 1n) }
+  const segment = (key: 'success' | 'processing' | 'failed' | 'uncategorized') => ({ ...countAmount(rows, key), percent: percentage(countAmount(rows, key).count, rows.length) })
+  return Object.freeze({ ...metadata, metrics: Object.freeze(metrics),
+    pie: Object.freeze({ success: segment('success'), processing: segment('processing'), failed: segment('failed'), uncategorized: segment('uncategorized') }),
+    buckets: Object.freeze(buckets.map((bucket) => {
+      const selected = rows.filter((row) => row.createdAt >= bucket.coverageStart.slice(0, 19) && row.createdAt < bucket.observedEnd.slice(0, 19))
+      return Object.freeze({ ...bucket, values: Object.freeze({ total: countAmount(selected, 'total'), success: countAmount(selected, 'success'),
+        processing: countAmount(selected, 'processing'), failed: countAmount(selected, 'failed'), uncategorized: countAmount(selected, 'uncategorized') }) })
+    })) })
 }
 
 function publicRow(row: (typeof d3DynamicQrRows)[number]): DynamicQrRow {

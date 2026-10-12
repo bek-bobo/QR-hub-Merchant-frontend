@@ -61,7 +61,7 @@ describe('dynamic QR quick filters', () => {
       new Date('2026-09-30T08:00:00Z'),
     )).toEqual({
       ...applied,
-      fromDate: '2026-09-24',
+      fromDate: '2026-09-30',
       toDate: '2026-09-30',
       page: 0,
     })
@@ -70,7 +70,7 @@ describe('dynamic QR quick filters', () => {
   it('applies and clears search without applying unrelated advanced drafts', () => {
     expect(applyDynamicQrSearchQuickFilter(applied, '  Terminal B  ')).toEqual({
       ...applied,
-      search: 'Terminal B',
+      search: '  Terminal B  ',
       page: 0,
     })
     expect(applyDynamicQrSearchQuickFilter(applied, '')).toEqual({

@@ -7,6 +7,7 @@ import {
   TriangleAlertIcon,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useMessages } from '@/shared/i18n/useMessages'
 
 interface AsyncStateFrameProps {
   icon: LucideIcon
@@ -49,24 +50,26 @@ interface StateCopyProps {
 }
 
 export function LoadingState({
-  title = 'Yuklanmoqda',
-  description = 'Ma’lumotlar tayyorlanmoqda.',
+  title,
+  description,
 }: StateCopyProps) {
+  const { message } = useMessages('common')
   return (
     <AsyncStateFrame
       icon={LoaderCircleIcon}
-      title={title}
-      description={description}
+      title={title ?? message('states.loading')}
+      description={description ?? message('states.loadingDescription')}
       animateIcon
     />
   )
 }
 
 export function EmptyState({
-  title = 'Ma’lumot topilmadi',
-  description = 'Hozircha ko‘rsatish uchun yozuvlar mavjud emas.',
+  title,
+  description,
 }: StateCopyProps) {
-  return <AsyncStateFrame icon={InboxIcon} title={title} description={description} />
+  const { message } = useMessages('common')
+  return <AsyncStateFrame icon={InboxIcon} title={title ?? message('states.empty')} description={description ?? message('states.emptyDescription')} />
 }
 
 interface ErrorStateProps extends StateCopyProps {
@@ -74,20 +77,21 @@ interface ErrorStateProps extends StateCopyProps {
 }
 
 export function ErrorState({
-  title = 'Ma’lumotni yuklab bo‘lmadi',
-  description = 'Birozdan so‘ng qayta urinib ko‘ring.',
+  title,
+  description,
   onRetry,
 }: ErrorStateProps) {
+  const { message } = useMessages('common')
   return (
     <AsyncStateFrame
       icon={TriangleAlertIcon}
-      title={title}
-      description={description}
+      title={title ?? message('states.error')}
+      description={description ?? message('states.errorDescription')}
       role="alert"
       action={
         onRetry ? (
           <Button type="button" variant="outline" size="sm" className="mt-3" onClick={onRetry}>
-            Qayta urinish
+            {message('actions.retry')}
           </Button>
         ) : undefined
       }
@@ -96,14 +100,15 @@ export function ErrorState({
 }
 
 export function NoAccessState({
-  title = 'Ko‘rish uchun ruxsat yo‘q',
-  description = 'Bu ma’lumotni ko‘rish huquqi mavjud emas.',
+  title,
+  description,
 }: StateCopyProps) {
+  const { message } = useMessages('common')
   return (
     <AsyncStateFrame
       icon={ShieldAlertIcon}
-      title={title}
-      description={description}
+      title={title ?? message('states.noAccess')}
+      description={description ?? message('states.noAccessDescription')}
     />
   )
 }

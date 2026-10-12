@@ -1,7 +1,9 @@
+import { createTerminalPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
-import { TERMINAL_DEFAULT_COLUMN_ORDER, terminalColumns } from './columns'
+import { TERMINAL_DEFAULT_COLUMN_ORDER, createTerminalColumns } from './columns'
 
 const expectedBusinessColumnIds = ['terminalId', 'merchant', 'name', 'bankAccount', 'status'] as const
 
@@ -109,3 +111,5 @@ describe('Terminal column metadata and preferences', () => {
     })
   })
 })
+
+const terminalColumns = createTerminalColumns(createTerminalPresentation('uz', localeMessages('terminals'), localeMessages('common')))

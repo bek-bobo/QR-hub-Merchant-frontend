@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { DynamicQrAdvancedFilterFields, type DynamicQrAdvancedFilterFieldsProps } from './DynamicQrAdvancedFilterFields'
 
@@ -111,3 +111,8 @@ describe('DynamicQrAdvancedFilterFields', () => {
     expect(bank).not.toContain('Barcha')
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

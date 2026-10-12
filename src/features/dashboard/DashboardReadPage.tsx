@@ -1,3 +1,4 @@
+import { useDashboardPresentation } from './presentation'
 import { useReducer, useState } from 'react'
 import { Link } from 'react-router'
 import { ChartNoAxesColumnIncreasingIcon, ChevronRightIcon } from 'lucide-react'
@@ -25,7 +26,7 @@ import {
 import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { DashboardRecentQrTable } from './DashboardRecentQrTable'
-import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
+import { createDashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardPageHeader } from './DashboardPageHeader'
 import { DashboardQuickDateFilter } from './DashboardQuickDateFilter'
 import { DashboardTerminalFilter } from './DashboardTerminalFilter'
@@ -34,11 +35,13 @@ import { MetricCards } from './MetricCards'
 import { StatusDonut } from './StatusDonut'
 import { resetDashboardFilters } from './presenters'
 import { useDashboardReadQueries } from './queries'
-import { ChartLocalDateFilter } from './ChartLocalDateFilter'
+import { GranularityControl } from './GranularityControl'
+import { TrendChart } from './TrendChart'
 
 function DashboardSkeleton() {
+ const p = useDashboardPresentation()
   return (
-    <div role="status" aria-label="Dashboard yuklanmoqda" className="space-y-6">
+    <div role="status" aria-label={p.message('states.loading')} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div
@@ -60,9 +63,10 @@ interface RecentQrPanelProps {
 }
 
 function RecentQrSkeleton() {
+ const p = useDashboardPresentation()
   return (
     <div role="status" className="min-w-0 space-y-3">
-      <p className="text-sm text-text-secondary">So‘nggi dinamik QRlar yuklanmoqda…</p>
+      <p className="text-sm text-text-secondary">{p.message('recentQr.loading')}</p>
       <div aria-hidden="true" className="overflow-hidden rounded-lg border motion-safe:animate-pulse">
         <div className="h-10 border-b bg-muted/50" />
         {Array.from({ length: 5 }, (_, index) => (
@@ -83,6 +87,8 @@ export function RecentQrPanel({
   filters,
   dynamicQrPath,
 }: RecentQrPanelProps) {
+  const p = useDashboardPresentation()
+  const dashboardRecentQrColumns = createDashboardRecentQrColumns(p)
   const columnPreferences = useTableColumnPreferences({
     tableKey: DASHBOARD_RECENT_QR_TABLE_KEY,
     columns: dashboardRecentQrColumns,
@@ -102,13 +108,13 @@ export function RecentQrPanel({
             <ChartNoAxesColumnIncreasingIcon className="size-6" aria-hidden="true" />
           </span>
           <div className="min-w-0 space-y-1">
-            <CardTitle className="text-xl font-bold tracking-tight">So‘nggi dinamik QRlar</CardTitle>
-            <CardDescription>Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.</CardDescription>
+            <CardTitle className="text-xl font-bold tracking-tight">{p.message('recentQr.title')}</CardTitle>
+            <CardDescription>{p.message('recentQr.description')}</CardDescription>
           </div>
         </div>
         <div className="flex max-w-full flex-wrap items-center gap-2">
           <TableColumnPreferences
-            tableLabel="So‘nggi dinamik QRlar"
+            tableLabel={p.message('recentQr.title')}
             triggerClassName="size-10 rounded-xl bg-muted/30"
             items={dashboardRecentQrColumns}
             order={columnPreferences.order}
@@ -132,7 +138,7 @@ export function RecentQrPanel({
                   : {}),
               }}
             >
-              Barchasini ko‘rish
+              {p.message('recentQr.viewAll')}
               <ChevronRightIcon aria-hidden="true" />
             </Link>
           </Button>
@@ -142,22 +148,22 @@ export function RecentQrPanel({
         {query.data ? (
           <>
             {query.isFetching ? (
-              <p className="mb-3 text-xs text-text-secondary">So‘nggi dinamik QRlar yangilanmoqda…</p>
+              <p className="mb-3 text-xs text-text-secondary">{p.message('recentQr.refreshing')}</p>
             ) : null}
             <DashboardRecentQrTable rows={query.data.content}
               columnOrder={columnPreferences.order} visibleColumnIds={columnPreferences.visible}
               onViewQr={setQrRow} onViewDetails={setDetailsRow} />
             {query.isRefetchError && !query.isFetching ? (
               <p role="alert" className="mt-3 text-sm text-destructive">
-                So‘nggi dinamik QRlar yangilanmadi. Avval yuklangan ma’lumotlar ko‘rsatilmoqda.
+                {p.message('recentQr.stale')}
               </p>
             ) : null}
           </>
         ) : query.isPending ? (
           <RecentQrSkeleton />
         ) : query.isError ? (
-          <ErrorState title="So‘nggi dinamik QRlarni yuklab bo‘lmadi"
-            description="Birozdan so‘ng qayta urinib ko‘ring."
+          <ErrorState title={p.message('recentQr.error')}
+
             onRetry={() => void query.refetch()} />
         ) : null}
       </CardContent>
@@ -169,9 +175,7 @@ export function RecentQrPanel({
   )
 }
 
-function formatUpdatedAt(value: number): string {
-  return formatInstantTime(value)
-}
+
 
 interface DashboardReadPageProps {
   readonly initialInstant?: Date
@@ -182,13 +186,14 @@ export function DashboardReadPage({
   initialInstant,
   dynamicQrPath = '/dynamic-qrs',
 }: DashboardReadPageProps = {}) {
+  const p = useDashboardPresentation()
   const [filters, dispatch] = useReducer(
     dashboardFilterReducer,
     initialInstant,
     (instant) => createDashboardFilterState(resetDashboardFilters(instant ?? new Date())),
   )
   const { applied, dateDraft, terminalDraft, validationMessage } = filters
-  const queries = useDashboardReadQueries(applied)
+  const queries = useDashboardReadQueries(applied, filters.requestedGranularity)
   const { dashboard, terminals, recent, enabled, runtime } = queries
   const refreshing = dashboard.isFetching || (enabled.recent && recent.isFetching)
 
@@ -214,14 +219,14 @@ export function DashboardReadPage({
   if (runtime.readiness.dashboard.kind === 'unavailable') {
     return (
       <ErrorState
-        title="Dashboard integratsiyasi sozlanmagan"
-        description={runtime.readiness.dashboard.reason}
+        title={p.message('states.integrationTitle')}
+        description={p.message('states.integrationDescription')}
       />
     )
   }
 
   if (!runtime.capabilities.dashboard) {
-    return <NoAccessState description="Dashboard ma’lumotlarini ko‘rish huquqi mavjud emas." />
+    return <NoAccessState description={p.message('states.noAccess')} />
   }
 
   return (
@@ -229,7 +234,7 @@ export function DashboardReadPage({
       <DashboardPageHeader
         updatedAt={
           dashboard.dataUpdatedAt > 0
-            ? formatUpdatedAt(dashboard.dataUpdatedAt)
+            ? formatInstantTime(dashboard.dataUpdatedAt, {locale: p.intlLocale, timeZone: 'Asia/Tashkent'})
             : undefined
         }
         refreshDisabled={!enabled.dashboard || refreshing}
@@ -241,7 +246,6 @@ export function DashboardReadPage({
           onPreset={selectPreset} onReset={resetDates} />}
       >
         <FilterDrawer
-          description="O‘zgarishlar faqat “Qo‘llash” bosilganda yuboriladi."
           onApply={() => { dispatch({ type: 'apply-terminal' }); return true }}
           onReset={() => dispatch({ type: 'terminal-draft', terminalId: undefined })}
           onOpenChange={(open) => dispatch({ type: 'terminal-drawer', open })}
@@ -263,12 +267,15 @@ export function DashboardReadPage({
         <>
           {dashboard.isRefetchError ? (
             <p role="alert" className="rounded-lg border border-status-error-border bg-status-error-background p-3 text-sm text-status-error-foreground">
-              Yangilanmadi
+              {p.message('states.stale')}
             </p>
           ) : null}
           <MetricCards metrics={dashboard.data.metrics} pie={dashboard.data.pie} />
           <div className="grid min-w-0 grid-cols-1 items-stretch gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(16rem,1.1fr)]">
-            <ChartLocalDateFilter view={dashboard.data} filters={applied} initialInstant={initialInstant} />
+            <TrendChart view={dashboard.data}
+              granularityControls={<GranularityControl aggregation={dashboard.data.aggregation}
+                onSelect={(granularity) => dispatch({ type: 'granularity', granularity })} />}
+              periodLabel={<p className="mt-1 text-xs text-text-secondary">{p.message('dates.graphPeriod', {from: p.date(dashboard.data.range.fromDate), to: p.date(dashboard.data.range.toDate)})}</p>} />
             <StatusDonut pie={dashboard.data.pie} metrics={dashboard.data.metrics} />
           </div>
         </>

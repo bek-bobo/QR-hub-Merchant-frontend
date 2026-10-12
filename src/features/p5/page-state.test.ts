@@ -19,7 +19,7 @@ describe('P5 page state', () => {
     const current = { ...createDefaultP5Filters(), status, search: ' device ', page: 3 }
     const draft = createP5AdvancedDraft(current)
     expect(resolveP5StatusDraft(draft.statusDraft)).toBe(status)
-    expect(applyP5AdvancedDraft(current, draft, {})).toMatchObject({ status, search: 'device', page: 0 })
+    expect(applyP5AdvancedDraft(current, draft, {})).toMatchObject({ status, search: ' device ', page: 0 })
     const query = toP5ListQuery(applyP5AdvancedDraft(current, draft, {}))
     if (status === undefined) expect(query).not.toHaveProperty('status')
     else expect(query.status).toBe(String(status))
@@ -36,9 +36,9 @@ describe('P5 page state', () => {
   it('preserves structured filters during search and quick search during drawer Apply', () => {
     const applied = { ...createDefaultP5Filters(), merchantId: '2', terminalId: 't1', status: 777, search: 'old', page: 3 }
     const searched = applyP5QuickSearch(applied, ' device ')
-    expect(toP5ListQuery(searched)).toEqual({ merchantId: '2', terminalId: 't1', status: '777', search: 'device', page: '0', size: '20' })
+    expect(toP5ListQuery(searched)).toEqual({ merchantId: '2', terminalId: 't1', status: '777', search: ' device ', page: '0', size: '20' })
     expect(applyP5QuickSearch(searched, ' device ')).toBe(searched)
-    expect(toP5ListQuery(applyP5QuickSearch(searched, ' '))).toEqual({ merchantId: '2', terminalId: 't1', status: '777', page: '0', size: '20' })
+    expect(toP5ListQuery(applyP5QuickSearch(searched, ' '))).toEqual({ merchantId: '2', terminalId: 't1', status: '777', search: ' ', page: '0', size: '20' })
     const changed = changeP5AdvancedMerchant(createP5AdvancedDraft(applied), '3')
     expect(changed.terminalId).toBeUndefined()
     const next = applyP5AdvancedDraft(applied, changed, { merchantIds: ['3'] })
@@ -70,7 +70,7 @@ describe('P5 page state', () => {
       merchantIds: ['2'],
       terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['terminal-a'] },
     })
-    expect(toP5ListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'terminal-a', status: '0', search: 'Device', page: '0', size: '20' })
+    expect(toP5ListQuery(applied)).toEqual({ merchantId: '2', terminalId: 'terminal-a', status: '0', search: '  Device ', page: '0', size: '20' })
     expect(() => applyP5Draft(draft, { merchantIds: ['1'], terminal: { lookupParentId: '2', lookupState: 'ready', optionIds: ['terminal-a'] } })).toThrow()
     expect(() => applyP5Draft(draft, { merchantIds: ['2'], terminal: { lookupParentId: '1', lookupState: 'ready', optionIds: ['terminal-a'] } })).toThrow()
   })

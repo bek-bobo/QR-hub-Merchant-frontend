@@ -18,10 +18,10 @@ describe('static QR applied filters', () => {
     expect(staticQrFiltersConfirmed(applied, valid)).toBe(true)
   })
 
-  it('trims search and clears immediately without altering applied structured filters', () => {
+  it('commits raw search and empty effective search without altering applied structured filters', () => {
     const next = applyStaticQrQuickSearch(applied, '  QR-Exact  ')
-    expect(next).toEqual({ ...applied, search: 'QR-Exact', page: 0 })
-    expect(applyStaticQrQuickSearch(next, ' QR-Exact ')).toBe(next)
+    expect(next).toEqual({ ...applied, search: '  QR-Exact  ', page: 0 })
+    expect(applyStaticQrQuickSearch(next, '  QR-Exact  ')).toBe(next)
     expect(applyStaticQrQuickSearch(next, '')).toEqual({ ...applied, search: '', page: 0 })
     expect(clearStaticTerminal({ ...applied, size: 25 })).toEqual({ search: '', page: 0, size: 25 })
   })
@@ -64,9 +64,9 @@ describe('static QR applied filters', () => {
   it('serializes exactly the supported whitelist, omits empty fields and validates numeric IDs', () => {
     const extra = { status: 0, fromDate: 'date', toDate: 'date', bankAccountId: '2', terminalType: 'WEB', sort: 'name' }
     expect(toStaticQrQuery({ ...extra, ...applied, merchantId: ' 1 ', terminalId: ' T-Exact ', regionId: ' 3 ', districtId: ' 4 ', search: ' old ' }))
-      .toEqual({ merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'old', page: '5', size: '20' })
+      .toEqual({ merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: ' old ', page: '5', size: '20' })
     expect(toStaticQrQuery({ ...defaultStaticFilters, merchantId: ' ', terminalId: '', regionId: '', districtId: ' ', search: ' ' }))
-      .toEqual({ page: '0', size: '20' })
+      .toEqual({ search: ' ', page: '0', size: '20' })
     for (const field of ['merchantId', 'regionId', 'districtId'] as const) {
       for (const id of ['bad', '-1', '1.1', '9007199254740992']) expect(() => toStaticQrQuery({ ...applied, [field]: id })).toThrow()
     }

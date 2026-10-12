@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { CreateCashierDialog } from './CreateCashierDialog'
 import dialogSource from './CreateCashierDialog.tsx?raw'

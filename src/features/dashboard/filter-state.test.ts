@@ -38,7 +38,7 @@ describe('Dashboard independent filter drafts', () => {
     const result = dashboardFilterReducer(drafted, { type: 'commit-dates', range })
     expect(result.applied).toBe(initial)
     expect(result.dateDraft).toEqual(range)
-    expect(result.validationMessage).toBe('Sana oralig‘ini to‘g‘ri kiriting.')
+    expect(result.validationMessage).toBe('invalidRange')
   })
 
   it('applies Terminal against applied dates while leaving an incomplete date draft untouched', () => {
@@ -79,7 +79,7 @@ describe('Dashboard independent filter drafts', () => {
       type: 'date-draft', range: { fromDate: '2026-09-01', toDate: '' },
     })
     const result = dashboardFilterReducer(dirty, { type: 'reset', filters: defaults })
-    expect(result).toEqual({ dateDraft: defaults, applied: defaults, terminalDraft: undefined, validationMessage: null })
+    expect(result).toEqual({ dateDraft: defaults, applied: defaults, terminalDraft: undefined, validationMessage: null, requestedGranularity: 'AUTO' })
     expect(deriveRecentQrFilters(result.applied)).toEqual({ ...defaults, search: '', status: undefined, page: 0, size: 10 })
   })
 

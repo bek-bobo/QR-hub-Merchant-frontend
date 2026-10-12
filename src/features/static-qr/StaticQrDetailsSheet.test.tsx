@@ -1,4 +1,4 @@
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import type { StaticQrRow } from './contract'
 import { StaticQrDetailsContent } from './StaticQrDetailsSheet'

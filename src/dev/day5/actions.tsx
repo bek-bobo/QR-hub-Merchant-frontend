@@ -1,3 +1,4 @@
+import { Select } from '@/components/ui/select'
 import { useRef, useState, useSyncExternalStore } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
@@ -190,15 +191,15 @@ export function Day5CashierPreview({ simulator }: { readonly simulator: Day5Simu
     <header><h2 className="text-2xl font-semibold">Sintetik kassirlar</h2><p className="text-sm text-text-secondary">Server-side page va ACTIVE nested membership. Terminal filtri tarixiy match bo‘lishi mumkin.</p></header>
     <div className="grid gap-3 rounded-lg border bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4">
       {merchantState.kind === 'ready' ? <label className="space-y-1 text-sm">Merchant
-        <select className="block w-full rounded-lg border bg-surface p-2" value={draft.merchantId ?? ''}
+        <Select value={draft.merchantId ?? ''}
           onChange={(event) => setDraft((current) => changeMerchantDraft(current, event.target.value || undefined))}>
           <option value="">Barcha merchantlar</option>{merchants.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select></label> : null}
+        </Select></label> : null}
       {draft.merchantId && draftTerminals.data ? <label className="space-y-1 text-sm">Terminal
-        <select className="block w-full rounded-lg border bg-surface p-2" value={draft.terminalId ?? ''}
+        <Select value={draft.terminalId ?? ''}
           onChange={(event) => setDraft((current) => ({ ...current, terminalId: event.target.value || undefined }))}>
           <option value="">Barcha terminallar</option>{draftTerminals.data.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-        </select></label> : null}
+        </Select></label> : null}
       <label className="space-y-1 text-sm">Kassir F.I.Sh. yoki telefon<Input value={draft.search} onChange={(event) => setDraft((current) => ({ ...current, search: event.target.value }))} /></label>
       <div className="flex flex-wrap items-end gap-2"><Button type="button" onClick={applyFilters}>Qo‘llash</Button>
         <Button type="button" variant="outline" onClick={() => { const next = clearManagementFilters(applied); selectedEpochRef.current++; setSelectedEpoch(selectedEpochRef.current); selectedRef.current = null; unassignRef.current = null; setSelected(null); setUnassign(null); setActionNotice(null); setDraft(next); setApplied(next); setFilterMessage(null) }}>Tozalash</Button></div>

@@ -31,9 +31,9 @@ describe('standalone export filter application', () => {
   })
   it('allows export without terminal lookup when no terminal was selected', () => {
     const result = applyExportDraft({ ...initial, search: '  Terminal A  ', status: 0 }, unavailable)
-    expect(result).toMatchObject({ kind: 'applied', filters: { search: 'Terminal A', status: 0 } })
+    expect(result).toMatchObject({ kind: 'applied', filters: { search: '  Terminal A  ', status: 0 } })
     if (result.kind !== 'applied') throw Error('Expected applied filters')
-    expect(toDynamicQrExportQuery(result.filters)).toMatchObject({ status: '0', search: 'Terminal A' })
+    expect(toDynamicQrExportQuery(result.filters)).toMatchObject({ status: '0', search: '  Terminal A  ' })
     expect(toDynamicQrExportQuery(result.filters)).not.toHaveProperty('terminalId')
   })
 

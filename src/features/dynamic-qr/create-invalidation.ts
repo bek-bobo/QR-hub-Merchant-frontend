@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
+import { invalidateConfirmedQueries, type ConfirmedReadRefresh } from '@/shared/api/confirmed-refresh'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 
 export function shouldInvalidateAfterCreate(
@@ -15,8 +16,8 @@ export async function invalidateConfirmedCreateReads(
   client: QueryClient,
   scope: ReadScope,
   canReadDynamicQrs: boolean,
-): Promise<void> {
-  await client.invalidateQueries({
+): Promise<ConfirmedReadRefresh> {
+  return invalidateConfirmedQueries(client, {
     predicate: (query) => shouldInvalidateAfterCreate(query.queryKey, scope, canReadDynamicQrs),
   })
 }

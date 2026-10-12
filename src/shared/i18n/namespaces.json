@@ -1,0 +1,16 @@
+{
+  "enabled": [
+    "common",
+    "shell",
+    "auth",
+    "account",
+    "dashboard",
+    "dynamicQr",
+    "staticQr",
+    "terminals",
+    "bankAccounts",
+    "cashiers",
+    "p5"
+  ],
+  "planned": []
+}

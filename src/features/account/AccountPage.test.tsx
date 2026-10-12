@@ -1,4 +1,4 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { AuthContext, type AuthContextValue } from '@/shared/auth/useAuth'
 import { AccountPage } from './AccountPage'

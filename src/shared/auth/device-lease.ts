@@ -1,13 +1,10 @@
+import type { DeviceLeaseFeedback } from './feedback'
 export const DEVICE_KEY_STORAGE_KEY = 'qrhub.device-key.v1'
 export const AUTH_OWNER_LOCK_NAME = 'qrhub:auth-owner:v1'
 
-export const AUTH_OWNER_BUSY_MESSAGE =
-  'Hisob boshqa oynada ochiq. O‘sha oynani yoping yoki undan chiqing, keyin qayta urinib ko‘ring.'
-
-const authUnsupportedMessage =
-  'Ushbu brauzerda xavfsiz kirish qo‘llab-quvvatlanmaydi.'
-const deviceStorageUnavailableMessage =
-  'Qurilma identifikatorini xavfsiz saqlab bo‘lmadi.'
+export const AUTH_OWNER_BUSY_MESSAGE = 'ownerBusy' as const
+const authUnsupportedMessage = 'browserUnsupported' as const
+const deviceStorageUnavailableMessage = 'deviceStorageUnavailable' as const
 
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -52,12 +49,12 @@ export interface BusyAuthDeviceLease {
 
 export interface UnsupportedAuthDeviceLease {
   readonly status: 'unsupported'
-  readonly message: string
+  readonly message: DeviceLeaseFeedback
 }
 
 export interface StorageUnavailableAuthDeviceLease {
   readonly status: 'storage-unavailable'
-  readonly message: string
+  readonly message: DeviceLeaseFeedback
 }
 
 export type AuthDeviceLeaseResult =

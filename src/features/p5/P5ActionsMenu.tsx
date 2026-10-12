@@ -1,3 +1,4 @@
+import { useP5Presentation } from './presentation'
 import { InfoIcon, KeyRoundIcon, QrCodeIcon } from 'lucide-react'
 import { RowActionMenu, RowActionItem, RowActionSeparator, RowActionHint } from '@/shared/ui/RowActionMenu'
 import type { P5Row } from '@/shared/contracts/p5-read'
@@ -12,12 +13,13 @@ interface P5ActionsMenuProps {
 }
 
 export function P5ActionsMenu({ row, onViewQr, onViewDetails, resetDisabled = true, resetUnavailableMessage, onReset }: P5ActionsMenuProps) {
+  const p = useP5Presentation()
   return <RowActionMenu>
-    <RowActionItem icon={QrCodeIcon} onSelect={() => onViewQr(row)}>Statik QR ko‘rish</RowActionItem>
-    <RowActionItem icon={InfoIcon} onSelect={() => onViewDetails(row)}>Qo‘shimcha ma’lumotlar</RowActionItem>
+    <RowActionItem icon={QrCodeIcon} onSelect={() => onViewQr(row)}>{p.message('actions.viewQr')}</RowActionItem>
+    <RowActionItem icon={InfoIcon} onSelect={() => onViewDetails(row)}>{p.message('actions.details')}</RowActionItem>
     <RowActionSeparator />
     <RowActionItem icon={KeyRoundIcon} disabled={resetDisabled || !onReset}
-      onSelect={() => { if (!resetDisabled) onReset?.(row) }}>PIN reset</RowActionItem>
+      onSelect={() => { if (!resetDisabled) onReset?.(row) }}>{p.message('reset.action')}</RowActionItem>
     {resetUnavailableMessage ? <RowActionHint>{resetUnavailableMessage}</RowActionHint> : null}
   </RowActionMenu>
 }

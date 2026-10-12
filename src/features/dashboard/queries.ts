@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime, type ReadRuntimeContextValue } from '@/app/read/useReadRuntime'
 import type {
   DashboardFilters,
+  DashboardRequest,
+  DashboardGranularity,
   DynamicQrFilters,
 } from '@/shared/contracts/merchant-read'
 import { isValidDateRange } from '@/shared/filters/date-range'
@@ -10,7 +12,7 @@ type ReadQueries = ReadRuntimeContextValue['queries']
 
 export function createDashboardQueryOptions(
   queries: ReadQueries,
-  filters: DashboardFilters,
+  filters: DashboardRequest,
 ) {
   const options = queries.dashboardOptions(filters)
   return {
@@ -33,9 +35,9 @@ export function deriveRecentQrFilters(
   })
 }
 
-export function useDashboardReadQueries(applied: DashboardFilters) {
+export function useDashboardReadQueries(applied: DashboardFilters, granularity: DashboardGranularity = 'AUTO') {
   const runtime = useReadRuntime()
-  const dashboardOptions = createDashboardQueryOptions(runtime.queries, applied)
+  const dashboardOptions = createDashboardQueryOptions(runtime.queries, { ...applied, granularity })
   const baseTerminalOptions = runtime.queries.terminalOptions()
   const terminalOptions = {
     ...baseTerminalOptions,

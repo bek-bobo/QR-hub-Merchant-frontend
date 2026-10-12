@@ -2,11 +2,33 @@ import { describe, expect, it } from 'vitest'
 import {
   buildCalendarMonth,
   calendarMonthForRange,
+  formatCalendarMonthLabel,
+  getCalendarPreviewRange,
   selectCalendarRangeDate,
   shiftCalendarMonth,
 } from './date-range-calendar'
 
 describe('date range calendar state', () => {
+  it('formats all twelve months deterministically in Uzbek, month before year', () => {
+    expect(Array.from({ length: 12 }, (_, index) => formatCalendarMonthLabel(`2026-${String(index + 1).padStart(2, '0')}-01`)))
+      .toEqual(['Yan 2026', 'Fev 2026', 'Mar 2026', 'Apr 2026', 'May 2026', 'Iyun 2026', 'Iyul 2026', 'Avg 2026', 'Sen 2026', 'Okt 2026', 'Noy 2026', 'Dek 2026'])
+    expect(formatCalendarMonthLabel('2027-01-01')).toBe('Yan 2027')
+  })
+  it.each(['2026-10-10', '2026-10-15', '2026-11-02'])('sorts preview for %s without filling or changing the draft', (hovered) => {
+    const draft = { fromDate: '2026-10-15', toDate: '' }
+    expect(getCalendarPreviewRange(draft, hovered)).toEqual({ fromDate: hovered < draft.fromDate ? hovered : draft.fromDate, toDate: hovered > draft.fromDate ? hovered : draft.fromDate })
+    expect(draft).toEqual({ fromDate: '2026-10-15', toDate: '' })
+  })
+  it('does not preview complete, missing or invalid endpoints', () => {
+    expect(getCalendarPreviewRange({ fromDate: '2026-10-01', toDate: '2026-10-07' }, '2026-10-15')).toBeNull()
+    for (const date of ['', 'invalid', '2026-02-30']) expect(getCalendarPreviewRange({ fromDate: date, toDate: '' }, '2026-10-15')).toBeNull()
+    for (const date of [null, '', 'invalid', '2026-02-30']) expect(getCalendarPreviewRange({ fromDate: '2026-10-15', toDate: '' }, date)).toBeNull()
+  })
+  it('completes the same day twice and continues accepting future dates', () => {
+    const draft = selectCalendarRangeDate({ fromDate: '2026-10-07', toDate: '2026-10-07' }, '2099-12-31')
+    expect(draft).toEqual({ fromDate: '2099-12-31', toDate: '' })
+    expect(selectCalendarRangeDate(draft, '2099-12-31')).toEqual({ fromDate: '2099-12-31', toDate: '2099-12-31' })
+  })
   it.each([
     [{ fromDate: '', toDate: '2026-10-01' }, '2026-10-01'],
     [{ fromDate: 'invalid', toDate: '2026-08-10' }, '2026-08-01'],

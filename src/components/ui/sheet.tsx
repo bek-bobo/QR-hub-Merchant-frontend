@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import * as React from "react"
 import { cn } from "cn"
 import { Dialog as SheetPrimitive } from "radix-ui"
@@ -53,6 +54,7 @@ function SheetContent({
   side?: "top" | "right" | "bottom" | "left"
   showCloseButton?: boolean
 }) {
+  const { message } = useMessages('common')
   return (
     <SheetPortal>
       <SheetOverlay />
@@ -75,7 +77,7 @@ function SheetContent({
             >
               <XIcon
               />
-              <span className="sr-only">Close</span>
+              <span className="sr-only">{message('actions.close')}</span>
             </Button>
           </SheetPrimitive.Close>
         )}

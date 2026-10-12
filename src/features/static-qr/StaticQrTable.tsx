@@ -1,3 +1,4 @@
+import { useStaticQrPresentation } from './presentation'
 import {
   Table,
   TableBody,
@@ -10,7 +11,7 @@ import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import type { StaticQrRow } from './contract'
 import {
   STATIC_QR_DEFAULT_COLUMN_ORDER,
-  staticQrColumns,
+  createStaticQrColumns,
   type StaticQrColumn,
   type StaticQrColumnId,
 } from './columns'
@@ -25,6 +26,7 @@ interface StaticQrTableProps {
 }
 
 function resolveColumns(
+  staticQrColumns: ReturnType<typeof createStaticQrColumns>,
   order: readonly string[],
   visibleColumnIds: readonly string[],
 ): readonly StaticQrColumn[] {
@@ -47,7 +49,9 @@ export function StaticQrTable({
   onViewQr,
   onViewDetails,
 }: StaticQrTableProps) {
-  const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const p = useStaticQrPresentation()
+  const staticQrColumns = createStaticQrColumns(p)
+  const columns = resolveColumns(staticQrColumns, columnOrder, visibleColumnIds)
   const columnWidths: Record<StaticQrColumnId, number> = {
     qrId: 320,
     terminal: 240,
@@ -68,7 +72,7 @@ export function StaticQrTable({
           {columns.map((column) => (
             <TableHead key={column.id}>{column.label}</TableHead>
           ))}
-          <TableHead className="sticky right-0 text-right">Amallar</TableHead>
+          <TableHead className="sticky right-0 text-right">{p.message('table.actions')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>

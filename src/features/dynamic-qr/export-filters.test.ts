@@ -7,7 +7,7 @@ describe('dynamic QR export filters', () => {
       terminalId: ' a ', status: 25 as const, distributionStatus: 20 as const, search: ' Name ', page: 3, size: 20 as const }
     const query = toDynamicQrExportQuery(filters)
     expect(query).toEqual({ fromDate: filters.fromDate, toDate: filters.toDate, merchantId: '1', bankAccountId: '2',
-      terminalId: 'a', status: '25', distributionStatus: '20', search: 'Name' })
+      terminalId: 'a', status: '25', distributionStatus: '20', search: ' Name ' })
     for (const change of [{ merchantId: '3' }, { bankAccountId: '4' }, { distributionStatus: 0 as const }]) {
       expect(JSON.stringify(toDynamicQrExportQuery({ ...filters, ...change }))).not.toBe(JSON.stringify(query))
     }
@@ -17,12 +17,12 @@ describe('dynamic QR export filters', () => {
     expect(toDynamicQrExportQuery({ fromDate: '2026-09-09', toDate: '2026-09-15',
       terminalId: ' a ', status: 0, search: ' Chilonzor ', page: 3, size: 50 }))
       .toEqual({ fromDate: '2026-09-09', toDate: '2026-09-15',
-        terminalId: 'a', status: '0', search: 'Chilonzor' })
+        terminalId: 'a', status: '0', search: ' Chilonzor ' })
   })
-  it('omits blank optional fields while preserving the applied date range', () => {
+  it('omits blank optional IDs and retains whitespace search while preserving the applied date range', () => {
     const query = toDynamicQrExportQuery({ fromDate: '2026-09-09', toDate: '2026-09-15',
       merchantId: ' ', bankAccountId: '', terminalId: ' ', search: '  ', page: 4, size: 25 })
-    expect(query).toEqual({ fromDate: '2026-09-09', toDate: '2026-09-15' })
+    expect(query).toEqual({ fromDate: '2026-09-09', toDate: '2026-09-15', search: '  ' })
     expect(query).not.toHaveProperty('page')
     expect(query).not.toHaveProperty('size')
   })

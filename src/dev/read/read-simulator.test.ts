@@ -160,7 +160,7 @@ describe('D3 read scenario gates', () => {
     const normal = await createReadSimulator('NORMAL').api.dashboard(defaultFilters, signal)
     const reconciled = await createReadSimulator('RECONCILED').api.dashboard(defaultFilters, signal)
     const amount = await createReadSimulator('AMOUNT_MISMATCH').api.dashboard(defaultFilters, signal)
-    expect(reconcileDashboard(normal)).toEqual({ countMatches: false, amountMatches: false })
+    expect(reconcileDashboard(normal)).toEqual({ countMatches: true, amountMatches: true })
     expect(reconcileDashboard(reconciled)).toEqual({ countMatches: true, amountMatches: true })
     expect(reconcileDashboard(amount)).toEqual({ countMatches: true, amountMatches: false })
   })
@@ -213,10 +213,13 @@ describe('D3 read scenario gates', () => {
       signal,
     )
 
-    expect(all.metrics.total.count).toBe(23)
-    expect(terminal.metrics.total.count).toBe(12)
-    expect(terminal.buckets.every((bucket) => bucket.values.total.count > 0))
-      .toBe(true)
+    const observedRows = d3DynamicQrRows.filter((row) => row.createdAt < all.range.asOf.slice(0, 19))
+    expect(all.metrics.total.count).toBe(observedRows.length)
+    expect(terminal.metrics.total.count).toBe(observedRows.filter((row) => row.terminalId === 'T-01').length)
+    expect(terminal.buckets).toHaveLength(168)
+    expect(terminal.buckets.some((bucket) => bucket.values.total.count === 0)).toBe(true)
+    expect(terminal.buckets.filter((bucket) => bucket.coverage === 'FUTURE').every((bucket) => bucket.values.total.count === 0)).toBe(true)
+    expect(terminal.buckets.reduce((sum, bucket) => sum + bucket.values.total.count, 0)).toBe(terminal.metrics.total.count)
   })
 
   it('keeps denied lookup and all-denied requests disabled at runtime', () => {
@@ -285,5 +288,20 @@ describe('D3 read scenario gates', () => {
 
     await expect(simulator.api.dashboard(defaultFilters, controller.signal))
       .rejects.toMatchObject({ name: 'AbortError' })
+  })
+})
+
+describe('DEV analytics contract compatibility', () => {
+  it('returns canonical dense coverage and respects explicit granularity without redefining live controls', async () => {
+    const { simulator } = runtimeFor('NORMAL')
+    const view = await simulator.api.dashboard({ fromDate: '2026-09-01', toDate: '2026-09-30', granularity: 'WEEK', terminalId: 'T-01' }, new AbortController().signal)
+    expect(view.aggregation).toMatchObject({ requestedGranularity: 'WEEK', resolvedGranularity: 'WEEK', zeroBucketsIncluded: true, timeField: 'CREATED_AT' })
+    expect(view.aggregation.allowedGranularities).toContain('WEEK')
+    expect(view.range).toMatchObject({ timezone: 'Asia/Tashkent', asOf: '2026-09-15T12:00:00+05:00' })
+    expect(view.filters).toEqual({ terminalId: 'T-01' })
+    expect(view.buckets.map(({ coverage }) => coverage)).toEqual(['COMPLETED', 'COMPLETED', 'PARTIAL', 'FUTURE', 'FUTURE'])
+    expect(view.buckets[0]!.partial).toBe(true)
+    expect(reconcileDashboard(view).countMatches).toBe(true)
+    await expect(simulator.api.dashboard({ fromDate: '2026-09-15', toDate: '2026-09-15', granularity: 'DAY' }, new AbortController().signal)).rejects.toThrow()
   })
 })

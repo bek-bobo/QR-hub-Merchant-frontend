@@ -1,10 +1,11 @@
 import type { ComponentProps } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Button } from '@/components/ui/button'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { LoginActions } from '@/shared/auth/useAuth'
 import { AuthShell } from './AuthPresentation'
+import { ThemeProvider } from '@/shared/theme/ThemeProvider'
 import { LoginForm } from './LoginForm'
 
 const capture = vi.hoisted(() => ({ buttons: [] as Array<ComponentProps<typeof Button>> }))
@@ -23,9 +24,9 @@ function actions(remainingMs = 73000): LoginActions {
     restart: vi.fn(), getOtpRemainingMs: vi.fn(() => remainingMs) }
 }
 
-function render(phase: LoginSnapshot['phase'], port = actions(), pending = false, message?: string) {
-  return renderToStaticMarkup(<AuthShell><LoginForm actions={port}
-    snapshot={{ phase, flow: phase === 'reset-otp' ? 'reset' : 'login', phone: '998901234567', pending, message }} /></AuthShell>)
+function render(phase: LoginSnapshot['phase'], port = actions(), pending = false, message?: LoginSnapshot['message']) {
+  return renderToStaticMarkup(<ThemeProvider><AuthShell><LoginForm actions={port}
+    snapshot={{ phase, flow: phase === 'reset-otp' ? 'reset' : 'login', phone: '998901234567', pending, message }} /></AuthShell></ThemeProvider>)
 }
 
 describe('auth flow presentation', () => {
@@ -59,13 +60,13 @@ describe('auth flow presentation', () => {
   it.each(['otp', 'reset-otp'] as const)('uses the real timer and expiry gate in %s', (phase) => {
     const port = actions(73000)
     expect(render(phase, port)).toContain('1:13')
-    expect(capture.buttons.find((button) => button.children === 'Kodni qayta yuborish')?.disabled).toBe(true)
+    expect(capture.buttons.find((button) => button.className === 'auth-secondary auth-resend')?.disabled).toBe(true)
     capture.buttons = []
     const expiredPort = actions(0)
     const html = render(phase, expiredPort)
     expect(html).toContain('0:00')
     expect(capture.buttons.find((button) => button.type === 'submit')?.disabled).toBe(true)
-    const resend = capture.buttons.find((button) => button.children === 'Kodni qayta yuborish')!
+    const resend = capture.buttons.find((button) => button.className === 'auth-secondary auth-resend')!
     expect(resend.disabled).toBe(false)
     resend.onClick?.({} as never)
     expect(expiredPort.resendOtp).toHaveBeenCalledOnce()
@@ -92,9 +93,9 @@ describe('auth flow presentation', () => {
   })
 
   it.each(['phone', 'otp', 'pin', 'set-pin'] as const)('keeps pending actions disabled and preserves feedback for %s', (phase) => {
-    const html = render(phase, actions(), true, 'Serverdan kelgan xabar')
+    const html = render(phase, actions(), true, 'request')
     expect(capture.buttons.find((button) => button.type === 'submit')?.disabled).toBe(true)
-    expect(html).toContain('Serverdan kelgan xabar')
+    expect(html).toContain('So‘rovni yakunlab bo‘lmadi. Kirishni qayta boshlang.')
     expect(html).toContain('aria-invalid="true"')
   })
 })

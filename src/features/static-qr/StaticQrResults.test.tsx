@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { StaticQrRow } from './contract'
@@ -42,6 +42,10 @@ describe('static QR result presentation', () => {
     expect(html).toContain('aria-label="Amallarni ochish"')
     expect(html).toContain('aria-label="Statik QR sahifalari"')
     expect(html).toContain('flex-wrap')
+    expect(html).not.toContain('Statik QR ro‘yxati</')
+    expect(html).not.toContain('Barcha statik QR kodlar va ularning holati bilan tanishing.')
+    expect(html).not.toContain('qrhub-favicon.svg')
+    expect(html).not.toContain('data-slot="card-header"')
   })
   it('shows human-readable active and unknown statuses without raw codes or actions', () => {
     const html = render()

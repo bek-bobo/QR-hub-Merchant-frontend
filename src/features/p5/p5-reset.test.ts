@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+import { QueryClient } from '@tanstack/react-query'
 import { can } from '@/shared/auth/access'
 import { createActionRegistry } from '@/shared/api/one-dispatch-action'
 import { createHttpTransport, validateWebBaseUrl } from '@/shared/api/http'
@@ -181,7 +182,9 @@ describe('P5 reset contract and controller', () => {
     subject.controller.request(row)
     expect((await subject.controller.confirm()).kind).toBe('unknown')
     expect(subject.controller.getState().outcome.kind).toBe('unknown')
-    await invalidateCurrentP5Lists({ invalidateQueries: async () => undefined } as never, scope, true)
+    const client = new QueryClient()
+    expect(await invalidateCurrentP5Lists(client, scope, true)).toBe('skipped')
+    client.clear()
     expect(subject.controller.getState().outcome.kind).toBe('unknown')
     expect(subject.controller.request(row)).toBe(true)
     expect((await subject.controller.confirm()).kind).toBe('not-sent')
@@ -219,11 +222,11 @@ describe('P5 reset contract and controller', () => {
       readKeys.dashboard(scope, { fromDate: '2026-09-01', toDate: '2026-09-23' }),
       readKeys.p5List({ ...scope, accessRevision: 2 }, filters),
     ]
-    const selected: (readonly unknown[])[] = []
-    await invalidateCurrentP5Lists({ invalidateQueries: async ({ predicate }: { predicate: (query: { queryKey: readonly unknown[] }) => boolean }) => {
-      selected.push(...keys.filter((queryKey) => predicate({ queryKey })))
-    } } as never, scope, true)
-    expect(selected).toEqual(keys.slice(0, 2))
+    const client = new QueryClient()
+    for (const key of keys) client.setQueryData(key, {})
+    expect(await invalidateCurrentP5Lists(client, scope, true)).toBe('skipped')
+    expect(keys.map((key) => client.getQueryState(key)?.isInvalidated)).toEqual([true, true, false, false])
+    client.clear()
   })
 })
 

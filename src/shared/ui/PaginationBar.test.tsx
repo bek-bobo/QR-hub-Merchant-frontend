@@ -1,12 +1,15 @@
-import { Children, isValidElement, type ChangeEvent, type ReactElement, type ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { captureWithLocale } from '@/test/locale-fixture'
+import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
+import { Select, type SelectChangeEvent } from '@/components/ui/select'
 import { PaginationBar } from './PaginationBar'
 
 interface ActionProps {
   readonly 'aria-label'?: string
   readonly onClick?: () => void
-  readonly onChange?: (event: ChangeEvent<HTMLSelectElement>) => void
+  readonly onChange?: (event: SelectChangeEvent) => void
+  readonly value?: string | number
   readonly children?: ReactNode
 }
 
@@ -36,13 +39,26 @@ function findAction(node: ReactNode, ariaLabel: string): ReactElement<ActionProp
 
 describe('PaginationBar', () => {
   it('renders the controlled page size with the existing supported sizes', () => {
-    const html = renderToString(<PaginationBar ariaLabel="Natija sahifalari"
-      currentPage={0} totalPages={14} totalItems={140} pageSize={10}
-      onPageChange={() => undefined} onPageSizeChange={() => undefined} />)
-
-    expect(html).toContain('aria-label="Sahifadagi yozuvlar soni"')
-    expect(html).toContain('<option value="10" selected="">10 / sah.</option>')
-    for (const size of [20, 25, 50]) expect(html).toContain(`<option value="${size}">${size} / sah.</option>`)
+    const tree = captureWithLocale(() => PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 0,
+      totalPages: 14, totalItems: 140, pageSize: 10,
+      onPageChange: () => undefined, onPageSizeChange: () => undefined }))
+    const control = findAction(tree, 'Sahifadagi yozuvlar soni')
+    expect(control.type).toBe(Select)
+    const select = control
+    expect(select.props['aria-label']).toBe('Sahifadagi yozuvlar soni')
+    expect(String(select.props.value)).toBe('10')
+    const options = Children.toArray(select.props.children).map((node) => {
+      if (!isValidElement<{ value: number; children: ReactNode }>(node) || node.type !== 'option') {
+        throw new Error('Expected a page-size option contract')
+      }
+      return { value: String(node.props.value), label: Children.toArray(node.props.children).join('') }
+    })
+    expect(options).toEqual([
+      { value: '10', label: '10 / sah.' },
+      { value: '20', label: '20 / sah.' },
+      { value: '25', label: '25 / sah.' },
+      { value: '50', label: '50 / sah.' },
+    ])
   })
 
   it('sends supported size changes through their own callback and ignores invalid values', () => {
@@ -50,12 +66,12 @@ describe('PaginationBar', () => {
     const onPageSizeChange = vi.fn()
     const props = { ariaLabel: 'Natija sahifalari', currentPage: 5,
       totalPages: 14, totalItems: 140, pageSize: 10, onPageChange, onPageSizeChange }
-    const select = findAction(PaginationBar(props), 'Sahifadagi yozuvlar soni')
-    const event = (value: string) => ({ target: { value } }) as ChangeEvent<HTMLSelectElement>
+    const select = findAction(captureWithLocale(() => PaginationBar(props)), 'Sahifadagi yozuvlar soni')
+    const event = (value: string): SelectChangeEvent => ({ target: { value }, currentTarget: { value } })
 
     select.props.onChange?.(event('25'))
     select.props.onChange?.(event('100'))
-    findAction(PaginationBar({ ...props, disabled: true }), 'Sahifadagi yozuvlar soni')
+    findAction(captureWithLocale(() => PaginationBar({ ...props, disabled: true })), 'Sahifadagi yozuvlar soni')
       .props.onChange?.(event('50'))
 
     expect(onPageSizeChange.mock.calls).toEqual([[25]])
@@ -67,7 +83,7 @@ describe('PaginationBar', () => {
       totalPages: 1, totalItems: 10, onPageChange: () => undefined }
     for (const html of [renderToString(<PaginationBar {...props} />),
       renderToString(<PaginationBar {...props} disabled onPageSizeChange={() => undefined} />)]) {
-      expect(html).toMatch(/<select[^>]*aria-label="Sahifadagi yozuvlar soni"[^>]*disabled=""/)
+      expect(html).toMatch(/<button(?=[^>]*aria-label="Sahifadagi yozuvlar soni")(?=[^>]*disabled="")[^>]*>/)
     }
   })
 
@@ -117,8 +133,8 @@ describe('PaginationBar', () => {
 
   it('sends zero-based targets for previous, numbered, and next actions', () => {
     const onPageChange = vi.fn()
-    const tree = PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 5,
-      totalPages: 13, totalItems: 128, onPageChange })
+    const tree = captureWithLocale(() => PaginationBar({ ariaLabel: 'Natija sahifalari', currentPage: 5,
+      totalPages: 13, totalItems: 128, onPageChange }))
 
     findAction(tree, 'Oldingi sahifa').props.onClick?.()
     findAction(tree, '13-sahifa').props.onClick?.()

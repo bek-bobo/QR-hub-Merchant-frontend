@@ -47,14 +47,14 @@ describe('FormField', () => {
     expect(attributeValue(error, 'role')).toBe('alert')
   })
 
-  it('keeps a disabled native select semantic and styled through the shared primitive', () => {
+  it('keeps a disabled custom select semantic and labelled through the shared primitive', () => {
     const html = renderToStaticMarkup(
       <FormField id="terminal" label="Terminal">
         {(controlProps) => <Select {...controlProps} disabled><option>Tanlang</option></Select>}
       </FormField>,
     )
 
-    expect(html).toContain('<select')
+    expect(html).toContain('role="combobox"')
     expect(html).toContain('data-slot="select"')
     expect(html).toContain('id="terminal"')
     expect(html).toContain('disabled=""')

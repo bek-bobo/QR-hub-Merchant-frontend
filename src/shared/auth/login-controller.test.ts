@@ -291,7 +291,7 @@ describe('login controller', () => {
     expect(controller.getSnapshot()).toMatchObject({
       phase: 'expired',
       pending: false,
-      message: expect.stringMatching(/Qayta boshlang/),
+      message: 'sessionExpired',
     })
     expect(controller.getSnapshot().otpDeadlineMs).toBeUndefined()
     expect(controller.getOtpRemainingMs()).toBe(0)
@@ -321,7 +321,7 @@ describe('login controller', () => {
     expect(controller.getSnapshot()).toMatchObject({
       phase: 'expired',
       pending: false,
-      message: expect.stringMatching(/Qayta boshlang/),
+      message: 'sessionExpired',
     })
     expect(controller.getSnapshot().otpDeadlineMs).toBeUndefined()
     expect(controller.getOtpRemainingMs()).toBe(0)

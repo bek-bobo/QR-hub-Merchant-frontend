@@ -1,0 +1,38 @@
+/* Keep G2's native tooltip, shared by pointer and keyboard, inside its chart.
+   The installed engine only flips sides and rewrites inline left/top on every
+   update; a persistent scoped anchor avoids overflow at dense middle buckets. */
+[data-trend-viewport] .g2-tooltip {
+  left: auto !important;
+  right: 8px !important;
+  top: 8px !important;
+  width: min(280px, calc(100% - 16px));
+  min-width: 0 !important;
+}
+
+[data-trend-viewport] .g2-tooltip-title {
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+}
+
+[data-trend-viewport] .g2-tooltip-list-item {
+  gap: 8px;
+  white-space: normal !important;
+}
+
+[data-trend-viewport] .g2-tooltip-list-item-name {
+  min-width: 0;
+  flex: 1;
+}
+
+[data-trend-viewport] .g2-tooltip-list-item-name-label,
+[data-trend-viewport] .g2-tooltip-list-item-value {
+  overflow: visible !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+[data-trend-viewport] .g2-tooltip-list-item-value {
+  flex: 0 1 auto !important;
+  min-width: 0 !important;
+  margin-left: 0 !important;
+}

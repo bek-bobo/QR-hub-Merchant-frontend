@@ -1,7 +1,9 @@
+import { createP5Presentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
-import { P5_DEFAULT_COLUMN_ORDER, p5Columns } from './columns'
+import { P5_DEFAULT_COLUMN_ORDER, createP5Columns } from './columns'
 
 const expectedBusinessColumnIds = [
   'deviceId',
@@ -123,3 +125,5 @@ describe('P5 business-column metadata and preferences', () => {
     })
   })
 })
+
+const p5Columns = createP5Columns(createP5Presentation('uz', localeMessages('p5'), localeMessages('common')))

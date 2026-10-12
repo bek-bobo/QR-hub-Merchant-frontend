@@ -1,7 +1,7 @@
+import type { TerminalPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
 import type { TerminalRow } from '@/shared/contracts/management-read'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
@@ -12,10 +12,11 @@ interface TerminalColumnDefinition<Id extends string = string>
   readonly cellClassName?: string
 }
 
-const terminalColumnDefinitions = [
+export function createTerminalColumns(p: TerminalPresentation) {
+  return [
   {
     id: 'terminalId',
-    label: 'Terminal ID',
+    label: p.message('fields.terminalId'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -23,7 +24,7 @@ const terminalColumnDefinitions = [
   },
   {
     id: 'merchant',
-    label: 'Merchant',
+    label: p.message('fields.merchant'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -32,7 +33,7 @@ const terminalColumnDefinitions = [
   },
   {
     id: 'name',
-    label: 'Nomi',
+    label: p.message('fields.name'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -41,7 +42,7 @@ const terminalColumnDefinitions = [
   },
   {
     id: 'bankAccount',
-    label: 'Bank hisobi',
+    label: p.message('fields.bank'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -50,12 +51,12 @@ const terminalColumnDefinitions = [
   },
   {
     id: 'status',
-    label: 'Holat',
+    label: p.message('fields.status'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: TerminalRow) => {
-      const status = presentActiveStatus(row.statusCode)
+      const status = p.status(row.statusCode)
       return (
         <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} h-auto max-w-full gap-1.5 rounded-full px-2.5 py-1 font-medium whitespace-normal`}>
           <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
@@ -65,13 +66,14 @@ const terminalColumnDefinitions = [
     },
   },
 ] as const satisfies readonly TerminalColumnDefinition[]
+}
 
-export type TerminalColumnId = (typeof terminalColumnDefinitions)[number]['id']
+
+export type TerminalColumnId = ReturnType<typeof createTerminalColumns>[number]['id']
 export type TerminalColumn = TerminalColumnDefinition & {
   readonly id: TerminalColumnId
 }
 
-export const terminalColumns: readonly TerminalColumn[] = terminalColumnDefinitions
 
 export const TERMINAL_DEFAULT_COLUMN_ORDER: readonly TerminalColumnId[] =
-  terminalColumnDefinitions.map((column) => column.id)
+  ["terminalId","merchant","name","bankAccount","status"]

@@ -1,0 +1,1838 @@
+[
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 169,
+      "x": 205.40000915527344,
+      "y": 16
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 253.40000915527344,
+        "width": 48,
+        "x": 205.40000915527344,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 266.3999938964844,
+        "width": 1,
+        "x": 265.3999938964844,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.3999938964844,
+        "width": 96,
+        "x": 278.3999938964844,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "light",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 169,
+      "x": 205.40000915527344,
+      "y": 16
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 253.40000915527344,
+        "width": 48,
+        "x": 205.40000915527344,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 266.3999938964844,
+        "width": 1,
+        "x": 265.3999938964844,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.3999938964844,
+        "width": 96,
+        "x": 278.3999938964844,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "dark",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 169,
+      "x": 205.40000915527344,
+      "y": 16
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 253.40000915527344,
+        "width": 48,
+        "x": 205.40000915527344,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 266.3999938964844,
+        "width": 1,
+        "x": 265.3999938964844,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.3999938964844,
+        "width": 96,
+        "x": 278.3999938964844,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "system",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 165.16250610351562,
+      "x": 209.2375030517578,
+      "y": 16
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.2375030517578,
+        "width": 48,
+        "x": 209.2375030517578,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.2375183105469,
+        "width": 1,
+        "x": 269.2375183105469,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.400016784668,
+        "width": 92.1624984741211,
+        "x": 282.2375183105469,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "light",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 165.16250610351562,
+      "x": 209.2375030517578,
+      "y": 16
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.2375030517578,
+        "width": 48,
+        "x": 209.2375030517578,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.2375183105469,
+        "width": 1,
+        "x": 269.2375183105469,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.400016784668,
+        "width": 92.1624984741211,
+        "x": 282.2375183105469,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "dark",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 165.16250610351562,
+      "x": 209.2375030517578,
+      "y": 16
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.2375030517578,
+        "width": 48,
+        "x": 209.2375030517578,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.2375183105469,
+        "width": 1,
+        "x": 269.2375183105469,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.400016784668,
+        "width": 92.1624984741211,
+        "x": 282.2375183105469,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "system",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 164.58750915527344,
+      "x": 209.8125,
+      "y": 16
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.8125,
+        "width": 48,
+        "x": 209.8125,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.8125,
+        "width": 1,
+        "x": 269.8125,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.4000015258789,
+        "width": 91.5875015258789,
+        "x": 282.8125,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "light",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 164.58750915527344,
+      "x": 209.8125,
+      "y": 16
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.8125,
+        "width": 48,
+        "x": 209.8125,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.8125,
+        "width": 1,
+        "x": 269.8125,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.4000015258789,
+        "width": 91.5875015258789,
+        "x": 282.8125,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "dark",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 314.0875015258789,
+      "height": 55.275001525878906,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 258.8125
+    },
+    "card": {
+      "bottom": 641.1875,
+      "height": 303.1000061035156,
+      "right": 374.3999938964844,
+      "width": 358.3999938964844,
+      "x": 16,
+      "y": 338.0874938964844
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 56,
+      "height": 40,
+      "right": 374.40000915527344,
+      "width": 164.58750915527344,
+      "x": 209.8125,
+      "y": 16
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 257.8125,
+        "width": 48,
+        "x": 209.8125,
+        "y": 16
+      },
+      {
+        "bottom": 54,
+        "height": 36,
+        "right": 270.8125,
+        "width": 1,
+        "x": 269.8125,
+        "y": 18
+      },
+      {
+        "bottom": 56,
+        "height": 40,
+        "right": 374.4000015258789,
+        "width": 91.5875015258789,
+        "x": 282.8125,
+        "y": 16
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 390,
+    "theme": "system",
+    "menu": {
+      "bottom": 195.6000061035156,
+      "height": 900,
+      "right": 374,
+      "width": 390,
+      "x": 246
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748,
+      "width": 187,
+      "x": 561,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 609,
+        "width": 48,
+        "x": 561,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 626,
+        "width": 1,
+        "x": 625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748,
+        "width": 106,
+        "x": 642,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748,
+      "width": 187,
+      "x": 561,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 609,
+        "width": 48,
+        "x": 561,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 626,
+        "width": 1,
+        "x": 625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748,
+        "width": 106,
+        "x": 642,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748,
+      "width": 187,
+      "x": 561,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 609,
+        "width": 48,
+        "x": 561,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 626,
+        "width": 1,
+        "x": 625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748,
+        "width": 106,
+        "x": 642,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000305175781,
+      "width": 183.1625061035156,
+      "x": 564.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 612.8375244140625,
+        "width": 48,
+        "x": 564.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 629.8375244140625,
+        "width": 1,
+        "x": 628.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000228881836,
+        "width": 102.1624984741211,
+        "x": 645.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000305175781,
+      "width": 183.1625061035156,
+      "x": 564.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 612.8375244140625,
+        "width": 48,
+        "x": 564.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 629.8375244140625,
+        "width": 1,
+        "x": 628.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000228881836,
+        "width": 102.1624984741211,
+        "x": 645.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000305175781,
+      "width": 183.1625061035156,
+      "x": 564.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 612.8375244140625,
+        "width": 48,
+        "x": 564.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 629.8375244140625,
+        "width": 1,
+        "x": 628.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000228881836,
+        "width": 102.1624984741211,
+        "x": 645.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000457763672,
+      "width": 182.58750915527344,
+      "x": 565.4125366210938,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 613.4125366210938,
+        "width": 48,
+        "x": 565.4125366210938,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 630.4125366210938,
+        "width": 1,
+        "x": 629.4125366210938,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000381469727,
+        "width": 101.5875015258789,
+        "x": 646.4125366210938,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000457763672,
+      "width": 182.58750915527344,
+      "x": 565.4125366210938,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 613.4125366210938,
+        "width": 48,
+        "x": 565.4125366210938,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 630.4125366210938,
+        "width": 1,
+        "x": 629.4125366210938,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000381469727,
+        "width": 101.5875015258789,
+        "x": 646.4125366210938,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 684,
+      "width": 600,
+      "x": 84,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 748.0000457763672,
+      "width": 182.58750915527344,
+      "x": 565.4125366210938,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 613.4125366210938,
+        "width": 48,
+        "x": 565.4125366210938,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 630.4125366210938,
+        "width": 1,
+        "x": 629.4125366210938,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 748.0000381469727,
+        "width": 101.5875015258789,
+        "x": 646.4125366210938,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 768,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 748,
+      "width": 768,
+      "x": 620
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260,
+      "width": 187,
+      "x": 1073,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1121,
+        "width": 48,
+        "x": 1073,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1138,
+        "width": 1,
+        "x": 1137,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260,
+        "width": 106,
+        "x": 1154,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260,
+      "width": 187,
+      "x": 1073,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1121,
+        "width": 48,
+        "x": 1073,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1138,
+        "width": 1,
+        "x": 1137,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260,
+        "width": 106,
+        "x": 1154,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260,
+      "width": 187,
+      "x": 1073,
+      "y": 20
+    },
+    "locale": "uz",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1121,
+        "width": 48,
+        "x": 1073,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1138,
+        "width": 1,
+        "x": 1137,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260,
+        "width": 106,
+        "x": 1154,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260.000030517578,
+      "width": 183.1625061035156,
+      "x": 1076.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1124.8375244140625,
+        "width": 48,
+        "x": 1076.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1141.8375244140625,
+        "width": 1,
+        "x": 1140.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260.0000228881836,
+        "width": 102.1624984741211,
+        "x": 1157.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260.000030517578,
+      "width": 183.1625061035156,
+      "x": 1076.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1124.8375244140625,
+        "width": 48,
+        "x": 1076.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1141.8375244140625,
+        "width": 1,
+        "x": 1140.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260.0000228881836,
+        "width": 102.1624984741211,
+        "x": 1157.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1260.000030517578,
+      "width": 183.1625061035156,
+      "x": 1076.8375244140625,
+      "y": 20
+    },
+    "locale": "ru",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1124.8375244140625,
+        "width": 48,
+        "x": 1076.8375244140625,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1141.8375244140625,
+        "width": 1,
+        "x": 1140.8375244140625,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1260.0000228881836,
+        "width": 102.1624984741211,
+        "x": 1157.8375244140625,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1259.999984741211,
+      "width": 182.58750915527344,
+      "x": 1077.4124755859375,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1125.4124755859375,
+        "width": 48,
+        "x": 1077.4124755859375,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1142.4124755859375,
+        "width": 1,
+        "x": 1141.4124755859375,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1259.9999771118164,
+        "width": 101.5875015258789,
+        "x": 1158.4124755859375,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "light",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1259.999984741211,
+      "width": 182.58750915527344,
+      "x": 1077.4124755859375,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1125.4124755859375,
+        "width": 48,
+        "x": 1077.4124755859375,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1142.4124755859375,
+        "width": 1,
+        "x": 1141.4124755859375,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1259.9999771118164,
+        "width": 101.5875015258789,
+        "x": 1158.4124755859375,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "dark",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "dark",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  },
+  {
+    "brand": {
+      "bottom": 315.4499969482422,
+      "height": 69.5,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 245.9499969482422
+    },
+    "card": {
+      "bottom": 654.0500183105469,
+      "height": 308.6000061035156,
+      "right": 940,
+      "width": 600,
+      "x": 340,
+      "y": 345.45001220703125
+    },
+    "draft": "<redacted>",
+    "group": {
+      "bottom": 60,
+      "height": 40,
+      "right": 1259.999984741211,
+      "width": 182.58750915527344,
+      "x": 1077.4124755859375,
+      "y": 20
+    },
+    "locale": "en",
+    "oldSelector": false,
+    "ordered": [
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1125.4124755859375,
+        "width": 48,
+        "x": 1077.4124755859375,
+        "y": 20
+      },
+      {
+        "bottom": 58,
+        "height": 36,
+        "right": 1142.4124755859375,
+        "width": 1,
+        "x": 1141.4124755859375,
+        "y": 22
+      },
+      {
+        "bottom": 60,
+        "height": 40,
+        "right": 1259.9999771118164,
+        "width": 101.5875015258789,
+        "x": 1158.4124755859375,
+        "y": 20
+      }
+    ],
+    "overflow": false,
+    "resolved": "light",
+    "selectors": 1,
+    "viewport": 1280,
+    "theme": "system",
+    "menu": {
+      "bottom": 199.6000061035156,
+      "height": 900,
+      "right": 1260,
+      "width": 1280,
+      "x": 1132
+    },
+    "escapeClosed": true
+  }
+]

@@ -1,3 +1,4 @@
+import type { ProfileRefreshFeedback, LogoutFeedback } from './feedback'
 import {
   useEffect,
   useMemo,
@@ -94,10 +95,10 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
   const logoutFlight = useRef<Promise<void> | null>(null)
   const [profileRefreshPending, setProfileRefreshPending] = useState(false)
   const [profileRefreshMessage, setProfileRefreshMessage] = useState<
-    string | null
+    ProfileRefreshFeedback | null
   >(null)
   const [logoutPending, setLogoutPending] = useState(false)
-  const [logoutMessage, setLogoutMessage] = useState<string | null>(null)
+  const [logoutMessage, setLogoutMessage] = useState<LogoutFeedback | null>(null)
   const sessionSnapshot = useSyncExternalStore(
     controllers.session.subscribe,
     controllers.session.getSnapshot,
@@ -173,11 +174,11 @@ export function AuthProvider({ api, children }: AuthProviderProps) {
             if (result.status === 'success') {
               setProfileRefreshMessage(
                 result.changed
-                  ? 'Ma’lumotlar yangilandi.'
-                  : 'Ma’lumotlarda o‘zgarish yo‘q.',
+                  ? 'changed'
+                  : 'unchanged',
               )
             } else if (result.status === 'failed') {
-              setProfileRefreshMessage('Ma’lumotlarni yangilab bo‘lmadi.')
+              setProfileRefreshMessage('failed')
             }
           } finally {
             profileRefreshFlight.current = null

@@ -1,3 +1,4 @@
+import type { LoginFeedback } from './feedback'
 import type { AuthApi } from '@/shared/api/auth-api'
 import { normalizeUnknownError } from '@/shared/api/errors'
 import type { AuthDeviceLeaseResult } from '@/shared/auth/device-lease'
@@ -30,7 +31,7 @@ export interface LoginSnapshot {
   readonly pending: boolean
   readonly phone?: string
   readonly otpDeadlineMs?: number
-  readonly message?: string
+  readonly message?: LoginFeedback
 }
 
 export interface LoginOwnerLease {
@@ -57,24 +58,7 @@ interface Command {
   readonly controller: AbortController
 }
 
-const messages = {
-  invalidPhone: 'Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.',
-  invalidOtp: 'Tasdiqlash kodi 6 ta raqamdan iborat bo‘lishi kerak.',
-  invalidPin: 'PIN 4–8 ta raqamdan iborat bo‘lishi kerak.',
-  pinMismatch: 'PIN tasdig‘i mos kelmadi.',
-  otpNotExpired: 'Yangi kodni muddat tugagandan keyin so‘rashingiz mumkin.',
-  otpExpired: 'Tasdiqlash kodi muddati tugagan. Yangi kod so‘rang.',
-  wrongOtp: 'Tasdiqlash kodi noto‘g‘ri.',
-  wrongPin: 'PIN noto‘g‘ri.',
-  sessionExpired: 'Kirish sessiyasi muddati tugagan. Qayta boshlang.',
-  blocked: 'Ushbu qurilmadan kirish vaqtincha bloklangan.',
-  rateLimited: 'Juda ko‘p urinish bo‘ldi. Keyinroq qayta urinib ko‘ring.',
-  unavailable: 'Kirish xizmati hozir mavjud emas.',
-  contract: 'Kutilmagan javob olindi. Kirishni qayta boshlang.',
-  request: 'So‘rovni yakunlab bo‘lmadi. Kirishni qayta boshlang.',
-  completing: 'Profil tekshirilmoqda…',
-  complete: 'Kirish jarayoni yakunlandi.',
-} as const
+
 
 const initialPhoneSnapshot: LoginSnapshot = Object.freeze({
   phase: 'phone',
@@ -120,7 +104,7 @@ export class LoginController {
           phase: 'unavailable',
           flow: 'login',
           pending: false,
-          message: messages.unavailable,
+          message: 'unavailable',
         })
   }
 
@@ -150,14 +134,14 @@ export class LoginController {
     }
   }
 
-  reportRestoreLeaseFailure(message: string): void {
+  reportRestoreLeaseFailure(message: LoginFeedback): void {
     if (!this.disposed && this.snapshot.phase === 'phone') this.setUnavailable(message)
   }
 
   async startLogin(phoneInput: string): Promise<void> {
     const api = this.dependencies.api
     if (!api) {
-      this.setUnavailable(messages.unavailable)
+      this.setUnavailable('unavailable')
       return
     }
 
@@ -171,7 +155,7 @@ export class LoginController {
         phase: 'phone',
         flow: 'login',
         pending: false,
-        message: messages.invalidPhone,
+        message: 'invalidPhone',
       })
       return
     }
@@ -208,7 +192,7 @@ export class LoginController {
         created.reply.stage !== 'otp' ||
         created.reply.tokenPair
       ) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
         return
       }
 
@@ -224,7 +208,7 @@ export class LoginController {
       }
 
       if (!this.applyLoginSendReply(reply)) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
       }
     } catch (error) {
       this.handleCommandError(command, error)
@@ -242,12 +226,12 @@ export class LoginController {
     }
 
     if (!isValidOtp(otpCode)) {
-      this.setStageMessage(messages.invalidOtp)
+      this.setStageMessage('invalidOtp')
       return
     }
 
     if (this.getOtpRemainingMs() === 0) {
-      this.setStageMessage(messages.otpExpired)
+      this.setStageMessage('otpExpired')
       return
     }
 
@@ -255,7 +239,7 @@ export class LoginController {
     const sessionKey = this.sessionKey
     const otpId = this.otpId
     if (!api || !sessionKey || !otpId) {
-      this.failTerminal('error', messages.contract)
+      this.failTerminal('error', 'contract')
       return
     }
 
@@ -291,7 +275,7 @@ export class LoginController {
             ? reply.stage
             : null
       if (!nextPhase || reply.tokenPair) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
         return
       }
 
@@ -315,14 +299,14 @@ export class LoginController {
     }
 
     if (!isValidPin(pin)) {
-      this.setStageMessage(messages.invalidPin)
+      this.setStageMessage('invalidPin')
       return
     }
 
     const api = this.dependencies.api
     const sessionKey = this.sessionKey
     if (!api || !sessionKey || !this.ownsLease) {
-      this.failTerminal('error', messages.contract)
+      this.failTerminal('error', 'contract')
       return
     }
 
@@ -340,7 +324,7 @@ export class LoginController {
       }
 
       if (reply.stage !== 'done' || !reply.tokenPair) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
         return
       }
 
@@ -358,19 +342,19 @@ export class LoginController {
     }
 
     if (!isValidPin(pin) || !isValidPin(confirmation)) {
-      this.setStageMessage(messages.invalidPin)
+      this.setStageMessage('invalidPin')
       return
     }
 
     if (pin !== confirmation) {
-      this.setStageMessage(messages.pinMismatch)
+      this.setStageMessage('pinMismatch')
       return
     }
 
     const api = this.dependencies.api
     const sessionKey = this.sessionKey
     if (!api || !sessionKey) {
-      this.failTerminal('error', messages.contract)
+      this.failTerminal('error', 'contract')
       return
     }
 
@@ -394,7 +378,7 @@ export class LoginController {
       }
 
       if (reply.stage !== 'pin' || reply.tokenPair) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
         return
       }
 
@@ -424,7 +408,7 @@ export class LoginController {
     const api = this.dependencies.api
     const sessionKey = this.sessionKey
     if (!api || !sessionKey) {
-      this.failTerminal('error', messages.contract)
+      this.failTerminal('error', 'contract')
       return
     }
 
@@ -444,7 +428,7 @@ export class LoginController {
       }
 
       if (!this.applyOtpReply(reply, 'reset-otp')) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
       }
     } catch (error) {
       this.handleCommandError(command, error)
@@ -462,14 +446,14 @@ export class LoginController {
     }
 
     if (this.getOtpRemainingMs() > 0) {
-      this.setStageMessage(messages.otpNotExpired)
+      this.setStageMessage('otpNotExpired')
       return
     }
 
     const api = this.dependencies.api
     const sessionKey = this.sessionKey
     if (!api || !sessionKey) {
-      this.failTerminal('error', messages.contract)
+      this.failTerminal('error', 'contract')
       return
     }
 
@@ -494,7 +478,7 @@ export class LoginController {
 
       const expectedPhase = this.flow === 'reset' ? 'reset-otp' : 'otp'
       if (!this.applyOtpReply(reply, expectedPhase)) {
-        this.failTerminal('error', messages.contract)
+        this.failTerminal('error', 'contract')
       }
     } catch (error) {
       this.handleCommandError(command, error)
@@ -519,7 +503,7 @@ export class LoginController {
             phase: 'unavailable',
             flow: 'login',
             pending: false,
-            message: messages.unavailable,
+            message: 'unavailable',
           },
     )
   }
@@ -642,7 +626,7 @@ export class LoginController {
       flow: 'login',
       pending: true,
       phone: phone ?? undefined,
-      message: messages.completing,
+      message: 'completing',
     })
 
     let result: EstablishSessionResult
@@ -658,7 +642,7 @@ export class LoginController {
           flow: 'login',
           pending: false,
           phone: phone ?? undefined,
-          message: messages.request,
+          message: 'request',
         })
       }
       command.controller.abort()
@@ -674,13 +658,13 @@ export class LoginController {
         flow: 'login',
         pending: false,
         phone: phone ?? undefined,
-        message: messages.complete,
+        message: 'complete',
       })
       return
     }
 
     const message =
-      result.status === 'access-denied' ? messages.contract : messages.request
+      result.status === 'access-denied' ? 'contract' : 'request'
     this.setSnapshot({
       phase: 'error',
       flow: 'login',
@@ -699,22 +683,22 @@ export class LoginController {
 
     const safeError = normalizeUnknownError(error)
     if (safeError.tag === 'OTP_CODE_INVALID') {
-      this.setStageMessage(messages.wrongOtp)
+      this.setStageMessage('wrongOtp')
       return
     }
 
     if (safeError.tag === 'PIN_INVALID') {
-      this.setStageMessage(messages.wrongPin)
+      this.setStageMessage('wrongPin')
       return
     }
 
     if (safeError.tag === 'OTP_EXPIRED') {
-      this.failTerminal('expired', messages.sessionExpired)
+      this.failTerminal('expired', 'sessionExpired')
       return
     }
 
     if (safeError.tag === 'OTP_NOT_EXPIRED_YET') {
-      this.setStageMessage(messages.otpNotExpired)
+      this.setStageMessage('otpNotExpired')
       return
     }
 
@@ -722,7 +706,7 @@ export class LoginController {
       safeError.tag === 'DEVICE_BLOCKED' ||
       safeError.tag === 'PIN_MAX_ATTEMPTS_EXCEEDED'
     ) {
-      this.failTerminal('blocked', messages.blocked)
+      this.failTerminal('blocked', 'blocked')
       return
     }
 
@@ -730,26 +714,26 @@ export class LoginController {
       safeError.tag === 'SESSION_EXPIRED' ||
       safeError.tag === 'OTP_MAX_ATTEMPTS_EXCEEDED'
     ) {
-      this.failTerminal('expired', messages.sessionExpired)
+      this.failTerminal('expired', 'sessionExpired')
       return
     }
 
     if (safeError.tag === 'RATE_LIMIT_EXCEEDED') {
-      this.failTerminal('error', messages.rateLimited)
+      this.failTerminal('error', 'rateLimited')
       return
     }
 
     this.failTerminal(
       'error',
-      safeError.kind === 'contract' ? messages.contract : messages.request,
+      safeError.kind === 'contract' ? 'contract' : 'request',
     )
   }
 
-  private setStageMessage(message: string): void {
+  private setStageMessage(message: LoginFeedback): void {
     this.setSnapshot({ ...this.snapshot, message })
   }
 
-  private setUnavailable(message: string): void {
+  private setUnavailable(message: LoginFeedback): void {
     this.invalidatePendingCommand()
     this.clearPrivateFlowState()
     this.releaseOwnedLease()
@@ -763,7 +747,7 @@ export class LoginController {
 
   private failTerminal(
     phase: 'error' | 'expired' | 'blocked',
-    message: string,
+    message: LoginFeedback,
   ): void {
     const phone = this.phone
     this.invalidatePendingCommand()

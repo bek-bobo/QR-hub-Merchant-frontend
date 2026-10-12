@@ -1,0 +1,19 @@
+{
+  "title": "Hisob ma’lumotlari",
+  "profile": {
+    "fullName": "F.I.Sh.",
+    "phone": "Telefon",
+    "missing": "Ko‘rsatilmagan"
+  },
+  "actions": {
+    "refresh": "Ma’lumotni yangilash"
+  },
+  "states": {
+    "refreshing": "Yangilanmoqda…"
+  },
+  "feedback": {
+    "changed": "Ma’lumotlar yangilandi.",
+    "unchanged": "Ma’lumotlarda o‘zgarish yo‘q.",
+    "failed": "Ma’lumotlarni yangilab bo‘lmadi."
+  }
+}

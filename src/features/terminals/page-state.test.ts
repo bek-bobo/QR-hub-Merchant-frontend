@@ -15,10 +15,10 @@ describe('terminal filter state', () => {
     expect(applied.page).toBe(5)
   })
 
-  it('trims quick search and immediately clears it without changing structured filters', () => {
+  it('commits raw search and empty effective search without changing structured filters', () => {
     const next = applyTerminalQuickSearch(applied, '  Terminal A  ')
-    expect(next).toEqual({ ...applied, search: 'Terminal A', page: 0 })
-    expect(applyTerminalQuickSearch(next, ' Terminal A ')).toBe(next)
+    expect(next).toEqual({ ...applied, search: '  Terminal A  ', page: 0 })
+    expect(applyTerminalQuickSearch(next, '  Terminal A  ')).toBe(next)
     expect(applyTerminalQuickSearch(next, '')).toEqual({ ...applied, search: '', page: 0 })
   })
 
@@ -56,9 +56,9 @@ describe('terminal filter state', () => {
 
   it('serializes only supported parameters, omits whitespace optionals, and rejects unsafe numeric IDs', () => {
     expect(toTerminalListQuery({ ...createDefaultTerminalFilters(), merchantId: ' ', bankAccountId: '', regionId: ' ', districtId: '', search: ' ' }))
-      .toEqual({ page: '0', size: '20' })
+      .toEqual({ search: ' ', page: '0', size: '20' })
     expect(toTerminalListQuery({ ...applied, merchantId: ' 1 ', bankAccountId: ' 2 ', regionId: ' 3 ', districtId: ' 4 ', search: ' old ' }))
-      .toEqual({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: 'old', page: '5', size: '20' })
+      .toEqual({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: ' old ', page: '5', size: '20' })
     for (const id of ['x', '-1', '1.1', '9007199254740992']) {
       expect(() => toTerminalListQuery({ ...applied, regionId: id })).toThrow()
       expect(() => toTerminalListQuery({ ...applied, districtId: id })).toThrow()
@@ -68,7 +68,7 @@ describe('terminal filter state', () => {
     const initial = createDefaultTerminalFilters()
     const draft = { ...initial, merchantId: '2', bankAccountId: '3', search: '  Terminal A ', page: 4 }
     const applied = applyTerminalDraft(draft, { merchantIds: ['2'], bank: { lookupParentId: '2', lookupState: 'ready', optionIds: ['3'] } })
-    expect(toTerminalListQuery(applied)).toEqual({ merchantId: '2', bankAccountId: '3', search: 'Terminal A', page: '0', size: '20' })
+    expect(toTerminalListQuery(applied)).toEqual({ merchantId: '2', bankAccountId: '3', search: '  Terminal A ', page: '0', size: '20' })
     expect(changeManagementPage(applied, 2).page).toBe(2)
     expect(clearManagementFilters(applied)).toMatchObject({ merchantId: undefined, bankAccountId: undefined, search: '', page: 0, size: 20 })
   })

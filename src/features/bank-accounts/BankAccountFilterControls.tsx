@@ -1,3 +1,4 @@
+import { useBankAccountPresentation } from './presentation'
 import { useEffect, type FormEvent } from 'react'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -8,24 +9,23 @@ import type { LookupSelectState } from '@/shared/ui/lookup-select-state'
 interface QuickSearchProps {
   readonly searchDraft: string
   readonly onDraftChange: (search: string) => void
-  readonly onApply: (search: string) => void
 }
 
-export function BankAccountQuickSearch({ searchDraft, onDraftChange, onApply }: QuickSearchProps) {
+export function BankAccountQuickSearch({ searchDraft, onDraftChange }: QuickSearchProps) {
+  const p = useBankAccountPresentation()
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onApply(searchDraft)
   }
   return <form className="relative w-full min-w-0 sm:w-[25rem]" role="search" onSubmit={submit}>
     <SearchIcon aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 size-5 -translate-y-1/2 text-text-secondary" />
     <Input type="text" enterKeyHint="search" value={searchDraft} className="h-10 rounded-xl bg-surface pl-10 pr-9 text-sm"
-      aria-label="Nomi, bank, hisob raqami yoki STIR bo‘yicha qidirish"
-      placeholder="Nomi, bank, hisob raqami yoki STIR"
+      aria-label={p.message('search.label')}
+      placeholder={p.message('search.placeholder')}
       onChange={(event) => onDraftChange(event.target.value)} />
     {searchDraft ? <Button type="button" variant="ghost" size="icon-sm"
-      className="absolute right-1 top-1/2 -translate-y-1/2" aria-label="Qidiruvni tozalash"
-      onClick={() => { onDraftChange(''); onApply('') }}><XIcon aria-hidden="true" /></Button> : null}
-    <button type="submit" className="sr-only" aria-label="Qidiruvni qo‘llash">Qidiruvni qo‘llash</button>
+      className="absolute right-1 top-1/2 -translate-y-1/2" aria-label={p.common('search.clear')}
+      onClick={() => onDraftChange('')}><XIcon aria-hidden="true" /></Button> : null}
+    <button type="submit" className="sr-only" aria-label={p.common('search.apply')}>{p.common('search.apply')}</button>
   </form>
 }
 
@@ -37,10 +37,11 @@ interface MerchantFilterProps {
 }
 
 export function BankAccountMerchantFilter({ merchantId, merchants, state, onChange }: MerchantFilterProps) {
+  const p = useBankAccountPresentation()
   const stale = Boolean(merchantId && (state === 'ready' || state === 'empty') &&
     merchants && !merchants.some((item) => item.id === merchantId))
   useEffect(() => { if (stale) onChange(undefined) }, [stale, onChange])
-  return <LookupFilterSelect label="Merchant" value={stale ? undefined : merchantId}
-    options={merchants} state={state} allLabel="Barcha merchantlar"
-    emptyLabel="Merchant mavjud emas" errorLabel="Merchantlarni yuklab bo‘lmadi" onChange={onChange} />
+  return <LookupFilterSelect label={p.message('fields.merchant')} value={stale ? undefined : merchantId}
+    options={merchants} state={state} allLabel={p.message('filters.allMerchants')}
+    emptyLabel={p.message('filters.noMerchants')} errorLabel={p.message('filters.merchantsFailed')} onChange={onChange} />
 }

@@ -1,5 +1,6 @@
+import { captureWithLocale } from '@/test/locale-fixture'
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { Tooltip } from 'radix-ui'
 import { describe, expect, it, vi } from 'vitest'
 import { Button } from '@/components/ui/button'
@@ -47,10 +48,10 @@ describe('DashboardPageHeader', () => {
   // verify that its real trigger wraps the unchanged button and portals the supplied value.
   it('connects the real button to Radix hover/focus and portals the current timestamp above it', () => {
     const onRefresh = vi.fn()
-    const render = (updatedAt?: string) => DashboardPageHeader({
+    const render = (updatedAt?: string) => captureWithLocale(() => DashboardPageHeader({
       children: <button type="button">Filtrlar</button>,
       updatedAt, refreshDisabled: false, refreshing: false, onRefresh,
-    })
+    }))
     const tree = render('17:44:58')
     expect(findElement(tree, Tooltip.Provider)).toBeDefined()
     expect(findElement(tree, Tooltip.Root)?.props.open).toBeUndefined()
@@ -66,9 +67,9 @@ describe('DashboardPageHeader', () => {
     const content = findElement(tree, Tooltip.Content)!
     expect(content.props.side).toBe('top')
     expect(content.props.className).toContain('whitespace-nowrap')
-    expect(content.props.children).toEqual(['Oxirgi yangilanish: ', '17:44:58'])
+    expect(content.props.children).toBe('Oxirgi yangilanish: 17:44:58')
     expect(findElement(render('18:05:09'), Tooltip.Content)?.props.children)
-      .toEqual(['Oxirgi yangilanish: ', '18:05:09'])
+      .toBe('Oxirgi yangilanish: 18:05:09')
     expect(findElement(render(), Tooltip.Content)).toBeUndefined()
   })
 

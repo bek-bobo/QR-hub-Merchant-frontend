@@ -24,7 +24,7 @@ export function createDefaultDynamicQrFilters(
   instant = new Date(),
 ): DynamicQrFilters {
   return Object.freeze({
-    ...getTashkentDatePreset(7, instant),
+    ...getTashkentDatePreset(1, instant),
     status: undefined,
     search: '',
     page: 0,

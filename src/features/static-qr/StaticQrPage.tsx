@@ -1,3 +1,5 @@
+import { useStaticQrPresentation } from './presentation'
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -11,7 +13,7 @@ import { FilterDrawer } from '@/shared/ui/FilterDrawer'
 import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
-import { applyStaticQrAdvancedDraft, applyStaticQrQuickSearch, clearStaticTerminal,
+import { applyStaticQrAdvancedDraft, applyStaticQrQuickSearch,
   defaultStaticFilters, type StaticQrAdvancedDraft, type StaticQrFilters } from './page-state'
 import { StaticQrAdvancedFilterFields, StaticQrQuickSearch } from './StaticQrFilterControls'
 import { useStaticQrFilterLookups } from './filter-lookups'
@@ -20,16 +22,21 @@ import { StaticQrResults } from './StaticQrResults'
 import type { StaticQrRow } from './contract'
 import { StaticQrDisplayDialog } from './StaticQrDisplayDialog'
 import { StaticQrDetailsSheet } from './StaticQrDetailsSheet'
-import { staticQrColumns } from './columns'
+import { createStaticQrColumns } from './columns'
 
 export function StaticQrPage() {
+  const p = useStaticQrPresentation()
+  const staticQrColumns = createStaticQrColumns(p)
   const runtime = useReadRuntime()
   const access = useAccessContext()
   const { bridge, getSessionSnapshot } = useProtectedReadContext()
   const [draft, setDraft] = useState<StaticQrAdvancedDraft>({})
   const [searchDraft, setSearchDraft] = useState('')
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  const [validationMessage, setValidationMessage] = useState<'invalid' | null>(null)
   const [applied, setApplied] = useState<StaticQrFilters>(defaultStaticFilters)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyStaticQrQuickSearch(current, search))
+  })
   const [selectedQrRow, setSelectedQrRow] = useState<StaticQrRow | null>(null)
   const [selectedDetailsRow, setSelectedDetailsRow] = useState<StaticQrRow | null>(null)
   const columnPreferences = useTableColumnPreferences({
@@ -55,7 +62,7 @@ export function StaticQrPage() {
   function applyFilters(): boolean {
     const next = applyStaticQrAdvancedDraft(applied, lookups.reconciledDraft, lookups.validation)
     if (!next) {
-      setValidationMessage('Tanlangan merchant, terminal, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      setValidationMessage('invalid')
       return false
     }
     setDraft(lookups.reconciledDraft)
@@ -66,14 +73,18 @@ export function StaticQrPage() {
 
   function resetFilters() {
     setDraft({})
-    setSearchDraft('')
-    setApplied((current) => clearStaticTerminal(current))
     setValidationMessage(null)
   }
 
-  if (!staticReadAllowed) return <NoAccessState description="Statik QR ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title="Statik QR autentifikatsiyasi sozlanmagan" />
-  if (!transport) return <ErrorState title="Statik QR integratsiyasi sozlanmagan" />
+  function syncDrawerDraft(open: boolean) {
+    setDraft(open ? { merchantId: applied.merchantId, terminalId: applied.terminalId,
+      regionId: applied.regionId, districtId: applied.districtId } : {})
+    setValidationMessage(null)
+  }
+
+  if (!staticReadAllowed) return <NoAccessState description={p.message('page.noAccess')} />
+  if (runtime.readiness.auth.kind === 'unavailable') return <ErrorState title={p.message('page.authUnavailable')} />
+  if (!transport) return <ErrorState title={p.message('page.unavailable')} />
 
   return <div className="mx-auto min-w-0 max-w-[96rem]">
     <StaticQrDisplayDialog row={selectedQrRow} onOpenChange={(open) => {
@@ -94,26 +105,26 @@ export function StaticQrPage() {
       onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
       onViewQr={setSelectedQrRow}
       onViewDetails={setSelectedDetailsRow}
-      quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft}
-        onApply={(search) => setApplied((current) => applyStaticQrQuickSearch(current, search))} />}
+      quickFilters={<StaticQrQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-3 sm:justify-end">
         <FilterDrawer
           onApply={applyFilters}
           onReset={resetFilters}
+          onOpenChange={syncDrawerDraft}
           triggerSize="sm"
           triggerClassName="h-10 gap-2 rounded-xl border-brand/60 bg-brand-soft/40 px-5 text-sm text-brand hover:bg-brand-soft hover:text-brand aria-expanded:bg-brand-soft aria-expanded:text-brand"
         >
           <StaticQrAdvancedFilterFields draft={lookups.reconciledDraft} {...lookups.fields} onChange={setDraft}
             onReconcileDraft={() => { if (lookups.reconciledDraft !== draft) setDraft(lookups.reconciledDraft) }} />
-          {validationMessage ? <p role="alert" className="text-sm text-destructive">{validationMessage}</p> : null}
+          {validationMessage ? <p role="alert" className="text-sm text-destructive">{p.message('filters.invalid')}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences
-          tableLabel="Statik QR"
+          tableLabel={p.message('page.name')}
           items={staticQrColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
-          triggerLabel="Ustunlar"
-          triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-5 text-sm"
+          iconOnly
+          triggerClassName="size-10 rounded-xl bg-muted/30"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}
@@ -123,7 +134,7 @@ export function StaticQrPage() {
         />
         <RefreshIconButton
           className="size-10 rounded-xl bg-surface"
-          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, { locale: p.intlLocale, timeZone: 'Asia/Tashkent' }) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}

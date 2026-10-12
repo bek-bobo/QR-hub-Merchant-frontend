@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { AccessProvider } from '@/shared/auth/AccessContext'
 import { DynamicQrPage } from './DynamicQrPage'
@@ -33,7 +33,7 @@ vi.mock('./queries', () => ({
     },
   }),
 }))
-vi.mock('./ExportButton', () => ({ ExportButton: () => null }))
+vi.mock('./ExportButton', () => ({ ExportButton: () => <button>XLSX</button> }))
 
 function pageWith(permissions: string[]) {
   return renderToString(<MemoryRouter><AccessProvider value={{ kind: 'authenticated', permissions: new Set(permissions) }}>
@@ -66,23 +66,33 @@ describe('production cancel list gate', () => {
 
   it('shows a create modal trigger rather than navigation only with CREATE_DYNAMIC_QR', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])
-    expect(html).toContain('Yangi QR yaratish')
+    expect(html).toContain('>Yangi QR</button>')
     expect(html).not.toContain('href="/dynamic-qrs/new"')
-    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('Yangi QR yaratish')
+    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('>Yangi QR</button>')
   })
 
-  it('renders primary controls before the secondary quick-filter actions', () => {
+  it('renders the toolbar controls in the requested order', () => {
     const html = pageWith(['GET_DYNAMIC_QRS', 'CREATE_DYNAMIC_QR'])
-    expect(html.indexOf('Yangi QR yaratish')).toBeLessThan(html.indexOf('aria-label="Jadval ustunlarini sozlash"'))
-    expect(html.indexOf('aria-label="Jadval ustunlarini sozlash"')).toBeLessThan(html.indexOf('aria-label="Yangilash"'))
-    expect(html.indexOf('aria-label="Yangilash"')).toBeLessThan(html.indexOf('Filtrlar'))
+    const controls = [
+      'aria-label="Sana oralig‘ini tanlash"',
+      'aria-label="Terminal nomi bo‘yicha qidirish"',
+      '>XLSX</button>',
+      'Filtrlar',
+      '>Yangi QR</button>',
+      'aria-label="Jadval ustunlarini sozlash"',
+      'aria-label="Yangilash"',
+    ]
+    const positions = controls.map((control) => html.indexOf(control))
+    positions.forEach((position) => expect(position).toBeGreaterThan(-1))
+    expect(positions).toEqual([...positions].sort((left, right) => left - right))
   })
 
   it('renders the compact table toolbar without the removed helper copy', () => {
     const html = pageWith(['GET_DYNAMIC_QRS'])
 
-    expect(html).toContain('Dinamik QR ro‘yxati')
-    expect(html).toContain('Yaratilgan dinamik QR kodlar va ularning holati')
+    expect(html).not.toContain('>Dinamik QR ro‘yxati<')
+    expect(html).not.toContain('Yaratilgan dinamik QR kodlar va ularning holati')
+    expect(html).not.toContain('lucide-scan-line')
     expect(html).toContain('placeholder="Terminal nomi bo‘yicha qidirish"')
     expect(html).toContain('Filtrlar')
     expect(html).toContain('Jadval ustunlari')
@@ -129,7 +139,7 @@ describe('production cancel list gate', () => {
     }
     expect(html).toContain('<table')
     expect(html).toContain('Asosiy terminal')
-    expect(html).toContain('Jami 1 ta yozuv')
+    expect(html).toContain('Jami 1 ta QR')
   })
 
   it('keeps disabled stats neutral and the list usable even with cached stats errors', () => {

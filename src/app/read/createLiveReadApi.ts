@@ -12,6 +12,7 @@ import {
 } from '@/shared/api/http'
 import type {
     DashboardFilters,
+    DashboardRequest,
     DashboardView,
     DynamicQrFilters,
     DynamicQrRow,
@@ -70,7 +71,7 @@ export interface MerchantReadApi {
     regionLookup(signal: AbortSignal): Promise<readonly ManagementOption[]>
     districtLookup(regionId: string, signal: AbortSignal): Promise<readonly ManagementOption[]>
     dashboard(
-        filters: DashboardFilters,
+        filters: DashboardRequest,
         signal: AbortSignal,
     ): Promise<DashboardView>
 
@@ -236,7 +237,7 @@ export function createLiveReadApi(
                 {
                     transport,
                     endpoint: endpoints.dashboard,
-                    query: toDateTerminalQuery(filters),
+                    query: { ...toDateTerminalQuery(filters), granularity: filters.granularity ?? 'AUTO' },
                     decode: decodeDashboardResponse,
                 },
                 signal,

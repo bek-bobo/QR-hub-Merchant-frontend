@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import { useState, type ReactNode } from 'react'
 import { CircleCheckIcon, ListFilterIcon, RotateCwIcon, SlidersHorizontalIcon, XIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -35,6 +36,7 @@ export function FilterDrawer({
   triggerSize = 'default',
   triggerClassName,
 }: FilterDrawerProps) {
+  const { message } = useMessages('common')
   const [open, setOpen] = useState(false)
   const handlers = createFilterDrawerHandlers({ setOpen, onApply, onReset, onOpenChange })
 
@@ -48,7 +50,7 @@ export function FilterDrawer({
           className={`w-fit max-w-full ${triggerClassName ?? ''}`}
         >
           <ListFilterIcon aria-hidden="true" />
-          Filtrlar
+          {message('filters.title')}
         </Button>
       </SheetTrigger>
 
@@ -62,13 +64,13 @@ export function FilterDrawer({
             <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <SlidersHorizontalIcon className="size-7" />
             </span>
-            <SheetTitle className="text-2xl font-semibold">Filtrlar</SheetTitle>
+            <SheetTitle className="text-2xl font-semibold">{message('filters.title')}</SheetTitle>
           </div>
           {description ? (
             <SheetDescription className="relative mt-3">{description}</SheetDescription>
           ) : (
             <SheetDescription className="sr-only">
-              Ro‘yxat uchun filtrlarni sozlang.
+              {message('filters.description')}
             </SheetDescription>
           )}
           <SheetClose asChild>
@@ -77,7 +79,7 @@ export function FilterDrawer({
               variant="ghost"
               size="icon"
               className="absolute right-5 top-7 size-11 rounded-full bg-primary/10 hover:bg-primary/15 sm:right-8"
-              aria-label="Filtrlarni yopish"
+              aria-label={message('filters.close')}
             >
               <XIcon aria-hidden="true" />
             </Button>
@@ -89,13 +91,13 @@ export function FilterDrawer({
         </div>
 
         <SheetFooter className="mt-0 shrink-0 flex-row items-center justify-between gap-3 border-t bg-surface px-5 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] sm:px-6">
-          <Button type="button" variant="outline" className="h-12 min-w-0 flex-1 gap-2 rounded-xl px-3 text-sm sm:max-w-56 sm:text-base" onClick={handlers.reset}>
+          <Button type="button" variant="outline" className="h-auto min-h-12 whitespace-normal min-w-0 flex-1 gap-2 rounded-xl px-3 text-sm sm:max-w-56 sm:text-base" onClick={handlers.reset}>
             <RotateCwIcon aria-hidden="true" className="size-5" />
-            Qayta tiklash
+            {message('actions.reset')}
           </Button>
-          <Button type="button" className="h-12 min-w-0 flex-1 gap-2 rounded-xl px-3 text-sm sm:max-w-48 sm:text-base" disabled={applyDisabled} onClick={handlers.apply}>
+          <Button type="button" className="h-auto min-h-12 whitespace-normal min-w-0 flex-1 gap-2 rounded-xl px-3 text-sm sm:max-w-48 sm:text-base" disabled={applyDisabled} onClick={handlers.apply}>
             <CircleCheckIcon aria-hidden="true" className="size-5" />
-            Qo‘llash
+            {message('actions.apply')}
           </Button>
         </SheetFooter>
       </SheetContent>

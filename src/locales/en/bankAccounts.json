@@ -1,0 +1,43 @@
+{
+  "status": {
+    "active": "Active",
+    "unknown": "Unknown"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "status": "Status",
+    "name": "Name",
+    "bank": "Bank",
+    "account": "Account number",
+    "mfo": "MFO",
+    "tin": "TIN",
+    "contract": "Contract"
+  },
+  "filters": {
+    "allMerchants": "All merchants",
+    "noMerchants": "No merchants available",
+    "merchantsFailed": "Unable to load merchants",
+    "invalid": "The selected merchant is unconfirmed. Update or clear the filter.",
+    "unconfirmed": "Applied merchant filter is unconfirmed",
+    "reselect": "Reselect and apply the merchant or clear the filter."
+  },
+  "page": {
+    "name": "Bank accounts",
+    "noAccess": "Permission to view bank accounts is unavailable.",
+    "unavailable": "Bank account integration is not configured"
+  },
+  "states": {
+    "loading": "Loading bank accounts",
+    "failed": "Unable to display bank accounts",
+    "empty": "No bank accounts found."
+  },
+  "table": {
+    "label": "Bank account table",
+    "pages": "Bank account pages",
+    "total": "Total bank accounts: {{countText}}"
+  },
+  "search": {
+    "label": "Search by name, bank, account number or TIN",
+    "placeholder": "Name, bank, account number or TIN"
+  }
+}

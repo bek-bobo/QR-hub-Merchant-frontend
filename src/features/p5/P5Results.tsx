@@ -1,3 +1,4 @@
+import { useP5Presentation } from './presentation'
 import { useState } from 'react'
 import { P5ActionsMenu } from './P5ActionsMenu'
 import { P5QrDialog } from './P5QrDialog'
@@ -13,7 +14,7 @@ import { PaginationBar } from '@/shared/ui/PaginationBar'
 import { TableScrollRegion } from '@/shared/ui/TableScrollRegion'
 import {
   P5_DEFAULT_COLUMN_ORDER,
-  p5Columns,
+  createP5Columns,
   type P5Column,
   type P5ColumnId,
 } from './columns'
@@ -45,6 +46,7 @@ interface P5ResultsProps {
 }
 
 function resolveColumns(
+  p5Columns: ReturnType<typeof createP5Columns>,
   order: readonly string[],
   visibleColumnIds: readonly string[],
 ): readonly P5Column[] {
@@ -63,20 +65,22 @@ function resolveColumns(
 export function P5Results({ blocked, pending, error, data, columnOrder,
   visibleColumnIds, onRetry, onPageChange, onPageSizeChange, resetAvailable = false,
   resetUnavailableMessage, onReset }: P5ResultsProps) {
+  const p = useP5Presentation()
+  const p5Columns = createP5Columns(p)
   const [action, setAction] = useState<{ readonly kind: 'qr' | 'details'; readonly row: P5Row } | null>(null)
   const actionRow = action && data?.content.includes(action.row) ? action.row : null
-  if (blocked) return <ErrorState title="Qo‘llangan P5 filtri tasdiqlanmadi" description="Filtrni tozalang yoki merchant va terminalni qayta tanlab qo‘llang." />
-  if (pending) return <LoadingState title="P5 qurilmalari yuklanmoqda" />
+  if (blocked) return <ErrorState title={p.message('filters.unconfirmed')} description={p.message('filters.reselect')} />
+  if (pending) return <LoadingState title={p.message('states.loading')} />
   if (error) {
     return isSafeApiError(error) && error.kind === 'contract'
-      ? <ErrorState title="P5 javobi kutilgan formatga mos emas" description="Ma’lumot bo‘sh ro‘yxat sifatida ko‘rsatilmadi. Qayta urinib ko‘ring." onRetry={onRetry} />
+      ? <ErrorState title={p.message('states.contract')} description={p.message('states.contractHelp')} onRetry={onRetry} />
       : <ErrorState onRetry={onRetry} />
   }
-  if (!data) return <ErrorState title="P5 qurilmalari ro‘yxatini ko‘rsatib bo‘lmadi" />
+  if (!data) return <ErrorState title={p.message('states.failed')} />
 
   const deviceOccurrences = new Map<string, number>()
   for (const row of data.content) deviceOccurrences.set(row.deviceId, (deviceOccurrences.get(row.deviceId) ?? 0) + 1)
-  const columns = resolveColumns(columnOrder, visibleColumnIds)
+  const columns = resolveColumns(p5Columns, columnOrder, visibleColumnIds)
   const totalWidth = columns.reduce((width, column) => width + columnWidths[column.id], actionsWidth)
   const flexibleColumns = columns.filter((column) => flexibleColumnIds.has(column.id))
   const renderColumnWidth = (column: P5Column) => (
@@ -88,14 +92,14 @@ export function P5Results({ blocked, pending, error, data, columnOrder,
   )
 
   return <Card className="min-w-0 rounded-2xl border border-border/70 shadow-sm ring-0"><CardContent className="min-w-0 space-y-6">
-    {data.content.length === 0 ? <EmptyState description="P5 qurilmasi topilmadi." />
-      : <TableScrollRegion ariaLabel="P5 qurilmalari jadvali" className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+    {data.content.length === 0 ? <EmptyState description={p.message('states.empty')} />
+      : <TableScrollRegion ariaLabel={p.message('table.label')} className="rounded-xl border border-border/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <Table className="p5-table table-fixed" style={{ minWidth: totalWidth, width: flexibleColumns.length > 0 ? '100%' : totalWidth }}>
             <colgroup>
               {columns.map(renderColumnWidth)}
               <col style={{ width: actionsWidth }} />
             </colgroup>
-            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">Amallar</TableHead></TableRow></TableHeader>
+            <TableHeader><TableRow>{columns.map((column) => <TableHead key={column.id}>{column.label}</TableHead>)}<TableHead className="w-16 text-right">{p.message('table.actions')}</TableHead></TableRow></TableHeader>
             <TableBody>{data.content.map((row, index) => {
               const ambiguous = deviceOccurrences.get(row.deviceId) !== 1
               return <TableRow key={`${row.deviceId}-${index}`}>
@@ -109,9 +113,9 @@ export function P5Results({ blocked, pending, error, data, columnOrder,
             })}</TableBody>
           </Table>
         </TableScrollRegion>}
-    <PaginationBar ariaLabel="P5 qurilmalari sahifalari" currentPage={data.page}
+    <PaginationBar ariaLabel={p.message('table.pages')} currentPage={data.page}
       totalPages={data.totalPages} totalItems={data.totalElements}
-      totalLabel={`Jami ${data.totalElements.toLocaleString('uz-UZ')} ta qurilma`}
+      totalLabel={p.message('table.total', { countText: p.number(data.totalElements) })}
       className="p5-pagination border-t-0 pt-1"
       onPageChange={onPageChange} pageSize={data.size} onPageSizeChange={onPageSizeChange} />
     <P5QrDialog row={action?.kind === 'qr' ? actionRow : null} onOpenChange={(open) => { if (!open) setAction(null) }} />

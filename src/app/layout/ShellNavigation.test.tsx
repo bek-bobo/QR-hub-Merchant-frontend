@@ -1,9 +1,9 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup, localeMessages } from '@/test/locale-fixture'
 import { LayoutDashboardIcon, UserRoundIcon } from 'lucide-react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it } from 'vitest'
 import { ShellNavigation } from './ShellNavigation'
-import { getVisibleLiveNavigationItems } from '../navigation'
+import { getVisibleLiveNavigationItems, presentNavigationItems } from '../navigation'
 
 describe('ShellNavigation', () => {
   it.each(['Live navigatsiya', 'Mobil navigatsiya'])('keeps creation out of %s while retaining cashiers', (label) => {
@@ -13,7 +13,7 @@ describe('ShellNavigation', () => {
       bankAccountList: ready, cashierList: ready, merchantLookup: ready, bankAccountLookup: ready, p5List: ready,
       regionLookup: ready, districtLookup: ready,
     })
-    const html = renderToStaticMarkup(<MemoryRouter><ShellNavigation items={items} label={label} /></MemoryRouter>)
+    const html = renderToStaticMarkup(<MemoryRouter><ShellNavigation items={presentNavigationItems(items, localeMessages('shell'))} label={label} /></MemoryRouter>)
     expect(html).toContain('href="/cashiers"')
     expect(html).not.toContain('/cashiers/new')
     expect(html).not.toContain('Yangi kassir')

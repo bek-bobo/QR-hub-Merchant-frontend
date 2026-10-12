@@ -1,6 +1,6 @@
+import type { StaticQrPresentation } from './presentation'
 import type { ReactNode } from 'react'
 import { Badge } from '@/components/ui/badge'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
 import { MetadataId } from '@/shared/presentation/MetadataId'
 import { statusToneClasses } from '@/shared/presentation/status-tone'
 import type { TableColumnDefinition } from '@/shared/table-columns/metadata'
@@ -11,10 +11,11 @@ interface StaticQrColumnDefinition<Id extends string = string>
   readonly renderCell: (row: StaticQrRow) => ReactNode
 }
 
-const staticQrColumnDefinitions = [
+export function createStaticQrColumns(p: StaticQrPresentation) {
+  return [
   {
     id: 'qrId',
-    label: 'QR ID',
+    label: p.message('fields.qrId'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -22,7 +23,7 @@ const staticQrColumnDefinitions = [
   },
   {
     id: 'terminal',
-    label: 'Terminal',
+    label: p.message('fields.terminal'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -30,7 +31,7 @@ const staticQrColumnDefinitions = [
   },
   {
     id: 'merchant',
-    label: 'Merchant',
+    label: p.message('fields.merchant'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
@@ -38,12 +39,12 @@ const staticQrColumnDefinitions = [
   },
   {
     id: 'status',
-    label: 'Holat',
+    label: p.message('fields.status'),
     defaultVisible: true,
     hideable: true,
     reorderable: true,
     renderCell: (row: StaticQrRow) => {
-      const status = presentActiveStatus(row.statusCode)
+      const status = p.status(row.statusCode)
       return (
         <Badge variant="outline" className={`${statusToneClasses[status.tone].badge} gap-2 rounded-full border-transparent px-3 py-1.5 text-sm font-medium`}>
           <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${statusToneClasses[status.tone].indicator}`} />
@@ -53,13 +54,14 @@ const staticQrColumnDefinitions = [
     },
   },
 ] as const satisfies readonly StaticQrColumnDefinition[]
+}
 
-export type StaticQrColumnId = (typeof staticQrColumnDefinitions)[number]['id']
+
+export type StaticQrColumnId = ReturnType<typeof createStaticQrColumns>[number]['id']
 export type StaticQrColumn = StaticQrColumnDefinition & {
   readonly id: StaticQrColumnId
 }
 
-export const staticQrColumns: readonly StaticQrColumn[] = staticQrColumnDefinitions
 
 export const STATIC_QR_DEFAULT_COLUMN_ORDER: readonly StaticQrColumnId[] =
-  staticQrColumnDefinitions.map((column) => column.id)
+  ["qrId","terminal","merchant","status"]

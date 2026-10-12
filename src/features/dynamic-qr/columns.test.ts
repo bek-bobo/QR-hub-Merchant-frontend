@@ -1,8 +1,10 @@
+import { localeMessages } from '@/test/locale-fixture'
+import { createDynamicQrPresentation } from './presentation'
 import { describe, expect, it } from 'vitest'
 import { normalizeColumnOrder } from '@/shared/table-columns/order'
 import {
   DYNAMIC_QR_DEFAULT_COLUMN_ORDER,
-  dynamicQrColumns,
+  createDynamicQrColumns,
 } from './columns'
 
 const expectedBusinessColumnIds = [
@@ -56,3 +58,5 @@ describe('Dynamic QR column metadata', () => {
     ])
   })
 })
+
+const dynamicQrColumns = createDynamicQrColumns(createDynamicQrPresentation('uz', localeMessages('dynamicQr'), localeMessages('common')))

@@ -112,7 +112,7 @@ export function createOneDispatchAction<T>(request: ActionRequest<T>) {
   }
 }
 
-/** Refetch failure is separate from a confirmed mutation. Feature adapters choose keys. */
+/** Adapters explicitly verify refresh; a resolved promise alone does not prove fresh reads. */
 export async function invalidateAfterConfirmed<T>(input: {
   readonly result: ActionResult<T>
   readonly isCurrent: () => boolean
@@ -121,8 +121,8 @@ export async function invalidateAfterConfirmed<T>(input: {
   if (input.result.kind !== 'confirmed') return 'skipped'
   if (!input.isCurrent()) return 'stale'
   try {
-    await input.invalidate()
-    return input.isCurrent() ? 'updated' : 'stale'
+    const refresh = await input.invalidate()
+    return input.isCurrent() ? refresh === 'updated' ? 'updated' : 'skipped' : 'stale'
   } catch {
     return input.isCurrent() ? 'failed' : 'stale'
   }

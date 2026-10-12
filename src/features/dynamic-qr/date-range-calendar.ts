@@ -15,6 +15,19 @@ function formatDate(value: Date): string {
   return value.toISOString().slice(0, 10)
 }
 
+const monthLabels = ['Yan', 'Fev', 'Mar', 'Apr', 'May', 'Iyun', 'Iyul', 'Avg', 'Sen', 'Okt', 'Noy', 'Dek'] as const
+
+export function formatCalendarMonthLabel(month: string): string {
+  const date = parseDate(month)
+  return `${monthLabels[date.getUTCMonth()]} ${date.getUTCFullYear()}`
+}
+
+// Presentation only: never fill the unfinished draft's second endpoint.
+export function getCalendarPreviewRange(draft: DateRange, hoveredDate: string | null): DateRange | null {
+  if (draft.toDate || !isIsoCalendarDate(draft.fromDate) || !hoveredDate || !isIsoCalendarDate(hoveredDate)) return null
+  return selectCalendarRangeDate(draft, hoveredDate)
+}
+
 export function monthStart(value: string): string {
   const date = parseDate(value)
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-01`

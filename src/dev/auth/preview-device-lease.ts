@@ -5,10 +5,8 @@ import type { LoginOwnerLease } from '@/shared/auth/login-controller'
 export const PREVIEW_AUTH_OWNER_LOCK_NAME = 'qrhub:auth-preview-owner:v1'
 export const PREVIEW_DEVICE_KEY_STORAGE_KEY = 'qrhub.preview-device-key.v1'
 
-const previewUnsupportedMessage =
-  'Auth preview ushbu brauzerda xavfsiz ownership ola olmaydi.'
-const previewStorageUnavailableMessage =
-  'Auth preview qurilma identifikatorini saqlay olmadi.'
+const previewUnsupportedMessage = 'browserUnsupported' as const
+const previewStorageUnavailableMessage = 'deviceStorageUnavailable' as const
 const uuidPattern =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 

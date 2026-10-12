@@ -1,18 +1,19 @@
+import { useTerminalPresentation } from './presentation'
 import { QrPresentation } from '@/features/dynamic-qr/QrPresentation'
 import { QrDisplayShell } from '@/features/dynamic-qr/QrDisplayShell'
 import { copyExactPresentedLink, presentQrLink, writeQrClipboardText } from '@/features/dynamic-qr/qr-presentation'
 import type { TerminalRow } from '@/shared/contracts/management-read'
-import { presentActiveStatus } from '@/shared/presentation/active-status'
 
 interface TerminalQrContentProps { readonly row: TerminalRow }
 
 export function TerminalQrContent({ row }: TerminalQrContentProps) {
+  const p = useTerminalPresentation()
   const link = presentQrLink(row.staticQrLink)
-  const status = presentActiveStatus(row.statusCode)
+  const status = p.status(row.statusCode)
   return <QrPresentation qrId={row.staticQrId ?? '—'} terminalName={row.name}
     merchantName={row.merchantName} statusLabel={status.label} statusTone={status.tone}
-    additionalMetadata={[{ label: 'Terminal ID', value: row.pkey }]}
-    link={link} unavailableMessage="Bu terminal uchun xavfsiz Statik QR havolasi mavjud emas."
+    additionalMetadata={[{ label: p.message('fields.terminalId'), value: row.pkey }]}
+    link={link} unavailableMessage={p.message('display.noLink')}
     onCopy={link.kind === 'available' ? () => copyExactPresentedLink(link, writeQrClipboardText) : undefined} />
 }
 

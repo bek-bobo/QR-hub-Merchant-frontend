@@ -17,6 +17,7 @@ export interface LiveCreateQrContext {
 
 interface LiveCreateQrPortDependencies {
   readonly transport: HttpTransport | null
+  readonly getTransport?: () => HttpTransport | null
   readonly protectedMutation: <T>(operation: ProtectedOperation<T>) => Promise<ProtectedOperationResult<T>>
   readonly getCurrentContext: () => LiveCreateQrContext | null
 }
@@ -27,14 +28,14 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
 }
 
 export function createLiveCreateQrPort(deps: LiveCreateQrPortDependencies): CreateQrPort | null {
-  if (!deps.transport) return null
-  const transport = deps.transport
+  if (!deps.transport && !deps.getTransport) return null
   return {
     async create(request, scope) {
       let dispatched = false
       const result = await deps.protectedMutation(async ({ accessToken, signal }) => {
+        const transport = deps.getTransport ? deps.getTransport() : deps.transport
         const current = deps.getCurrentContext()
-        if (!current || !sameScope(scope, current.scope) ||
+        if (!transport || !current || !sameScope(scope, current.scope) ||
           !current.permissions.includes('CREATE_DYNAMIC_QR') ||
           !current.permissions.includes('GET_DROPDOWN_TERMINALS') ||
           !current.permissions.includes('GET_CURRENCY_CODE') ||

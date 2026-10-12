@@ -1,3 +1,5 @@
+import { useDashboardPresentation } from './presentation'
+import { useMessages } from '@/shared/i18n/useMessages'
 import type { ReactNode } from 'react'
 import { RefreshCwIcon } from 'lucide-react'
 import { Tooltip } from 'radix-ui'
@@ -20,6 +22,8 @@ export function DashboardPageHeader({
   refreshing,
   onRefresh,
 }: DashboardPageHeaderProps) {
+  const p = useDashboardPresentation()
+  const common = useMessages('common')
   return (
     <div className="dashboard-filter-toolbar flex min-w-0 flex-col gap-2 rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm sm:px-4">
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
@@ -38,7 +42,7 @@ export function DashboardPageHeader({
                   onClick={onRefresh}
                 >
                   <RefreshCwIcon className={refreshing ? 'animate-spin' : ''} aria-hidden="true" />
-                  Yangilash
+                  {common.message('actions.refresh')}
                 </Button>
               </Tooltip.Trigger>
               {updatedAt ? (
@@ -48,7 +52,7 @@ export function DashboardPageHeader({
                     sideOffset={6}
                     className="z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground shadow-md"
                   >
-                    Oxirgi yangilanish: {updatedAt}
+                    {p.message('states.updatedAt', {time: updatedAt})}
                   </Tooltip.Content>
                 </Tooltip.Portal>
               ) : null}

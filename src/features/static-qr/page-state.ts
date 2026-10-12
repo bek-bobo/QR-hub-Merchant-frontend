@@ -1,3 +1,4 @@
+import { applyEffectiveSearch } from '@/shared/filters/debounced-search'
 import type { TerminalOption } from '@/shared/contracts/merchant-read'
 import { dependentReadGate, toStaticQrListQuery, type DependentLookupGateInput, type StaticQrListFilters } from '@/shared/contracts/management-filters'
 import { DEFAULT_PAGE_SIZE } from '@/shared/pagination'
@@ -85,7 +86,5 @@ export function applyStaticQrAdvancedDraft(applied: StaticQrFilters, draft: Stat
 }
 
 export function applyStaticQrQuickSearch(applied: StaticQrFilters, search: string): StaticQrFilters {
-  const normalized = search.trim()
-  if (applied.search === normalized && applied.page === 0) return applied
-  return Object.freeze({ ...applied, search: normalized, page: 0 })
+  return applyEffectiveSearch(applied, search)
 }

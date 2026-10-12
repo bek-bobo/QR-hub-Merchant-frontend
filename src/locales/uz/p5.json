@@ -1,0 +1,97 @@
+{
+  "fields": {
+    "merchant": "Merchant",
+    "terminal": "Terminal",
+    "terminalId": "Terminal ID",
+    "terminalType": "Terminal turi",
+    "createdAt": "Yaratilgan vaqt",
+    "qrId": "Statik QR ID",
+    "qrLink": "Statik QR havola",
+    "deviceId": "Qurilma ID",
+    "description": "Tavsif",
+    "status": "Qurilma holati",
+    "created": "Yaratilgan",
+    "qrStatus": "Statik QR holati"
+  },
+  "filters": {
+    "allMerchants": "Barcha merchantlar",
+    "noMerchants": "Merchant mavjud emas",
+    "merchantsFailed": "Merchantlarni yuklab bo‘lmadi",
+    "allTerminals": "Barcha terminallar",
+    "noMerchantTerminals": "Bu merchant uchun terminal mavjud emas",
+    "terminalsFailed": "Terminallarni yuklab bo‘lmadi",
+    "chooseMerchant": "Avval merchantni tanlang",
+    "invalid": "Merchant, terminal yoki status kodi tasdiqlanmadi. Filtrlarni tekshiring yoki tozalang.",
+    "unconfirmed": "Qo‘llangan P5 filtri tasdiqlanmadi",
+    "reselect": "Filtrni tozalang yoki merchant va terminalni qayta tanlab qo‘llang.",
+    "all": "Barchasi",
+    "status": "Status",
+    "custom": "Boshqa status kodi...",
+    "statusCode": "Status kodi",
+    "codeValue": "Status kodi: {{code}}",
+    "codeInvalid": "Butun status kodini kiriting (-2147483648…2147483647)."
+  },
+  "table": {
+    "actions": "Amallar",
+    "label": "P5 qurilmalari jadvali",
+    "pages": "P5 qurilmalari sahifalari",
+    "total": "Jami {{countText}} ta qurilma"
+  },
+  "details": {
+    "qr": "Statik QR",
+    "device": "Qurilma",
+    "title": "P5 qurilma tafsilotlari"
+  },
+  "actions": {
+    "viewQr": "Statik QR ko‘rish",
+    "details": "Qo‘shimcha ma’lumotlar"
+  },
+  "display": {
+    "unavailable": "Xavfsiz Statik QR havolasi mavjud emas.",
+    "noLink": "Bu qurilma uchun xavfsiz Statik QR havolasi mavjud emas."
+  },
+  "page": {
+    "name": "P5 qurilmalari",
+    "noAccess": "P5 qurilmalari ro‘yxatini ko‘rish huquqi mavjud emas.",
+    "unavailable": "P5 qurilmalari integratsiyasi sozlanmagan"
+  },
+  "search": {
+    "label": "Qurilma ID yoki terminal nomi bo‘yicha qidirish",
+    "placeholder": "Qurilma ID yoki terminal nomi"
+  },
+  "status": {
+    "active": "Faol",
+    "inactive": "Faol emas / administrator belgisi",
+    "unknown": "Holat noma’lum",
+    "qrActive": "Faol",
+    "qrUnknown": "Noma’lum"
+  },
+  "states": {
+    "loading": "P5 qurilmalari yuklanmoqda",
+    "failed": "P5 qurilmalari ro‘yxatini ko‘rsatib bo‘lmadi",
+    "contract": "P5 javobi kutilgan formatga mos emas",
+    "contractHelp": "Ma’lumot bo‘sh ro‘yxat sifatida ko‘rsatilmadi. Qayta urinib ko‘ring.",
+    "empty": "P5 qurilmasi topilmadi."
+  },
+  "reset": {
+    "unavailable": "PIN reset funksiyasi hozir mavjud emas.",
+    "action": "PIN reset",
+    "title": "PINni tiklash",
+    "confirm": "PINni tiklash",
+    "warning": "{{id}} qurilmasining PIN kodi tiklanadi. Davom etasizmi?",
+    "terminal": "Terminal: {{name}}",
+    "pending": "PIN reset so‘rovi yuborilmoqda.",
+    "pendingCaption": "Tiklanmoqda…",
+    "confirmedTitle": "Reset OTP jo'natildi",
+    "unknownTitle": "Reset natijasini tasdiqlab bo‘lmadi",
+    "rejectedTitle": "PIN reset rad etildi",
+    "notSentTitle": "PIN reset so‘rovi yuborilmadi",
+    "confirmed": "{{id}} qurilmasi uchun reset OTP yuborildi. Kodni P5 qurilmaga kiriting.",
+    "unknown": "{{id}}: So‘rov yuborilgan bo‘lishi mumkin, lekin server natijasini tasdiqlab bo‘lmadi. Yangi reset yuborishdan oldin joriy holatni tekshiring.",
+    "rejected": "{{id}} qurilmasi uchun PIN reset so‘rovi server tomonidan rad etildi.",
+    "notSent": "{{id}} qurilmasi uchun PIN reset so‘rovi yuborilmadi. Qayta urinishdan oldin sessiya va ruxsatlarni tekshiring.",
+    "newRisk": "Takrorlash yangi reset so‘rovini yuboradi.",
+    "refreshFailed": "Ro‘yxatni yangilab bo‘lmadi. Yangilash tugmasini bosing.",
+    "newConfirm": "Yangi resetni tasdiqlash"
+  }
+}

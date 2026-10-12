@@ -1,7 +1,7 @@
 import { InfoIcon, QrCodeIcon } from 'lucide-react'
 import { RowActionMenu, RowActionItem } from '@/shared/ui/RowActionMenu'
 import type { StaticQrRow } from './contract'
-import { staticQrRowActionLabels } from './row-actions'
+import { useStaticQrPresentation } from './presentation'
 
 interface StaticQrActionsMenuProps {
   readonly row: StaticQrRow
@@ -10,12 +10,13 @@ interface StaticQrActionsMenuProps {
 }
 
 export function StaticQrActionsMenu({ row, onViewQr, onViewDetails }: StaticQrActionsMenuProps) {
+  const p = useStaticQrPresentation()
   return <RowActionMenu>
     <RowActionItem icon={QrCodeIcon} onSelect={() => onViewQr(row)}>
-      {staticQrRowActionLabels.viewQr}
+      {p.message('actions.viewQr')}
     </RowActionItem>
     <RowActionItem icon={InfoIcon} onSelect={() => onViewDetails(row)}>
-      {staticQrRowActionLabels.viewDetails}
+      {p.message('actions.details')}
     </RowActionItem>
   </RowActionMenu>
 }

@@ -1,5 +1,5 @@
 import { createElement, type ReactNode } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it, vi } from 'vitest'
 import { decodeCashierPage, type CashierRow } from '@/shared/contracts/management-read'
 import type { Page } from '@/shared/contracts/merchant-read'
@@ -46,7 +46,7 @@ describe('cashier results', () => {
     expect(html).toContain('Bu kassirga terminal biriktirilmagan.')
     expect(html).not.toContain('term-inactive-filter')
     expect(text).not.toContain('Jami: 47')
-    expect(text).toContain('Jami 47 ta yozuv')
+    expect(text).toContain('Jami 47 ta kassir')
     expect(html).toContain('aria-current="page"')
     expect(html).toContain('>Noma’lum<')
     expect(html).not.toContain('>777<')

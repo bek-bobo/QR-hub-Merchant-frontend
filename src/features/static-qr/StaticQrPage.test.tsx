@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -52,12 +52,18 @@ describe('static QR page auxiliary terminal lookup', () => {
       isFetching: false, dataUpdatedAt: 0, refetch: vi.fn(), data: options.queryKey[3] === 'static-qrs' ? page : undefined }) as never)
     const html = renderToString(createElement(StaticQrPage))
     expect(html.match(/<h1\b/g)).toBeNull()
-    expect(html).toContain('>Statik QR ro‘yxati<')
-    expect(html).toContain('Barcha statik QR kodlar va ularning holati bilan tanishing.')
+    expect(html).not.toContain('>Statik QR ro‘yxati<')
+    expect(html).not.toContain('Barcha statik QR kodlar va ularning holati bilan tanishing.')
     expect(html).toContain('>Filtrlar</button>')
     expect(html).toContain('aria-label="Jadval ustunlarini sozlash"')
     expect(html.match(/aria-label="Jadval ustunlarini sozlash"/g)).toHaveLength(1)
-    expect(html).toContain('>Ustunlar</button>')
+    const columnTrigger = html.match(/<button\b[^>]*aria-label="Jadval ustunlarini sozlash"[^>]*>[\s\S]*?<\/button>/)?.[0]
+    expect(columnTrigger).toBeDefined()
+    expect(columnTrigger).toContain('data-size="icon-sm"')
+    expect(columnTrigger).toContain('size-10 rounded-xl bg-muted/30')
+    expect(columnTrigger).toContain('lucide-columns-3')
+    expect(columnTrigger).not.toContain('Ustunlar')
+    expect(html).toContain('>Ustunlar</span>')
     expect(html).toContain('aria-label="Yangilash"')
     expect(html).not.toContain('>Yangilash</button>')
     expect(html).toContain('role="tooltip"')
@@ -106,3 +112,8 @@ describe('static QR page auxiliary terminal lookup', () => {
     expect(terminalSelectIsDisabled(filtersHtml)).toBe(false)
   })
 })
+
+// Exercise feature option/state contracts independently of the closed portal.
+vi.mock('@/components/ui/select', async () => ({
+  Select: (await import('@/test/select-contract')).SelectContract,
+}))

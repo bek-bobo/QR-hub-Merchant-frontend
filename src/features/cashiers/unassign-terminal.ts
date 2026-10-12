@@ -60,6 +60,8 @@ export function decodeUnassignSuccess(payload: unknown): void {
 export interface UnassignDependencies {
   readonly currentScope: () => ReadScope
   readonly currentTarget: () => UnassignTarget | null
+  /** Row/access evidence independent of temporary selection, for dispatched settlement. */
+  readonly currentEvidence?: () => UnassignTarget | null
   readonly canUnassign: () => boolean
   readonly port: () => UnassignPort | null
   readonly invalidateConfirmed: (scope: ReadScope) => Promise<unknown>
@@ -112,12 +114,21 @@ export function createUnassignTerminalController(deps: UnassignDependencies) {
       if (!query) return { kind: 'not-sent', reason: 'Faol terminal tanlovi mavjud emas.' }
       const port = deps.port()
       if (!port) return { kind: 'not-sent', reason: 'Terminalni ajratish transporti mavjud emas.' }
+      const validEvidence = () => {
+        if (!deps.currentEvidence) return deps.currentTarget() === target
+        const current = deps.currentEvidence()
+        return current?.cashier === target.cashier && current.terminal === target.terminal && buildUnassignQuery(target) !== null
+      }
+      let dispatchStarted = false
       action = createOneDispatchAction<void>({
         currentScope: () => scopeId(deps.currentScope()),
-        permitted: () => deps.canUnassign() && deps.port() === port && sameScope(scope, deps.currentScope()) && validArmed(),
+        permitted: () => deps.canUnassign() && deps.port() === port && sameScope(scope, deps.currentScope()) &&
+          (dispatchStarted ? validEvidence() : validArmed()),
         prepare: async () => validArmed(),
         dispatch: async () => {
           if (!validArmed()) throw new ActionNotDispatchedError()
+          // Selection authorizes dispatch; subsequent UI choices cannot rewrite its frozen query.
+          dispatchStarted = true
           decodeUnassignSuccess(await port.unassign(query, scope))
         },
       })
@@ -126,7 +137,7 @@ export function createUnassignTerminalController(deps: UnassignDependencies) {
       const result = await action.run()
       void invalidateAfterConfirmed({
         result,
-        isCurrent: () => deps.canUnassign() && sameScope(scope, deps.currentScope()) && deps.currentTarget() === target,
+        isCurrent: () => deps.canUnassign() && sameScope(scope, deps.currentScope()) && validEvidence(),
         invalidate: () => deps.invalidateConfirmed(scope),
       })
       return result

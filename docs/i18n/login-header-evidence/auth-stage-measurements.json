@@ -1,0 +1,236 @@
+[
+  {
+    "cardBottom": 641.1875,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-phone",
+        "value": ""
+      }
+    ],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "phone"
+  },
+  {
+    "cardBottom": 720.9250183105469,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-otp",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "otp"
+  },
+  {
+    "cardBottom": 720.9250183105469,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-otp",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "reset-otp"
+  },
+  {
+    "cardBottom": 681.9375,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-pin",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "pin"
+  },
+  {
+    "cardBottom": 745.1875152587891,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "new-pin",
+        "value": "<redacted>"
+      },
+      {
+        "id": "confirm-pin",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "set-pin"
+  },
+  {
+    "cardBottom": 604.4375,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "blocked"
+  },
+  {
+    "cardBottom": 604.4375,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "expired"
+  },
+  {
+    "cardBottom": 645.4375,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "ru",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "error"
+  },
+  {
+    "cardBottom": 641.1875,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-phone",
+        "value": ""
+      }
+    ],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "phone"
+  },
+  {
+    "cardBottom": 704.6750183105469,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-otp",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "otp"
+  },
+  {
+    "cardBottom": 704.6750183105469,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-otp",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "reset-otp"
+  },
+  {
+    "cardBottom": 681.9375,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "login-pin",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "pin"
+  },
+  {
+    "cardBottom": 728.9375152587891,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [
+      {
+        "id": "new-pin",
+        "value": "<redacted>"
+      },
+      {
+        "id": "confirm-pin",
+        "value": "<redacted>"
+      }
+    ],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "set-pin"
+  },
+  {
+    "cardBottom": 593.1875,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "blocked"
+  },
+  {
+    "cardBottom": 593.1875,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "expired"
+  },
+  {
+    "cardBottom": 634.1875,
+    "controls": 1,
+    "dispatchText": "Preview phase phoneotpreset-otppinset-pinblockedexpirederrorPending Synthetic dispatches: 0",
+    "inputs": [],
+    "locale": "en",
+    "overflow": false,
+    "overlap": false,
+    "themeFocus": true,
+    "phase": "error"
+  }
+]

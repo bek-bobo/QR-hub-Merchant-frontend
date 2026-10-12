@@ -1,5 +1,6 @@
+// @vitest-environment happy-dom
 import { createRef } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
 import { ThemeContext } from '@/shared/theme/ThemeContext'
@@ -30,7 +31,13 @@ describe('Header', () => {
     expect(html).toContain('aria-controls="live-mobile-navigation"')
     expect(html).toContain('Merchant User')
     expect(html).toContain('Ko‘rinish')
-    expect(html).toContain('value="system" selected=""')
+    const host = document.createElement('div')
+    host.innerHTML = html
+    const themeSelect = host.querySelector<HTMLButtonElement>('[role="combobox"]')!
+    expect(themeSelect.closest('label')?.textContent).toContain('Ko‘rinish')
+    expect(themeSelect.textContent).toBe('Tizim')
+    expect(themeSelect.getAttribute('aria-expanded')).toBe('false')
+    expect(themeSelect.disabled).toBe(false)
     expect(html).toContain('Chiqish')
   })
 
@@ -54,6 +61,20 @@ describe('Header', () => {
     expect(html.match(/<h1\b/g)).toHaveLength(1)
     expect(html).toContain('>Dinamik QRlar</h1>')
     expect(html).toContain('truncate')
+    expect(html).not.toContain('<img')
+    expect(html).toContain('lg:border-l')
+  })
+
+  it('places an optional decorative icon between navigation and the accessible page heading', () => {
+    const html = renderToStaticMarkup(<Header title="Statik QRlar" titleAsHeading
+      onOpenNavigation={vi.fn()} titleIcon={<span className="bg-brand-soft size-9"><img src="/qrhub-favicon.svg" alt="" /></span>} />)
+    const host = document.createElement('div'); host.innerHTML = html
+    const icon = host.querySelector('img')!
+    expect(host.querySelectorAll('img')).toHaveLength(1)
+    expect(icon.closest('[aria-hidden="true"]')).not.toBeNull()
+    expect(host.querySelector('h1')?.textContent).toBe('Statik QRlar')
+    expect(html.indexOf('Navigatsiyani ochish')).toBeLessThan(html.indexOf('<img'))
+    expect(html.indexOf('<img')).toBeLessThan(html.indexOf('<h1'))
   })
 
   it('uses the avatar as the accessible profile menu trigger and keeps identity in its tooltip', () => {
@@ -84,8 +105,11 @@ describe('Header', () => {
     expect(html).toContain('aria-label="Ko‘rinish: Tungi. Keyingi rejimga o‘tish"')
     expect(html).not.toContain('aria-label="Chiqish"')
     expect(html).not.toContain('lucide-log-out')
-    expect(html.match(/<button\b/g)).toHaveLength(2)
-    expect(html).not.toContain('<select')
+    expect(html.match(/<button\b/g)).toHaveLength(3)
+    expect(html.match(/data-locale-trigger/g)).toHaveLength(1)
+    expect(html).not.toMatch(/<select\b/)
+    expect(html).toContain('aria-label="Til"')
+    expect(html).not.toContain('role="combobox"')
     expect(html).not.toContain('>Chiqish</button>')
   })
 })

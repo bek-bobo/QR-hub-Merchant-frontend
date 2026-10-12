@@ -1,3 +1,4 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useState } from 'react'
 import { DownloadIcon, FileDownIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -9,6 +10,7 @@ interface QrPosterDownloadsProps {
 }
 
 export function QrPosterDownloads({ poster, qrId }: QrPosterDownloadsProps) {
+  const p = useDynamicQrPresentation()
   const [pending, setPending] = useState<'pdf' | 'png' | null>(null)
   const [failed, setFailed] = useState(false)
 
@@ -28,14 +30,12 @@ export function QrPosterDownloads({ poster, qrId }: QrPosterDownloadsProps) {
       <Button type="button" className="h-11 w-full" disabled={!poster || pending !== null}
         aria-busy={pending === 'pdf'} onClick={() => void download('pdf')}>
         <FileDownIcon aria-hidden="true" />
-        PDF yuklab olish
-      </Button>
+        {p.message('download.pdf')}</Button>
       <Button type="button" className="h-11 w-full" variant="outline" disabled={!poster || pending !== null}
         aria-busy={pending === 'png'} onClick={() => void download('png')}>
         <DownloadIcon aria-hidden="true" />
-        PNG yuklab olish
-      </Button>
+        {p.message('download.png')}</Button>
     </div>
-    {failed ? <p role="alert" className="text-sm text-destructive">QR plakatini yuklab bo‘lmadi. Qayta urinib ko‘ring.</p> : null}
+    {failed ? <p role="alert" className="text-sm text-destructive">{p.message('download.failed')}</p> : null}
   </div>
 }

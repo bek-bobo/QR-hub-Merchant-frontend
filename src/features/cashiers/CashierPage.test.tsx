@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
@@ -52,7 +52,10 @@ describe('CashierPage column settings integration', () => {
 
     const html = renderToString(createElement(CashierPage))
 
-    expect(html).toContain('>Kassirlar ro‘yxati<')
+    expect(html).not.toContain('>Kassirlar ro‘yxati<')
+    expect(html).toContain('>Filtrlar</button>')
+    expect(html.match(/aria-label="Yangilash"/g)).toHaveLength(1)
+    expect(html).toContain('aria-label="Kassir sahifalari"')
     expect(html.match(/aria-label="F.I.Sh. yoki telefon bo‘yicha qidirish"/g)).toHaveLength(1)
     expect(html).toContain('placeholder="F.I.Sh. yoki telefon"')
     expect(html.indexOf('placeholder="F.I.Sh. yoki telefon"')).toBeLessThan(html.indexOf('aria-label="Yangi kassir yaratish"'))

@@ -1,0 +1,82 @@
+{
+  "page": {
+    "name": "Static QR",
+    "noAccess": "Permission to view static QR codes is unavailable.",
+    "authUnavailable": "Static QR authentication is not configured",
+    "unavailable": "Static QR integration is not configured"
+  },
+  "filters": {
+    "invalid": "The selected merchant, terminal, region or district is unconfirmed. Update or clear the filter.",
+    "unconfirmed": "Applied filter is unconfirmed",
+    "reselect": "Clear the filter or reselect and apply the merchant, terminal, region or district.",
+    "allMerchants": "All merchants",
+    "noMerchants": "No merchants available",
+    "merchantsFailed": "Unable to load merchants",
+    "allTerminals": "All terminals",
+    "noMerchantTerminals": "No terminals available for this merchant",
+    "noTerminals": "No terminals available",
+    "terminalsFailed": "Unable to load terminals",
+    "allRegions": "All regions",
+    "noRegions": "No regions available",
+    "regionsFailed": "Unable to load regions",
+    "allDistricts": "All districts",
+    "noDistricts": "No districts available for this region",
+    "districtsFailed": "Unable to load districts",
+    "chooseRegion": "Select a region first"
+  },
+  "search": {
+    "label": "Search by QR ID",
+    "placeholder": "By QR ID"
+  },
+  "states": {
+    "loading": "Loading static QR codes",
+    "failed": "Unable to display static QR codes",
+    "empty": "No static QR codes found."
+  },
+  "table": {
+    "label": "Static QR table",
+    "pages": "Static QR pages",
+    "total": "QR codes found: {{countText}}",
+    "actions": "Actions"
+  },
+  "fields": {
+    "qrId": "QR ID",
+    "terminal": "Terminal",
+    "merchant": "Merchant",
+    "status": "Status",
+    "createdAt": "Created at",
+    "updatedAt": "Updated at",
+    "terminalName": "Terminal name",
+    "terminalId": "Terminal ID",
+    "terminalType": "Terminal type",
+    "merchantId": "Merchant ID",
+    "minimum": "Minimum amount",
+    "maximum": "Maximum amount",
+    "region": "Region",
+    "regionId": "Region ID",
+    "district": "District",
+    "districtId": "District ID",
+    "link": "QR link",
+    "redirect": "Redirect URL",
+    "statusCode": "Status code"
+  },
+  "details": {
+    "main": "Main information",
+    "bounds": "Amount limits",
+    "region": "Location",
+    "links": "Links",
+    "technical": "Technical information",
+    "title": "Static QR details"
+  },
+  "actions": {
+    "viewQr": "View QR",
+    "details": "Details"
+  },
+  "display": {
+    "noLink": "No safe canonical link is available for this QR."
+  },
+  "status": {
+    "active": "Active",
+    "unknown": "Unknown"
+  }
+}

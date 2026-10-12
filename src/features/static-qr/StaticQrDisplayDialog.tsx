@@ -1,4 +1,4 @@
-import { presentActiveStatus } from '@/shared/presentation/active-status'
+import { useStaticQrPresentation } from './presentation'
 import { QrPresentation } from '@/features/dynamic-qr/QrPresentation'
 import { QrDisplayShell } from '@/features/dynamic-qr/QrDisplayShell'
 import { copyExactPresentedLink, presentQrLink, writeQrClipboardText } from '@/features/dynamic-qr/qr-presentation'
@@ -10,13 +10,14 @@ interface StaticQrDisplayDialogProps {
 }
 
 export function StaticQrDisplayDialog({ row, onOpenChange }: StaticQrDisplayDialogProps) {
+  const p = useStaticQrPresentation()
   if (!row) return null
   const link = presentQrLink(row.link)
-  const status = presentActiveStatus(row.statusCode)
+  const status = p.status(row.statusCode)
   return <QrDisplayShell onOpenChange={onOpenChange}>
     <QrPresentation qrId={row.id} terminalName={row.terminalName} merchantName={row.merchantName}
       statusLabel={status.label} statusTone={status.tone}
-      link={link} unavailableMessage="Bu QR uchun xavfsiz kanonik havola mavjud emas."
+      link={link} unavailableMessage={p.message('display.noLink')}
       onCopy={link.kind === 'available' ? () => copyExactPresentedLink(link, writeQrClipboardText) : undefined} />
   </QrDisplayShell>
 }

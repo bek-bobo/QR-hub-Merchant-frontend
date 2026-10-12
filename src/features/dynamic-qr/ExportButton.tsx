@@ -1,5 +1,7 @@
+import { useDynamicQrPresentation } from './presentation'
 import { useLayoutEffect, useState } from 'react'
-import { FileSpreadsheetIcon } from 'lucide-react'
+import { DownloadIcon, FileSpreadsheetIcon } from 'lucide-react'
+import { ResultToast } from '@/shared/ui/ResultToast'
 import { Button } from '@/components/ui/button'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
@@ -28,10 +30,12 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
 function ExportForAppliedFilters({ applied, terminalValid, compact = false, className, showIcon = false, scope }: ExportButtonProps & {
   readonly scope: ReadScope
 }) {
+  const p = useDynamicQrPresentation()
   const { getCurrentScope } = useReadRuntime()
   const { bridge, getSessionSnapshot } = useProtectedReadContext()
   const [pending, setPending] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
+  const [message, setMessage] = useState<'unavailable' | 'success' | 'failed' | null>(null)
+  const [messageTone, setMessageTone] = useState<'success' | 'error'>('error')
 
   function allowedNow(): boolean {
     const snapshot = getSessionSnapshot()
@@ -60,7 +64,8 @@ function ExportForAppliedFilters({ applied, terminalValid, compact = false, clas
     const base = validateWebBaseUrl(import.meta.env.VITE_WEB_API_BASE_URL,
       import.meta.env.DEV ? 'development' : 'production')
     if (base.kind !== 'valid') {
-      setMessage('Export integratsiyasi sozlanmagan.')
+      setMessageTone('error')
+      setMessage('unavailable')
       return
     }
     setPending(true)
@@ -68,21 +73,28 @@ function ExportForAppliedFilters({ applied, terminalValid, compact = false, clas
     const outcome = await intent.run(toDynamicQrExportQuery(applied))
     if (outcome === 'stale') return
     setPending(false)
-    if (outcome === 'handed-off') setMessage('XLSX yuklab olish brauzerga topshirildi.')
-    if (outcome === 'failed') setMessage('XLSX yuklab bo‘lmadi. Filtrlarni tekshirib, qayta urinib ko‘ring.')
+    if (outcome === 'handed-off') {
+      setMessageTone('success')
+      setMessage('success')
+    }
+    if (outcome === 'failed') {
+      setMessageTone('error')
+      setMessage('failed')
+    }
   }
 
-  return <span className="flex flex-wrap items-center gap-2" aria-busy={pending}>
+  return <span className="flex max-w-full flex-wrap items-center gap-2" aria-busy={pending}>
     <Button type="button" variant="outline" size={compact ? 'sm' : 'default'}
       className={className}
       disabled={pending || !terminalValid}
-      onClick={() => void download()}>
+      aria-label={p.message('export.label')} title={p.message('export.label')} onClick={() => void download()}>
       {showIcon ? <FileSpreadsheetIcon className="size-4" aria-hidden="true" /> : null}
-      Tanlangan filtrlar bo‘yicha XLSX
+      XLSX
     </Button>
-    {pending ? <Button type="button" variant="ghost" size={compact ? 'sm' : 'default'} onClick={() => { intent.cancel(); setPending(false) }}>Kutishni to‘xtatish</Button> : null}
-    {pending ? <span role="status" className="text-xs text-text-secondary">XLSX tayyorlanmoqda.</span> : null}
-    {message ? <span role="status" className="text-xs text-text-secondary">{message}</span> : null}
+    {pending ? <Button type="button" variant="ghost" size={compact ? 'sm' : 'default'} onClick={() => { intent.cancel(); setPending(false) }}>{p.message('export.stop')}</Button> : null}
+    {pending ? <span role="status" className="text-xs text-text-secondary">{p.message('export.pending')}</span> : null}
+    {message ? <ResultToast key={message} tone={messageTone} title={p.message(message === 'success' ? 'export.success' : message === 'failed' ? 'export.failed' : 'export.unavailable')} placement="below-header"
+      icon={messageTone === 'success' ? DownloadIcon : undefined} /> : null}
   </span>
 }
 

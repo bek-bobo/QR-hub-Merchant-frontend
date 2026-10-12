@@ -1,0 +1,96 @@
+{
+  "actions": {
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "close": "Yopish",
+    "retry": "Qayta urinish",
+    "apply": "Qo‘llash",
+    "reset": "Qayta tiklash",
+    "clear": "Tozalash",
+    "done": "Tayyor",
+    "refresh": "Yangilash",
+    "openMenu": "Amallarni ochish"
+  },
+  "states": {
+    "unavailable": "Hozircha mavjud emas.",
+    "loading": "Yuklanmoqda",
+    "loadingDescription": "Ma’lumotlar tayyorlanmoqda.",
+    "loadingOption": "Yuklanmoqda...",
+    "empty": "Ma’lumot topilmadi",
+    "emptyDescription": "Hozircha ko‘rsatish uchun yozuvlar mavjud emas.",
+    "error": "Ma’lumotni yuklab bo‘lmadi",
+    "errorDescription": "Birozdan so‘ng qayta urinib ko‘ring.",
+    "noAccess": "Ko‘rish uchun ruxsat yo‘q",
+    "noAccessDescription": "Bu ma’lumotni ko‘rish huquqi mavjud emas."
+  },
+  "locale": {
+    "changeFailed": "Tilni o‘zgartirib bo‘lmadi. Qayta urinib ko‘ring.",
+    "label": "Til",
+    "selected": "Tanlangan til: {{language}}",
+    "switching": "Til o‘zgartirilmoqda…"
+  },
+  "greeting": "Salom, {{name}}!",
+  "items_one": "{{count}} ta yozuv",
+  "items_other": "{{count}} ta yozuv",
+  "pagination": {
+    "total": "Jami: {{value}}",
+    "pageSummary": "{{page}}-sahifa, jami {{count}} sahifa",
+    "noPages": "Sahifalar mavjud emas",
+    "previous": "Oldingi sahifa",
+    "next": "Keyingi sahifa",
+    "page": "{{page}}-sahifa",
+    "pageSize": "Sahifadagi yozuvlar soni",
+    "perPage": "{{size}} / sah."
+  },
+  "toast": {
+    "viewport": "Bildirishnomalar ({{hotkey}})",
+    "notification": "Bildirishnoma",
+    "close": "Bildirishnomani yopish"
+  },
+  "copy": {
+    "link": "Havolani nusxalash",
+    "success": "Nusxalandi.",
+    "failed": "Nusxalab bo‘lmadi."
+  },
+  "filters": {
+    "title": "Filtrlar",
+    "description": "Ro‘yxat uchun filtrlarni sozlang.",
+    "close": "Filtrlarni yopish",
+    "clearSelection": "{{label}} tanlovini tozalash"
+  },
+  "table": {
+    "trigger": "Jadval ustunlari",
+    "settings": "Jadval ustunlarini sozlash",
+    "columns": "Ustunlar",
+    "title": "{{table}} jadvali ustunlari",
+    "description": "Jadvalda ko‘rsatiladigan ustunlarni tanlang va ularning tartibini o‘zgartiring.",
+    "close": "Ustun sozlamalarini yopish",
+    "move": "{{label}} ustunini ko‘chirish",
+    "visibility": "{{label}} ustuni ko‘rinishi",
+    "moveUp": "{{label}} ustunini chapga — ro‘yxatda yuqoriga ko‘chirish",
+    "moveDown": "{{label}} ustunini o‘ngga — ro‘yxatda pastga ko‘chirish",
+    "moved": "{{label}} ustuni {{position}}-o‘ringa ko‘chirildi.",
+    "shown": "{{label}} ustuni ko‘rsatildi.",
+    "hidden": "{{label}} ustuni yashirildi.",
+    "reset": "Standart tartibga qaytarish",
+    "restored": "Standart ustun tartibi va ko‘rinishi tiklandi."
+  },
+  "theme": {
+    "light": "Yorug‘",
+    "dark": "Tungi",
+    "system": "Tizim",
+    "label": "Ko‘rinish",
+    "current": "Ko‘rinish: {{label}}",
+    "next": "Ko‘rinish: {{label}}. Keyingi rejimga o‘tish"
+  },
+  "phone": {
+    "countryCode": "O‘zbekiston telefon kodi: +998."
+  },
+  "refresh": {
+    "updated": "Yangilangan: {{time}}"
+  },
+  "search": {
+    "clear": "Qidiruvni tozalash",
+    "apply": "Qidiruvni qo‘llash"
+  }
+}

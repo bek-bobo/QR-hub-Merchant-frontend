@@ -1,0 +1,97 @@
+{
+  "fields": {
+    "merchant": "Merchant",
+    "terminal": "Terminal",
+    "terminalId": "Terminal ID",
+    "terminalType": "Terminal type",
+    "createdAt": "Created at",
+    "qrId": "Static QR ID",
+    "qrLink": "Static QR link",
+    "deviceId": "Device ID",
+    "description": "Description",
+    "status": "Device status",
+    "created": "Created at",
+    "qrStatus": "Static QR status"
+  },
+  "filters": {
+    "allMerchants": "All merchants",
+    "noMerchants": "No merchants available",
+    "merchantsFailed": "Unable to load merchants",
+    "allTerminals": "All terminals",
+    "noMerchantTerminals": "No terminals available for this merchant",
+    "terminalsFailed": "Unable to load terminals",
+    "chooseMerchant": "Select a merchant first",
+    "invalid": "The merchant, terminal or status code is unconfirmed. Check or clear the filters.",
+    "unconfirmed": "Applied P5 filter is unconfirmed",
+    "reselect": "Clear the filter or reselect and apply the merchant and terminal.",
+    "all": "All",
+    "status": "Status",
+    "custom": "Other status code…",
+    "statusCode": "Status code",
+    "codeValue": "Status code: {{code}}",
+    "codeInvalid": "Enter an integer status code (-2147483648…2147483647)."
+  },
+  "table": {
+    "actions": "Actions",
+    "label": "P5 device table",
+    "pages": "P5 device pages",
+    "total": "Total devices: {{countText}}"
+  },
+  "details": {
+    "qr": "Static QR",
+    "device": "Device",
+    "title": "P5 device details"
+  },
+  "actions": {
+    "viewQr": "View static QR",
+    "details": "Details"
+  },
+  "display": {
+    "unavailable": "No safe static QR link is available.",
+    "noLink": "No safe static QR link is available for this device."
+  },
+  "page": {
+    "name": "P5 devices",
+    "noAccess": "Permission to view P5 devices is unavailable.",
+    "unavailable": "P5 device integration is not configured"
+  },
+  "search": {
+    "label": "Search by device ID or terminal name",
+    "placeholder": "Device ID or terminal name"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive / administrator flag",
+    "unknown": "Status unknown",
+    "qrActive": "Active",
+    "qrUnknown": "Unknown"
+  },
+  "states": {
+    "loading": "Loading P5 devices",
+    "failed": "Unable to display P5 devices",
+    "contract": "P5 response has an unexpected format",
+    "contractHelp": "The data was not displayed as an empty list. Try again.",
+    "empty": "No P5 devices found."
+  },
+  "reset": {
+    "unavailable": "PIN reset is currently unavailable.",
+    "action": "Reset PIN",
+    "title": "Reset PIN",
+    "confirm": "Reset PIN",
+    "warning": "The PIN for device {{id}} will be reset. Continue?",
+    "terminal": "Terminal: {{name}}",
+    "pending": "Sending PIN reset request.",
+    "pendingCaption": "Resetting…",
+    "confirmedTitle": "Reset OTP sent",
+    "unknownTitle": "Reset outcome unconfirmed",
+    "rejectedTitle": "PIN reset rejected",
+    "notSentTitle": "PIN reset request not sent",
+    "confirmed": "Reset OTP sent for device {{id}}. Enter the code on the P5 device.",
+    "unknown": "{{id}}: The request may have been sent, but the server outcome could not be confirmed. Check the current status before a new reset.",
+    "rejected": "The server rejected the PIN reset request for device {{id}}.",
+    "notSent": "PIN reset request for device {{id}} was not sent. Check the session and permissions before trying again.",
+    "newRisk": "Repeating sends a new reset request.",
+    "refreshFailed": "Unable to refresh the list. Press Refresh.",
+    "newConfirm": "Confirm a new reset"
+  }
+}

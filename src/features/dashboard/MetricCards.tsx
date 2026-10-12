@@ -1,3 +1,4 @@
+import { useDashboardPresentation } from './presentation'
 import type { LucideIcon } from 'lucide-react'
 import {
   CircleCheckIcon,
@@ -34,6 +35,7 @@ function MetricCard({
   description,
   percent,
 }: MetricDefinition) {
+ const p = useDashboardPresentation()
   return (
     <Card data-outcome={outcome} className="dashboard-metric relative min-w-0 gap-2 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)]">
       <svg aria-hidden="true" viewBox="0 0 240 70" preserveAspectRatio="none" className="pointer-events-none absolute inset-y-0 right-0 h-full w-3/4 text-[var(--metric-accent)]">
@@ -48,8 +50,8 @@ function MetricCard({
       </CardHeader>
       <CardContent className="relative">
         <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <p className="text-3xl font-bold tracking-tight text-text-primary [overflow-wrap:anywhere]">{metric.count.toLocaleString('uz-UZ')}</p>
-          {percent !== undefined ? <span aria-label={`${label} ulushi`} className={`rounded-full px-3 py-0.5 text-sm font-semibold ${iconClassName}`}>{percent.toLocaleString('uz-UZ')}%</span> : null}
+          <p className="text-3xl font-bold tracking-tight text-text-primary [overflow-wrap:anywhere]">{p.number(metric.count)}</p>
+          {percent !== undefined ? <span aria-label={p.message('metrics.share', {label})} className={`rounded-full px-3 py-0.5 text-sm font-semibold ${iconClassName}`}>{p.percent(percent)}</span> : null}
         </div>
         <p className="mt-1 text-sm text-text-secondary">{description}</p>
       </CardContent>
@@ -58,20 +60,21 @@ function MetricCard({
 }
 
 export function MetricCards({ metrics, pie }: Pick<DashboardView, 'metrics'> & Partial<Pick<DashboardView, 'pie'>>) {
+  const p = useDashboardPresentation()
   const showPercent = Boolean(pie && metrics.total.count > 0 && reconcileDashboard({ metrics, pie }).countMatches)
   const definitions: readonly MetricDefinition[] = [
     {
       outcome: 'total',
-      label: 'Jami',
-      description: 'Barcha tranzaksiyalar',
+      label: p.label('total'),
+      description: p.message('metrics.totalDescription'),
       metric: metrics.total,
       icon: QrCodeIcon,
       iconClassName: 'bg-brand-soft text-brand',
     },
     {
       outcome: 'success',
-      label: 'Muvaffaqiyatli',
-      description: 'Muvaffaqiyatli tranzaksiyalar',
+      label: p.label('success'),
+      description: p.message('metrics.successDescription'),
       percent: showPercent ? pie?.success.percent : undefined,
       metric: metrics.success,
       icon: CircleCheckIcon,
@@ -79,8 +82,8 @@ export function MetricCards({ metrics, pie }: Pick<DashboardView, 'metrics'> & P
     },
     {
       outcome: 'processing',
-      label: 'Jarayonda',
-      description: 'Jarayondagi tranzaksiyalar',
+      label: p.label('processing'),
+      description: p.message('metrics.processingDescription'),
       percent: showPercent ? pie?.processing.percent : undefined,
       metric: metrics.processing,
       icon: Clock3Icon,
@@ -88,8 +91,8 @@ export function MetricCards({ metrics, pie }: Pick<DashboardView, 'metrics'> & P
     },
     {
       outcome: 'failed',
-      label: 'Muvaffaqiyatsiz',
-      description: 'Muvaffaqiyatsiz tranzaksiyalar',
+      label: p.label('failed'),
+      description: p.message('metrics.failedDescription'),
       percent: showPercent ? pie?.failed.percent : undefined,
       metric: metrics.failed,
       icon: TriangleAlertIcon,
@@ -99,11 +102,11 @@ export function MetricCards({ metrics, pie }: Pick<DashboardView, 'metrics'> & P
 
   return (
     <section
-      aria-label="Asosiy ko‘rsatkichlar"
+      aria-label={p.message('metrics.summary')}
       className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
     >
       {definitions.map((definition) => (
-        <MetricCard key={definition.label} {...definition} />
+        <MetricCard key={definition.outcome} {...definition} />
       ))}
     </section>
   )

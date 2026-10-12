@@ -1,0 +1,5619 @@
+{
+  "summary": [
+    {
+      "namespace": "common",
+      "logicalKeys": 69,
+      "physicalLeaves": {
+        "uz": 70,
+        "ru": 72,
+        "en": 70
+      },
+      "literalUsageUnproven": [
+        "actions.save",
+        "greeting",
+        "items"
+      ],
+      "duplicateUzKeys": [
+        "items_one",
+        "items_other"
+      ]
+    },
+    {
+      "namespace": "shell",
+      "logicalKeys": 64,
+      "physicalLeaves": {
+        "uz": 64,
+        "ru": 64,
+        "en": 64
+      },
+      "literalUsageUnproven": [
+        "navigation.empty",
+        "navigation.main",
+        "navigation.sections"
+      ],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "auth",
+      "logicalKeys": 55,
+      "physicalLeaves": {
+        "uz": 55,
+        "ru": 55,
+        "en": 55
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "account",
+      "logicalKeys": 9,
+      "physicalLeaves": {
+        "uz": 9,
+        "ru": 9,
+        "en": 9
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "dashboard",
+      "logicalKeys": 108,
+      "physicalLeaves": {
+        "uz": 109,
+        "ru": 111,
+        "en": 109
+      },
+      "literalUsageUnproven": [
+        "granularity.AUTO",
+        "granularity.DAY",
+        "granularity.HOUR",
+        "granularity.MONTH",
+        "granularity.WEEK",
+        "granularity.YEAR",
+        "growth.downFavorable",
+        "growth.downNeutral",
+        "growth.downUnfavorable",
+        "growth.unavailable",
+        "growth.unchanged",
+        "growth.upFavorable",
+        "growth.upNeutral",
+        "growth.upUnfavorable"
+      ],
+      "duplicateUzKeys": [
+        "metrics.success",
+        "metrics.processing",
+        "trend.amount",
+        "filters.terminal",
+        "filters.preset_other",
+        "filters.preset_one",
+        "recentQr.amount",
+        "recentQr.terminal",
+        "qrStatus.processing",
+        "qrStatus.success"
+      ]
+    },
+    {
+      "namespace": "dynamicQr",
+      "logicalKeys": 155,
+      "physicalLeaves": {
+        "uz": 155,
+        "ru": 155,
+        "en": 155
+      },
+      "literalUsageUnproven": [
+        "cancel.checkFirst",
+        "cancel.confirm",
+        "cancel.confirmed",
+        "cancel.id",
+        "cancel.noRetry",
+        "cancel.notSentDetail",
+        "cancel.refreshFailed",
+        "cancel.rejected",
+        "cancel.title",
+        "cancel.unknown",
+        "cancel.warning"
+      ],
+      "duplicateUzKeys": [
+        "filters.distribution",
+        "details.distributionCode"
+      ]
+    },
+    {
+      "namespace": "staticQr",
+      "logicalKeys": 60,
+      "physicalLeaves": {
+        "uz": 60,
+        "ru": 60,
+        "en": 60
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "terminals",
+      "logicalKeys": 59,
+      "physicalLeaves": {
+        "uz": 59,
+        "ru": 59,
+        "en": 59
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "bankAccounts",
+      "logicalKeys": 27,
+      "physicalLeaves": {
+        "uz": 27,
+        "ru": 27,
+        "en": 27
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "cashiers",
+      "logicalKeys": 92,
+      "physicalLeaves": {
+        "uz": 92,
+        "ru": 92,
+        "en": 92
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": []
+    },
+    {
+      "namespace": "p5",
+      "logicalKeys": 73,
+      "physicalLeaves": {
+        "uz": 73,
+        "ru": 73,
+        "en": 73
+      },
+      "literalUsageUnproven": [],
+      "duplicateUzKeys": [
+        "status.active",
+        "status.qrActive",
+        "reset.title",
+        "reset.confirm"
+      ]
+    }
+  ],
+  "rows": [
+    {
+      "namespace": "common",
+      "key": "actions.save",
+      "uz": "Saqlash",
+      "ru": "Сохранить",
+      "en": "Save"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.cancel",
+      "uz": "Bekor qilish",
+      "ru": "Отмена",
+      "en": "Cancel"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.close",
+      "uz": "Yopish",
+      "ru": "Закрыть",
+      "en": "Close"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.retry",
+      "uz": "Qayta urinish",
+      "ru": "Повторить попытку",
+      "en": "Retry"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.apply",
+      "uz": "Qo‘llash",
+      "ru": "Применить",
+      "en": "Apply"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.reset",
+      "uz": "Qayta tiklash",
+      "ru": "Сбросить",
+      "en": "Reset"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.clear",
+      "uz": "Tozalash",
+      "ru": "Очистить",
+      "en": "Clear"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.done",
+      "uz": "Tayyor",
+      "ru": "Готово",
+      "en": "Done"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.refresh",
+      "uz": "Yangilash",
+      "ru": "Обновить",
+      "en": "Refresh"
+    },
+    {
+      "namespace": "common",
+      "key": "actions.openMenu",
+      "uz": "Amallarni ochish",
+      "ru": "Открыть действия",
+      "en": "Open actions"
+    },
+    {
+      "namespace": "common",
+      "key": "states.unavailable",
+      "uz": "Hozircha mavjud emas.",
+      "ru": "Пока недоступно.",
+      "en": "Currently unavailable."
+    },
+    {
+      "namespace": "common",
+      "key": "states.loading",
+      "uz": "Yuklanmoqda",
+      "ru": "Загрузка",
+      "en": "Loading"
+    },
+    {
+      "namespace": "common",
+      "key": "states.loadingDescription",
+      "uz": "Ma’lumotlar tayyorlanmoqda.",
+      "ru": "Подготовка данных.",
+      "en": "Preparing data."
+    },
+    {
+      "namespace": "common",
+      "key": "states.loadingOption",
+      "uz": "Yuklanmoqda...",
+      "ru": "Загрузка...",
+      "en": "Loading..."
+    },
+    {
+      "namespace": "common",
+      "key": "states.empty",
+      "uz": "Ma’lumot topilmadi",
+      "ru": "Данные не найдены",
+      "en": "No data found"
+    },
+    {
+      "namespace": "common",
+      "key": "states.emptyDescription",
+      "uz": "Hozircha ko‘rsatish uchun yozuvlar mavjud emas.",
+      "ru": "Пока нет записей для отображения.",
+      "en": "There are currently no records to display."
+    },
+    {
+      "namespace": "common",
+      "key": "states.error",
+      "uz": "Ma’lumotni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить данные",
+      "en": "Unable to load data"
+    },
+    {
+      "namespace": "common",
+      "key": "states.errorDescription",
+      "uz": "Birozdan so‘ng qayta urinib ko‘ring.",
+      "ru": "Попробуйте ещё раз немного позже.",
+      "en": "Please try again shortly."
+    },
+    {
+      "namespace": "common",
+      "key": "states.noAccess",
+      "uz": "Ko‘rish uchun ruxsat yo‘q",
+      "ru": "Нет доступа к просмотру",
+      "en": "No viewing access"
+    },
+    {
+      "namespace": "common",
+      "key": "states.noAccessDescription",
+      "uz": "Bu ma’lumotni ko‘rish huquqi mavjud emas.",
+      "ru": "У вас нет права просматривать эти данные.",
+      "en": "You do not have permission to view this data."
+    },
+    {
+      "namespace": "common",
+      "key": "locale.changeFailed",
+      "uz": "Tilni o‘zgartirib bo‘lmadi. Qayta urinib ko‘ring.",
+      "ru": "Не удалось изменить язык. Попробуйте ещё раз.",
+      "en": "Unable to change the language. Please try again."
+    },
+    {
+      "namespace": "common",
+      "key": "locale.label",
+      "uz": "Til",
+      "ru": "Язык",
+      "en": "Language"
+    },
+    {
+      "namespace": "common",
+      "key": "locale.selected",
+      "uz": "Tanlangan til: {{language}}",
+      "ru": "Выбранный язык: {{language}}",
+      "en": "Selected language: {{language}}"
+    },
+    {
+      "namespace": "common",
+      "key": "locale.switching",
+      "uz": "Til o‘zgartirilmoqda…",
+      "ru": "Смена языка…",
+      "en": "Changing language…"
+    },
+    {
+      "namespace": "common",
+      "key": "greeting",
+      "uz": "Salom, {{name}}!",
+      "ru": "Здравствуйте, {{name}}!",
+      "en": "Hello, {{name}}!"
+    },
+    {
+      "namespace": "common",
+      "key": "items_one",
+      "uz": "{{count}} ta yozuv",
+      "ru": "{{count}} запись",
+      "en": "{{count}} record"
+    },
+    {
+      "namespace": "common",
+      "key": "items_other",
+      "uz": "{{count}} ta yozuv",
+      "ru": "{{count}} записи",
+      "en": "{{count}} records"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.total",
+      "uz": "Jami: {{value}}",
+      "ru": "Всего: {{value}}",
+      "en": "Total: {{value}}"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.pageSummary",
+      "uz": "{{page}}-sahifa, jami {{count}} sahifa",
+      "ru": "Страница {{page}} из {{count}}",
+      "en": "Page {{page}} of {{count}}"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.noPages",
+      "uz": "Sahifalar mavjud emas",
+      "ru": "Нет страниц",
+      "en": "No pages available"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.previous",
+      "uz": "Oldingi sahifa",
+      "ru": "Предыдущая страница",
+      "en": "Previous page"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.next",
+      "uz": "Keyingi sahifa",
+      "ru": "Следующая страница",
+      "en": "Next page"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.page",
+      "uz": "{{page}}-sahifa",
+      "ru": "Страница {{page}}",
+      "en": "Page {{page}}"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.pageSize",
+      "uz": "Sahifadagi yozuvlar soni",
+      "ru": "Количество записей на странице",
+      "en": "Records per page"
+    },
+    {
+      "namespace": "common",
+      "key": "pagination.perPage",
+      "uz": "{{size}} / sah.",
+      "ru": "{{size}} / стр.",
+      "en": "{{size}} / page"
+    },
+    {
+      "namespace": "common",
+      "key": "toast.viewport",
+      "uz": "Bildirishnomalar ({{hotkey}})",
+      "ru": "Уведомления ({{hotkey}})",
+      "en": "Notifications ({{hotkey}})"
+    },
+    {
+      "namespace": "common",
+      "key": "toast.notification",
+      "uz": "Bildirishnoma",
+      "ru": "Уведомление",
+      "en": "Notification"
+    },
+    {
+      "namespace": "common",
+      "key": "toast.close",
+      "uz": "Bildirishnomani yopish",
+      "ru": "Закрыть уведомление",
+      "en": "Close notification"
+    },
+    {
+      "namespace": "common",
+      "key": "copy.link",
+      "uz": "Havolani nusxalash",
+      "ru": "Скопировать ссылку",
+      "en": "Copy link"
+    },
+    {
+      "namespace": "common",
+      "key": "copy.success",
+      "uz": "Nusxalandi.",
+      "ru": "Скопировано.",
+      "en": "Copied."
+    },
+    {
+      "namespace": "common",
+      "key": "copy.failed",
+      "uz": "Nusxalab bo‘lmadi.",
+      "ru": "Не удалось скопировать.",
+      "en": "Unable to copy."
+    },
+    {
+      "namespace": "common",
+      "key": "filters.title",
+      "uz": "Filtrlar",
+      "ru": "Фильтры",
+      "en": "Filters"
+    },
+    {
+      "namespace": "common",
+      "key": "filters.description",
+      "uz": "Ro‘yxat uchun filtrlarni sozlang.",
+      "ru": "Настройте фильтры списка.",
+      "en": "Configure filters for the list."
+    },
+    {
+      "namespace": "common",
+      "key": "filters.close",
+      "uz": "Filtrlarni yopish",
+      "ru": "Закрыть фильтры",
+      "en": "Close filters"
+    },
+    {
+      "namespace": "common",
+      "key": "filters.clearSelection",
+      "uz": "{{label}} tanlovini tozalash",
+      "ru": "Очистить выбор: {{label}}",
+      "en": "Clear selection: {{label}}"
+    },
+    {
+      "namespace": "common",
+      "key": "table.trigger",
+      "uz": "Jadval ustunlari",
+      "ru": "Столбцы таблицы",
+      "en": "Table columns"
+    },
+    {
+      "namespace": "common",
+      "key": "table.settings",
+      "uz": "Jadval ustunlarini sozlash",
+      "ru": "Настроить столбцы таблицы",
+      "en": "Configure table columns"
+    },
+    {
+      "namespace": "common",
+      "key": "table.columns",
+      "uz": "Ustunlar",
+      "ru": "Столбцы",
+      "en": "Columns"
+    },
+    {
+      "namespace": "common",
+      "key": "table.title",
+      "uz": "{{table}} jadvali ustunlari",
+      "ru": "Столбцы таблицы «{{table}}»",
+      "en": "Columns for {{table}}"
+    },
+    {
+      "namespace": "common",
+      "key": "table.description",
+      "uz": "Jadvalda ko‘rsatiladigan ustunlarni tanlang va ularning tartibini o‘zgartiring.",
+      "ru": "Выберите отображаемые столбцы и измените их порядок.",
+      "en": "Choose which columns to display and change their order."
+    },
+    {
+      "namespace": "common",
+      "key": "table.close",
+      "uz": "Ustun sozlamalarini yopish",
+      "ru": "Закрыть настройки столбцов",
+      "en": "Close column settings"
+    },
+    {
+      "namespace": "common",
+      "key": "table.move",
+      "uz": "{{label}} ustunini ko‘chirish",
+      "ru": "Переместить столбец «{{label}}»",
+      "en": "Move {{label}} column"
+    },
+    {
+      "namespace": "common",
+      "key": "table.visibility",
+      "uz": "{{label}} ustuni ko‘rinishi",
+      "ru": "Видимость столбца «{{label}}»",
+      "en": "Visibility of {{label}} column"
+    },
+    {
+      "namespace": "common",
+      "key": "table.moveUp",
+      "uz": "{{label}} ustunini chapga — ro‘yxatda yuqoriga ko‘chirish",
+      "ru": "Переместить столбец «{{label}}» влево — выше в списке",
+      "en": "Move {{label}} column left — up in the list"
+    },
+    {
+      "namespace": "common",
+      "key": "table.moveDown",
+      "uz": "{{label}} ustunini o‘ngga — ro‘yxatda pastga ko‘chirish",
+      "ru": "Переместить столбец «{{label}}» вправо — ниже в списке",
+      "en": "Move {{label}} column right — down in the list"
+    },
+    {
+      "namespace": "common",
+      "key": "table.moved",
+      "uz": "{{label}} ustuni {{position}}-o‘ringa ko‘chirildi.",
+      "ru": "Столбец «{{label}}» перемещён на позицию {{position}}.",
+      "en": "{{label}} column moved to position {{position}}."
+    },
+    {
+      "namespace": "common",
+      "key": "table.shown",
+      "uz": "{{label}} ustuni ko‘rsatildi.",
+      "ru": "Столбец «{{label}}» показан.",
+      "en": "{{label}} column shown."
+    },
+    {
+      "namespace": "common",
+      "key": "table.hidden",
+      "uz": "{{label}} ustuni yashirildi.",
+      "ru": "Столбец «{{label}}» скрыт.",
+      "en": "{{label}} column hidden."
+    },
+    {
+      "namespace": "common",
+      "key": "table.reset",
+      "uz": "Standart tartibga qaytarish",
+      "ru": "Восстановить стандартный порядок",
+      "en": "Restore default order"
+    },
+    {
+      "namespace": "common",
+      "key": "table.restored",
+      "uz": "Standart ustun tartibi va ko‘rinishi tiklandi.",
+      "ru": "Стандартный порядок и видимость столбцов восстановлены.",
+      "en": "Default column order and visibility restored."
+    },
+    {
+      "namespace": "common",
+      "key": "theme.light",
+      "uz": "Yorug‘",
+      "ru": "Светлая",
+      "en": "Light"
+    },
+    {
+      "namespace": "common",
+      "key": "theme.dark",
+      "uz": "Tungi",
+      "ru": "Тёмная",
+      "en": "Dark"
+    },
+    {
+      "namespace": "common",
+      "key": "theme.system",
+      "uz": "Tizim",
+      "ru": "Системная",
+      "en": "System"
+    },
+    {
+      "namespace": "common",
+      "key": "theme.label",
+      "uz": "Ko‘rinish",
+      "ru": "Тема",
+      "en": "Theme"
+    },
+    {
+      "namespace": "common",
+      "key": "theme.current",
+      "uz": "Ko‘rinish: {{label}}",
+      "ru": "Тема: {{label}}",
+      "en": "Theme: {{label}}"
+    },
+    {
+      "namespace": "common",
+      "key": "theme.next",
+      "uz": "Ko‘rinish: {{label}}. Keyingi rejimga o‘tish",
+      "ru": "Тема: {{label}}. Переключить на следующий режим",
+      "en": "Theme: {{label}}. Switch to the next mode"
+    },
+    {
+      "namespace": "common",
+      "key": "phone.countryCode",
+      "uz": "O‘zbekiston telefon kodi: +998.",
+      "ru": "Телефонный код Узбекистана: +998.",
+      "en": "Uzbekistan telephone code: +998."
+    },
+    {
+      "namespace": "common",
+      "key": "refresh.updated",
+      "uz": "Yangilangan: {{time}}",
+      "ru": "Обновлено: {{time}}",
+      "en": "Updated: {{time}}"
+    },
+    {
+      "namespace": "common",
+      "key": "search.clear",
+      "uz": "Qidiruvni tozalash",
+      "ru": "Очистить поиск",
+      "en": "Clear search"
+    },
+    {
+      "namespace": "common",
+      "key": "search.apply",
+      "uz": "Qidiruvni qo‘llash",
+      "ru": "Применить поиск",
+      "en": "Apply search"
+    },
+    {
+      "namespace": "common",
+      "key": "items_few",
+      "ru": "{{count}} записи",
+      "context": "Russian-specific plural category; logical parity validated separately"
+    },
+    {
+      "namespace": "common",
+      "key": "items_many",
+      "ru": "{{count}} записей",
+      "context": "Russian-specific plural category; logical parity validated separately"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.dashboard",
+      "uz": "Dashboard",
+      "ru": "Панель управления",
+      "en": "Dashboard"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.home",
+      "uz": "Bosh sahifa",
+      "ru": "Главная",
+      "en": "Home"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.dynamicQr",
+      "uz": "Dinamik QRlar",
+      "ru": "Динамические QR",
+      "en": "Dynamic QRs"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.dynamicQrPreview",
+      "uz": "Dinamik QR",
+      "ru": "Динамический QR",
+      "en": "Dynamic QR"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.staticQr",
+      "uz": "Statik QRlar",
+      "ru": "Статические QR",
+      "en": "Static QRs"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.staticQrPreview",
+      "uz": "Statik QR",
+      "ru": "Статический QR",
+      "en": "Static QR"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.terminals",
+      "uz": "Terminallar",
+      "ru": "Терминалы",
+      "en": "Terminals"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.bankAccounts",
+      "uz": "Bank hisoblari",
+      "ru": "Банковские счета",
+      "en": "Bank accounts"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.cashiers",
+      "uz": "Kassirlar",
+      "ru": "Кассиры",
+      "en": "Cashiers"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.devices",
+      "uz": "P5 qurilmalari",
+      "ru": "Устройства P5",
+      "en": "P5 devices"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.account",
+      "uz": "Hisob",
+      "ru": "Аккаунт",
+      "en": "Account"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.main",
+      "uz": "Asosiy navigatsiya",
+      "ru": "Основная навигация",
+      "en": "Main navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.desktop",
+      "uz": "Ish maydoni navigatsiyasi",
+      "ru": "Навигация рабочего пространства",
+      "en": "Workspace navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.mobile",
+      "uz": "Mobil navigatsiya",
+      "ru": "Мобильная навигация",
+      "en": "Mobile navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.description",
+      "uz": "Merchant ish maydoni navigatsiyasi",
+      "ru": "Навигация рабочего пространства мерчанта",
+      "en": "Merchant workspace navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.sections",
+      "uz": "QRHub Merchant bo‘limlari",
+      "ru": "Разделы QRHub Merchant",
+      "en": "QRHub Merchant sections"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.empty",
+      "uz": "Ruxsat berilgan bo‘lim yo‘q.",
+      "ru": "Нет доступных разделов.",
+      "en": "No permitted sections."
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.open",
+      "uz": "Navigatsiyani ochish",
+      "ru": "Открыть навигацию",
+      "en": "Open navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.close",
+      "uz": "Navigatsiyani yopish",
+      "ru": "Закрыть навигацию",
+      "en": "Close navigation"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.expand",
+      "uz": "Yon panelni ochish",
+      "ru": "Развернуть боковую панель",
+      "en": "Expand sidebar"
+    },
+    {
+      "namespace": "shell",
+      "key": "navigation.collapse",
+      "uz": "Yon panelni yopish",
+      "ru": "Свернуть боковую панель",
+      "en": "Collapse sidebar"
+    },
+    {
+      "namespace": "shell",
+      "key": "header.profileMenu",
+      "uz": "Profil menyusi",
+      "ru": "Меню профиля",
+      "en": "Profile menu"
+    },
+    {
+      "namespace": "shell",
+      "key": "header.profile",
+      "uz": "Profil",
+      "ru": "Профиль",
+      "en": "Profile"
+    },
+    {
+      "namespace": "shell",
+      "key": "header.user",
+      "uz": "Merchant foydalanuvchi",
+      "ru": "Пользователь мерчанта",
+      "en": "Merchant user"
+    },
+    {
+      "namespace": "shell",
+      "key": "header.demo",
+      "uz": "Demo — namuna ma’lumotlari",
+      "ru": "Демо — пример данных",
+      "en": "Demo — sample data"
+    },
+    {
+      "namespace": "shell",
+      "key": "workspace",
+      "uz": "Merchant ish maydoni",
+      "ru": "Рабочее пространство мерчанта",
+      "en": "Merchant workspace"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.sessionLoading",
+      "uz": "Sessiya tekshirilmoqda",
+      "ru": "Проверка сессии",
+      "en": "Checking session"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.sessionDescription",
+      "uz": "Profil ma’lumotlari xavfsiz tarzda yuklanmoqda.",
+      "ru": "Данные профиля загружаются безопасно.",
+      "en": "Loading profile data securely."
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.accountLoading",
+      "uz": "Hisob sahifasi yuklanmoqda",
+      "ru": "Загрузка аккаунта",
+      "en": "Loading account"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.dashboardLoading",
+      "uz": "Dashboard sahifasi yuklanmoqda",
+      "ru": "Загрузка панели управления",
+      "en": "Loading dashboard"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.dynamicQrLoading",
+      "uz": "Dinamik QRlar sahifasi yuklanmoqda",
+      "ru": "Загрузка динамических QR",
+      "en": "Loading dynamic QRs"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.staticQrLoading",
+      "uz": "Statik QRlar sahifasi yuklanmoqda",
+      "ru": "Загрузка статических QR",
+      "en": "Loading static QRs"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.terminalsLoading",
+      "uz": "Terminallar sahifasi yuklanmoqda",
+      "ru": "Загрузка терминалов",
+      "en": "Loading terminals"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.bankAccountsLoading",
+      "uz": "Bank hisoblari sahifasi yuklanmoqda",
+      "ru": "Загрузка банковских счетов",
+      "en": "Loading bank accounts"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.cashiersLoading",
+      "uz": "Kassirlar sahifasi yuklanmoqda",
+      "ru": "Загрузка кассиров",
+      "en": "Loading cashiers"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.devicesLoading",
+      "uz": "P5 qurilmalari sahifasi yuklanmoqda",
+      "ru": "Загрузка устройств P5",
+      "en": "Loading P5 devices"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.createQrLoading",
+      "uz": "QR yaratish sahifasi yuklanmoqda",
+      "ru": "Загрузка страницы создания QR",
+      "en": "Loading QR creation"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.exportLoading",
+      "uz": "XLSX eksport sahifasi yuklanmoqda",
+      "ru": "Загрузка экспорта XLSX",
+      "en": "Loading XLSX export"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.forbidden",
+      "uz": "Ruxsat mavjud emas",
+      "ru": "Нет доступа",
+      "en": "Access denied"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.forbiddenDescription",
+      "uz": "Bu bo‘lim uchun tasdiqlangan ruxsat topilmadi. Chiqish amali bundan qat’i nazar mavjud.",
+      "ru": "Доступ к этому разделу не подтверждён. Вы по-прежнему можете выйти из аккаунта.",
+      "en": "Permission for this section is not confirmed. You can still sign out."
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.notFound",
+      "uz": "Sahifa topilmadi",
+      "ru": "Страница не найдена",
+      "en": "Page not found"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.notFoundDescription",
+      "uz": "Bu manzil live merchant doirasida mavjud emas.",
+      "ru": "Этот адрес недоступен в рабочем пространстве мерчанта.",
+      "en": "This address is not available in the merchant workspace."
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.returnSafe",
+      "uz": "Xavfsiz sahifaga qaytish",
+      "ru": "Вернуться на безопасную страницу",
+      "en": "Return to a safe page"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.unavailable",
+      "uz": "Funksiya mavjud emas",
+      "ru": "Функция недоступна",
+      "en": "Feature unavailable"
+    },
+    {
+      "namespace": "shell",
+      "key": "routes.integrationUnavailable",
+      "uz": "Xizmat hozircha mavjud emas.",
+      "ru": "Сервис временно недоступен.",
+      "en": "The service is currently unavailable."
+    },
+    {
+      "namespace": "shell",
+      "key": "recovery.title",
+      "uz": "Sahifani yuklashda xatolik yuz berdi",
+      "ru": "Не удалось загрузить страницу",
+      "en": "Unable to load the page"
+    },
+    {
+      "namespace": "shell",
+      "key": "recovery.description",
+      "uz": "Ushbu bo‘limni yuklab bo‘lmadi. Sahifani qayta yuklab ko‘ring.",
+      "ru": "Не удалось загрузить этот раздел. Попробуйте перезагрузить страницу.",
+      "en": "Unable to load this section. Try reloading the page."
+    },
+    {
+      "namespace": "shell",
+      "key": "recovery.reload",
+      "uz": "Sahifani qayta yuklash",
+      "ru": "Перезагрузить страницу",
+      "en": "Reload page"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.dashboardTitle",
+      "uz": "Dashboard hozircha sozlanmagan",
+      "ru": "Панель управления пока не настроена",
+      "en": "Dashboard is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.dashboardDescription",
+      "uz": "Dashboard funksiyasi ushbu muhitda hozircha mavjud emas.",
+      "ru": "Панель управления пока недоступна в этой среде.",
+      "en": "Dashboard is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.dynamicQrTitle",
+      "uz": "Dinamik QR ro‘yxati hozircha sozlanmagan",
+      "ru": "Список динамических QR пока не настроен",
+      "en": "Dynamic QR list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.dynamicQrDescription",
+      "uz": "Dinamik QR ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список динамических QR пока недоступен в этой среде.",
+      "en": "Dynamic QR list is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.exportQrTitle",
+      "uz": "XLSX eksport hozircha sozlanmagan",
+      "ru": "Экспорт XLSX пока не настроен",
+      "en": "XLSX export is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.exportQrDescription",
+      "uz": "XLSX eksport ushbu muhitda hozircha mavjud emas.",
+      "ru": "Экспорт XLSX пока недоступен в этой среде.",
+      "en": "XLSX export is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.staticQrTitle",
+      "uz": "Statik QR ro‘yxati hozircha sozlanmagan",
+      "ru": "Список статических QR пока не настроен",
+      "en": "Static QR list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.staticQrDescription",
+      "uz": "Statik QR ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список статических QR пока недоступен в этой среде.",
+      "en": "Static QR list is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.terminalsTitle",
+      "uz": "Terminal ro‘yxati hozircha sozlanmagan",
+      "ru": "Список терминалов пока не настроен",
+      "en": "Terminal list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.terminalsDescription",
+      "uz": "Terminal ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список терминалов пока недоступен в этой среде.",
+      "en": "Terminal list is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.bankAccountsTitle",
+      "uz": "Bank hisoblari ro‘yxati hozircha sozlanmagan",
+      "ru": "Список банковских счетов пока не настроен",
+      "en": "Bank account list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.bankAccountsDescription",
+      "uz": "Bank hisoblari ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список банковских счетов пока недоступен в этой среде.",
+      "en": "Bank account list is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.cashiersTitle",
+      "uz": "Kassirlar ro‘yxati hozircha sozlanmagan",
+      "ru": "Список кассиров пока не настроен",
+      "en": "Cashier list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.cashiersDescription",
+      "uz": "Kassirlar ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список кассиров пока недоступен в этой среде.",
+      "en": "Cashier list is not yet available in this environment."
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.devicesTitle",
+      "uz": "P5 qurilmalari ro‘yxati hozircha sozlanmagan",
+      "ru": "Список устройств P5 пока не настроен",
+      "en": "P5 device list is not configured yet"
+    },
+    {
+      "namespace": "shell",
+      "key": "unavailable.devicesDescription",
+      "uz": "P5 qurilmalari ro‘yxati ushbu muhitda hozircha mavjud emas.",
+      "ru": "Список устройств P5 пока недоступен в этой среде.",
+      "en": "P5 device list is not yet available in this environment."
+    },
+    {
+      "namespace": "auth",
+      "key": "brand.subtitle",
+      "uz": "Merchant boshqaruv tizimi",
+      "ru": "Система управления мерчанта",
+      "en": "Merchant management system"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.restart",
+      "uz": "Qayta boshlash",
+      "ru": "Начать заново",
+      "en": "Start again"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.continue",
+      "uz": "Davom etish",
+      "ru": "Продолжить",
+      "en": "Continue"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.verify",
+      "uz": "Tasdiqlash",
+      "ru": "Подтвердить",
+      "en": "Verify"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.signIn",
+      "uz": "Kirish",
+      "ru": "Войти",
+      "en": "Sign in"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.savePin",
+      "uz": "PINni saqlash",
+      "ru": "Сохранить PIN",
+      "en": "Save PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.resend",
+      "uz": "Kodni qayta yuborish",
+      "ru": "Отправить код повторно",
+      "en": "Resend code"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.forgotPin",
+      "uz": "PINni unutdingizmi?",
+      "ru": "Забыли PIN?",
+      "en": "Forgot PIN?"
+    },
+    {
+      "namespace": "auth",
+      "key": "actions.logout",
+      "uz": "Chiqish",
+      "ru": "Выйти",
+      "en": "Sign out"
+    },
+    {
+      "namespace": "auth",
+      "key": "states.waiting",
+      "uz": "Kutilmoqda…",
+      "ru": "Ожидание…",
+      "en": "Please wait…"
+    },
+    {
+      "namespace": "auth",
+      "key": "states.checking",
+      "uz": "Tekshirilmoqda…",
+      "ru": "Проверка…",
+      "en": "Verifying…"
+    },
+    {
+      "namespace": "auth",
+      "key": "states.saving",
+      "uz": "Saqlanmoqda…",
+      "ru": "Сохранение…",
+      "en": "Saving…"
+    },
+    {
+      "namespace": "auth",
+      "key": "states.signingOut",
+      "uz": "Chiqilmoqda…",
+      "ru": "Выход…",
+      "en": "Signing out…"
+    },
+    {
+      "namespace": "auth",
+      "key": "login.title",
+      "uz": "Tizimga kirish",
+      "ru": "Вход в систему",
+      "en": "Sign in"
+    },
+    {
+      "namespace": "auth",
+      "key": "login.description",
+      "uz": "Merchant hisobingiz telefon raqamini kiriting.",
+      "ru": "Введите номер телефона аккаунта мерчанта.",
+      "en": "Enter your merchant account phone number."
+    },
+    {
+      "namespace": "auth",
+      "key": "login.phone",
+      "uz": "Telefon raqami",
+      "ru": "Номер телефона",
+      "en": "Phone number"
+    },
+    {
+      "namespace": "auth",
+      "key": "login.confirmDetails",
+      "uz": "Kirish ma’lumotlarini tasdiqlang.",
+      "ru": "Подтвердите данные для входа.",
+      "en": "Confirm your sign-in details."
+    },
+    {
+      "namespace": "auth",
+      "key": "login.phoneSummary",
+      "uz": "Telefon: {{phone}}",
+      "ru": "Телефон: {{phone}}",
+      "en": "Phone: {{phone}}"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.title",
+      "uz": "PIN kiriting",
+      "ru": "Введите PIN",
+      "en": "Enter PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.createTitle",
+      "uz": "Yangi PIN yarating",
+      "ru": "Создайте новый PIN",
+      "en": "Create a new PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.new",
+      "uz": "Yangi PIN",
+      "ru": "Новый PIN",
+      "en": "New PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.confirm",
+      "uz": "PINni tasdiqlang",
+      "ru": "Подтвердите PIN",
+      "en": "Confirm PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.repeat",
+      "uz": "PINni qayta kiriting",
+      "ru": "Введите PIN повторно",
+      "en": "Re-enter PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.show",
+      "uz": "PINni ko‘rsatish",
+      "ru": "Показать PIN",
+      "en": "Show PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.hide",
+      "uz": "PINni yashirish",
+      "ru": "Скрыть PIN",
+      "en": "Hide PIN"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.showConfirmation",
+      "uz": "PIN tasdig‘ini ko‘rsatish",
+      "ru": "Показать подтверждение PIN",
+      "en": "Show PIN confirmation"
+    },
+    {
+      "namespace": "auth",
+      "key": "pin.hideConfirmation",
+      "uz": "PIN tasdig‘ini yashirish",
+      "ru": "Скрыть подтверждение PIN",
+      "en": "Hide PIN confirmation"
+    },
+    {
+      "namespace": "auth",
+      "key": "otp.title",
+      "uz": "Tasdiqlash kodi",
+      "ru": "Код подтверждения",
+      "en": "Verification code"
+    },
+    {
+      "namespace": "auth",
+      "key": "otp.validity",
+      "uz": "Kodning amal qilish muddati",
+      "ru": "Срок действия кода",
+      "en": "Code validity"
+    },
+    {
+      "namespace": "auth",
+      "key": "completion.checking",
+      "uz": "Profil tekshirilmoqda",
+      "ru": "Проверка профиля",
+      "en": "Checking profile"
+    },
+    {
+      "namespace": "auth",
+      "key": "completion.complete",
+      "uz": "Kirish yakunlandi",
+      "ru": "Вход выполнен",
+      "en": "Sign-in complete"
+    },
+    {
+      "namespace": "auth",
+      "key": "completion.checkingDescription",
+      "uz": "Xavfsiz sessiya holati tekshirilmoqda.",
+      "ru": "Проверяется состояние защищённой сессии.",
+      "en": "Checking secure session status."
+    },
+    {
+      "namespace": "auth",
+      "key": "completion.completeDescription",
+      "uz": "Merchant hisobingizga kirish yakunlandi.",
+      "ru": "Вход в аккаунт мерчанта выполнен.",
+      "en": "You have signed in to your merchant account."
+    },
+    {
+      "namespace": "auth",
+      "key": "failure.title",
+      "uz": "Kirishni davom ettirib bo‘lmadi",
+      "ru": "Не удалось продолжить вход",
+      "en": "Unable to continue signing in"
+    },
+    {
+      "namespace": "auth",
+      "key": "failure.description",
+      "uz": "Xavfsiz tarzda qayta boshlashingiz mumkin.",
+      "ru": "Вы можете безопасно начать заново.",
+      "en": "You can safely start again."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.invalidPhone",
+      "uz": "Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.",
+      "ru": "Номер телефона должен содержать 9 цифр.",
+      "en": "The phone number must contain 9 digits."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.invalidOtp",
+      "uz": "Tasdiqlash kodi 6 ta raqamdan iborat bo‘lishi kerak.",
+      "ru": "Код подтверждения должен содержать 6 цифр.",
+      "en": "The verification code must contain 6 digits."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.invalidPin",
+      "uz": "PIN 4–8 ta raqamdan iborat bo‘lishi kerak.",
+      "ru": "PIN должен содержать от 4 до 8 цифр.",
+      "en": "PIN must contain 4–8 digits."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.pinMismatch",
+      "uz": "PIN tasdig‘i mos kelmadi.",
+      "ru": "Подтверждение PIN не совпадает.",
+      "en": "PIN confirmation does not match."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.otpNotExpired",
+      "uz": "Yangi kodni muddat tugagandan keyin so‘rashingiz mumkin.",
+      "ru": "Новый код можно запросить после истечения срока действия текущего.",
+      "en": "You can request a new code after the current one expires."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.otpExpired",
+      "uz": "Tasdiqlash kodi muddati tugagan. Yangi kod so‘rang.",
+      "ru": "Срок действия кода подтверждения истёк. Запросите новый код.",
+      "en": "The verification code has expired. Request a new code."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.wrongOtp",
+      "uz": "Tasdiqlash kodi noto‘g‘ri.",
+      "ru": "Неверный код подтверждения.",
+      "en": "Incorrect verification code."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.wrongPin",
+      "uz": "PIN noto‘g‘ri.",
+      "ru": "Неверный PIN.",
+      "en": "Incorrect PIN."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.sessionExpired",
+      "uz": "Kirish sessiyasi muddati tugagan. Qayta boshlang.",
+      "ru": "Сессия входа истекла. Начните заново.",
+      "en": "The sign-in session has expired. Start again."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.blocked",
+      "uz": "Ushbu qurilmadan kirish vaqtincha bloklangan.",
+      "ru": "Вход с этого устройства временно заблокирован.",
+      "en": "Sign-in from this device is temporarily blocked."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.rateLimited",
+      "uz": "Juda ko‘p urinish bo‘ldi. Keyinroq qayta urinib ko‘ring.",
+      "ru": "Слишком много попыток. Попробуйте позже.",
+      "en": "Too many attempts. Try again later."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.unavailable",
+      "uz": "Kirish xizmati hozir mavjud emas.",
+      "ru": "Сервис входа сейчас недоступен.",
+      "en": "The sign-in service is currently unavailable."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.contract",
+      "uz": "Kutilmagan javob olindi. Kirishni qayta boshlang.",
+      "ru": "Получен неожиданный ответ. Начните вход заново.",
+      "en": "An unexpected response was received. Start signing in again."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.request",
+      "uz": "So‘rovni yakunlab bo‘lmadi. Kirishni qayta boshlang.",
+      "ru": "Не удалось завершить запрос. Начните вход заново.",
+      "en": "Unable to complete the request. Start signing in again."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.completing",
+      "uz": "Profil tekshirilmoqda…",
+      "ru": "Проверка профиля…",
+      "en": "Checking profile…"
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.complete",
+      "uz": "Kirish jarayoni yakunlandi.",
+      "ru": "Вход выполнен.",
+      "en": "Sign-in is complete."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.ownerBusy",
+      "uz": "Hisob boshqa oynada ochiq. O‘sha oynani yoping yoki undan chiqing, keyin qayta urinib ko‘ring.",
+      "ru": "Аккаунт открыт в другом окне. Закройте его или выйдите из аккаунта в том окне, затем повторите попытку.",
+      "en": "The account is open in another window. Close that window or sign out there, then try again."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.browserUnsupported",
+      "uz": "Ushbu brauzerda xavfsiz kirish qo‘llab-quvvatlanmaydi.",
+      "ru": "Этот браузер не поддерживает безопасный вход.",
+      "en": "This browser does not support secure sign-in."
+    },
+    {
+      "namespace": "auth",
+      "key": "feedback.deviceStorageUnavailable",
+      "uz": "Qurilma identifikatorini xavfsiz saqlab bo‘lmadi.",
+      "ru": "Не удалось безопасно сохранить идентификатор устройства.",
+      "en": "Unable to securely store the device identifier."
+    },
+    {
+      "namespace": "auth",
+      "key": "logout.remoteUnconfirmed",
+      "uz": "Bu oynadan chiqildi. Serverdagi sessiya yopilganini tasdiqlab bo‘lmadi.",
+      "ru": "Вы вышли из аккаунта в этом окне. Не удалось подтвердить завершение сессии на сервере.",
+      "en": "You have signed out in this window. Server session termination could not be confirmed."
+    },
+    {
+      "namespace": "account",
+      "key": "title",
+      "uz": "Hisob ma’lumotlari",
+      "ru": "Данные аккаунта",
+      "en": "Account information"
+    },
+    {
+      "namespace": "account",
+      "key": "profile.fullName",
+      "uz": "F.I.Sh.",
+      "ru": "Ф. И. О.",
+      "en": "Full name"
+    },
+    {
+      "namespace": "account",
+      "key": "profile.phone",
+      "uz": "Telefon",
+      "ru": "Телефон",
+      "en": "Phone"
+    },
+    {
+      "namespace": "account",
+      "key": "profile.missing",
+      "uz": "Ko‘rsatilmagan",
+      "ru": "Не указано",
+      "en": "Not provided"
+    },
+    {
+      "namespace": "account",
+      "key": "actions.refresh",
+      "uz": "Ma’lumotni yangilash",
+      "ru": "Обновить данные",
+      "en": "Refresh information"
+    },
+    {
+      "namespace": "account",
+      "key": "states.refreshing",
+      "uz": "Yangilanmoqda…",
+      "ru": "Обновление…",
+      "en": "Refreshing…"
+    },
+    {
+      "namespace": "account",
+      "key": "feedback.changed",
+      "uz": "Ma’lumotlar yangilandi.",
+      "ru": "Данные обновлены.",
+      "en": "Information updated."
+    },
+    {
+      "namespace": "account",
+      "key": "feedback.unchanged",
+      "uz": "Ma’lumotlarda o‘zgarish yo‘q.",
+      "ru": "Данные не изменились.",
+      "en": "Information is unchanged."
+    },
+    {
+      "namespace": "account",
+      "key": "feedback.failed",
+      "uz": "Ma’lumotlarni yangilab bo‘lmadi.",
+      "ru": "Не удалось обновить данные.",
+      "en": "Unable to refresh information."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.total",
+      "uz": "Jami",
+      "ru": "Всего",
+      "en": "Total"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.success",
+      "uz": "Muvaffaqiyatli",
+      "ru": "Успешные",
+      "en": "Successful"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.processing",
+      "uz": "Jarayonda",
+      "ru": "В обработке",
+      "en": "Processing"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.failed",
+      "uz": "Muvaffaqiyatsiz",
+      "ru": "Неуспешные",
+      "en": "Failed"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.uncategorized",
+      "uz": "Tasniflanmagan",
+      "ru": "Без категории",
+      "en": "Uncategorized"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.totalDescription",
+      "uz": "Barcha tranzaksiyalar",
+      "ru": "Все транзакции",
+      "en": "All transactions"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.successDescription",
+      "uz": "Muvaffaqiyatli tranzaksiyalar",
+      "ru": "Успешные транзакции",
+      "en": "Successful transactions"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.processingDescription",
+      "uz": "Jarayondagi tranzaksiyalar",
+      "ru": "Транзакции в обработке",
+      "en": "Transactions in progress"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.failedDescription",
+      "uz": "Muvaffaqiyatsiz tranzaksiyalar",
+      "ru": "Неуспешные транзакции",
+      "en": "Failed transactions"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.share",
+      "uz": "{{label}} ulushi",
+      "ru": "Доля: {{label}}",
+      "en": "{{label}} share"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "metrics.summary",
+      "uz": "Asosiy ko‘rsatkichlar",
+      "ru": "Основные показатели",
+      "en": "Key metrics"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.unavailable",
+      "uz": "Taqqoslash mavjud emas",
+      "ru": "Сравнение недоступно",
+      "en": "Comparison unavailable"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.unchanged",
+      "uz": "O‘zgarish yo‘q",
+      "ru": "Без изменений",
+      "en": "No change"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.upNeutral",
+      "uz": "O‘sish",
+      "ru": "Рост",
+      "en": "Increase"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.downNeutral",
+      "uz": "Kamayish",
+      "ru": "Снижение",
+      "en": "Decrease"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.upFavorable",
+      "uz": "O‘sish, ijobiy o‘zgarish",
+      "ru": "Рост, положительное изменение",
+      "en": "Increase, favorable change"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.downFavorable",
+      "uz": "Kamayish, ijobiy o‘zgarish",
+      "ru": "Снижение, положительное изменение",
+      "en": "Decrease, favorable change"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.upUnfavorable",
+      "uz": "O‘sish, salbiy o‘zgarish",
+      "ru": "Рост, отрицательное изменение",
+      "en": "Increase, unfavorable change"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "growth.downUnfavorable",
+      "uz": "Kamayish, salbiy o‘zgarish",
+      "ru": "Снижение, отрицательное изменение",
+      "en": "Decrease, unfavorable change"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.title",
+      "uz": "Tranzaksiyalar dinamikasi",
+      "ru": "Динамика транзакций",
+      "en": "Transaction trends"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.amountUnit",
+      "uz": "Summa (UZS)",
+      "ru": "Сумма (UZS)",
+      "en": "Amount (UZS)"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.countUnit",
+      "uz": "Tranzaksiyalar soni (dona)",
+      "ru": "Количество транзакций",
+      "en": "Transaction count"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.grouping",
+      "uz": "Guruhlash: {{group}}",
+      "ru": "Группировка: {{group}}",
+      "en": "Grouping: {{group}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.mode",
+      "uz": "Trend ko‘rinishi",
+      "ru": "Вид графика",
+      "en": "Trend view"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.amount",
+      "uz": "Summa",
+      "ru": "Сумма",
+      "en": "Amount"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.count",
+      "uz": "Soni",
+      "ru": "Количество",
+      "en": "Count"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.empty",
+      "uz": "Tanlangan davr uchun trend nuqtalari mavjud emas.",
+      "ru": "Нет точек графика за выбранный период.",
+      "en": "No trend points for the selected period."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.series",
+      "uz": "Trend qatorlari",
+      "ru": "Ряды графика",
+      "en": "Trend series"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.exactTitle",
+      "uz": "Trend: davrlar bo‘yicha aniq qiymatlar",
+      "ru": "График: точные значения по периодам",
+      "en": "Trend: exact values by period"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.exactDescription",
+      "uz": "Har bir davr uchun statuslarning aniq soni va summasi, yashirilgan qatorlar bilan birga.",
+      "ru": "Точное количество и сумма для каждого статуса за каждый период, включая скрытые ряды.",
+      "en": "Exact counts and amounts for every status and period, including hidden series."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.exactItem",
+      "uz": "{{label}}: Soni: {{countText}}, Summa: {{amount}}",
+      "ru": "{{label}}: количество: {{countText}}, сумма: {{amount}}",
+      "en": "{{label}}: Count: {{countText}}, Amount: {{amount}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.future",
+      "uz": "Hali kuzatilmagan",
+      "ru": "Ещё не наблюдалось",
+      "en": "Not yet observed"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.partial",
+      "uz": "Qisman davr",
+      "ru": "Неполный период",
+      "en": "Partial period"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.coverageTitle",
+      "uz": "{{title}} · {{coverage}}",
+      "ru": "{{title}} · {{coverage}}",
+      "en": "{{title}} · {{coverage}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.keyboard",
+      "uz": "Grafik davrlari: chap va o‘ng tugmalar bilan ko‘rish",
+      "ru": "Периоды графика: используйте стрелки влево и вправо",
+      "en": "Chart periods: use the left and right arrow keys"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.settings",
+      "uz": "Grafik qatorlarini sozlash",
+      "ru": "Настроить ряды графика",
+      "en": "Configure chart series"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.settingsTitle",
+      "uz": "Grafik qatorlari",
+      "ru": "Ряды графика",
+      "en": "Chart series"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.settingsHelp",
+      "uz": "Kamida bitta qator tanlangan bo‘lishi kerak.",
+      "ru": "Должен быть выбран хотя бы один ряд.",
+      "en": "At least one series must remain selected."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "trend.failed",
+      "uz": "Grafikni yuklab bo‘lmadi.",
+      "ru": "Не удалось загрузить график.",
+      "en": "Unable to load the chart."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.week",
+      "uz": "{{date}} haftasi",
+      "ru": "Неделя с {{date}}",
+      "en": "Week of {{date}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.hourSame",
+      "uz": "{{date}} · {{start}} ≤ vaqt < {{end}}",
+      "ru": "{{date}} · {{start}} ≤ время < {{end}}",
+      "en": "{{date}} · {{start}} ≤ time < {{end}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.hourAcross",
+      "uz": "{{startDate}} {{start}} ≤ vaqt < {{endDate}} {{end}}",
+      "ru": "{{startDate}} {{start}} ≤ время < {{endDate}} {{end}}",
+      "en": "{{startDate}} {{start}} ≤ time < {{endDate}} {{end}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.interval",
+      "uz": "{{start}} ≤ vaqt < {{end}}",
+      "ru": "{{start}} ≤ время < {{end}}",
+      "en": "{{start}} ≤ time < {{end}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.graphPeriod",
+      "uz": "Grafik davri: {{from}} → {{to}}",
+      "ru": "Период графика: {{from}} → {{to}}",
+      "en": "Chart period: {{from}} → {{to}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.choose",
+      "uz": "Sana oralig‘ini tanlash",
+      "ru": "Выбрать диапазон дат",
+      "en": "Choose a date range"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.previous",
+      "uz": "Oldingi oy",
+      "ru": "Предыдущий месяц",
+      "en": "Previous month"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.next",
+      "uz": "Keyingi oy",
+      "ru": "Следующий месяц",
+      "en": "Next month"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "dates.reset",
+      "uz": "Standart 7 kunlik oraliq",
+      "ru": "Стандартный период: 7 дней",
+      "en": "Default 7-day range"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.label",
+      "uz": "Grafik guruhlash",
+      "ru": "Группировка графика",
+      "en": "Chart grouping"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.HOUR",
+      "uz": "Soat",
+      "ru": "Час",
+      "en": "Hour"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.DAY",
+      "uz": "Kun",
+      "ru": "День",
+      "en": "Day"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.WEEK",
+      "uz": "Hafta",
+      "ru": "Неделя",
+      "en": "Week"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.MONTH",
+      "uz": "Oy",
+      "ru": "Месяц",
+      "en": "Month"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.YEAR",
+      "uz": "Yil",
+      "ru": "Год",
+      "en": "Year"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.AUTO",
+      "uz": "Avtomatik",
+      "ru": "Автоматически",
+      "en": "Automatic"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.groupHOUR",
+      "uz": "Soatlik",
+      "ru": "По часам",
+      "en": "Hourly"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.groupDAY",
+      "uz": "Kunlik",
+      "ru": "По дням",
+      "en": "Daily"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.groupWEEK",
+      "uz": "Haftalik",
+      "ru": "По неделям",
+      "en": "Weekly"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.groupMONTH",
+      "uz": "Oylik",
+      "ru": "По месяцам",
+      "en": "Monthly"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "granularity.groupYEAR",
+      "uz": "Yillik",
+      "ru": "По годам",
+      "en": "Yearly"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.title",
+      "uz": "Statuslar taqsimoti",
+      "ru": "Распределение статусов",
+      "en": "Status distribution"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.unavailable",
+      "uz": "Status taqsimoti mavjud emas",
+      "ru": "Распределение статусов недоступно",
+      "en": "Status distribution unavailable"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.total",
+      "uz": "Jami tranzaksiyalar: {{countText}}",
+      "ru": "Всего транзакций: {{countText}}",
+      "en": "Total transactions: {{countText}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.shareItem",
+      "uz": "{{label}}: {{percent}}",
+      "ru": "{{label}}: {{percent}}",
+      "en": "{{label}}: {{percent}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.details",
+      "uz": "Summalar va muvaffaqiyat ulushi",
+      "ru": "Суммы и доля успешных транзакций",
+      "en": "Amounts and success share"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.successShare",
+      "uz": "Muvaffaqiyat ulushi",
+      "ru": "Доля успешных транзакций",
+      "en": "Success share"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.empty",
+      "uz": "Tanlangan davrda tranzaksiyalar mavjud emas.",
+      "ru": "Нет транзакций за выбранный период.",
+      "en": "No transactions in the selected period."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.relative",
+      "uz": "Jami tranzaksiyalar soniga nisbatan",
+      "ru": "От общего количества транзакций",
+      "en": "Relative to the total transaction count"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.countMismatch",
+      "uz": "Ayrim holatlar ushbu taqsimotga kirmagan; foizlar ko‘rsatilmaydi.",
+      "ru": "Некоторые статусы не вошли в распределение; проценты не отображаются.",
+      "en": "Some statuses are outside this distribution; percentages are withheld."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "donut.amountMismatch",
+      "uz": "Kategoriyalar summasi jami summaga teng emas.",
+      "ru": "Сумма по категориям не совпадает с общей суммой.",
+      "en": "Category amounts do not match the total amount."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.dates",
+      "uz": "Dashboard sana filtri",
+      "ru": "Фильтр дат на панели",
+      "en": "Dashboard date filter"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.presets",
+      "uz": "Davr presetlari",
+      "ru": "Быстрый выбор периода",
+      "en": "Date presets"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.invalid",
+      "uz": "Sana oralig‘ini to‘g‘ri kiriting.",
+      "ru": "Укажите корректный диапазон дат.",
+      "en": "Enter a valid date range."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.allTerminals",
+      "uz": "Barcha terminallar",
+      "ru": "Все терминалы",
+      "en": "All terminals"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.noTerminal",
+      "uz": "Terminal mavjud emas",
+      "ru": "Нет терминалов",
+      "en": "No terminals available"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.terminalError",
+      "uz": "Terminallarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить терминалы",
+      "en": "Unable to load terminals"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.terminalUnavailable",
+      "uz": "Terminal filtri mavjud emas",
+      "ru": "Фильтр терминалов недоступен",
+      "en": "Terminal filter unavailable"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.preset_other",
+      "uz": "{{count}} kun",
+      "ru": "{{count}} дня",
+      "en": "{{count}} days"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.preset_one",
+      "uz": "{{count}} kun",
+      "ru": "{{count}} день",
+      "en": "{{count}} day"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.title",
+      "uz": "So‘nggi dinamik QRlar",
+      "ru": "Последние динамические QR",
+      "en": "Recent dynamic QR codes"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.description",
+      "uz": "Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.",
+      "ru": "Последние 10 динамических QR по выбранным фильтрам.",
+      "en": "The latest 10 dynamic QR codes matching the selected filters."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.viewAll",
+      "uz": "Barchasini ko‘rish",
+      "ru": "Показать все",
+      "en": "View all"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.loading",
+      "uz": "So‘nggi dinamik QRlar yuklanmoqda…",
+      "ru": "Загрузка последних динамических QR…",
+      "en": "Loading recent dynamic QR codes…"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.refreshing",
+      "uz": "So‘nggi dinamik QRlar yangilanmoqda…",
+      "ru": "Обновление последних динамических QR…",
+      "en": "Refreshing recent dynamic QR codes…"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.stale",
+      "uz": "So‘nggi dinamik QRlar yangilanmadi. Avval yuklangan ma’lumotlar ko‘rsatilmoqda.",
+      "ru": "Не удалось обновить последние динамические QR. Показаны ранее загруженные данные.",
+      "en": "Recent dynamic QR codes could not be refreshed. Previously loaded data is shown."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.error",
+      "uz": "So‘nggi dinamik QRlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить последние динамические QR",
+      "en": "Unable to load recent dynamic QR codes"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.empty",
+      "uz": "Tanlangan davrda dinamik QR topilmadi.",
+      "ru": "Нет динамических QR за выбранный период.",
+      "en": "No dynamic QR codes in the selected period."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.amount",
+      "uz": "Summa",
+      "ru": "Сумма",
+      "en": "Amount"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.qrId",
+      "uz": "QR ID",
+      "ru": "QR ID",
+      "en": "QR ID"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.createdAt",
+      "uz": "Vaqt",
+      "ru": "Время",
+      "en": "Time"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.status",
+      "uz": "Status",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.viewQr",
+      "uz": "QRni ko‘rish",
+      "ru": "Показать QR",
+      "en": "View QR"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "recentQr.viewDetails",
+      "uz": "Tafsilotlar",
+      "ru": "Подробности",
+      "en": "Details"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.new",
+      "uz": "Yangi",
+      "ru": "Новый",
+      "en": "New"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.expired",
+      "uz": "Muddati o‘tgan",
+      "ru": "Истёк срок действия",
+      "en": "Expired"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.processing",
+      "uz": "Jarayonda",
+      "ru": "В обработке",
+      "en": "Processing"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.cancelled",
+      "uz": "Bekor qilingan",
+      "ru": "Отменён",
+      "en": "Cancelled"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.rejected",
+      "uz": "Rad etilgan",
+      "ru": "Отклонён",
+      "en": "Rejected"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.success",
+      "uz": "Muvaffaqiyatli",
+      "ru": "Успешный",
+      "en": "Successful"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "qrStatus.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестный",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.loading",
+      "uz": "Dashboard yuklanmoqda",
+      "ru": "Загрузка панели",
+      "en": "Loading dashboard"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.integrationTitle",
+      "uz": "Dashboard integratsiyasi sozlanmagan",
+      "ru": "Интеграция панели не настроена",
+      "en": "Dashboard integration is not configured"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.integrationDescription",
+      "uz": "Dashboard ma’lumotlari hozir mavjud emas.",
+      "ru": "Данные панели сейчас недоступны.",
+      "en": "Dashboard data is currently unavailable."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.noAccess",
+      "uz": "Dashboard ma’lumotlarini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр данных панели.",
+      "en": "Permission to view dashboard data is unavailable."
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.stale",
+      "uz": "Yangilanmadi",
+      "ru": "Не удалось обновить",
+      "en": "Refresh failed"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "states.updatedAt",
+      "uz": "Oxirgi yangilanish: {{time}}",
+      "ru": "Последнее обновление: {{time}}",
+      "en": "Last updated: {{time}}"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.preset_few",
+      "ru": "{{count}} дня",
+      "context": "Russian-specific plural category; logical parity validated separately"
+    },
+    {
+      "namespace": "dashboard",
+      "key": "filters.preset_many",
+      "ru": "{{count}} дней",
+      "context": "Russian-specific plural category; logical parity validated separately"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.name",
+      "uz": "Dinamik QR",
+      "ru": "Динамические QR",
+      "en": "Dynamic QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.loading",
+      "uz": "Dinamik QR ro‘yxati yuklanmoqda",
+      "ru": "Загрузка динамических QR",
+      "en": "Loading dynamic QR codes"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.list",
+      "uz": "Dinamik QR ro‘yxati",
+      "ru": "Список динамических QR",
+      "en": "Dynamic QR list"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.pages",
+      "uz": "Dinamik QR sahifalari",
+      "ru": "Страницы динамических QR",
+      "en": "Dynamic QR pages"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.integration",
+      "uz": "Dinamik QR integratsiyasi sozlanmagan",
+      "ru": "Интеграция динамических QR не настроена",
+      "en": "Dynamic QR integration is not configured"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.noAccess",
+      "uz": "Dinamik QR ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр динамических QR.",
+      "en": "Permission to view dynamic QR codes is unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.emptyHigh",
+      "uz": "Bu sahifada ma’lumot qolmadi",
+      "ru": "На этой странице больше нет данных",
+      "en": "No data remains on this page"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.firstHelp",
+      "uz": "Natijalar o‘zgargan bo‘lishi mumkin. Birinchi sahifaga qayting.",
+      "ru": "Результаты могли измениться. Вернитесь на первую страницу.",
+      "en": "Results may have changed. Return to the first page."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.first",
+      "uz": "Birinchi sahifaga qaytish",
+      "ru": "Вернуться на первую страницу",
+      "en": "Return to first page"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.empty",
+      "uz": "Qo‘llangan filtrlar bo‘yicha ma’lumot topilmadi.",
+      "ru": "По выбранным фильтрам данные не найдены.",
+      "en": "No data matches the applied filters."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.stale",
+      "uz": "Yangilanmadi",
+      "ru": "Не удалось обновить",
+      "en": "Refresh failed"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "page.total",
+      "uz": "Jami {{countText}} ta QR",
+      "ru": "Всего QR: {{countText}}",
+      "en": "Total QR codes: {{countText}}"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "stats.total",
+      "uz": "Jami summa",
+      "ru": "Общая сумма",
+      "en": "Total amount"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "stats.fee",
+      "uz": "Xizmat haqi",
+      "ru": "Комиссия",
+      "en": "Service fee"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "stats.unavailable",
+      "uz": "Statistika hozircha mavjud emas",
+      "ru": "Статистика пока недоступна",
+      "en": "Statistics are currently unavailable"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "stats.failed",
+      "uz": "Jami summa va xizmat haqini yuklab bo‘lmadi.",
+      "ru": "Не удалось загрузить общую сумму и комиссию.",
+      "en": "Unable to load the total amount and service fee."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.invalid",
+      "uz": "Tanlangan filtrlarni tasdiqlab bo‘lmadi.",
+      "ru": "Не удалось подтвердить выбранные фильтры.",
+      "en": "Unable to verify the selected filters."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.checking",
+      "uz": "Tanlangan filtrlar tekshirilmoqda.",
+      "ru": "Проверка выбранных фильтров.",
+      "en": "Checking selected filters."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.unavailable",
+      "uz": "Tanlangan filtr endi mavjud emas",
+      "ru": "Выбранный фильтр больше недоступен",
+      "en": "The selected filter is no longer available"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.noExpansion",
+      "uz": "Xavfsizlik sababli so‘rov barcha terminallarga avtomatik kengaytirilmadi.",
+      "ru": "Из соображений безопасности запрос не был автоматически расширен на все терминалы.",
+      "en": "For safety, the request was not automatically expanded to all terminals."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.clear",
+      "uz": "Filtrni tozalash",
+      "ru": "Очистить фильтр",
+      "en": "Clear filter"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.checkOrClear",
+      "uz": "Tanlangan filtrni tekshiring yoki tozalang.",
+      "ru": "Проверьте или очистите выбранный фильтр.",
+      "en": "Check or clear the selected filter."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.search",
+      "uz": "Terminal nomi bo‘yicha qidirish",
+      "ru": "Поиск по названию терминала",
+      "en": "Search by terminal name"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.searchShort",
+      "uz": "Terminal nomi bo‘yicha",
+      "ru": "Название терминала",
+      "en": "Terminal name"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.clearSearch",
+      "uz": "Qidiruvni tozalash",
+      "ru": "Очистить поиск",
+      "en": "Clear search"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.applySearch",
+      "uz": "Qidiruvni qo‘llash",
+      "ru": "Применить поиск",
+      "en": "Apply search"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет доступных мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.allBanks",
+      "uz": "Barcha bank hisoblari",
+      "ru": "Все банковские счета",
+      "en": "All bank accounts"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.noBanks",
+      "uz": "Bank hisobi mavjud emas",
+      "ru": "Нет доступных банковских счетов",
+      "en": "No bank accounts available"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.noMerchantBanks",
+      "uz": "Bu merchant uchun bank hisobi mavjud emas",
+      "ru": "У этого мерчанта нет доступных банковских счетов",
+      "en": "No bank accounts available for this merchant"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.banksFailed",
+      "uz": "Bank hisoblarini yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить банковские счета",
+      "en": "Unable to load bank accounts"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.allTerminals",
+      "uz": "Barcha terminallar",
+      "ru": "Все терминалы",
+      "en": "All terminals"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.clearSelection",
+      "uz": "Tanlovni tozalang",
+      "ru": "Очистите выбор",
+      "en": "Clear the selection"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.distribution",
+      "uz": "Tarqatish holati",
+      "ru": "Статус распространения",
+      "en": "Distribution status"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "filters.all",
+      "uz": "Barchasi",
+      "ru": "Все",
+      "en": "All"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.new",
+      "uz": "Yangi",
+      "ru": "Новый",
+      "en": "New"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.processing",
+      "uz": "Jarayonda",
+      "ru": "В процессе",
+      "en": "Processing"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.success",
+      "uz": "Muvaffaqiyatli",
+      "ru": "Успешный",
+      "en": "Successful"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.expired",
+      "uz": "Muddati o‘tgan",
+      "ru": "Истёк срок",
+      "en": "Expired"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.cancelled",
+      "uz": "Bekor qilingan",
+      "ru": "Отменён",
+      "en": "Cancelled"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.rejected",
+      "uz": "Rad etilgan",
+      "ru": "Отклонён",
+      "en": "Rejected"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "status.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестный",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "distribution.created",
+      "uz": "Yaratildi",
+      "ru": "Создан",
+      "en": "Created"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "distribution.expired",
+      "uz": "Eskirdi",
+      "ru": "Устарел",
+      "en": "Expired"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "distribution.rejected",
+      "uz": "Rad etildi",
+      "ru": "Отклонён",
+      "en": "Rejected"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.bank",
+      "uz": "Bank hisobi",
+      "ru": "Банковский счёт",
+      "en": "Bank account"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.createdAt",
+      "uz": "Yaratilgan vaqt",
+      "ru": "Время создания",
+      "en": "Created at"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.updatedAt",
+      "uz": "Yangilangan vaqt",
+      "ru": "Время обновления",
+      "en": "Updated at"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.amount",
+      "uz": "Summa",
+      "ru": "Сумма",
+      "en": "Amount"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.status",
+      "uz": "Status",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.state",
+      "uz": "Holat",
+      "ru": "Состояние",
+      "en": "Status"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.qrId",
+      "uz": "QR ID",
+      "ru": "QR ID",
+      "en": "QR ID"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.rrn",
+      "uz": "RRN",
+      "ru": "RRN",
+      "en": "RRN"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "table.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "actions.new",
+      "uz": "Yangi QR",
+      "ru": "Новый QR",
+      "en": "New QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "actions.viewQr",
+      "uz": "QR ko‘rish",
+      "ru": "Показать QR",
+      "en": "View QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "actions.details",
+      "uz": "Qo‘shimcha ma’lumotlar",
+      "ru": "Подробности",
+      "en": "Details"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.title",
+      "uz": "Dinamik QR yaratish",
+      "ru": "Создать динамический QR",
+      "en": "Create dynamic QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.description",
+      "uz": "Summa UZSda kiritiladi.",
+      "ru": "Сумма вводится в UZS.",
+      "en": "Enter the amount in UZS."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.dialogHelp",
+      "uz": "Terminalni tanlang va summani UZSda kiriting.",
+      "ru": "Выберите терминал и введите сумму в UZS.",
+      "en": "Select a terminal and enter the amount in UZS."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.resultHelp",
+      "uz": "Natija tafsilotlarini ko‘rib chiqing va keyingi amalni tanlang.",
+      "ru": "Просмотрите результат и выберите следующее действие.",
+      "en": "Review the result and choose the next action."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.chooseTerminal",
+      "uz": "Terminalni tanlang",
+      "ru": "Выберите терминал",
+      "en": "Select a terminal"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalNoAccess",
+      "uz": "Terminal ro‘yxatiga ruxsat mavjud emas.",
+      "ru": "Нет разрешения на просмотр терминалов.",
+      "en": "Permission to view terminals is unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalsUnavailable",
+      "uz": "Terminal ro‘yxati hozir mavjud emas.",
+      "ru": "Список терминалов сейчас недоступен.",
+      "en": "The terminal list is currently unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalsLoading",
+      "uz": "Terminallar yuklanmoqda…",
+      "ru": "Загрузка терминалов…",
+      "en": "Loading terminals…"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalsFailed",
+      "uz": "Terminal ro‘yxatini yuklab bo‘lmadi.",
+      "ru": "Не удалось загрузить список терминалов.",
+      "en": "Unable to load the terminal list."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalsEmpty",
+      "uz": "Biriktirilgan faol terminal topilmadi.",
+      "ru": "Назначенных активных терминалов не найдено.",
+      "en": "No assigned active terminal found."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.terminalRemoved",
+      "uz": "Tanlangan terminal endi mavjud emas. Qayta tanlang.",
+      "ru": "Выбранный терминал больше недоступен. Выберите другой.",
+      "en": "The selected terminal is no longer available. Select again."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.boundsUnavailable",
+      "uz": "Bu terminal uchun summa oralig‘i mavjud emas.",
+      "ru": "Для этого терминала недоступны ограничения суммы.",
+      "en": "Amount limits are unavailable for this terminal."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.amount",
+      "uz": "Summa, UZS",
+      "ru": "Сумма, UZS",
+      "en": "Amount, UZS"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.example",
+      "uz": "Masalan: 12 500.50 yoki 12 500,50",
+      "ru": "Например: 12 500.50 или 12 500,50",
+      "en": "For example: 12 500.50 or 12 500,50"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.currencyNoAccess",
+      "uz": "Valyuta ro‘yxatiga ruxsat mavjud emas.",
+      "ru": "Нет разрешения на просмотр валют.",
+      "en": "Permission to view currencies is unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.currenciesUnavailable",
+      "uz": "Valyuta ro‘yxati hozir mavjud emas.",
+      "ru": "Список валют сейчас недоступен.",
+      "en": "The currency list is currently unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.currenciesLoading",
+      "uz": "Valyutalar yuklanmoqda…",
+      "ru": "Загрузка валют…",
+      "en": "Loading currencies…"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.currenciesFailed",
+      "uz": "Valyuta ro‘yxatini yuklab bo‘lmadi.",
+      "ru": "Не удалось загрузить список валют.",
+      "en": "Unable to load the currency list."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.noUzs",
+      "uz": "UZS valyutasi mavjud emas.",
+      "ru": "Валюта UZS недоступна.",
+      "en": "UZS currency is unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.submit",
+      "uz": "QR yaratish",
+      "ru": "Создать QR",
+      "en": "Create QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.pending",
+      "uz": "Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.",
+      "ru": "Запрос отправляется. Закрытие страницы не отменяет операцию на сервере.",
+      "en": "Sending. Closing the page does not cancel the operation on the server."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.closed",
+      "uz": "Natija yopildi. Bu amal QRni bekor qilmaydi.",
+      "ru": "Результат закрыт. Это действие не отменяет QR.",
+      "en": "Result closed. This action does not cancel the QR."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.newRisk",
+      "uz": "Yangi urinish alohida QR yaratishi mumkin.",
+      "ru": "Новая попытка может создать отдельный QR.",
+      "en": "A new attempt may create a separate QR."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.linkUnavailable",
+      "uz": "QR yaratildi, lekin havolani xavfsiz ko‘rsatib bo‘lmadi.",
+      "ru": "QR создан, но ссылку нельзя безопасно отобразить.",
+      "en": "QR created, but its link cannot be displayed safely."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.unknown",
+      "uz": "Natija tasdiqlanmadi",
+      "ru": "Результат не подтверждён",
+      "en": "Result not confirmed"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.checkFirst",
+      "uz": "Qayta yuborishdan oldin holatni tekshiring.",
+      "ru": "Проверьте состояние перед повторной отправкой.",
+      "en": "Check the status before sending again."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.failed",
+      "uz": "QR yaratilmadi",
+      "ru": "QR не создан",
+      "en": "QR not created"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "create.bounds",
+      "uz": "Ruxsat etilgan summa: {{minimum}} – {{maximum}}",
+      "ru": "Допустимая сумма: {{minimum}} – {{maximum}}",
+      "en": "Permitted amount: {{minimum}} – {{maximum}}"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "validation.amount",
+      "uz": "Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting.",
+      "ru": "Введите сумму в указанном формате и допустимом диапазоне.",
+      "en": "Enter the amount in the specified format and permitted range."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.title",
+      "uz": "QR ni bekor qilish",
+      "ru": "Отменить QR",
+      "en": "Cancel QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.warning",
+      "uz": "Bekor qilish to‘lov mavjudligiga ta’sir qilishi mumkin.",
+      "ru": "Отмена может повлиять на возможность оплаты.",
+      "en": "Cancellation may affect payment availability."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.confirm",
+      "uz": "Tasdiqlash",
+      "ru": "Подтвердить",
+      "en": "Confirm"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.confirmed",
+      "uz": "Bekor qilish so‘rovi tasdiqlandi. Ro‘yxatdagi status yangilanishini tekshiring.",
+      "ru": "Запрос на отмену подтверждён. Проверьте обновление статуса в списке.",
+      "en": "Cancellation request confirmed. Check the updated status in the list."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.refreshFailed",
+      "uz": "Ro‘yxatni yangilab bo‘lmadi; tasdiqlangan amal holati saqlanadi.",
+      "ru": "Не удалось обновить список; подтверждённый результат операции сохранён.",
+      "en": "Unable to refresh the list; the confirmed operation result is retained."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.unknown",
+      "uz": "So‘rov serverga yetgan bo‘lishi mumkin. Bekor qilish holati noma’lum.",
+      "ru": "Запрос мог достичь сервера. Результат отмены неизвестен.",
+      "en": "The request may have reached the server. Cancellation outcome is unknown."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.checkFirst",
+      "uz": "Qayta yuborishdan oldin ro‘yxatni yangilab holatni tekshiring.",
+      "ru": "Обновите список и проверьте статус перед повторной отправкой.",
+      "en": "Refresh the list and check the status before sending again."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.noRetry",
+      "uz": "Takroriy so‘rov xavfsizligi tasdiqlanmagan.",
+      "ru": "Безопасность повторного запроса не подтверждена.",
+      "en": "The safety of a repeated request has not been confirmed."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.rejected",
+      "uz": "Bekor qilish so‘rovi rad etildi.",
+      "ru": "Запрос на отмену отклонён.",
+      "en": "Cancellation request rejected."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.notSent",
+      "uz": "So‘rov yuborilmadi. Sessiya, ruxsat va QR holatini tekshiring.",
+      "ru": "Запрос не отправлен. Проверьте сессию, разрешения и статус QR.",
+      "en": "Request not sent. Check the session, permissions and QR status."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.id",
+      "uz": "QR ID: {{id}}",
+      "ru": "QR ID: {{id}}",
+      "en": "QR ID: {{id}}"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "cancel.notSentDetail",
+      "uz": "So‘rov yuborilmadi. {{reason}}",
+      "ru": "Запрос не отправлен. {{reason}}",
+      "en": "Request not sent. {{reason}}"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.title",
+      "uz": "Dinamik QR tafsilotlari",
+      "ru": "Подробности динамического QR",
+      "en": "Dynamic QR details"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.main",
+      "uz": "Asosiy ma’lumotlar",
+      "ru": "Основные сведения",
+      "en": "Main information"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.terminalName",
+      "uz": "Terminal nomi",
+      "ru": "Название терминала",
+      "en": "Terminal name"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.terminalId",
+      "uz": "Terminal ID",
+      "ru": "ID терминала",
+      "en": "Terminal ID"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.terminalType",
+      "uz": "Terminal turi",
+      "ru": "Тип терминала",
+      "en": "Terminal type"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.merchantId",
+      "uz": "Merchant ID",
+      "ru": "ID мерчанта",
+      "en": "Merchant ID"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.bankId",
+      "uz": "Bank hisobi ID",
+      "ru": "ID банковского счёта",
+      "en": "Bank account ID"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.payment",
+      "uz": "To‘lov / valyuta ma’lumotlari",
+      "ru": "Сведения об оплате / валюте",
+      "en": "Payment / currency information"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.baseAmount",
+      "uz": "Asosiy summa",
+      "ru": "Основная сумма",
+      "en": "Base amount"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.currencyAmount",
+      "uz": "Valyutadagi summa",
+      "ru": "Сумма в валюте",
+      "en": "Currency amount"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.currency",
+      "uz": "Valyuta",
+      "ru": "Валюта",
+      "en": "Currency"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.rate",
+      "uz": "Kurs",
+      "ru": "Курс",
+      "en": "Exchange rate"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.technical",
+      "uz": "Texnik holat",
+      "ru": "Технический статус",
+      "en": "Technical status"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.statusCode",
+      "uz": "Holat kodi",
+      "ru": "Код статуса",
+      "en": "Status code"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.distributionCode",
+      "uz": "Tarqatish holati",
+      "ru": "Статус распространения",
+      "en": "Distribution status"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.linkSection",
+      "uz": "QR / havola",
+      "ru": "QR / ссылка",
+      "en": "QR / link"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "details.noLink",
+      "uz": "Havola mavjud emas",
+      "ru": "Ссылка недоступна",
+      "en": "Link unavailable"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.title",
+      "uz": "QR ko‘rsatish",
+      "ru": "Показать QR",
+      "en": "Show QR"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.description",
+      "uz": "To‘lov uchun QR ma’lumotlari",
+      "ru": "Сведения QR для оплаты",
+      "en": "QR information for payment"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.metadata",
+      "uz": "QR ma’lumotlari",
+      "ru": "Сведения QR",
+      "en": "QR information"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.canonical",
+      "uz": "Kanonik havola",
+      "ru": "Каноническая ссылка",
+      "en": "Canonical link"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.link",
+      "uz": "Havola",
+      "ru": "Ссылка",
+      "en": "Link"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.noLink",
+      "uz": "Bu QR uchun xavfsiz kanonik havola mavjud emas.",
+      "ru": "Для этого QR нет безопасной канонической ссылки.",
+      "en": "No safe canonical link is available for this QR."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.qrTitle",
+      "uz": "To‘lov havolasi QR kodi",
+      "ru": "QR-код платёжной ссылки",
+      "en": "Payment link QR code"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.poster",
+      "uz": "QRHUB to‘lov plakati",
+      "ru": "Платёжный плакат QRHUB",
+      "en": "QRHUB payment poster"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "display.posterAlt",
+      "uz": "QRHUB — to‘lov havolasi QR kodi",
+      "ru": "QRHUB — QR-код платёжной ссылки",
+      "en": "QRHUB — payment link QR code"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "download.posterFailed",
+      "uz": "QR plakatini tayyorlab bo‘lmadi. Oynani qayta ochib ko‘ring.",
+      "ru": "Не удалось подготовить QR-плакат. Попробуйте открыть окно заново.",
+      "en": "Unable to prepare the QR poster. Try reopening the window."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "download.posterLoading",
+      "uz": "QR plakati tayyorlanmoqda…",
+      "ru": "Подготовка QR-плаката…",
+      "en": "Preparing QR poster…"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "download.pdf",
+      "uz": "PDF yuklab olish",
+      "ru": "Скачать PDF",
+      "en": "Download PDF"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "download.png",
+      "uz": "PNG yuklab olish",
+      "ru": "Скачать PNG",
+      "en": "Download PNG"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "download.failed",
+      "uz": "QR plakatini yuklab bo‘lmadi. Qayta urinib ko‘ring.",
+      "ru": "Не удалось скачать QR-плакат. Попробуйте снова.",
+      "en": "Unable to download the QR poster. Try again."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.title",
+      "uz": "Dinamik QR XLSX eksporti",
+      "ru": "Экспорт динамических QR в XLSX",
+      "en": "Dynamic QR XLSX export"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.unavailable",
+      "uz": "Export integratsiyasi sozlanmagan.",
+      "ru": "Интеграция экспорта не настроена.",
+      "en": "Export integration is not configured."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.success",
+      "uz": "XLSX yuklab olish brauzerga topshirildi.",
+      "ru": "Скачивание XLSX передано браузеру.",
+      "en": "XLSX download handed off to the browser."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.failed",
+      "uz": "XLSX yuklab bo‘lmadi. Filtrlarni tekshirib, qayta urinib ko‘ring.",
+      "ru": "Не удалось скачать XLSX. Проверьте фильтры и попробуйте снова.",
+      "en": "Unable to download XLSX. Check the filters and try again."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.stop",
+      "uz": "Kutishni to‘xtatish",
+      "ru": "Прекратить ожидание",
+      "en": "Stop waiting"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.pending",
+      "uz": "XLSX tayyorlanmoqda.",
+      "ru": "Подготовка XLSX.",
+      "en": "Preparing XLSX."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "export.label",
+      "uz": "XLSX yuklab olish",
+      "ru": "Скачать XLSX",
+      "en": "Download XLSX"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.idCopied",
+      "uz": "QR ID nusxalandi.",
+      "ru": "QR ID скопирован.",
+      "en": "QR ID copied."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.idFailed",
+      "uz": "QR ID nusxalanmadi.",
+      "ru": "Не удалось скопировать QR ID.",
+      "en": "Unable to copy QR ID."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.copyId",
+      "uz": "QR ID nusxalash",
+      "ru": "Скопировать QR ID",
+      "en": "Copy QR ID"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.linkCopied",
+      "uz": "Havola nusxalandi.",
+      "ru": "Ссылка скопирована.",
+      "en": "Link copied."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.linkFailed",
+      "uz": "Havolani nusxalab bo‘lmadi.",
+      "ru": "Не удалось скопировать ссылку.",
+      "en": "Unable to copy link."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.createNotSent",
+      "uz": "QR yaratish so‘rovi yuborilmadi. Terminal, summa, valyuta va ruxsatni tekshiring.",
+      "ru": "Запрос на создание QR не отправлен. Проверьте терминал, сумму, валюту и разрешения.",
+      "en": "Create QR request not sent. Check the terminal, amount, currency and permissions."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.createRejected",
+      "uz": "QR yaratish so‘rovi rad etildi.",
+      "ru": "Запрос на создание QR отклонён.",
+      "en": "Create QR request rejected."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.alreadySent",
+      "uz": "Bu amal allaqachon yuborilgan. Holatni tekshiring va faqat alohida yangi amalni tanlang.",
+      "ru": "Эта операция уже отправлена. Проверьте статус; новая операция должна быть отдельным выбором.",
+      "en": "This operation has already been sent. Check its status; a new operation requires a separate choice."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.permission",
+      "uz": "Ruxsat mavjud emas.",
+      "ru": "Разрешение отсутствует.",
+      "en": "Permission is unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.selection",
+      "uz": "Terminal, summa yoki valyuta tanlovini tekshiring.",
+      "ru": "Проверьте терминал, сумму или валюту.",
+      "en": "Check the terminal, amount or currency selection."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "feedback.unavailable",
+      "uz": "Amal hozir mavjud emas.",
+      "ru": "Операция сейчас недоступна.",
+      "en": "The operation is currently unavailable."
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "dates.choose",
+      "uz": "Sana oralig‘ini tanlash",
+      "ru": "Выбрать диапазон дат",
+      "en": "Choose a date range"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "dates.previous",
+      "uz": "Oldingi oy",
+      "ru": "Предыдущий месяц",
+      "en": "Previous month"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "dates.next",
+      "uz": "Keyingi oy",
+      "ru": "Следующий месяц",
+      "en": "Next month"
+    },
+    {
+      "namespace": "dynamicQr",
+      "key": "dates.reset",
+      "uz": "Bugungi kun",
+      "ru": "Сегодня",
+      "en": "Today"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "page.name",
+      "uz": "Statik QR",
+      "ru": "Статический QR",
+      "en": "Static QR"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "page.noAccess",
+      "uz": "Statik QR ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр статических QR.",
+      "en": "Permission to view static QR codes is unavailable."
+    },
+    {
+      "namespace": "staticQr",
+      "key": "page.authUnavailable",
+      "uz": "Statik QR autentifikatsiyasi sozlanmagan",
+      "ru": "Аутентификация статических QR не настроена",
+      "en": "Static QR authentication is not configured"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "page.unavailable",
+      "uz": "Statik QR integratsiyasi sozlanmagan",
+      "ru": "Интеграция статических QR не настроена",
+      "en": "Static QR integration is not configured"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.invalid",
+      "uz": "Tanlangan merchant, terminal, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+      "ru": "Выбранный мерчант, терминал, область или район не подтверждён. Обновите или очистите фильтр.",
+      "en": "The selected merchant, terminal, region or district is unconfirmed. Update or clear the filter."
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.unconfirmed",
+      "uz": "Qo‘llangan filtr tasdiqlanmadi",
+      "ru": "Применённый фильтр не подтверждён",
+      "en": "Applied filter is unconfirmed"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.reselect",
+      "uz": "Filtrni tozalang yoki merchant, terminal, viloyat yoki tumanni qayta tanlab qo‘llang.",
+      "ru": "Очистите фильтр или повторно выберите мерчанта, терминал, область или район и примените его.",
+      "en": "Clear the filter or reselect and apply the merchant, terminal, region or district."
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.allTerminals",
+      "uz": "Barcha terminallar",
+      "ru": "Все терминалы",
+      "en": "All terminals"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.noMerchantTerminals",
+      "uz": "Bu merchant uchun terminal mavjud emas",
+      "ru": "У этого мерчанта нет терминалов",
+      "en": "No terminals available for this merchant"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.noTerminals",
+      "uz": "Terminal mavjud emas",
+      "ru": "Нет терминалов",
+      "en": "No terminals available"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.terminalsFailed",
+      "uz": "Terminallarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить терминалы",
+      "en": "Unable to load terminals"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.allRegions",
+      "uz": "Barcha viloyatlar",
+      "ru": "Все области",
+      "en": "All regions"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.noRegions",
+      "uz": "Viloyat mavjud emas",
+      "ru": "Нет областей",
+      "en": "No regions available"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.regionsFailed",
+      "uz": "Viloyatlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить области",
+      "en": "Unable to load regions"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.allDistricts",
+      "uz": "Barcha tumanlar",
+      "ru": "Все районы",
+      "en": "All districts"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.noDistricts",
+      "uz": "Bu viloyat uchun tuman mavjud emas",
+      "ru": "В этой области нет районов",
+      "en": "No districts available for this region"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.districtsFailed",
+      "uz": "Tumanlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить районы",
+      "en": "Unable to load districts"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "filters.chooseRegion",
+      "uz": "Avval viloyatni tanlang",
+      "ru": "Сначала выберите область",
+      "en": "Select a region first"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "search.label",
+      "uz": "QR ID bo‘yicha qidirish",
+      "ru": "Поиск по QR ID",
+      "en": "Search by QR ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "search.placeholder",
+      "uz": "QR ID bo‘yicha",
+      "ru": "По QR ID",
+      "en": "By QR ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "states.loading",
+      "uz": "Statik QRlar yuklanmoqda",
+      "ru": "Загрузка статических QR",
+      "en": "Loading static QR codes"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "states.failed",
+      "uz": "Statik QR ro‘yxatini ko‘rsatib bo‘lmadi",
+      "ru": "Не удалось показать список статических QR",
+      "en": "Unable to display static QR codes"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "states.empty",
+      "uz": "Statik QR topilmadi.",
+      "ru": "Статические QR не найдены.",
+      "en": "No static QR codes found."
+    },
+    {
+      "namespace": "staticQr",
+      "key": "table.label",
+      "uz": "Statik QR jadvali",
+      "ru": "Таблица статических QR",
+      "en": "Static QR table"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "table.pages",
+      "uz": "Statik QR sahifalari",
+      "ru": "Страницы статических QR",
+      "en": "Static QR pages"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "table.total",
+      "uz": "{{countText}} ta QR topildi",
+      "ru": "Найдено QR: {{countText}}",
+      "en": "QR codes found: {{countText}}"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "table.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.qrId",
+      "uz": "QR ID",
+      "ru": "QR ID",
+      "en": "QR ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.status",
+      "uz": "Holat",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.createdAt",
+      "uz": "Yaratilgan vaqt",
+      "ru": "Время создания",
+      "en": "Created at"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.updatedAt",
+      "uz": "Yangilangan vaqt",
+      "ru": "Время обновления",
+      "en": "Updated at"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.terminalName",
+      "uz": "Terminal nomi",
+      "ru": "Название терминала",
+      "en": "Terminal name"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.terminalId",
+      "uz": "Terminal ID",
+      "ru": "ID терминала",
+      "en": "Terminal ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.terminalType",
+      "uz": "Terminal turi",
+      "ru": "Тип терминала",
+      "en": "Terminal type"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.merchantId",
+      "uz": "Merchant ID",
+      "ru": "ID мерчанта",
+      "en": "Merchant ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.minimum",
+      "uz": "Minimum summa",
+      "ru": "Минимальная сумма",
+      "en": "Minimum amount"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.maximum",
+      "uz": "Maksimum summa",
+      "ru": "Максимальная сумма",
+      "en": "Maximum amount"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.region",
+      "uz": "Viloyat",
+      "ru": "Область",
+      "en": "Region"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.regionId",
+      "uz": "Viloyat ID",
+      "ru": "ID области",
+      "en": "Region ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.district",
+      "uz": "Tuman",
+      "ru": "Район",
+      "en": "District"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.districtId",
+      "uz": "Tuman ID",
+      "ru": "ID района",
+      "en": "District ID"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.link",
+      "uz": "QR havola",
+      "ru": "QR-ссылка",
+      "en": "QR link"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.redirect",
+      "uz": "Yo‘naltirish URL manzili",
+      "ru": "URL перенаправления",
+      "en": "Redirect URL"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "fields.statusCode",
+      "uz": "Holat kodi",
+      "ru": "Код статуса",
+      "en": "Status code"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.main",
+      "uz": "Asosiy ma’lumotlar",
+      "ru": "Основные сведения",
+      "en": "Main information"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.bounds",
+      "uz": "Summa chegaralari",
+      "ru": "Ограничения суммы",
+      "en": "Amount limits"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.region",
+      "uz": "Hudud",
+      "ru": "Местоположение",
+      "en": "Location"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.links",
+      "uz": "Linklar",
+      "ru": "Ссылки",
+      "en": "Links"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.technical",
+      "uz": "Texnik ma’lumotlar",
+      "ru": "Технические сведения",
+      "en": "Technical information"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "details.title",
+      "uz": "Statik QR tafsilotlari",
+      "ru": "Подробности статического QR",
+      "en": "Static QR details"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "actions.viewQr",
+      "uz": "QR ko‘rish",
+      "ru": "Показать QR",
+      "en": "View QR"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "actions.details",
+      "uz": "Qo‘shimcha ma’lumotlar",
+      "ru": "Подробности",
+      "en": "Details"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "display.noLink",
+      "uz": "Bu QR uchun xavfsiz kanonik havola mavjud emas.",
+      "ru": "Для этого QR нет безопасной канонической ссылки.",
+      "en": "No safe canonical link is available for this QR."
+    },
+    {
+      "namespace": "staticQr",
+      "key": "status.active",
+      "uz": "Faol",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    {
+      "namespace": "staticQr",
+      "key": "status.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестно",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "terminals",
+      "key": "status.active",
+      "uz": "Faol",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    {
+      "namespace": "terminals",
+      "key": "status.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестно",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "terminals",
+      "key": "table.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "terminals",
+      "key": "table.label",
+      "uz": "Terminal jadvali",
+      "ru": "Таблица терминалов",
+      "en": "Terminal table"
+    },
+    {
+      "namespace": "terminals",
+      "key": "table.pages",
+      "uz": "Terminal sahifalari",
+      "ru": "Страницы терминалов",
+      "en": "Terminal pages"
+    },
+    {
+      "namespace": "terminals",
+      "key": "table.total",
+      "uz": "Jami {{countText}} ta Terminal",
+      "ru": "Всего терминалов: {{countText}}",
+      "en": "Total terminals: {{countText}}"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.unconfirmed",
+      "uz": "Qo‘llangan filtr tasdiqlanmadi",
+      "ru": "Применённый фильтр не подтверждён",
+      "en": "Applied filter is unconfirmed"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.allRegions",
+      "uz": "Barcha viloyatlar",
+      "ru": "Все области",
+      "en": "All regions"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.noRegions",
+      "uz": "Viloyat mavjud emas",
+      "ru": "Нет областей",
+      "en": "No regions available"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.regionsFailed",
+      "uz": "Viloyatlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить области",
+      "en": "Unable to load regions"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.allDistricts",
+      "uz": "Barcha tumanlar",
+      "ru": "Все районы",
+      "en": "All districts"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.noDistricts",
+      "uz": "Bu viloyat uchun tuman mavjud emas",
+      "ru": "В этой области нет районов",
+      "en": "No districts available for this region"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.districtsFailed",
+      "uz": "Tumanlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить районы",
+      "en": "Unable to load districts"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.chooseRegion",
+      "uz": "Avval viloyatni tanlang",
+      "ru": "Сначала выберите область",
+      "en": "Select a region first"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.invalid",
+      "uz": "Tanlangan merchant, bank hisobi, viloyat yoki tuman tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+      "ru": "Выбранный мерчант, банковский счёт, область или район не подтверждён. Обновите или очистите фильтр.",
+      "en": "The selected merchant, bank account, region or district is unconfirmed. Update or clear the filter."
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.reselect",
+      "uz": "Merchant, bank hisobi, viloyat yoki tumanni qayta tanlab qo‘llang yoki filtrni tozalang.",
+      "ru": "Повторно выберите мерчанта, банковский счёт, область или район и примените фильтр либо очистите его.",
+      "en": "Reselect and apply the merchant, bank account, region or district, or clear the filter."
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.allBanks",
+      "uz": "Barcha bank hisoblari",
+      "ru": "Все банковские счета",
+      "en": "All bank accounts"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.noMerchantBanks",
+      "uz": "Bu merchant uchun bank hisobi mavjud emas",
+      "ru": "У этого мерчанта нет банковских счетов",
+      "en": "No bank accounts available for this merchant"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.noBanks",
+      "uz": "Bank hisobi mavjud emas",
+      "ru": "Нет банковских счетов",
+      "en": "No bank accounts available"
+    },
+    {
+      "namespace": "terminals",
+      "key": "filters.banksFailed",
+      "uz": "Bank hisoblarini yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить банковские счета",
+      "en": "Unable to load bank accounts"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.terminalId",
+      "uz": "Terminal ID",
+      "ru": "ID терминала",
+      "en": "Terminal ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.status",
+      "uz": "Holat",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.terminalType",
+      "uz": "Terminal turi",
+      "ru": "Тип терминала",
+      "en": "Terminal type"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.merchantId",
+      "uz": "Merchant ID",
+      "ru": "ID мерчанта",
+      "en": "Merchant ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.region",
+      "uz": "Viloyat",
+      "ru": "Область",
+      "en": "Region"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.regionId",
+      "uz": "Viloyat ID",
+      "ru": "ID области",
+      "en": "Region ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.district",
+      "uz": "Tuman",
+      "ru": "Район",
+      "en": "District"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.districtId",
+      "uz": "Tuman ID",
+      "ru": "ID района",
+      "en": "District ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.name",
+      "uz": "Nomi",
+      "ru": "Название",
+      "en": "Name"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.bank",
+      "uz": "Bank hisobi",
+      "ru": "Банковский счёт",
+      "en": "Bank account"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.bankId",
+      "uz": "Bank hisobi ID",
+      "ru": "ID банковского счёта",
+      "en": "Bank account ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.mcc",
+      "uz": "MCC",
+      "ru": "MCC",
+      "en": "MCC"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.createdAt",
+      "uz": "Yaratilgan",
+      "ru": "Создан",
+      "en": "Created at"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.updatedAt",
+      "uz": "Yangilangan",
+      "ru": "Обновлён",
+      "en": "Updated at"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.address",
+      "uz": "Manzil",
+      "ru": "Адрес",
+      "en": "Address"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.phones",
+      "uz": "Telefonlar",
+      "ru": "Телефоны",
+      "en": "Phone numbers"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.qrId",
+      "uz": "Statik QR ID",
+      "ru": "ID статического QR",
+      "en": "Static QR ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "fields.qrLink",
+      "uz": "Statik QR havola",
+      "ru": "Ссылка статического QR",
+      "en": "Static QR link"
+    },
+    {
+      "namespace": "terminals",
+      "key": "page.terminals",
+      "uz": "Terminallar",
+      "ru": "Терминалы",
+      "en": "Terminals"
+    },
+    {
+      "namespace": "terminals",
+      "key": "page.noAccess",
+      "uz": "Terminal ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр терминалов.",
+      "en": "Permission to view terminals is unavailable."
+    },
+    {
+      "namespace": "terminals",
+      "key": "page.unavailable",
+      "uz": "Terminal integratsiyasi sozlanmagan",
+      "ru": "Интеграция терминалов не настроена",
+      "en": "Terminal integration is not configured"
+    },
+    {
+      "namespace": "terminals",
+      "key": "search.label",
+      "uz": "Terminal nomi yoki ID bo‘yicha qidirish",
+      "ru": "Поиск по названию или ID терминала",
+      "en": "Search by terminal name or ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "search.placeholder",
+      "uz": "Terminal nomi yoki ID",
+      "ru": "Название или ID терминала",
+      "en": "Terminal name or ID"
+    },
+    {
+      "namespace": "terminals",
+      "key": "states.loading",
+      "uz": "Terminallar yuklanmoqda",
+      "ru": "Загрузка терминалов",
+      "en": "Loading terminals"
+    },
+    {
+      "namespace": "terminals",
+      "key": "states.failed",
+      "uz": "Terminal ro‘yxatini ko‘rsatib bo‘lmadi",
+      "ru": "Не удалось показать список терминалов",
+      "en": "Unable to display terminals"
+    },
+    {
+      "namespace": "terminals",
+      "key": "states.empty",
+      "uz": "Terminal topilmadi.",
+      "ru": "Терминалы не найдены.",
+      "en": "No terminals found."
+    },
+    {
+      "namespace": "terminals",
+      "key": "details.main",
+      "uz": "Asosiy",
+      "ru": "Основные сведения",
+      "en": "Main information"
+    },
+    {
+      "namespace": "terminals",
+      "key": "details.location",
+      "uz": "Joylashuv",
+      "ru": "Местоположение",
+      "en": "Location"
+    },
+    {
+      "namespace": "terminals",
+      "key": "details.contact",
+      "uz": "Aloqa",
+      "ru": "Контакты",
+      "en": "Contact"
+    },
+    {
+      "namespace": "terminals",
+      "key": "details.qr",
+      "uz": "Statik QR",
+      "ru": "Статический QR",
+      "en": "Static QR"
+    },
+    {
+      "namespace": "terminals",
+      "key": "details.title",
+      "uz": "Terminal tafsilotlari",
+      "ru": "Подробности терминала",
+      "en": "Terminal details"
+    },
+    {
+      "namespace": "terminals",
+      "key": "actions.viewQr",
+      "uz": "Statik QR ko‘rish",
+      "ru": "Показать статический QR",
+      "en": "View static QR"
+    },
+    {
+      "namespace": "terminals",
+      "key": "actions.details",
+      "uz": "Qo‘shimcha ma’lumotlar",
+      "ru": "Подробности",
+      "en": "Details"
+    },
+    {
+      "namespace": "terminals",
+      "key": "display.noLink",
+      "uz": "Bu terminal uchun xavfsiz Statik QR havolasi mavjud emas.",
+      "ru": "Для этого терминала нет безопасной ссылки статического QR.",
+      "en": "No safe static QR link is available for this terminal."
+    },
+    {
+      "namespace": "terminals",
+      "key": "display.unavailable",
+      "uz": "Xavfsiz Statik QR havolasi mavjud emas.",
+      "ru": "Безопасная ссылка статического QR недоступна.",
+      "en": "No safe static QR link is available."
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "status.active",
+      "uz": "Faol",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "status.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестно",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.status",
+      "uz": "Holat",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.name",
+      "uz": "Nomi",
+      "ru": "Название",
+      "en": "Name"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.bank",
+      "uz": "Bank",
+      "ru": "Банк",
+      "en": "Bank"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.account",
+      "uz": "Hisob raqami",
+      "ru": "Номер счёта",
+      "en": "Account number"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.mfo",
+      "uz": "MFO",
+      "ru": "МФО",
+      "en": "MFO"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.tin",
+      "uz": "STIR",
+      "ru": "ИНН",
+      "en": "TIN"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "fields.contract",
+      "uz": "Shartnoma",
+      "ru": "Договор",
+      "en": "Contract"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.invalid",
+      "uz": "Tanlangan merchant tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+      "ru": "Выбранный мерчант не подтверждён. Обновите или очистите фильтр.",
+      "en": "The selected merchant is unconfirmed. Update or clear the filter."
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.unconfirmed",
+      "uz": "Qo‘llangan merchant filtri tasdiqlanmadi",
+      "ru": "Применённый фильтр мерчанта не подтверждён",
+      "en": "Applied merchant filter is unconfirmed"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "filters.reselect",
+      "uz": "Merchantni qayta tanlab qo‘llang yoki filtrni tozalang.",
+      "ru": "Повторно выберите мерчанта и примените фильтр либо очистите его.",
+      "en": "Reselect and apply the merchant or clear the filter."
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "page.name",
+      "uz": "Bank hisoblari",
+      "ru": "Банковские счета",
+      "en": "Bank accounts"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "page.noAccess",
+      "uz": "Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр банковских счетов.",
+      "en": "Permission to view bank accounts is unavailable."
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "page.unavailable",
+      "uz": "Bank hisoblari integratsiyasi sozlanmagan",
+      "ru": "Интеграция банковских счетов не настроена",
+      "en": "Bank account integration is not configured"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "states.loading",
+      "uz": "Bank hisoblari yuklanmoqda",
+      "ru": "Загрузка банковских счетов",
+      "en": "Loading bank accounts"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "states.failed",
+      "uz": "Bank hisoblari ro‘yxatini ko‘rsatib bo‘lmadi",
+      "ru": "Не удалось показать банковские счета",
+      "en": "Unable to display bank accounts"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "states.empty",
+      "uz": "Bank hisobi topilmadi.",
+      "ru": "Банковские счета не найдены.",
+      "en": "No bank accounts found."
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "table.label",
+      "uz": "Bank hisoblari jadvali",
+      "ru": "Таблица банковских счетов",
+      "en": "Bank account table"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "table.pages",
+      "uz": "Bank hisoblari sahifalari",
+      "ru": "Страницы банковских счетов",
+      "en": "Bank account pages"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "table.total",
+      "uz": "Jami {{countText}} ta Bank hisoblari",
+      "ru": "Всего банковских счетов: {{countText}}",
+      "en": "Total bank accounts: {{countText}}"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "search.label",
+      "uz": "Nomi, bank, hisob raqami yoki STIR bo‘yicha qidirish",
+      "ru": "Поиск по названию, банку, номеру счёта или ИНН",
+      "en": "Search by name, bank, account number or TIN"
+    },
+    {
+      "namespace": "bankAccounts",
+      "key": "search.placeholder",
+      "uz": "Nomi, bank, hisob raqami yoki STIR",
+      "ru": "Название, банк, номер счёта или ИНН",
+      "en": "Name, bank, account number or TIN"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "status.active",
+      "uz": "Faol",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "status.unknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестно",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "status.inactive",
+      "uz": "Faol emas",
+      "ru": "Неактивен",
+      "en": "Inactive"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.terminalId",
+      "uz": "Terminal ID",
+      "ru": "ID терминала",
+      "en": "Terminal ID"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.status",
+      "uz": "Holat",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.fullname",
+      "uz": "F.I.Sh.",
+      "ru": "Ф.И.О.",
+      "en": "Full name"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.phone",
+      "uz": "Telefon",
+      "ru": "Телефон",
+      "en": "Phone"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.role",
+      "uz": "Rol",
+      "ru": "Роль",
+      "en": "Role"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "fields.cashier",
+      "uz": "Kassir",
+      "ru": "Кассир",
+      "en": "Cashier"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.allTerminals",
+      "uz": "Barcha terminallar",
+      "ru": "Все терминалы",
+      "en": "All terminals"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.noMerchantTerminals",
+      "uz": "Bu merchant uchun terminal mavjud emas",
+      "ru": "У этого мерчанта нет терминалов",
+      "en": "No terminals available for this merchant"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.terminalsFailed",
+      "uz": "Terminallarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить терминалы",
+      "en": "Unable to load terminals"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.unconfirmed",
+      "uz": "Qo‘llangan filtr tasdiqlanmadi",
+      "ru": "Применённый фильтр не подтверждён",
+      "en": "Applied filter is unconfirmed"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.invalid",
+      "uz": "Tanlangan merchant yoki terminal tasdiqlanmadi. Filtrni yangilang yoki tozalang.",
+      "ru": "Выбранный мерчант или терминал не подтверждён. Обновите или очистите фильтр.",
+      "en": "The selected merchant or terminal is unconfirmed. Update or clear the filter."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.reselect",
+      "uz": "Merchant yoki terminalni qayta tanlab qo‘llang yoki filtrni tozalang.",
+      "ru": "Повторно выберите мерчанта или терминал и примените фильтр либо очистите его.",
+      "en": "Reselect and apply the merchant or terminal, or clear the filter."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.chooseMerchant",
+      "uz": "Avval merchantni tanlang",
+      "ru": "Сначала выберите мерчанта",
+      "en": "Select a merchant first"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "filters.membership",
+      "uz": "Terminal filtri natijasi joriy faol biriktirishni anglatmasligi mumkin.",
+      "ru": "Результат фильтра терминала может не означать текущее активное назначение.",
+      "en": "A terminal filter match may not represent a current active assignment."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "table.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "table.label",
+      "uz": "Kassirlar jadvali",
+      "ru": "Таблица кассиров",
+      "en": "Cashier table"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "table.pages",
+      "uz": "Kassir sahifalari",
+      "ru": "Страницы кассиров",
+      "en": "Cashier pages"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "table.total",
+      "uz": "Jami {{countText}} ta kassir",
+      "ru": "Всего кассиров: {{countText}}",
+      "en": "Total cashiers: {{countText}}"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "page.name",
+      "uz": "Kassirlar",
+      "ru": "Кассиры",
+      "en": "Cashiers"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "page.noAccess",
+      "uz": "Kassirlar ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр кассиров.",
+      "en": "Permission to view cashiers is unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "page.unavailable",
+      "uz": "Kassirlar integratsiyasi sozlanmagan",
+      "ru": "Интеграция кассиров не настроена",
+      "en": "Cashier integration is not configured"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "states.loading",
+      "uz": "Kassirlar yuklanmoqda",
+      "ru": "Загрузка кассиров",
+      "en": "Loading cashiers"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "states.failed",
+      "uz": "Kassirlar ro‘yxatini ko‘rsatib bo‘lmadi",
+      "ru": "Не удалось показать кассиров",
+      "en": "Unable to display cashiers"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "states.empty",
+      "uz": "Kassir topilmadi.",
+      "ru": "Кассиры не найдены.",
+      "en": "No cashiers found."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "search.label",
+      "uz": "F.I.Sh. yoki telefon bo‘yicha qidirish",
+      "ru": "Поиск по Ф.И.О. или телефону",
+      "en": "Search by full name or phone"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "search.placeholder",
+      "uz": "F.I.Sh. yoki telefon",
+      "ru": "Ф.И.О. или телефон",
+      "en": "Full name or phone"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.new",
+      "uz": "Yangi kassir",
+      "ru": "Новый кассир",
+      "en": "New cashier"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.create",
+      "uz": "Yangi kassir yaratish",
+      "ru": "Создать кассира",
+      "en": "Create cashier"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.assign",
+      "uz": "Terminal qo‘shish",
+      "ru": "Добавить терминал",
+      "en": "Add terminal"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.unassign",
+      "uz": "Terminal ajratish",
+      "ru": "Отвязать терминал",
+      "en": "Unassign terminal"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.unassignShort",
+      "uz": "Ajratish",
+      "ru": "Отвязать",
+      "en": "Unassign"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.row",
+      "uz": "{{name}} uchun amallarni ochish",
+      "ru": "Открыть действия для {{name}}",
+      "en": "Open actions for {{name}}"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.activeTerminals",
+      "uz": "Faol terminallar · {{countText}}",
+      "ru": "Активные терминалы · {{countText}}",
+      "en": "Active terminals · {{countText}}"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.unassignLabel",
+      "uz": "{{name}} ({{id}}) terminalini ajratish",
+      "ru": "Отвязать терминал {{name}} ({{id}})",
+      "en": "Unassign terminal {{name}} ({{id}})"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "actions.refreshStatus",
+      "uz": "Holatni yangilash",
+      "ru": "Обновить статус",
+      "en": "Refresh status"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.active",
+      "uz": "Faol terminal biriktirishlari",
+      "ru": "Активные назначения терминалов",
+      "en": "Active terminal assignments"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.assigned",
+      "uz": "Biriktirilgan terminallar",
+      "ru": "Назначенные терминалы",
+      "en": "Assigned terminals"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.total",
+      "uz": "{{countText}} ta terminal",
+      "ru": "Терминалов: {{countText}}",
+      "en": "Terminals: {{countText}}"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.empty",
+      "uz": "Bu kassirga terminal biriktirilmagan.",
+      "ru": "Этому кассиру не назначены терминалы.",
+      "en": "No terminal is assigned to this cashier."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.unassignTarget",
+      "uz": "Ajratiladigan terminal",
+      "ru": "Терминал для отвязки",
+      "en": "Terminal to unassign"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.unassignHelp",
+      "uz": "Ushbu terminalni kassirdan ajratishingiz mumkin.",
+      "ru": "Вы можете отвязать этот терминал от кассира.",
+      "en": "You can unassign this terminal from the cashier."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.description",
+      "uz": "Ushbu kassirga hozirda biriktirilgan faol terminallar ro‘yxati.",
+      "ru": "Список активных терминалов, назначенных этому кассиру.",
+      "en": "Active terminals currently assigned to this cashier."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "details.terminalId",
+      "uz": "Terminal ID:",
+      "ru": "ID терминала:",
+      "en": "Terminal ID:"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.description",
+      "uz": "F.I.Sh., telefon va terminalni tanlang.",
+      "ru": "Укажите Ф.И.О., телефон и терминал.",
+      "en": "Enter a full name, phone and terminal."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.namePlaceholder",
+      "uz": "F.I.Sh. ni kiriting",
+      "ru": "Введите Ф.И.О.",
+      "en": "Enter full name"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.phoneHelp",
+      "uz": "9 ta mahalliy raqamni kiriting.",
+      "ru": "Введите 9 цифр местного номера.",
+      "en": "Enter 9 local phone digits."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.phoneInvalid",
+      "uz": "Telefon raqami 9 ta raqamdan iborat bo‘lishi kerak.",
+      "ru": "Номер телефона должен содержать 9 цифр.",
+      "en": "The phone number must contain 9 digits."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.chooseTerminal",
+      "uz": "Terminalni tanlang",
+      "ru": "Выберите терминал",
+      "en": "Select a terminal"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.submit",
+      "uz": "Kassir yaratish",
+      "ru": "Создать кассира",
+      "en": "Create cashier"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.pending",
+      "uz": "Yuborilmoqda. Sahifani yopish serverdagi amalni bekor qilmaydi.",
+      "ru": "Отправка. Закрытие страницы не отменяет операцию на сервере.",
+      "en": "Sending. Closing the page does not cancel the server operation."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.unknown",
+      "uz": "Holat noma’lum",
+      "ru": "Результат неизвестен",
+      "en": "Outcome unknown"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.checkFirst",
+      "uz": "Kassir yaratilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassirlar ro‘yxatini tekshiring.",
+      "ru": "Кассир мог быть создан. Проверьте список кассиров перед повторной отправкой.",
+      "en": "The cashier may have been created. Check the cashier list before sending again."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.duplicateRisk",
+      "uz": "Kassir yaratilgan bo‘lishi mumkin. Takroriy yuborish yangi kassir yaratishi mumkin.",
+      "ru": "Кассир мог быть создан. Повторная отправка может создать ещё одного кассира.",
+      "en": "The cashier may have been created. Sending again may create another cashier."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "create.newIntent",
+      "uz": "Yangi intent",
+      "ru": "Новая операция",
+      "en": "New operation"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.denied",
+      "uz": "Terminal tanlash uchun ruxsat mavjud emas.",
+      "ru": "Нет разрешения на выбор терминала.",
+      "en": "Permission to select a terminal is unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.assignDenied",
+      "uz": "Terminal tanlash huquqi mavjud emas.",
+      "ru": "Нет разрешения на выбор терминала.",
+      "en": "Permission to select a terminal is unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.unavailable",
+      "uz": "Terminal tanlash integratsiyasi mavjud emas.",
+      "ru": "Интеграция выбора терминала недоступна.",
+      "en": "Terminal selection integration is unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.failed",
+      "uz": "Terminallarni yuklab bo‘lmadi.",
+      "ru": "Не удалось загрузить терминалы.",
+      "en": "Unable to load terminals."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.loading",
+      "uz": "Terminallar yuklanmoqda.",
+      "ru": "Загрузка терминалов.",
+      "en": "Loading terminals."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "lookup.unconfirmed",
+      "uz": "Terminal tanlovi qayta tasdiqlanishi kerak.",
+      "ru": "Выбор терминала необходимо подтвердить заново.",
+      "en": "The terminal selection must be confirmed again."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.title",
+      "uz": "Terminallarni qo‘shish",
+      "ru": "Добавление терминалов",
+      "en": "Add terminals"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.warning",
+      "uz": "Bu amal mavjud faol biriktirishlarni almashtirmaydi. Faqat tanlangan terminallar qo‘shiladi yoki avvalgi nofaol biriktirish qayta faollashishi mumkin.",
+      "ru": "Эта операция не заменяет активные назначения. Добавляются только выбранные терминалы; прежнее неактивное назначение может быть восстановлено.",
+      "en": "This operation does not replace active assignments. Only selected terminals are added, or a previous inactive assignment may be reactivated."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.options",
+      "uz": "Qo‘shiladigan terminallar",
+      "ru": "Терминалы для добавления",
+      "en": "Terminals to add"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.selectionHelp",
+      "uz": "Kamida bitta hali faol bo‘lmagan joriy terminalni tanlang.",
+      "ru": "Выберите хотя бы один доступный терминал, ещё не назначенный активно.",
+      "en": "Select at least one current terminal that is not already actively assigned."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.submit",
+      "uz": "Tanlangan terminallarni qo‘shish",
+      "ru": "Добавить выбранные терминалы",
+      "en": "Add selected terminals"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.pending",
+      "uz": "Biriktirish yuborilmoqda.",
+      "ru": "Отправка назначения.",
+      "en": "Sending assignment."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.confirmed",
+      "uz": "Terminallar biriktirildi. Faol biriktirishlar ro‘yxati yangilangach tekshiriladi.",
+      "ru": "Терминалы назначены. Активные назначения будут проверены после обновления списка.",
+      "en": "Terminals assigned. Active assignments will be checked after the list refreshes."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "assign.unknown",
+      "uz": "Natija noma’lum. Ayrim terminallar biriktirilgan bo‘lishi mumkin. Qayta yuborishdan oldin kassir terminal holatini yangilang.",
+      "ru": "Результат неизвестен. Некоторые терминалы могли быть назначены. Обновите состояние терминалов кассира перед повторной отправкой.",
+      "en": "Outcome unknown. Some terminals may have been assigned. Refresh the cashier terminal status before sending again."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.label",
+      "uz": "Terminalni ajratishni tasdiqlash",
+      "ru": "Подтвердить отвязку терминала",
+      "en": "Confirm terminal unassignment"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.title",
+      "uz": "Terminalni kassirdan ajratish",
+      "ru": "Отвязать терминал от кассира",
+      "en": "Unassign terminal from cashier"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.confirm",
+      "uz": "Terminalni ajratish",
+      "ru": "Отвязать терминал",
+      "en": "Unassign terminal"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.warning",
+      "uz": "{{cashier}} kassirdan {{terminal}} ({{id}}) terminalining biriktirilishini olib tashlashni tasdiqlaysizmi?",
+      "ru": "Подтверждаете отвязку терминала {{terminal}} ({{id}}) от кассира {{cashier}}?",
+      "en": "Confirm removing terminal {{terminal}} ({{id}}) from cashier {{cashier}}?"
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.stale",
+      "uz": "Oldingi tanlov endi amal qilmaydi. Kassirlar ro‘yxatini yangilang.",
+      "ru": "Предыдущий выбор больше не действителен. Обновите список кассиров.",
+      "en": "The previous selection is no longer current. Refresh the cashier list."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.pending",
+      "uz": "Ajratish so‘rovi yuborilmoqda.",
+      "ru": "Отправка запроса на отвязку.",
+      "en": "Sending unassignment request."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.confirmed",
+      "uz": "Terminalni ajratish so‘rovi tasdiqlandi. Joriy faol biriktirishlar yangilangach tekshiriladi.",
+      "ru": "Запрос на отвязку подтверждён. Текущие активные назначения будут проверены после обновления.",
+      "en": "Unassignment request confirmed. Current active assignments will be checked after refresh."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "unassign.unknown",
+      "uz": "Natija noma’lum. Terminal allaqachon ajratilgan bo‘lishi mumkin. Qayta urinishdan oldin kassirning terminal holatini yangilang.",
+      "ru": "Результат неизвестен. Терминал уже мог быть отвязан. Обновите статус терминалов кассира перед повторной попыткой.",
+      "en": "Outcome unknown. The terminal may already be unassigned. Refresh the cashier terminal status before trying again."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.permission",
+      "uz": "Ruxsat mavjud emas.",
+      "ru": "Разрешение отсутствует.",
+      "en": "Permission is unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.validation",
+      "uz": "F.I.Sh., telefon va joriy terminal tanlovini tekshiring.",
+      "ru": "Проверьте Ф.И.О., телефон и текущий выбор терминала.",
+      "en": "Check the full name, phone and current terminal selection."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.selection",
+      "uz": "Joriy faol bo‘lmagan, tasdiqlangan terminallarni tanlang.",
+      "ru": "Выберите подтверждённые терминалы без активного назначения.",
+      "en": "Select confirmed terminals that are not actively assigned."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.stale",
+      "uz": "Kassir yoki faol terminal tanlovi eskirgan. Ro‘yxatni yangilang.",
+      "ru": "Выбор кассира или активного терминала устарел. Обновите список.",
+      "en": "The cashier or active terminal selection is stale. Refresh the list."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.unavailable",
+      "uz": "Amal hozir mavjud emas.",
+      "ru": "Операция сейчас недоступна.",
+      "en": "The operation is currently unavailable."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.notSent",
+      "uz": "Amal yuborilmadi. Sessiya va ruxsatlarni tekshiring.",
+      "ru": "Операция не отправлена. Проверьте сессию и разрешения.",
+      "en": "The operation was not sent. Check the session and permissions."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.rejected",
+      "uz": "So‘rov rad etildi.",
+      "ru": "Запрос отклонён.",
+      "en": "Request rejected."
+    },
+    {
+      "namespace": "cashiers",
+      "key": "feedback.alreadySent",
+      "uz": "Bu intent allaqachon yuborilgan. Yangi amalni alohida tanlang.",
+      "ru": "Эта операция уже отправлена. Новая операция требует отдельного выбора.",
+      "en": "This operation has already been sent. Choose a new operation separately."
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.merchant",
+      "uz": "Merchant",
+      "ru": "Мерчант",
+      "en": "Merchant"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.terminal",
+      "uz": "Terminal",
+      "ru": "Терминал",
+      "en": "Terminal"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.terminalId",
+      "uz": "Terminal ID",
+      "ru": "ID терминала",
+      "en": "Terminal ID"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.terminalType",
+      "uz": "Terminal turi",
+      "ru": "Тип терминала",
+      "en": "Terminal type"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.createdAt",
+      "uz": "Yaratilgan vaqt",
+      "ru": "Время создания",
+      "en": "Created at"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.qrId",
+      "uz": "Statik QR ID",
+      "ru": "ID статического QR",
+      "en": "Static QR ID"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.qrLink",
+      "uz": "Statik QR havola",
+      "ru": "Ссылка статического QR",
+      "en": "Static QR link"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.deviceId",
+      "uz": "Qurilma ID",
+      "ru": "ID устройства",
+      "en": "Device ID"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.description",
+      "uz": "Tavsif",
+      "ru": "Описание",
+      "en": "Description"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.status",
+      "uz": "Qurilma holati",
+      "ru": "Статус устройства",
+      "en": "Device status"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.created",
+      "uz": "Yaratilgan",
+      "ru": "Создано",
+      "en": "Created at"
+    },
+    {
+      "namespace": "p5",
+      "key": "fields.qrStatus",
+      "uz": "Statik QR holati",
+      "ru": "Статус статического QR",
+      "en": "Static QR status"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.allMerchants",
+      "uz": "Barcha merchantlar",
+      "ru": "Все мерчанты",
+      "en": "All merchants"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.noMerchants",
+      "uz": "Merchant mavjud emas",
+      "ru": "Нет мерчантов",
+      "en": "No merchants available"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.merchantsFailed",
+      "uz": "Merchantlarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить мерчантов",
+      "en": "Unable to load merchants"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.allTerminals",
+      "uz": "Barcha terminallar",
+      "ru": "Все терминалы",
+      "en": "All terminals"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.noMerchantTerminals",
+      "uz": "Bu merchant uchun terminal mavjud emas",
+      "ru": "У этого мерчанта нет терминалов",
+      "en": "No terminals available for this merchant"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.terminalsFailed",
+      "uz": "Terminallarni yuklab bo‘lmadi",
+      "ru": "Не удалось загрузить терминалы",
+      "en": "Unable to load terminals"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.chooseMerchant",
+      "uz": "Avval merchantni tanlang",
+      "ru": "Сначала выберите мерчанта",
+      "en": "Select a merchant first"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.invalid",
+      "uz": "Merchant, terminal yoki status kodi tasdiqlanmadi. Filtrlarni tekshiring yoki tozalang.",
+      "ru": "Мерчант, терминал или код статуса не подтверждён. Проверьте или очистите фильтры.",
+      "en": "The merchant, terminal or status code is unconfirmed. Check or clear the filters."
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.unconfirmed",
+      "uz": "Qo‘llangan P5 filtri tasdiqlanmadi",
+      "ru": "Применённый фильтр P5 не подтверждён",
+      "en": "Applied P5 filter is unconfirmed"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.reselect",
+      "uz": "Filtrni tozalang yoki merchant va terminalni qayta tanlab qo‘llang.",
+      "ru": "Очистите фильтр или повторно выберите мерчанта и терминал и примените его.",
+      "en": "Clear the filter or reselect and apply the merchant and terminal."
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.all",
+      "uz": "Barchasi",
+      "ru": "Все",
+      "en": "All"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.status",
+      "uz": "Status",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.custom",
+      "uz": "Boshqa status kodi...",
+      "ru": "Другой код статуса…",
+      "en": "Other status code…"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.statusCode",
+      "uz": "Status kodi",
+      "ru": "Код статуса",
+      "en": "Status code"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.codeValue",
+      "uz": "Status kodi: {{code}}",
+      "ru": "Код статуса: {{code}}",
+      "en": "Status code: {{code}}"
+    },
+    {
+      "namespace": "p5",
+      "key": "filters.codeInvalid",
+      "uz": "Butun status kodini kiriting (-2147483648…2147483647).",
+      "ru": "Введите целый код статуса (-2147483648…2147483647).",
+      "en": "Enter an integer status code (-2147483648…2147483647)."
+    },
+    {
+      "namespace": "p5",
+      "key": "table.actions",
+      "uz": "Amallar",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    {
+      "namespace": "p5",
+      "key": "table.label",
+      "uz": "P5 qurilmalari jadvali",
+      "ru": "Таблица устройств P5",
+      "en": "P5 device table"
+    },
+    {
+      "namespace": "p5",
+      "key": "table.pages",
+      "uz": "P5 qurilmalari sahifalari",
+      "ru": "Страницы устройств P5",
+      "en": "P5 device pages"
+    },
+    {
+      "namespace": "p5",
+      "key": "table.total",
+      "uz": "Jami {{countText}} ta qurilma",
+      "ru": "Всего устройств: {{countText}}",
+      "en": "Total devices: {{countText}}"
+    },
+    {
+      "namespace": "p5",
+      "key": "details.qr",
+      "uz": "Statik QR",
+      "ru": "Статический QR",
+      "en": "Static QR"
+    },
+    {
+      "namespace": "p5",
+      "key": "details.device",
+      "uz": "Qurilma",
+      "ru": "Устройство",
+      "en": "Device"
+    },
+    {
+      "namespace": "p5",
+      "key": "details.title",
+      "uz": "P5 qurilma tafsilotlari",
+      "ru": "Подробности устройства P5",
+      "en": "P5 device details"
+    },
+    {
+      "namespace": "p5",
+      "key": "actions.viewQr",
+      "uz": "Statik QR ko‘rish",
+      "ru": "Показать статический QR",
+      "en": "View static QR"
+    },
+    {
+      "namespace": "p5",
+      "key": "actions.details",
+      "uz": "Qo‘shimcha ma’lumotlar",
+      "ru": "Подробности",
+      "en": "Details"
+    },
+    {
+      "namespace": "p5",
+      "key": "display.unavailable",
+      "uz": "Xavfsiz Statik QR havolasi mavjud emas.",
+      "ru": "Безопасная ссылка статического QR недоступна.",
+      "en": "No safe static QR link is available."
+    },
+    {
+      "namespace": "p5",
+      "key": "display.noLink",
+      "uz": "Bu qurilma uchun xavfsiz Statik QR havolasi mavjud emas.",
+      "ru": "Для этого устройства нет безопасной ссылки статического QR.",
+      "en": "No safe static QR link is available for this device."
+    },
+    {
+      "namespace": "p5",
+      "key": "page.name",
+      "uz": "P5 qurilmalari",
+      "ru": "Устройства P5",
+      "en": "P5 devices"
+    },
+    {
+      "namespace": "p5",
+      "key": "page.noAccess",
+      "uz": "P5 qurilmalari ro‘yxatini ko‘rish huquqi mavjud emas.",
+      "ru": "Нет разрешения на просмотр устройств P5.",
+      "en": "Permission to view P5 devices is unavailable."
+    },
+    {
+      "namespace": "p5",
+      "key": "page.unavailable",
+      "uz": "P5 qurilmalari integratsiyasi sozlanmagan",
+      "ru": "Интеграция устройств P5 не настроена",
+      "en": "P5 device integration is not configured"
+    },
+    {
+      "namespace": "p5",
+      "key": "search.label",
+      "uz": "Qurilma ID yoki terminal nomi bo‘yicha qidirish",
+      "ru": "Поиск по ID устройства или названию терминала",
+      "en": "Search by device ID or terminal name"
+    },
+    {
+      "namespace": "p5",
+      "key": "search.placeholder",
+      "uz": "Qurilma ID yoki terminal nomi",
+      "ru": "ID устройства или название терминала",
+      "en": "Device ID or terminal name"
+    },
+    {
+      "namespace": "p5",
+      "key": "status.active",
+      "uz": "Faol",
+      "ru": "Активно",
+      "en": "Active"
+    },
+    {
+      "namespace": "p5",
+      "key": "status.inactive",
+      "uz": "Faol emas / administrator belgisi",
+      "ru": "Неактивно / отметка администратора",
+      "en": "Inactive / administrator flag"
+    },
+    {
+      "namespace": "p5",
+      "key": "status.unknown",
+      "uz": "Holat noma’lum",
+      "ru": "Статус неизвестен",
+      "en": "Status unknown"
+    },
+    {
+      "namespace": "p5",
+      "key": "status.qrActive",
+      "uz": "Faol",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    {
+      "namespace": "p5",
+      "key": "status.qrUnknown",
+      "uz": "Noma’lum",
+      "ru": "Неизвестно",
+      "en": "Unknown"
+    },
+    {
+      "namespace": "p5",
+      "key": "states.loading",
+      "uz": "P5 qurilmalari yuklanmoqda",
+      "ru": "Загрузка устройств P5",
+      "en": "Loading P5 devices"
+    },
+    {
+      "namespace": "p5",
+      "key": "states.failed",
+      "uz": "P5 qurilmalari ro‘yxatini ko‘rsatib bo‘lmadi",
+      "ru": "Не удалось показать устройства P5",
+      "en": "Unable to display P5 devices"
+    },
+    {
+      "namespace": "p5",
+      "key": "states.contract",
+      "uz": "P5 javobi kutilgan formatga mos emas",
+      "ru": "Ответ P5 не соответствует ожидаемому формату",
+      "en": "P5 response has an unexpected format"
+    },
+    {
+      "namespace": "p5",
+      "key": "states.contractHelp",
+      "uz": "Ma’lumot bo‘sh ro‘yxat sifatida ko‘rsatilmadi. Qayta urinib ko‘ring.",
+      "ru": "Данные не показаны как пустой список. Повторите попытку.",
+      "en": "The data was not displayed as an empty list. Try again."
+    },
+    {
+      "namespace": "p5",
+      "key": "states.empty",
+      "uz": "P5 qurilmasi topilmadi.",
+      "ru": "Устройства P5 не найдены.",
+      "en": "No P5 devices found."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.unavailable",
+      "uz": "PIN reset funksiyasi hozir mavjud emas.",
+      "ru": "Сброс PIN сейчас недоступен.",
+      "en": "PIN reset is currently unavailable."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.action",
+      "uz": "PIN reset",
+      "ru": "Сброс PIN",
+      "en": "Reset PIN"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.title",
+      "uz": "PINni tiklash",
+      "ru": "Сброс PIN",
+      "en": "Reset PIN"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.confirm",
+      "uz": "PINni tiklash",
+      "ru": "Сбросить PIN",
+      "en": "Reset PIN"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.warning",
+      "uz": "{{id}} qurilmasining PIN kodi tiklanadi. Davom etasizmi?",
+      "ru": "PIN устройства {{id}} будет сброшен. Продолжить?",
+      "en": "The PIN for device {{id}} will be reset. Continue?"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.terminal",
+      "uz": "Terminal: {{name}}",
+      "ru": "Терминал: {{name}}",
+      "en": "Terminal: {{name}}"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.pending",
+      "uz": "PIN reset so‘rovi yuborilmoqda.",
+      "ru": "Отправка запроса на сброс PIN.",
+      "en": "Sending PIN reset request."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.pendingCaption",
+      "uz": "Tiklanmoqda…",
+      "ru": "Сброс…",
+      "en": "Resetting…"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.confirmedTitle",
+      "uz": "Reset OTP jo'natildi",
+      "ru": "OTP для сброса отправлен",
+      "en": "Reset OTP sent"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.unknownTitle",
+      "uz": "Reset natijasini tasdiqlab bo‘lmadi",
+      "ru": "Результат сброса не подтверждён",
+      "en": "Reset outcome unconfirmed"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.rejectedTitle",
+      "uz": "PIN reset rad etildi",
+      "ru": "Сброс PIN отклонён",
+      "en": "PIN reset rejected"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.notSentTitle",
+      "uz": "PIN reset so‘rovi yuborilmadi",
+      "ru": "Запрос на сброс PIN не отправлен",
+      "en": "PIN reset request not sent"
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.confirmed",
+      "uz": "{{id}} qurilmasi uchun reset OTP yuborildi. Kodni P5 qurilmaga kiriting.",
+      "ru": "OTP для сброса устройства {{id}} отправлен. Введите код на устройстве P5.",
+      "en": "Reset OTP sent for device {{id}}. Enter the code on the P5 device."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.unknown",
+      "uz": "{{id}}: So‘rov yuborilgan bo‘lishi mumkin, lekin server natijasini tasdiqlab bo‘lmadi. Yangi reset yuborishdan oldin joriy holatni tekshiring.",
+      "ru": "{{id}}: Запрос мог быть отправлен, но результат сервера не подтверждён. Проверьте текущий статус перед новым сбросом.",
+      "en": "{{id}}: The request may have been sent, but the server outcome could not be confirmed. Check the current status before a new reset."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.rejected",
+      "uz": "{{id}} qurilmasi uchun PIN reset so‘rovi server tomonidan rad etildi.",
+      "ru": "Сервер отклонил сброс PIN для устройства {{id}}.",
+      "en": "The server rejected the PIN reset request for device {{id}}."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.notSent",
+      "uz": "{{id}} qurilmasi uchun PIN reset so‘rovi yuborilmadi. Qayta urinishdan oldin sessiya va ruxsatlarni tekshiring.",
+      "ru": "Запрос на сброс PIN устройства {{id}} не отправлен. Проверьте сессию и разрешения перед повторной попыткой.",
+      "en": "PIN reset request for device {{id}} was not sent. Check the session and permissions before trying again."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.newRisk",
+      "uz": "Takrorlash yangi reset so‘rovini yuboradi.",
+      "ru": "Повторная попытка отправит новый запрос на сброс.",
+      "en": "Repeating sends a new reset request."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.refreshFailed",
+      "uz": "Ro‘yxatni yangilab bo‘lmadi. Yangilash tugmasini bosing.",
+      "ru": "Не удалось обновить список. Нажмите кнопку обновления.",
+      "en": "Unable to refresh the list. Press Refresh."
+    },
+    {
+      "namespace": "p5",
+      "key": "reset.newConfirm",
+      "uz": "Yangi resetni tasdiqlash",
+      "ru": "Подтвердить новый сброс",
+      "en": "Confirm a new reset"
+    }
+  ]
+}

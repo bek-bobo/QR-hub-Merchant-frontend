@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { CashierRow } from '@/shared/contracts/management-read'
 import { CashierActionsMenu } from './CashierActionsMenu'

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { validateCreateLink } from './create-result'
 import { QrPresentation } from './QrPresentation'
 import { copyExactPresentedLink } from './qr-presentation'

@@ -34,7 +34,7 @@ export function toP5ListQuery(filters: P5Filters): Readonly<Record<string, strin
   const merchantId = optionalLongId(filters.merchantId)
   const terminalId = optionalText(filters.terminalId)
   const status = integerStatus(filters.status)
-  const search = optionalText(filters.search)
+  const search = filters.search
   if (merchantId) query.merchantId = merchantId
   if (terminalId) query.terminalId = terminalId
   if (status !== undefined) query.status = String(status)
@@ -48,7 +48,7 @@ export function changeP5MerchantDraft<T extends P5Filters>(draft: T, merchantId?
 
 export function applyP5Filters<T extends P5Filters>(draft: T, terminalGate?: DependentLookupGateInput): T {
   if (dependentReadGate({ appliedParentId: draft.merchantId, appliedChildId: draft.terminalId, ...terminalGate, lookupState: terminalGate?.lookupState ?? 'unavailable' }) === 'pause') throw safeContractError()
-  return { ...draft, search: draft.search.trim(), page: 0 }
+  return { ...draft, search: draft.search, page: 0 }
 }
 
 export function clearP5Filters<T extends P5Filters>(filters: T): T {

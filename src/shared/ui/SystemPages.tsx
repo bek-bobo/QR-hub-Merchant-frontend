@@ -1,10 +1,14 @@
+import { LocaleSelect } from '@/shared/i18n/LocaleSelect'
+import { useMessages } from '@/shared/i18n/useMessages'
 import { Link } from 'react-router'
 
 export function IntegrationUnavailablePage() {
+  const { message } = useMessages('shell')
   return (
     <main className="app">
       <h1>QRHub Merchant</h1>
-      <p>Xizmat hozircha mavjud emas.</p>
+      <p>{message('routes.integrationUnavailable')}</p>
+      <LocaleSelect />
     </main>
   )
 }

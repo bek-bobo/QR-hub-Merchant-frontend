@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { MemoryRouter } from 'react-router'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ThemeContext } from '@/shared/theme/ThemeContext'
@@ -16,6 +16,9 @@ vi.mock('radix-ui', async (importOriginal) => {
   const part = ({ children }: { children?: ReactNode }) => <div>{children}</div>
   return { ...actual, DropdownMenu: { ...actual.DropdownMenu,
     Root: part, Trigger: part, Portal: part,
+    RadioGroup: part,
+    RadioItem: ({ children }: { children: ReactNode }) => <div role="menuitemradio">{children}</div>,
+    ItemIndicator: part,
     Content: ({ children, side, align }: { children: ReactNode; side: string; align: string }) => (
       <div role="menu" data-side={side} data-align={align}>{children}</div>
     ),
@@ -75,7 +78,8 @@ describe('Header profile menu actions', () => {
     expect(items?.[1]).toContain('lucide-log-out size-4 shrink-0')
     expect(items?.[1]).toContain('aria-hidden="true"')
     expect(html.match(/lucide-log-out/g)).toHaveLength(1)
-    expect(html.match(/<button\b/g)).toHaveLength(2)
+    expect(html.match(/<button\b/g)).toHaveLength(3)
+    expect(html.match(/data-locale-trigger/g)).toHaveLength(1)
   })
 
   it('disables menu logout while logout is pending', () => {

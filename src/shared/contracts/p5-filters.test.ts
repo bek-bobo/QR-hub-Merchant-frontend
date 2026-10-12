@@ -21,12 +21,12 @@ describe('P5 filters', () => {
       fromDate: '2026-09-01',
     } as never)
     expect(query).toEqual({
-      merchantId: '002', terminalId: 'terminal-a', status: '0', search: 'Device', page: '0', size: '20',
+      merchantId: '002', terminalId: 'terminal-a', status: '0', search: '  Device ', page: '0', size: '20',
     })
   })
 
   it('omits blank optional filters and rejects values outside backend integer contracts', () => {
-    expect(toP5ListQuery({ ...base, merchantId: ' ', terminalId: ' ', search: ' ' })).toEqual({ page: '0', size: '20' })
+    expect(toP5ListQuery({ ...base, merchantId: ' ', terminalId: ' ', search: ' ' })).toEqual({ search: ' ', page: '0', size: '20' })
     expect(() => toP5ListQuery({ ...base, status: 2_147_483_648 })).toThrow()
     expect(() => toP5ListQuery({ ...base, merchantId: '2.5' })).toThrow()
   })
@@ -39,7 +39,7 @@ describe('P5 filters', () => {
   it('requires a scoped lookup to confirm an applied terminal and resets the page on apply', () => {
     const draft = { ...base, merchantId: '2', terminalId: 'terminal-a', search: '  A  ', page: 3 }
     expect(applyP5Filters(draft, { lookupParentId: '2', lookupState: 'ready', optionIds: ['terminal-a'] }))
-      .toMatchObject({ search: 'A', page: 0 })
+      .toMatchObject({ search: '  A  ', page: 0 })
     expect(() => applyP5Filters(draft, { lookupParentId: '1', lookupState: 'ready', optionIds: ['terminal-a'] })).toThrow()
     expect(applyP5Filters({ ...base }, { lookupState: 'denied' })).toEqual(base)
   })

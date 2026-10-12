@@ -1,3 +1,5 @@
+import { useBankAccountPresentation } from './presentation'
+import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
@@ -7,19 +9,24 @@ import { formatInstantTime } from '@/shared/presentation/date-time'
 import { useTableColumnPreferences } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferences } from '@/shared/ui/TableColumnPreferences'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
-import { changeManagementPage, clearManagementFilters, type BankAccountListFilters } from '@/shared/contracts/management-filters'
+import { changeManagementPage, type BankAccountListFilters } from '@/shared/contracts/management-filters'
 import { applyBankAccountMerchantDraft, applyBankAccountQuickSearch, bankAccountParentState, createDefaultBankAccountFilters, type BankAccountMerchantDraft, type MerchantLookupState } from './page-state'
 import { BankAccountMerchantFilter, BankAccountQuickSearch } from './BankAccountFilterControls'
 import { resolveLookupSelectState } from '@/shared/ui/lookup-select-state'
-import { bankAccountColumns } from './columns'
+import { createBankAccountColumns } from './columns'
 import { BankAccountResults } from './BankAccountResults'
 
 export function BankAccountPage() {
+  const p = useBankAccountPresentation()
+  const bankAccountColumns = createBankAccountColumns(p)
   const runtime = useReadRuntime()
   const [merchantDraft, setMerchantDraft] = useState<BankAccountMerchantDraft>({})
   const [searchDraft, setSearchDraft] = useState('')
   const [applied, setApplied] = useState<BankAccountListFilters>(createDefaultBankAccountFilters)
-  const [validationMessage, setValidationMessage] = useState<string | null>(null)
+  useDebouncedSearch(searchDraft, applied.search, (search) => {
+    setApplied((current) => applyBankAccountQuickSearch(current, search))
+  })
+  const [validationMessage, setValidationMessage] = useState<'invalid' | null>(null)
   const columnPreferences = useTableColumnPreferences({
     tableKey: 'bankAccounts',
     columns: bankAccountColumns,
@@ -53,26 +60,24 @@ export function BankAccountPage() {
       setValidationMessage(null)
       return true
     } catch {
-      setValidationMessage('Tanlangan merchant tasdiqlanmadi. Filtrni yangilang yoki tozalang.')
+      setValidationMessage('invalid')
       return false
     }
   }
 
   function resetFilters() {
-    const next = clearManagementFilters(applied)
     setMerchantDraft({})
-    setSearchDraft('')
-    setApplied(next)
     setValidationMessage(null)
   }
 
-  function applySearch(search: string) {
-    setSearchDraft(search.trim())
-    setApplied((current) => applyBankAccountQuickSearch(current, search))
+
+  function syncDrawerDraft(open: boolean) {
+    setMerchantDraft(open ? { merchantId: applied.merchantId } : {})
+    setValidationMessage(null)
   }
 
-  if (!runtime.capabilities.bankAccountList) return <NoAccessState description="Bank hisoblari ro‘yxatini ko‘rish huquqi mavjud emas." />
-  if (runtime.readiness.bankAccountList.kind === 'unavailable') return <ErrorState title="Bank hisoblari integratsiyasi sozlanmagan" />
+  if (!runtime.capabilities.bankAccountList) return <NoAccessState description={p.message('page.noAccess')} />
+  if (runtime.readiness.bankAccountList.kind === 'unavailable') return <ErrorState title={p.message('page.unavailable')} />
 
   return <div className="mx-auto min-w-0 max-w-[96rem]">
     <BankAccountResults blocked={!parentReady} pending={list.isPending} error={list.isError} data={list.data}
@@ -81,15 +86,15 @@ export function BankAccountPage() {
       onRetry={() => void list.refetch()}
       onPageChange={(page) => setApplied((current) => changeManagementPage(current, page))}
       onPageSizeChange={(size) => setApplied((current) => ({ ...current, size, page: 0 }))}
-      quickFilters={<BankAccountQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} onApply={applySearch} />}
+      quickFilters={<BankAccountQuickSearch searchDraft={searchDraft} onDraftChange={setSearchDraft} />}
       headerActions={<div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
-        <FilterDrawer onApply={applyFilters} onReset={resetFilters} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
+        <FilterDrawer onApply={applyFilters} onReset={resetFilters} onOpenChange={syncDrawerDraft} triggerSize="sm" triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-4 text-sm">
           <BankAccountMerchantFilter merchantId={merchantDraft.merchantId} merchants={merchants.data}
             state={merchantPresentation} onChange={(merchantId) => setMerchantDraft({ merchantId })} />
-          {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{validationMessage}</p> : null}
+          {validationMessage ? <p role="alert" className="text-sm text-destructive sm:col-span-2">{p.message('filters.invalid')}</p> : null}
         </FilterDrawer>
         <TableColumnPreferences
-          tableLabel="Bank hisoblari"
+          tableLabel={p.message('page.name')}
           items={bankAccountColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
@@ -104,7 +109,7 @@ export function BankAccountPage() {
         />
         <RefreshIconButton
           className="size-10 rounded-xl bg-muted/30"
-          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt) : '—'}
+          updatedTime={list.dataUpdatedAt > 0 ? formatInstantTime(list.dataUpdatedAt, { locale: p.intlLocale, timeZone: 'Asia/Tashkent' }) : '—'}
           disabled={!listOptions.enabled || list.isFetching}
           loading={list.isFetching}
           onClick={() => void list.refetch()}

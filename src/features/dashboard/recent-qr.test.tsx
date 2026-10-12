@@ -1,4 +1,8 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { createDynamicQrPresentation } from '@/features/dynamic-qr/presentation'
+import { createDashboardPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
+import { captureWithLocale } from '@/test/locale-fixture'
+import { renderToStaticMarkup } from '@/test/locale-fixture'
 import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from 'react'
 import { MemoryRouter } from 'react-router'
 import { describe, expect, it, vi } from 'vitest'
@@ -12,8 +16,9 @@ import { TABLE_COLUMN_STORAGE_KEY } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
 import { TableColumnPreferenceList } from '@/shared/ui/TableColumnPreferences'
 import { RecentQrPanel } from './DashboardReadPage'
-import { dashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
+import { createDashboardRecentQrColumns, DASHBOARD_RECENT_QR_TABLE_KEY } from './recent-qr-columns'
 import { DashboardRecentQrTable } from './DashboardRecentQrTable'
+import { createDynamicQrColumns } from '@/features/dynamic-qr/columns'
 
 const navigation = vi.hoisted(() => ({ state: undefined as unknown }))
 
@@ -140,6 +145,23 @@ function findElement(node: ReactNode, predicate: (element: ReactElement<Record<s
 }
 
 describe('Dashboard recent QR async presentation', () => {
+  it.each([[25, 'Rad etilgan', 'error'], [777, 'Noma’lum', 'neutral']] as const)(
+    'preserves QR status %s across dashboard, dynamic table, details and display consumers', (statusCode, label, tone) => {
+      const row = decode({ statusCode })
+      const before = JSON.stringify(row)
+      for (const columns of [dashboardRecentQrColumns, dynamicQrColumns]) {
+        const html = renderToStaticMarkup(<>{columns.find(({ id }) => id === 'status')!.renderCell(row)}</>)
+        expect(html).toContain(label)
+        expect(html).toContain(`status-${tone}`)
+        expect(html).not.toContain(String(statusCode))
+      }
+      expect(renderToStaticMarkup(<DynamicQrDetailsContent row={row} onViewQr={() => undefined} />)).toContain(label)
+      const presentation = findElement(captureWithLocale(() => QrDisplayDialog({ row, onOpenChange: () => undefined })), (element) => element.type === QrPresentation)!
+      expect(presentation.props.statusLabel).toBe(label)
+      expect(presentation.props.statusTone).toBe(tone)
+      expect(JSON.stringify(row)).toBe(before)
+    },
+  )
   it.each([undefined, 'terminal-1'])('preserves view-all dates and optional terminal %s', (terminalId) => {
     const filters = { fromDate: '2026-09-30', toDate: '2026-10-01',
       ...(terminalId ? { terminalId } : {}) }
@@ -254,9 +276,9 @@ describe('Dashboard recent QR preferences and actions', () => {
     const row = decode()
     let qrRow: unknown
     let detailsRow: unknown
-    const menu = DynamicQrActionsMenu({ row,
+    const menu = captureWithLocale(() => DynamicQrActionsMenu({ row,
       onViewQr: (selected) => { qrRow = selected }, onViewDetails: (selected) => { detailsRow = selected },
-    })
+    }))
     for (const label of ['QR ko‘rish', 'Qo‘shimcha ma’lumotlar']) {
       const item = findElement(menu, (element) => typeof element.props.onSelect === 'function'
         && Children.toArray(element.props.children as ReactNode).includes(label))
@@ -271,12 +293,12 @@ describe('Dashboard recent QR preferences and actions', () => {
     const { preferences } = runtime()
     preferences.toggleVisibility('terminal')
     const hidden = preferences.getSnapshot().hidden
-    const list = TableColumnPreferenceList({ items: dashboardRecentQrColumns,
+    const list = captureWithLocale(() => TableColumnPreferenceList({ items: dashboardRecentQrColumns,
       order: preferences.getSnapshot().order, hidden, draggedColumnId: 'status', dropTargetId: 'createdAt',
       onMoveUp: preferences.moveUp, onMoveDown: preferences.moveDown, onMove: preferences.move,
       onToggleVisibility: preferences.toggleVisibility, canHide: preferences.canHide,
       onDragStart: () => undefined, onDragTarget: () => undefined, onDragEnd: () => undefined,
-    })
+    }))
     const target = findElement(list, (element) => element.props['data-column-id'] === 'createdAt')
     expect(target).toBeDefined()
     ;(target!.props.onDrop as (event: { preventDefault: () => void }) => void)({ preventDefault: () => undefined })
@@ -365,7 +387,7 @@ describe('Dashboard recent QR preferences and actions', () => {
   })
 
   it.each([dto.link, null, 'javascript:alert(1)'])('passes the Dashboard row through the shared QR safety presentation: %s', (link) => {
-    const dialog = QrDisplayDialog({ row: decode({ link }), onOpenChange: () => undefined })
+    const dialog = captureWithLocale(() => QrDisplayDialog({ row: decode({ link }), onOpenChange: () => undefined }))
     const presentation = findElement(dialog, (element) => element.type === QrPresentation)
     expect(presentation).toBeDefined()
     if (link === dto.link) {
@@ -377,3 +399,7 @@ describe('Dashboard recent QR preferences and actions', () => {
     }
   })
 })
+
+const dashboardRecentQrColumns = createDashboardRecentQrColumns(createDashboardPresentation('uz', localeMessages('dashboard')))
+
+const dynamicQrColumns = createDynamicQrColumns(createDynamicQrPresentation('uz', localeMessages('dynamicQr'), localeMessages('common')))

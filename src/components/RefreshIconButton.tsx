@@ -1,3 +1,4 @@
+import { useMessages } from '@/shared/i18n/useMessages'
 import type { ComponentProps } from 'react'
 import { RefreshCwIcon } from 'lucide-react'
 
@@ -20,6 +21,7 @@ export function RefreshIconButton({
   size,
   ...props
 }: RefreshIconButtonProps) {
+  const { message } = useMessages('common')
   return (
     <span className="group relative inline-flex shrink-0">
       <Button
@@ -27,7 +29,7 @@ export function RefreshIconButton({
         type={props.type ?? "button"}
         variant={props.variant ?? "outline"}
         size={size ?? 'icon-sm'}
-        aria-label="Yangilash"
+        aria-label={message('actions.refresh')}
         disabled={disabled || loading}
         className={className}
       >
@@ -41,7 +43,7 @@ export function RefreshIconButton({
         role="tooltip"
         className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
       >
-        Yangilangan: {updatedTime}
+        {message('refresh.updated', { time: updatedTime })}
       </span>
     </span>
   );

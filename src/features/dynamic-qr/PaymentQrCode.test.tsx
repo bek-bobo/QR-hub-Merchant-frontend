@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { CreateQrControllerState } from './create-qr'
 import { CreateQrResult } from './CreateQrResult'

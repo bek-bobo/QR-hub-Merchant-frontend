@@ -37,7 +37,7 @@ export function applyQrFilters(
     ...(draft.merchantId?.trim() ? { merchantId: draft.merchantId.trim() } : {}),
     ...(draft.bankAccountId?.trim() ? { bankAccountId: draft.bankAccountId.trim() } : {}),
     ...(draft.distributionStatus === undefined ? {} : { distributionStatus: draft.distributionStatus }),
-    search: draft.search.trim(),
+    search: draft.search,
     page: 0,
     size: draft.size,
   })
@@ -72,7 +72,7 @@ export function toDynamicQrQuery(
     if (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id))) throw safeContractError()
     query[name] = id
   }
-  const search = filters.search.trim()
+  const search = filters.search
   if (terminalId) {
     query.terminalId = terminalId
   }

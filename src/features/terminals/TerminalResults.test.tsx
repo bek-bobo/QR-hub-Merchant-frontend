@@ -1,5 +1,5 @@
 import { createElement } from 'react'
-import { renderToString } from 'react-dom/server'
+import { renderToString } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import type { Page } from '@/shared/contracts/merchant-read'
 import type { TerminalRow } from '@/shared/contracts/management-read'
@@ -26,6 +26,10 @@ describe('terminal results', () => {
     expect(html).toContain('flex-wrap')
     expect(html).toContain('overflow-x-auto')
     expect(html).not.toContain('bg-red-')
+    expect(html).not.toContain('>Terminallar<')
+    expect(html).not.toContain('Terminallar ro‘yxati')
+    expect(html).not.toContain('lucide-monitor')
+    expect(html).not.toContain('data-slot="card-header"')
   })
   it('preserves duplicate rows, shows the server total and presents unknown status neutrally', () => {
     const html = render()
@@ -34,7 +38,7 @@ describe('terminal results', () => {
     expect(html.match(/>Noma’lum</g)).toHaveLength(2)
     expect(html).not.toContain('>777<')
     expect(normalizedHtml).not.toContain('Jami: 47')
-    expect(normalizedHtml).toContain('Jami 47 ta yozuv')
+    expect(normalizedHtml).toContain('Jami 47 ta Terminal')
     expect(html).toContain('aria-current="page"')
     expect(html).not.toContain('Nusxalash')
     expect(html).not.toContain('Muvaffaqiyatli')

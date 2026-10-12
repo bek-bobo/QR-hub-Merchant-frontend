@@ -1,7 +1,9 @@
+import { createStaticQrPresentation } from './presentation'
+import { localeMessages } from '@/test/locale-fixture'
 import { describe, expect, it } from 'vitest'
 import { TABLE_COLUMN_STORAGE_KEY, type TableColumnStorage } from '@/shared/table-columns/storage'
 import { createTableColumnPreferenceRuntime } from '@/shared/table-columns/useTableColumnPreferences'
-import { STATIC_QR_DEFAULT_COLUMN_ORDER, staticQrColumns } from './columns'
+import { STATIC_QR_DEFAULT_COLUMN_ORDER, createStaticQrColumns } from './columns'
 
 const expectedBusinessColumnIds = ['qrId', 'terminal', 'merchant', 'status'] as const
 
@@ -94,3 +96,5 @@ describe('Static QR column metadata and preferences', () => {
     })
   })
 })
+
+const staticQrColumns = createStaticQrColumns(createStaticQrPresentation('uz', localeMessages('staticQr'), localeMessages('common')))

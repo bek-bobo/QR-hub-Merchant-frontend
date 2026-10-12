@@ -3,6 +3,7 @@ import {can, type AccessContextValue, type Capability} from '@/shared/auth/acces
 import {isReadQueryKey, readKeys} from '@/shared/api/read-keys'
 import type {
     DashboardFilters,
+    DashboardRequest,
     DynamicQrFilters,
     ReadScope,
 } from '@/shared/contracts/merchant-read'
@@ -103,7 +104,7 @@ export interface ReadRuntime {
     districtLookupOptions(regionId?: string): ReadQueryOptions<Awaited<ReturnType<MerchantReadApi['districtLookup']>>>
     readonly api: MerchantReadApi
 
-    dashboardOptions(filters: DashboardFilters): ReadQueryOptions<Awaited<ReturnType<MerchantReadApi['dashboard']>>>
+    dashboardOptions(filters: DashboardRequest): ReadQueryOptions<Awaited<ReturnType<MerchantReadApi['dashboard']>>>
 
     dynamicQrOptions(filters: DynamicQrFilters): ReadQueryOptions<Awaited<ReturnType<MerchantReadApi['dynamicQrs']>>>
 

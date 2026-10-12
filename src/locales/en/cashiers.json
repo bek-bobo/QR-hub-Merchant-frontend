@@ -1,0 +1,122 @@
+{
+  "status": {
+    "active": "Active",
+    "unknown": "Unknown",
+    "inactive": "Inactive"
+  },
+  "fields": {
+    "merchant": "Merchant",
+    "terminal": "Terminal",
+    "terminalId": "Terminal ID",
+    "status": "Status",
+    "fullname": "Full name",
+    "phone": "Phone",
+    "role": "Role",
+    "cashier": "Cashier"
+  },
+  "filters": {
+    "allMerchants": "All merchants",
+    "noMerchants": "No merchants available",
+    "merchantsFailed": "Unable to load merchants",
+    "allTerminals": "All terminals",
+    "noMerchantTerminals": "No terminals available for this merchant",
+    "terminalsFailed": "Unable to load terminals",
+    "unconfirmed": "Applied filter is unconfirmed",
+    "invalid": "The selected merchant or terminal is unconfirmed. Update or clear the filter.",
+    "reselect": "Reselect and apply the merchant or terminal, or clear the filter.",
+    "chooseMerchant": "Select a merchant first",
+    "membership": "A terminal filter match may not represent a current active assignment."
+  },
+  "table": {
+    "actions": "Actions",
+    "label": "Cashier table",
+    "pages": "Cashier pages",
+    "total": "Total cashiers: {{countText}}"
+  },
+  "page": {
+    "name": "Cashiers",
+    "noAccess": "Permission to view cashiers is unavailable.",
+    "unavailable": "Cashier integration is not configured"
+  },
+  "states": {
+    "loading": "Loading cashiers",
+    "failed": "Unable to display cashiers",
+    "empty": "No cashiers found."
+  },
+  "search": {
+    "label": "Search by full name or phone",
+    "placeholder": "Full name or phone"
+  },
+  "actions": {
+    "new": "New cashier",
+    "create": "Create cashier",
+    "assign": "Add terminal",
+    "unassign": "Unassign terminal",
+    "unassignShort": "Unassign",
+    "row": "Open actions for {{name}}",
+    "activeTerminals": "Active terminals · {{countText}}",
+    "unassignLabel": "Unassign terminal {{name}} ({{id}})",
+    "refreshStatus": "Refresh status"
+  },
+  "details": {
+    "active": "Active terminal assignments",
+    "assigned": "Assigned terminals",
+    "total": "Terminals: {{countText}}",
+    "empty": "No terminal is assigned to this cashier.",
+    "unassignTarget": "Terminal to unassign",
+    "unassignHelp": "You can unassign this terminal from the cashier.",
+    "description": "Active terminals currently assigned to this cashier.",
+    "terminalId": "Terminal ID:"
+  },
+  "create": {
+    "description": "Enter a full name, phone and terminal.",
+    "namePlaceholder": "Enter full name",
+    "phoneHelp": "Enter 9 local phone digits.",
+    "phoneInvalid": "The phone number must contain 9 digits.",
+    "chooseTerminal": "Select a terminal",
+    "submit": "Create cashier",
+    "pending": "Sending. Closing the page does not cancel the server operation.",
+    "unknown": "Outcome unknown",
+    "checkFirst": "The cashier may have been created. Check the cashier list before sending again.",
+    "duplicateRisk": "The cashier may have been created. Sending again may create another cashier.",
+    "newIntent": "New operation"
+  },
+  "lookup": {
+    "denied": "Permission to select a terminal is unavailable.",
+    "assignDenied": "Permission to select a terminal is unavailable.",
+    "unavailable": "Terminal selection integration is unavailable.",
+    "failed": "Unable to load terminals.",
+    "loading": "Loading terminals.",
+    "unconfirmed": "The terminal selection must be confirmed again."
+  },
+  "assign": {
+    "title": "Add terminals",
+    "warning": "This operation does not replace active assignments. Only selected terminals are added, or a previous inactive assignment may be reactivated.",
+    "options": "Terminals to add",
+    "selectionHelp": "Select at least one current terminal that is not already actively assigned.",
+    "submit": "Add selected terminals",
+    "pending": "Sending assignment.",
+    "confirmed": "Terminals assigned. Active assignments will be checked after the list refreshes.",
+    "unknown": "Outcome unknown. Some terminals may have been assigned. Refresh the cashier terminal status before sending again."
+  },
+  "unassign": {
+    "label": "Confirm terminal unassignment",
+    "title": "Unassign terminal from cashier",
+    "confirm": "Unassign terminal",
+    "warning": "Confirm removing terminal {{terminal}} ({{id}}) from cashier {{cashier}}?",
+    "stale": "The previous selection is no longer current. Refresh the cashier list.",
+    "pending": "Sending unassignment request.",
+    "confirmed": "Unassignment request confirmed. Current active assignments will be checked after refresh.",
+    "unknown": "Outcome unknown. The terminal may already be unassigned. Refresh the cashier terminal status before trying again."
+  },
+  "feedback": {
+    "permission": "Permission is unavailable.",
+    "validation": "Check the full name, phone and current terminal selection.",
+    "selection": "Select confirmed terminals that are not actively assigned.",
+    "stale": "The cashier or active terminal selection is stale. Refresh the list.",
+    "unavailable": "The operation is currently unavailable.",
+    "notSent": "The operation was not sent. Check the session and permissions.",
+    "rejected": "Request rejected.",
+    "alreadySent": "This operation has already been sent. Choose a new operation separately."
+  }
+}
