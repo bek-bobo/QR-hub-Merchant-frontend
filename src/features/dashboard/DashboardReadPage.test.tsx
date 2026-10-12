@@ -112,7 +112,7 @@ describe('Dashboard filter placement and query coordination', () => {
     const html = renderToStaticMarkup(<MemoryRouter>
       <DashboardReadPage initialInstant={new Date('2026-09-30T19:01:00Z')} />
     </MemoryRouter>)
-    const recentStart = html.indexOf('So‘nggi dinamik QRlar</div>')
+    const recentStart = html.indexOf('So‘nggi tranzaksiyalar</div>')
     for (const section of ['metrics', 'trend', 'status']) {
       const position = html.indexOf(`data-test-analytics="${section}"`)
       expect(position).toBeGreaterThan(0)

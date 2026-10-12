@@ -1,4 +1,5 @@
 import { LocaleSelect } from '@/shared/i18n/LocaleSelect'
+import { ThemeModeSelect } from '@/shared/theme/ThemeModeSelect'
 import { useMessages } from '@/shared/i18n/useMessages'
 import { useState, type ComponentProps, type ReactNode } from 'react'
 import { ArrowRightIcon, EyeIcon, EyeOffIcon, LockKeyholeIcon, type LucideIcon } from 'lucide-react'
@@ -11,6 +12,11 @@ export function AuthShell({ children, notice }: { readonly children: ReactNode; 
   const { message } = useMessages('auth')
   return <main className="auth-shell">
     <div className="auth-background" aria-hidden="true"><span /><span /><span /><span /></div>
+    <div className="auth-header-controls">
+      <ThemeModeSelect compact />
+      <span className="auth-header-divider" aria-hidden="true" />
+      <LocaleSelect />
+    </div>
     <section className="auth-composition" aria-labelledby="login-brand">
       <div className="auth-brand">
         <span className="auth-emblem" aria-hidden="true" />
@@ -19,7 +25,6 @@ export function AuthShell({ children, notice }: { readonly children: ReactNode; 
           <p className="auth-brand-subtitle">{message('brand.subtitle')}</p>
         </div>
       </div>
-      <div className="flex justify-end"><LocaleSelect /></div>
       {notice}
       {children}
     </section>
@@ -70,11 +75,21 @@ export function AuthPinInput({ className, withLock = false, ...props }: Omit<Com
   </div>
 }
 
-export function AuthOtpInput({ value, ...props }: ComponentProps<typeof Input> & { readonly value: string }) {
+export function AuthOtpInput({ value, onChange, onSelect, ...props }: ComponentProps<typeof Input> & { readonly value: string }) {
+  const [caret, setCaret] = useState(value.length)
+  const activeIndex = Math.min(caret, value.length, (props.maxLength ?? 6) - 1)
   return <div className="auth-otp-field">
     <div className="auth-otp-cells" aria-hidden="true">
-      {Array.from({ length: props.maxLength ?? 6 }, (_, index) => <span key={index} data-active={index === Math.min(value.length, (props.maxLength ?? 6) - 1)}>{value[index] ?? ''}</span>)}
+      {Array.from({ length: props.maxLength ?? 6 }, (_, index) => <span key={index} data-active={index === activeIndex}>{value[index] ?? ''}</span>)}
     </div>
-    <Input {...props} value={value} className="auth-otp-input" />
+    <Input {...props} value={value} className="auth-otp-input"
+      onChange={(event) => {
+        setCaret(event.currentTarget.selectionStart ?? event.currentTarget.value.length)
+        onChange?.(event)
+      }}
+      onSelect={(event) => {
+        setCaret(event.currentTarget.selectionStart ?? value.length)
+        onSelect?.(event)
+      }} />
   </div>
 }

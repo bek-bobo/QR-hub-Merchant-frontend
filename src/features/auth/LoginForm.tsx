@@ -1,9 +1,9 @@
 import type { LoginFeedback } from '@/shared/auth/feedback'
 import { presentLoginFeedback } from './feedback-presentation'
 import { useMessages } from '@/shared/i18n/useMessages'
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
-import { KeyRoundIcon, ScanLineIcon, ShieldCheckIcon, SmartphoneIcon } from 'lucide-react'
+import { KeyRoundIcon, RefreshCwIcon, ScanLineIcon, ShieldCheckIcon, SmartphoneIcon } from 'lucide-react'
 import { AuthCard, AuthOtpInput, AuthPinInput, AuthPrimaryButton, AuthRestartAction, AuthStepHeader } from './AuthPresentation'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { LoginActions } from '@/shared/auth/useAuth'
@@ -59,6 +59,18 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
   const [localError, setLocalError] = useState<LoginFeedback | null>(null)
   const remainingMs = useOtpRemainingMs(actions, snapshot)
   const otpExpired = remainingMs === 0
+  const otpInput = useRef<HTMLInputElement>(null)
+  const otpFocus = useRef({ phase: snapshot.phase, focused: false })
+  useEffect(() => {
+    if (otpFocus.current.phase !== snapshot.phase) {
+      otpFocus.current = { phase: snapshot.phase, focused: false }
+    }
+    if (snapshot.phase !== 'otp' && snapshot.phase !== 'reset-otp') return
+    const input = otpInput.current
+    if (otpFocus.current.focused || !input || input.disabled) return
+    input.focus({ preventScroll: true })
+    otpFocus.current.focused = document.activeElement === input
+  }, [snapshot.phase, snapshot.pending, otpExpired])
   const feedback = localError ?? snapshot.message
   const feedbackText = feedback ? presentLoginFeedback(feedback, messages) : null
 
@@ -178,16 +190,19 @@ export function LoginForm({ actions, snapshot }: LoginFormProps) {
     </form>}
 
     {(snapshot.phase === 'otp' || snapshot.phase === 'reset-otp') && <form className="space-y-5" onSubmit={submitOtp} noValidate>
-      <AuthOtpInput id="login-otp" aria-label={message('otp.title')} type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6}
-        value={otp} onChange={(event) => setOtp(event.target.value)} aria-invalid={Boolean(feedbackText)} aria-describedby="login-feedback"
+      <AuthOtpInput ref={otpInput} id="login-otp" aria-label={message('otp.title')} type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} pattern="[0-9]{6}"
+        value={otp} onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))} aria-invalid={Boolean(feedbackText)} aria-describedby="login-feedback"
         disabled={snapshot.pending || otpExpired} />
       <div className="flex items-center justify-between gap-3 text-sm text-text-secondary">
         <span>{message('otp.validity')}</span><span className="tabular-nums" aria-hidden="true">{formatCountdown(remainingMs)}</span>
       </div>
       {status}
       <AuthPrimaryButton type="submit" disabled={snapshot.pending || otpExpired || !canSubmit}>{snapshot.pending ? message('states.checking') : message('actions.verify')}</AuthPrimaryButton>
-      <Button type="button" variant="outline" className="auth-secondary" disabled={snapshot.pending || !otpExpired || !canResend}
-        onClick={() => { if (!canResend) return; setOtp(''); void actions.resendOtp() }}>{message('actions.resend')}</Button>
+      <Button type="button" variant="outline" className="auth-secondary auth-resend" disabled={snapshot.pending || !otpExpired || !canResend}
+        onClick={() => { if (!canResend) return; setOtp(''); void actions.resendOtp() }}>
+        <RefreshCwIcon aria-hidden="true" className="size-5" />
+        {message('actions.resend')}
+      </Button>
       <AuthRestartAction onClick={restart} />
     </form>}
 

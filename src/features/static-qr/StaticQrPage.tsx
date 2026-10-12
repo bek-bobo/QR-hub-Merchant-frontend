@@ -123,8 +123,8 @@ export function StaticQrPage() {
           items={staticQrColumns}
           order={columnPreferences.order}
           hidden={columnPreferences.hidden}
-          triggerLabel={p.common('table.columns')}
-          triggerClassName="h-10 gap-2 rounded-xl bg-muted/30 px-5 text-sm"
+          iconOnly
+          triggerClassName="size-10 rounded-xl bg-muted/30"
           onMoveUp={columnPreferences.moveUp}
           onMoveDown={columnPreferences.moveDown}
           onMove={columnPreferences.move}

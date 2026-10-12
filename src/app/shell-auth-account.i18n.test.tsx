@@ -106,6 +106,15 @@ describe.each(['uz', 'ru', 'en'] as const)('shell/auth/account in %s', (locale) 
     for (const text of [copy[locale].account, copy[locale].fullName, copy[locale].refresh, 'shell.navigation.account', '+998 90 000 00 00']) expect(host.textContent).toContain(text)
     expect(host.textContent).not.toContain('remoteUnconfirmed')
     expect(value.actions.refreshProfile).not.toHaveBeenCalled(); expect(value.actions.logout).not.toHaveBeenCalled()
+    const buttons = [...host.querySelectorAll<HTMLButtonElement>('section[aria-labelledby="account-title"] button')]
+    expect(buttons).toHaveLength(1)
+    expect(buttons[0].textContent).toBe(copy[locale].logout)
+    expect(buttons[0].disabled).toBe(false)
+    buttons[0].focus()
+    expect(document.activeElement).toBe(buttons[0])
+    await act(async () => buttons[0].click())
+    expect(value.actions.logout).toHaveBeenCalledOnce()
+    expect(value.actions.refreshProfile).not.toHaveBeenCalled()
   })
   it('renders permitted shell labels, active destination, header and profile menu', async () => {
     const instance = await runtime(locale)
@@ -269,7 +278,9 @@ describe('mounted locale selection and state preservation', () => {
     const requests = vi.mocked(api.getMe).mock.calls.length
     await switchTo(instance, 'ru'); expect(host.textContent).toContain('Данные не изменились.')
     await switchTo(instance, 'en'); expect(host.textContent).toContain('Information is unchanged.'); expect(api.getMe).toHaveBeenCalledTimes(requests)
-    await act(async () => observed!.actions.logout())
+    const logout = host.querySelector<HTMLButtonElement>('section[aria-labelledby="account-title"] button')!
+    expect(logout.textContent).toBe(copy.en.logout)
+    await act(async () => { logout.click(); await new Promise((resolve) => setTimeout(resolve, 0)) })
     expect(observed?.logoutMessage).toBe('remoteUnconfirmed'); expect(observed?.sessionPhase).toBe('anonymous')
     expect(host.textContent).toContain('Server session termination could not be confirmed.')
     await switchTo(instance, 'ru'); expect(host.textContent).toContain('Не удалось подтвердить завершение сессии на сервере.')

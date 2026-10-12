@@ -94,7 +94,7 @@
     "preset_one": "{{count}} kun"
   },
   "recentQr": {
-    "title": "So‘nggi dinamik QRlar",
+    "title": "So‘nggi tranzaksiyalar",
     "description": "Tanlangan filtrlar bo‘yicha so‘nggi 10 ta dinamik QR.",
     "viewAll": "Barchasini ko‘rish",
     "loading": "So‘nggi dinamik QRlar yuklanmoqda…",

@@ -1,5 +1,5 @@
 import { useMessages } from '@/shared/i18n/useMessages'
-import { LogOutIcon, PencilIcon, PhoneIcon, UserIcon } from 'lucide-react'
+import { LogOutIcon, PhoneIcon, UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -63,18 +63,6 @@ export function AccountPage() {
             ) : null}
 
             <div className="flex flex-col gap-3 border-t border-border/70 pt-5 sm:flex-row sm:flex-wrap">
-              <Button
-                type="button"
-                variant="outline"
-                className="h-10 gap-2.5 rounded-lg bg-muted/50 px-4 font-semibold text-text-primary shadow-sm"
-                disabled={pending.profileRefresh || pending.logout}
-                onClick={() => void actions.refreshProfile()}
-              >
-                <PencilIcon className="size-4 text-text-secondary" aria-hidden="true" />
-                {pending.profileRefresh
-                  ? message('states.refreshing')
-                  : message('actions.refresh')}
-              </Button>
               <Button
                 type="button"
                 className="h-10 gap-2.5 rounded-lg bg-brand px-6 font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover"

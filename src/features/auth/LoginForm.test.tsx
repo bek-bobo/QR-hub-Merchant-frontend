@@ -5,6 +5,7 @@ import type { Button } from '@/components/ui/button'
 import type { LoginSnapshot } from '@/shared/auth/login-controller'
 import type { LoginActions } from '@/shared/auth/useAuth'
 import { AuthShell } from './AuthPresentation'
+import { ThemeProvider } from '@/shared/theme/ThemeProvider'
 import { LoginForm } from './LoginForm'
 
 const capture = vi.hoisted(() => ({ buttons: [] as Array<ComponentProps<typeof Button>> }))
@@ -24,8 +25,8 @@ function actions(remainingMs = 73000): LoginActions {
 }
 
 function render(phase: LoginSnapshot['phase'], port = actions(), pending = false, message?: LoginSnapshot['message']) {
-  return renderToStaticMarkup(<AuthShell><LoginForm actions={port}
-    snapshot={{ phase, flow: phase === 'reset-otp' ? 'reset' : 'login', phone: '998901234567', pending, message }} /></AuthShell>)
+  return renderToStaticMarkup(<ThemeProvider><AuthShell><LoginForm actions={port}
+    snapshot={{ phase, flow: phase === 'reset-otp' ? 'reset' : 'login', phone: '998901234567', pending, message }} /></AuthShell></ThemeProvider>)
 }
 
 describe('auth flow presentation', () => {
@@ -59,13 +60,13 @@ describe('auth flow presentation', () => {
   it.each(['otp', 'reset-otp'] as const)('uses the real timer and expiry gate in %s', (phase) => {
     const port = actions(73000)
     expect(render(phase, port)).toContain('1:13')
-    expect(capture.buttons.find((button) => button.children === 'Kodni qayta yuborish')?.disabled).toBe(true)
+    expect(capture.buttons.find((button) => button.className === 'auth-secondary auth-resend')?.disabled).toBe(true)
     capture.buttons = []
     const expiredPort = actions(0)
     const html = render(phase, expiredPort)
     expect(html).toContain('0:00')
     expect(capture.buttons.find((button) => button.type === 'submit')?.disabled).toBe(true)
-    const resend = capture.buttons.find((button) => button.children === 'Kodni qayta yuborish')!
+    const resend = capture.buttons.find((button) => button.className === 'auth-secondary auth-resend')!
     expect(resend.disabled).toBe(false)
     resend.onClick?.({} as never)
     expect(expiredPort.resendOtp).toHaveBeenCalledOnce()

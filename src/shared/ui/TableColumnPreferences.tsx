@@ -230,6 +230,7 @@ export function TableColumnPreferences({
   const [announcement, setAnnouncement] = useState<ColumnAnnouncement | null>(null)
   const [draggedColumnId, setDraggedColumnId] = useState<string | null>(null)
   const [dropTargetId, setDropTargetId] = useState<string | null>(null)
+  const [tooltipDismissed, setTooltipDismissed] = useState(false)
   const tooltipId = useId()
   const itemById = new Map(items.map((item) => [item.id, item] as const))
 
@@ -308,6 +309,11 @@ export function TableColumnPreferences({
             aria-label={iconOnly || triggerAccessibleName === 'settings' ? message('table.settings') : undefined}
             aria-describedby={iconOnly ? tooltipId : undefined}
             className={triggerClassName}
+            onPointerEnter={() => setTooltipDismissed(false)}
+            onFocus={() => setTooltipDismissed(false)}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape') setTooltipDismissed(true)
+            }}
           >
             <Columns3Icon aria-hidden="true" />
             {iconOnly ? null : (triggerLabel ?? message('table.trigger'))}
@@ -317,7 +323,10 @@ export function TableColumnPreferences({
           <span
             id={tooltipId}
             role="tooltip"
-            className="pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+            className={cn(
+              'pointer-events-none invisible absolute right-0 top-[calc(100%+0.375rem)] z-50 whitespace-nowrap rounded-md border bg-popover px-2 py-1 text-xs text-popover-foreground opacity-0 shadow-md transition-opacity',
+              !tooltipDismissed && 'group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100',
+            )}
           >
             {message('table.columns')}
           </span>

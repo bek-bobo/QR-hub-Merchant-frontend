@@ -8,6 +8,11 @@ import { LocaleSelect } from './LocaleSelect'
 import { createLocaleRuntime, type LocaleRuntime } from './runtime'
 import { languageRegistry, supportedLocales, type SupportedLocale } from './registry'
 import { ThemeProvider } from '@/shared/theme/ThemeProvider'
+import uzFlag from './flags/uz.svg'
+import ruFlag from './flags/ru.svg'
+import gbFlag from './flags/gb.svg'
+
+const flagSources = { uz: uzFlag, ru: ruFlag, en: gbFlag }
 
 const mounted: { root: Root; host: HTMLElement }[] = []
 beforeEach(() => {
@@ -49,17 +54,27 @@ describe('shared locale pill and Radix dropdown', () => {
     expect(trigger.getAttribute('aria-label')).toBe('Til')
     expect(trigger.querySelector('.lucide-globe')).not.toBeNull()
     expect(trigger.querySelector('.lucide-chevron-down')).not.toBeNull()
+    expect([...trigger.children].map(element => element.tagName.toLowerCase())).toEqual(['svg', 'img', 'span', 'svg'])
     expect(document.getElementById(trigger.getAttribute('aria-describedby')!)?.textContent).toContain('O‘zbekcha')
     expect(host.querySelector('select')).toBeNull()
     expect(document.querySelector('[role=menu]')).toBeNull()
   })
   it.each(['uz', 'ru', 'en'] as const)('derives enabled options and checked highlight from canonical %s', async (locale) => {
     const { trigger, host } = await mount(locale)
+    expect(trigger.querySelector('img')?.getAttribute('src')).toBe(flagSources[locale])
+    expect(trigger.querySelector('img')?.getAttribute('alt')).toBe('')
+    expect(trigger.querySelector('img')?.getAttribute('aria-hidden')).toBe('true')
     await open(trigger)
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(options().map((item) => item.lang)).toEqual(supportedLocales)
     expect(options().map((item) => item.getAttribute('aria-label'))).toEqual(supportedLocales.map((code) => languageRegistry[code].nativeName))
     expect(options().map((item) => item.textContent)).toEqual(['O‘Z', 'RU', 'EN'])
+    for (const [index, code] of supportedLocales.entries()) {
+      const flag = options()[index].querySelector('img')!
+      expect(flag.getAttribute('src')).toBe(flagSources[code])
+      expect(flag.getAttribute('aria-hidden')).toBe('true')
+      expect(flag.getAttribute('alt')).toBe('')
+    }
     const checked = options().filter((item) => item.getAttribute('aria-checked') === 'true')
     expect(checked).toHaveLength(1); expect(checked[0].lang).toBe(locale)
     expect(checked[0].className).toContain('data-[state=checked]:bg-brand-soft')
@@ -79,6 +94,7 @@ describe('shared locale pill and Radix dropdown', () => {
     expect(document.activeElement).toBe(options()[1])
     await key(options()[1], 'Enter')
     expect(runtime.getSnapshot().locale).toBe('ru'); expect(trigger.textContent).toBe('RU')
+    expect(trigger.querySelector('img')?.getAttribute('src')).toBe(ruFlag)
     expect(service).toHaveBeenCalledExactlyOnceWith('ru'); expect(change).toHaveBeenCalledExactlyOnceWith('ru')
     expect(localStorage.getItem('qrhub:locale:v1')).toBe('ru')
     expect(document.documentElement.lang).toBe('ru'); expect(document.documentElement.dir).toBe('ltr')
@@ -93,11 +109,41 @@ describe('shared locale pill and Radix dropdown', () => {
     expect(trigger.textContent).toBe('EN'); expect(service).not.toHaveBeenCalled(); expect(change).not.toHaveBeenCalled()
     expect(document.querySelector('[role=menu]')).toBeNull(); expect(document.activeElement).toBe(trigger)
   })
+  it('keeps flag, abbreviation, announcement and persistence synchronized through all locales without requests', async () => {
+    const { trigger, runtime, service } = await mount()
+    const fetch = vi.fn(); vi.stubGlobal('fetch', fetch)
+    for (const code of ['en', 'ru', 'uz'] as const) {
+      await open(trigger); await choose(code)
+      expect(trigger.querySelector('img')?.getAttribute('src')).toBe(flagSources[code])
+      expect(trigger.textContent).toBe({ uz: 'O‘Z', ru: 'RU', en: 'EN' }[code])
+      expect(runtime.getSnapshot().locale).toBe(code)
+      expect(localStorage.getItem('qrhub:locale:v1')).toBe(code)
+      expect(document.documentElement.lang).toBe(code)
+      expect(document.getElementById(trigger.getAttribute('aria-describedby')!)?.textContent).toContain(languageRegistry[code].nativeName)
+    }
+    expect(service.mock.calls.map(call => call[0])).toEqual(['en', 'ru', 'uz'])
+    expect(fetch).not.toHaveBeenCalled()
+    expect(localStorage.getItem('qrhub:theme:v1')).toBe('light')
+  })
   it('dismisses with Escape and restores focus', async () => {
     const { trigger } = await mount()
     await open(trigger); await key(document.querySelector('[role=menu]')!, 'Escape')
     expect(document.querySelector('[role=menu]')).toBeNull()
     expect(trigger.getAttribute('aria-expanded')).toBe('false'); expect(document.activeElement).toBe(trigger)
+  })
+  it('opens and selects through Space while retaining arrow navigation and focus restoration', async () => {
+    const { trigger, runtime, service } = await mount()
+    trigger.focus(); await key(trigger, ' ')
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+    await key(document.querySelector('[role=menu]')!, 'ArrowDown')
+    await key(options()[0], 'ArrowDown')
+    expect(document.activeElement).toBe(options()[1])
+    await key(options()[1], ' ')
+    expect(runtime.getSnapshot().locale).toBe('ru')
+    expect(trigger.querySelector('img')?.getAttribute('src')).toBe(ruFlag)
+    expect(service).toHaveBeenCalledExactlyOnceWith('ru')
+    expect(document.querySelector('[role=menu]')).toBeNull()
+    expect(document.activeElement).toBe(trigger)
   })
   it('dismisses on an outside pointer press', async () => {
     const { trigger } = await mount()

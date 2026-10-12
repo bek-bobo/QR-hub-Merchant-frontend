@@ -94,7 +94,7 @@
     "preset_one": "{{count}} day"
   },
   "recentQr": {
-    "title": "Recent dynamic QR codes",
+    "title": "Recent transactions",
     "description": "The latest 10 dynamic QR codes matching the selected filters.",
     "viewAll": "View all",
     "loading": "Loading recent dynamic QR codes…",
