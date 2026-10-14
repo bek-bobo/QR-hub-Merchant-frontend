@@ -1,8 +1,9 @@
-import { can, type AccessContextValue, type Capability } from '@/shared/auth/access'
+import { can, type AccessContextValue } from '@/shared/auth/access'
 import type { SessionSnapshot } from '@/shared/auth/session-controller'
 import type { ReadApiRegistrations } from './read/createLiveReadApi'
 
-export type LiveFeatureRoute = 'dashboard' | 'dynamicQr' | 'exportQr' | 'staticQr' | 'terminals' | 'bankAccounts' | 'cashiers' | 'devices'
+import { liveFeatureRouteDefinitions, accountRoutePolicy, createQrRoutePolicy, type LiveFeatureRoute } from './access-policy'
+export { liveFeatureRouteDefinitions, type LiveFeatureRoute } from './access-policy'
 export type LiveFeatureRouteDecision =
   | 'login'
   | 'pending'
@@ -10,57 +11,6 @@ export type LiveFeatureRouteDecision =
   | 'unavailable'
   | 'allowed'
 
-export const liveFeatureRouteDefinitions = {
-  dashboard: {
-    path: '/dashboard',
-    capability: 'dashboard.read',
-    registration: 'dashboard',
-  },
-  dynamicQr: {
-    path: '/dynamic-qrs',
-    capability: 'dynamicQr.read',
-    registration: 'dynamicQr',
-  },
-  exportQr: {
-    path: '/dynamic-qrs/export',
-    capability: 'dynamicQr.export',
-    // Shared web-base registration; the read capability is checked separately.
-    registration: 'dynamicQr',
-  },
-  staticQr: {
-    path: '/static-qrs',
-    capability: 'staticQr.read',
-    // Both list APIs use the same validated web base; grants remain independent.
-    registration: 'dynamicQr',
-  },
-  terminals: {
-    path: '/terminals',
-    capability: 'terminal.read',
-    registration: 'terminalList',
-  },
-  bankAccounts: {
-    path: '/bank-accounts',
-    capability: 'bankAccount.read',
-    registration: 'bankAccountList',
-  },
-  cashiers: {
-    path: '/cashiers',
-    capability: 'cashier.read',
-    registration: 'cashierList',
-  },
-  devices: {
-    path: '/devices',
-    capability: 'p5.read',
-    registration: 'p5List',
-  },
-} as const satisfies Record<
-  LiveFeatureRoute,
-  {
-    readonly path: string
-    readonly capability: Capability
-    readonly registration: keyof ReadApiRegistrations
-  }
->
 
 interface LiveFeatureRoutePolicyInput {
   readonly sessionPhase: SessionSnapshot['phase']
@@ -98,16 +48,16 @@ export function isLiveRouteAccessible(
     return true
   }
 
-  if (path === '/account') {
-    return can(input.access, 'profile.read', false)
+  if (path === accountRoutePolicy.path) {
+    return can(input.access, accountRoutePolicy.capability, false)
   }
 
   if (path === '/cashiers/new') {
     return isLiveRouteAccessible('/cashiers', input)
   }
 
-  if (path === '/dynamic-qrs/new') {
-    return can(input.access, 'dynamicQr.create', false)
+  if (path === createQrRoutePolicy.path) {
+    return can(input.access, createQrRoutePolicy.capability, false)
   }
 
   const feature = Object.values(liveFeatureRouteDefinitions).find(
@@ -139,5 +89,6 @@ export function decideLiveFeatureRoute(
     return 'forbidden'
   }
 
+  if (!Object.hasOwn(liveFeatureRouteDefinitions, route)) return 'forbidden'
   return decideAuthenticatedFeatureAccess(liveFeatureRouteDefinitions[route], input)
 }

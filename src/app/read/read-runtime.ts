@@ -1,3 +1,4 @@
+import { readEndpointCapabilities as featureCapabilities } from '@/app/access-policy'
 import type {QueryClient} from '@tanstack/react-query'
 import {can, type AccessContextValue, type Capability} from '@/shared/auth/access'
 import {isReadQueryKey, readKeys} from '@/shared/api/read-keys'
@@ -59,19 +60,6 @@ function scopesMatch(left: ReadScope, right: ReadScope): boolean {
     )
 }
 
-const featureCapabilities = {
-    dashboard: 'dashboard.read',
-    dynamicQr: 'dynamicQr.read',
-    terminalLookup: 'terminal.lookup',
-    terminalList: 'terminal.read',
-    bankAccountList: 'bankAccount.read',
-    cashierList: 'cashier.read',
-    merchantLookup: 'merchant.lookup',
-    bankAccountLookup: 'bankAccount.lookup',
-    regionLookup: 'region.lookup',
-    districtLookup: 'district.lookup',
-    p5List: 'p5.read',
-} as const satisfies Record<keyof ReadApiRegistrations, Capability>
 
 function assertRunnable(
     registrations: ReadApiRegistrations,

@@ -90,6 +90,7 @@ function LiveShell({
           identityLabel={identityLabel}
           identitySecondary={profile?.roles[0]}
           compactAccountControls
+          accountAccessible={isLiveRouteAccessible('/account', { access, registrations: runtime.readiness })}
           logoutPending={pending.logout}
           onLogout={() => void actions.logout()}
         />

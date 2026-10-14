@@ -109,4 +109,10 @@ describe('production auth wire contract', () => {
       permissions: ['GET_ME'],
     })
   })
+
+  it.each([undefined, null, 'GET_P5', ['GET_P5', 1], [null]])('fails closed for malformed permissions %j', (permissions) => {
+    expect(() => wire().decodeProfile({ success: true, data: {
+      userId: 101, phone: '998901234567', fullname: null, roles: ['ROLE_MERCHANT'], permissions,
+    } })).toThrow()
+  })
 })

@@ -109,7 +109,7 @@ async function setup(flow: Flow) {
       terminals: qrTerminals, currencies, terminalLookupAllowed: true, currencyLookupAllowed: true })
     outcome = () => controller.getState().outcome.kind
   }
-  return { client, scope, run, outcome, fetchImpl, refresh, refreshAuth, session, mutationResults, qr, target,
+  return { client, scope, run, outcome, fetchImpl, refresh, refreshAuth, session, mutationResults, qr, target, assignPort: assign.port,
     setResponse: (nextStatus: number, body: unknown = payload) => { status = nextStatus; payload = body },
     fail: (kind: typeof failure) => { failure = kind },
     revoke: () => { currentPermissions = [] },
@@ -136,6 +136,12 @@ async function setup(flow: Flow) {
     holdPreflight: () => { const hold = deferred<void>(); preflight = () => hold.promise; return hold.resolve },
   }
 }
+
+it('rejects a tampered cashier ID at the live assignment port before network dispatch', async () => {
+  const h = await setup('assign')
+  await expect(h.assignPort()!.assign({ cashierId: 99, terminalIds: ['new'] }, h.scope)).rejects.toThrow()
+  expect(h.fetchImpl).not.toHaveBeenCalled()
+})
 
 describe.each(flows)('F08 %s live wire parity', (flow) => {
   it('uses the exact method, endpoint, auth and request, and never replays confirmation', async () => {

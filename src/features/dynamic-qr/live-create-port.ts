@@ -1,3 +1,4 @@
+import { canWithPermissions } from '@/shared/auth/access'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
 import { safeHttpError } from '@/shared/api/errors'
 import type { HttpTransport } from '@/shared/api/http'
@@ -36,9 +37,9 @@ export function createLiveCreateQrPort(deps: LiveCreateQrPortDependencies): Crea
         const transport = deps.getTransport ? deps.getTransport() : deps.transport
         const current = deps.getCurrentContext()
         if (!transport || !current || !sameScope(scope, current.scope) ||
-          !current.permissions.includes('CREATE_DYNAMIC_QR') ||
-          !current.permissions.includes('GET_DROPDOWN_TERMINALS') ||
-          !current.permissions.includes('GET_CURRENCY_CODE') ||
+          !canWithPermissions(current.permissions, 'dynamicQr.create') ||
+          !canWithPermissions(current.permissions, 'terminal.lookup') ||
+          !canWithPermissions(current.permissions, 'currency.lookup') ||
           !isCurrentCreateQrRequest(request, current.terminals, current.currencies)) {
           throw new ActionNotDispatchedError()
         }

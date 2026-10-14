@@ -1,3 +1,4 @@
+import { readEndpointCapabilities } from '@/app/access-policy'
 import {
   useEffect,
   useMemo,
@@ -27,18 +28,7 @@ interface ReadProviderProps {
   readonly children: ReactNode
 }
 
-const requiredCapabilities = Object.freeze({
-  dashboard: 'dashboard.read',
-  dynamicQr: 'dynamicQr.read',
-  terminalLookup: 'terminal.lookup',
-  terminalList: 'terminal.read',
-  bankAccountList: 'bankAccount.read',
-  cashierList: 'cashier.read',
-  merchantLookup: 'merchant.lookup',
-  bankAccountLookup: 'bankAccount.lookup',
-  p5List: 'p5.read',
-  p5ResetPin: 'p5.resetPin',
-} as const)
+const requiredCapabilities = { ...readEndpointCapabilities, p5ResetPin: 'p5.resetPin' } as const
 
 function sameScope(left: ReadScope, right: ReadScope): boolean {
   return (

@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SessionSnapshot } from '@/shared/auth/session-controller'
 import routerSource from './LiveRouter.tsx?raw'
 import { LiveRouter } from './LiveRouter'
+import { cashierPermissions, merchantPermissions } from '@/test/rbac-fixtures'
 
 const state = vi.hoisted(() => ({
   path: '/dashboard',
@@ -49,6 +50,7 @@ vi.mock('@/features/dynamic-qr/DynamicQrPage', () => ({
 vi.mock('@/features/dynamic-qr/CreateQrPage', () => ({ CreateQrPage: () => <p>create-page</p> }))
 vi.mock('@/features/dynamic-qr/ExportQrPage', () => ({ ExportQrPage: () => <p>export-page</p> }))
 vi.mock('@/features/static-qr/StaticQrPage', () => ({ StaticQrPage: () => <p>static-page</p> }))
+vi.mock('@/features/p5/P5Page', () => ({ P5Page: () => <p>p5-page</p> }))
 
 function renderRoute(): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -73,6 +75,25 @@ beforeEach(() => {
 })
 
 describe('production lazy route boundaries', () => {
+  it('enforces P5 direct URLs for cashier and merchant before mounting lazy content', async () => {
+    state.path = '/devices'
+    state.permissions = [...cashierPermissions]
+    let html = await renderRoute()
+    expect(html).toContain('data-redirect="/403"')
+    expect(html).not.toContain('p5-page')
+    state.permissions = [...merchantPermissions]
+    html = await renderRoute()
+    expect(html).toContain('p5-page')
+    expect(html).toContain('href="/devices"')
+    state.permissions = ['GET_P5']
+    expect(await renderRoute()).toContain('p5-page')
+    state.phase = 'bootstrapping'
+    html = await renderRoute()
+    expect(html).toContain('Sessiya tekshirilmoqda')
+    expect(html).not.toContain('p5-page')
+    state.phase = 'bootstrap-error'
+    expect(await renderRoute()).toContain('data-redirect="/login"')
+  })
   it('redirects the legacy cashier create URL without rendering a standalone page', async () => {
     state.path = '/cashiers/new'
     expect(await renderRoute()).toContain('data-redirect="/cashiers"')

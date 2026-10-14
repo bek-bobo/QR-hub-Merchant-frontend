@@ -107,14 +107,17 @@ describe.each(['uz', 'ru', 'en'] as const)('shell/auth/account in %s', (locale) 
     expect(host.textContent).not.toContain('remoteUnconfirmed')
     expect(value.actions.refreshProfile).not.toHaveBeenCalled(); expect(value.actions.logout).not.toHaveBeenCalled()
     const buttons = [...host.querySelectorAll<HTMLButtonElement>('section[aria-labelledby="account-title"] button')]
-    expect(buttons).toHaveLength(1)
-    expect(buttons[0].textContent).toBe(copy[locale].logout)
+    expect(buttons).toHaveLength(2)
     expect(buttons[0].disabled).toBe(false)
-    buttons[0].focus()
-    expect(document.activeElement).toBe(buttons[0])
     await act(async () => buttons[0].click())
+    expect(value.actions.refreshProfile).toHaveBeenCalledOnce()
+    expect(buttons[1].textContent).toBe(copy[locale].logout)
+    expect(buttons[1].disabled).toBe(false)
+    buttons[1].focus()
+    expect(document.activeElement).toBe(buttons[1])
+    await act(async () => buttons[1].click())
     expect(value.actions.logout).toHaveBeenCalledOnce()
-    expect(value.actions.refreshProfile).not.toHaveBeenCalled()
+    expect(value.actions.refreshProfile).toHaveBeenCalledOnce()
   })
   it('renders permitted shell labels, active destination, header and profile menu', async () => {
     const instance = await runtime(locale)
@@ -273,12 +276,15 @@ describe('mounted locale selection and state preservation', () => {
     let observed: AuthContextValue | undefined
     function Fixture() { const current = useAuth(); useLayoutEffect(() => { observed = current }, [current]); return current.sessionPhase === 'authenticated' ? <AccountPage /> : <LoginPage /> }
     const host = await mount(instance, <QueryClientProvider client={client}><AuthProvider api={api}><Fixture /></AuthProvider></QueryClientProvider>)
-    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); await observed!.actions.refreshProfile() })
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
+    const refresh = host.querySelector<HTMLButtonElement>('section[aria-labelledby="account-title"] button')!
+    await act(async () => { refresh.click(); await new Promise((resolve) => setTimeout(resolve, 0)) })
     expect(observed?.profileRefreshMessage).toBe('unchanged')
     const requests = vi.mocked(api.getMe).mock.calls.length
     await switchTo(instance, 'ru'); expect(host.textContent).toContain('Данные не изменились.')
     await switchTo(instance, 'en'); expect(host.textContent).toContain('Information is unchanged.'); expect(api.getMe).toHaveBeenCalledTimes(requests)
-    const logout = host.querySelector<HTMLButtonElement>('section[aria-labelledby="account-title"] button')!
+    const logout = [...host.querySelectorAll<HTMLButtonElement>('section[aria-labelledby="account-title"] button')]
+      .find((button) => button.textContent === copy.en.logout)!
     expect(logout.textContent).toBe(copy.en.logout)
     await act(async () => { logout.click(); await new Promise((resolve) => setTimeout(resolve, 0)) })
     expect(observed?.logoutMessage).toBe('remoteUnconfirmed'); expect(observed?.sessionPhase).toBe('anonymous')

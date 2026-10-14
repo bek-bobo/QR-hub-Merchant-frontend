@@ -31,6 +31,20 @@ export type AccessContextValue =
 
 export type VerifiedAuthorityMap = Partial<Record<Capability, string>>
 
+// Empty requirements are not an implicit public policy. Public routes are explicit.
+export function hasPermission(context: AccessContextValue, permission: string): boolean {
+  return context.kind === 'authenticated' && permission.trim().length > 0 &&
+    context.permissions.has(permission)
+}
+
+export function hasAllPermissions(context: AccessContextValue, permissions: readonly string[]): boolean {
+  return permissions.length > 0 && permissions.every((permission) => hasPermission(context, permission))
+}
+
+export function hasAnyPermission(context: AccessContextValue, permissions: readonly string[]): boolean {
+  return permissions.some((permission) => hasPermission(context, permission))
+}
+
 export const verifiedAuthorityMap: VerifiedAuthorityMap = {
   'dashboard.read': 'GET_DASHBOARD',
   'dynamicQr.read': 'GET_DYNAMIC_QRS',
@@ -74,6 +88,12 @@ export function can(
   return (
     typeof authority === 'string' &&
     authority.length > 0 &&
-    context.permissions.has(authority)
+    Object.hasOwn(authorityMap, capability) &&
+    hasPermission(context, authority)
   )
+}
+
+// For live adapters that must recheck the session at dispatch time, not render time.
+export function canWithPermissions(permissions: readonly string[], capability: Capability): boolean {
+  return can({ kind: 'authenticated', permissions: new Set(permissions) }, capability, false)
 }

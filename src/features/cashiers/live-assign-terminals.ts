@@ -1,3 +1,4 @@
+import { canWithPermissions, type Capability } from '@/shared/auth/access'
 import { useMemo } from 'react'
 import { useCommittedGetter, useLiveWebContext, type LiveWebContext } from '@/app/read/useLiveWebContext'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
@@ -22,9 +23,9 @@ function sameScope(left: ReadScope, right: ReadScope) {
 }
 
 export function createLiveAssignTerminalsAdapter(getCurrent: () => LiveWebContext, getEvidence: () => AssignEvidence): AssignTerminalsDependencies {
-  const permitted = (permission: string) => {
+  const permitted = (capability: Capability) => {
     const snapshot = getCurrent().auth.getSessionSnapshot()
-    return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes(permission)
+    return snapshot.phase === 'authenticated' && canWithPermissions(snapshot.profile.permissions, capability)
   }
   const currentTarget = () => {
     const evidence = getEvidence()
@@ -33,13 +34,13 @@ export function createLiveAssignTerminalsAdapter(getCurrent: () => LiveWebContex
     return resolveCurrentAssignTarget({ ...evidence,
       currentData: state?.status === 'success' ? state.data : undefined,
       currentUpdatedAt: state?.dataUpdatedAt, invalidated: state?.isInvalidated ?? true,
-      currentScope: runtime.getCurrentScope(), canRead: permitted('GET_CASHIERS'), canAssign: permitted('ASSIGN_TERMINALS'),
+      currentScope: runtime.getCurrentScope(), canRead: permitted('cashier.read'), canAssign: permitted('cashier.assignTerminals'),
     })
   }
   const currentOptions = (): readonly TerminalOption[] | null => {
     const { runtime, queryClient } = getCurrent()
     const { scope } = getEvidence()
-    if (!sameScope(scope, runtime.getCurrentScope()) || !permitted('GET_DROPDOWN_TERMINALS')) return null
+    if (!sameScope(scope, runtime.getCurrentScope()) || !permitted('terminal.lookup')) return null
     const state = queryClient.getQueryState<readonly TerminalOption[]>(readKeys.terminals(scope))
     return state?.status === 'success' && !state.isInvalidated ? state.data ?? null : null
   }
@@ -49,11 +50,12 @@ export function createLiveAssignTerminalsAdapter(getCurrent: () => LiveWebContex
       const result = await getCurrent().auth.protectedMutation(async ({ accessToken, signal }) => {
         const { runtime, transport } = getCurrent()
         const row = currentTarget()
+        const validated = row ? buildAssignTerminalsRequest(row, request.terminalIds, currentOptions()) : null
         if (!transport || !row || !sameScope(intentScope, runtime.getCurrentScope()) || signal.aborted ||
-          !buildAssignTerminalsRequest(row, request.terminalIds, currentOptions())) throw new ActionNotDispatchedError()
+          !validated || validated.cashierId !== request.cashierId) throw new ActionNotDispatchedError()
         dispatched = true
         const response = await transport.request({ endpoint: endpoints.assignCashierTerminals,
-          credential: { kind: 'bearer', accessToken }, body: request, signal })
+          credential: { kind: 'bearer', accessToken }, body: validated, signal })
         if (!response.ok) throw safeHttpError(response.status)
         if (response.status !== 200) throw new Error('Assign response was not confirmed.')
         return response.body
@@ -65,7 +67,7 @@ export function createLiveAssignTerminalsAdapter(getCurrent: () => LiveWebContex
   }
   return {
     currentScope: () => getCurrent().runtime.getCurrentScope(), currentTarget, currentOptions,
-    canAssign: () => permitted('ASSIGN_TERMINALS'),
+    canAssign: () => permitted('cashier.assignTerminals'),
     port: () => getCurrent().transport ? port : null,
     invalidateConfirmed: async (scope) => {
       const { runtime, queryClient } = getCurrent()

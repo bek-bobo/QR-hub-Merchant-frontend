@@ -20,6 +20,7 @@ interface HeaderProps {
   identityLabel?: string
   identitySecondary?: string
   compactAccountControls?: boolean
+  accountAccessible?: boolean
   logoutPending?: boolean
   onLogout?: () => void
 }
@@ -37,6 +38,7 @@ export function Header({
   identityLabel,
   identitySecondary,
   compactAccountControls = false,
+  accountAccessible = true,
   logoutPending = false,
   onLogout,
 }: HeaderProps) {
@@ -125,12 +127,12 @@ export function Header({
                 sideOffset={6}
                 className="z-50 min-w-36 rounded-lg border bg-popover p-1 text-popover-foreground shadow-lg"
               >
-                <Menu.Item
+                {accountAccessible ? <Menu.Item
                   asChild
                   className="flex cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-muted data-[highlighted]:text-text-primary"
                 >
                   <Link to="/account">{message('header.profile')}</Link>
-                </Menu.Item>
+                </Menu.Item> : null}
                 <Menu.Item
                   disabled={logoutPending || !canLogout}
                   onSelect={canLogout ? onLogout : undefined}

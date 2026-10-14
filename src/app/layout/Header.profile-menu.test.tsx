@@ -44,6 +44,18 @@ function renderHeader(onLogout: () => void, logoutPending = false) {
 beforeEach(() => { menu.items = [] })
 
 describe('Header profile menu actions', () => {
+  it('omits the inaccessible account link while retaining local logout', () => {
+    const onLogout = vi.fn()
+    const html = renderToStaticMarkup(<MemoryRouter>
+      <ThemeContext.Provider value={{ mode: 'dark', resolvedTheme: 'dark', setMode: vi.fn() }}>
+        <Header compactAccountControls accountAccessible={false} onLogout={onLogout} />
+      </ThemeContext.Provider>
+    </MemoryRouter>)
+    expect(html).not.toContain('href="/account"')
+    expect(menu.items).toHaveLength(1)
+    menu.items[0]?.onSelect?.()
+    expect(onLogout).toHaveBeenCalledTimes(1)
+  })
   it('keeps the X trigger a button and exposes exactly Profil and Chiqish below it', () => {
     const onLogout = vi.fn()
     const html = renderHeader(onLogout)

@@ -1,3 +1,4 @@
+import { canWithPermissions, type Capability } from '@/shared/auth/access'
 import { useMemo } from 'react'
 import { useCommittedGetter, useLiveWebContext, type LiveWebContext } from '@/app/read/useLiveWebContext'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
@@ -22,9 +23,9 @@ function sameScope(left: ReadScope, right: ReadScope) {
 }
 
 export function createLiveUnassignTerminalAdapter(getCurrent: () => LiveWebContext, getEvidence: () => UnassignEvidence): UnassignDependencies {
-  const permitted = (permission: string) => {
+  const permitted = (capability: Capability) => {
     const snapshot = getCurrent().auth.getSessionSnapshot()
-    return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes(permission)
+    return snapshot.phase === 'authenticated' && canWithPermissions(snapshot.profile.permissions, capability)
   }
   const currentEvidence = () => {
     const evidence = getEvidence()
@@ -33,7 +34,7 @@ export function createLiveUnassignTerminalAdapter(getCurrent: () => LiveWebConte
     return resolveCurrentUnassignTarget({ ...evidence,
       currentData: state?.status === 'success' ? state.data : undefined,
       currentUpdatedAt: state?.dataUpdatedAt, invalidated: state?.isInvalidated ?? true,
-      currentScope: runtime.getCurrentScope(), canRead: permitted('GET_CASHIERS'), canUnassign: permitted('UNASSIGN_TERMINAL'),
+      currentScope: runtime.getCurrentScope(), canRead: permitted('cashier.read'), canUnassign: permitted('cashier.unassignTerminal'),
     })
   }
   const currentTarget = () => {
@@ -64,7 +65,7 @@ export function createLiveUnassignTerminalAdapter(getCurrent: () => LiveWebConte
   }
   return {
     currentScope: () => getCurrent().runtime.getCurrentScope(), currentTarget, currentEvidence,
-    canUnassign: () => permitted('UNASSIGN_TERMINAL'),
+    canUnassign: () => permitted('cashier.unassignTerminal'),
     port: () => getCurrent().transport ? port : null,
     invalidateConfirmed: async (scope) => {
       const { runtime, queryClient } = getCurrent()

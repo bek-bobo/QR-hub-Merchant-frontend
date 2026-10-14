@@ -1,3 +1,4 @@
+import { canWithPermissions } from '@/shared/auth/access'
 import { useDynamicQrPresentation } from './presentation'
 import { useLayoutEffect, useState } from 'react'
 import { DownloadIcon, FileSpreadsheetIcon } from 'lucide-react'
@@ -42,7 +43,7 @@ function ExportForAppliedFilters({ applied, terminalValid, compact = false, clas
     return sameScope(scope, getCurrentScope()) &&
       snapshot.phase === 'authenticated' &&
       snapshot.sessionScopeId === scope.sessionScopeId &&
-      snapshot.profile.permissions.includes('EXPORT_DYNAMIC_QRS')
+      canWithPermissions(snapshot.profile.permissions, 'dynamicQr.export')
   }
 
   const [intent] = useState(() => createExportDownloadIntent({

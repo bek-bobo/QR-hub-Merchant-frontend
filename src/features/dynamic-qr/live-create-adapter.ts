@@ -1,3 +1,4 @@
+import { canWithPermissions } from '@/shared/auth/access'
 import { useMemo } from 'react'
 import { useLiveWebContext, type LiveWebContext } from '@/app/read/useLiveWebContext'
 import { readQueryPolicy } from '@/app/read/read-runtime'
@@ -20,7 +21,7 @@ function sameScope(left: ReadScope, right: ReadScope) {
 export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, ownerScope: ReadScope) {
   const canCreate = () => {
     const snapshot = getCurrent().auth.getSessionSnapshot()
-    return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes('CREATE_DYNAMIC_QR')
+    return snapshot.phase === 'authenticated' && canWithPermissions(snapshot.profile.permissions, 'dynamicQr.create')
   }
   const getCurrentContext = () => {
     const { runtime, auth, queryClient } = getCurrent()
@@ -40,7 +41,7 @@ export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, owne
     invalidateConfirmed: async (scope) => {
       const { runtime, auth, queryClient } = getCurrent()
       const snapshot = auth.getSessionSnapshot()
-      if (snapshot.phase !== 'authenticated' || !snapshot.profile.permissions.includes('GET_DYNAMIC_QRS') ||
+      if (snapshot.phase !== 'authenticated' || !canWithPermissions(snapshot.profile.permissions, 'dynamicQr.read') ||
         !sameScope(scope, runtime.getCurrentScope())) return 'skipped'
       return invalidateConfirmedCreateReads(queryClient, scope, true)
     },
@@ -51,8 +52,8 @@ export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, owne
     requestForDraft: (draft: CreateQrDraft) => {
       const current = getCurrentContext()
       return current ? buildCreateQrRequest({ draft, terminals: current.terminals, currencies: current.currencies,
-        terminalLookupAllowed: current.permissions.includes('GET_DROPDOWN_TERMINALS'),
-        currencyLookupAllowed: current.permissions.includes('GET_CURRENCY_CODE') }) : null
+        terminalLookupAllowed: canWithPermissions(current.permissions, 'terminal.lookup'),
+        currencyLookupAllowed: canWithPermissions(current.permissions, 'currency.lookup') }) : null
     },
     terminalOptions: () => ({
       queryKey: [...readKeys.terminals(ownerScope), 'create-limits'],
@@ -60,11 +61,11 @@ export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, owne
         const { auth, transport } = getCurrent()
         const before = auth.getSessionSnapshot()
         if (!transport || before.phase !== 'authenticated' || before.sessionScopeId !== ownerScope.sessionScopeId ||
-          !before.profile.permissions.includes('GET_DROPDOWN_TERMINALS')) throw safeHttpError(403)
+          !canWithPermissions(before.profile.permissions, 'terminal.lookup')) throw safeHttpError(403)
         const result = await auth.bridge.get({ transport, endpoint: endpoints.terminalLookup, decode: decodeCreateTerminalOptionsResponse }, signal)
         const after = getCurrent().auth.getSessionSnapshot()
         if (after.phase !== 'authenticated' || after.sessionScopeId !== before.sessionScopeId ||
-          !after.profile.permissions.includes('GET_DROPDOWN_TERMINALS') || signal.aborted ||
+          !canWithPermissions(after.profile.permissions, 'terminal.lookup') || signal.aborted ||
           !sameScope(ownerScope, getCurrent().runtime.getCurrentScope())) throw safeHttpError(403)
         return result
       },
@@ -77,11 +78,11 @@ export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, owne
         const { auth, transport } = getCurrent()
         const before = auth.getSessionSnapshot()
         if (!transport || before.phase !== 'authenticated' || before.sessionScopeId !== ownerScope.sessionScopeId ||
-          !before.profile.permissions.includes('GET_CURRENCY_CODE')) throw safeHttpError(403)
+          !canWithPermissions(before.profile.permissions, 'currency.lookup')) throw safeHttpError(403)
         const result = await auth.bridge.get({ transport, endpoint: endpoints.currencies, decode: decodeCurrencyOptionsResponse }, signal)
         const after = getCurrent().auth.getSessionSnapshot()
         if (after.phase !== 'authenticated' || after.sessionScopeId !== before.sessionScopeId ||
-          !after.profile.permissions.includes('GET_CURRENCY_CODE') || signal.aborted ||
+          !canWithPermissions(after.profile.permissions, 'currency.lookup') || signal.aborted ||
           !sameScope(ownerScope, getCurrent().runtime.getCurrentScope())) throw safeHttpError(403)
         return result
       },

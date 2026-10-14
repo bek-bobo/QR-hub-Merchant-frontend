@@ -1,3 +1,4 @@
+import { canWithPermissions, type Capability } from '@/shared/auth/access'
 import { useMemo } from 'react'
 import { useLiveWebContext, type LiveWebContext } from '@/app/read/useLiveWebContext'
 import { ActionNotDispatchedError } from '@/shared/api/one-dispatch-action'
@@ -13,14 +14,14 @@ function sameScope(left: ReadScope, right: ReadScope) {
 }
 
 export function createLiveCashierCreateAdapter(getCurrent: () => LiveWebContext, ownerScope: ReadScope): CashierCreateAdapter {
-  const permitted = (permission: string) => {
+  const permitted = (capability: Capability) => {
     const snapshot = getCurrent().auth.getSessionSnapshot()
-    return snapshot.phase === 'authenticated' && snapshot.profile.permissions.includes(permission)
+    return snapshot.phase === 'authenticated' && canWithPermissions(snapshot.profile.permissions, capability)
   }
   const currentOptions = (): readonly TerminalOption[] | null => {
     const { runtime, queryClient } = getCurrent()
     const scope = runtime.getCurrentScope()
-    if (!sameScope(scope, ownerScope) || !permitted('GET_DROPDOWN_TERMINALS')) return null
+    if (!sameScope(scope, ownerScope) || !permitted('terminal.lookup')) return null
     const state = queryClient.getQueryState<readonly TerminalOption[]>(readKeys.terminals(scope))
     return state?.status === 'success' && !state.isInvalidated ? state.data ?? null : null
   }
@@ -30,8 +31,8 @@ export function createLiveCashierCreateAdapter(getCurrent: () => LiveWebContext,
       const result = await getCurrent().auth.protectedMutation(async ({ accessToken, signal }) => {
         const { runtime, queryClient, transport } = getCurrent()
         const lookup = queryClient.getQueryState<readonly TerminalOption[]>(readKeys.terminals(runtime.getCurrentScope()))
-        if (!transport || !sameScope(scope, runtime.getCurrentScope()) || !permitted('CREATE_CASHIER') ||
-          !permitted('GET_DROPDOWN_TERMINALS') || lookup?.status !== 'success' || lookup.isInvalidated ||
+        if (!transport || !sameScope(scope, runtime.getCurrentScope()) || !permitted('cashier.create') ||
+          !permitted('terminal.lookup') || lookup?.status !== 'success' || lookup.isInvalidated ||
           !buildCashierCreateRequest(request, lookup.data ?? null)) throw new ActionNotDispatchedError()
         dispatched = true
         const response = await transport.request({ endpoint: endpoints.createCashier,
@@ -47,13 +48,13 @@ export function createLiveCashierCreateAdapter(getCurrent: () => LiveWebContext,
   }
   return {
     currentScope: () => getCurrent().runtime.getCurrentScope(),
-    canCreate: () => permitted('CREATE_CASHIER'),
-    canReadList: () => permitted('GET_CASHIERS'),
+    canCreate: () => permitted('cashier.create'),
+    canReadList: () => permitted('cashier.read'),
     currentTerminalOptions: currentOptions,
     port: () => getCurrent().transport ? port : null,
     invalidateConfirmed: async (scope) => {
       const { runtime, queryClient } = getCurrent()
-      if (!permitted('GET_CASHIERS') || !sameScope(scope, runtime.getCurrentScope())) return 'skipped'
+      if (!permitted('cashier.read') || !sameScope(scope, runtime.getCurrentScope())) return 'skipped'
       return invalidateCurrentCashierLists(queryClient, scope, true)
     },
   }

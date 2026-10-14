@@ -1,3 +1,4 @@
+import { canWithPermissions } from '@/shared/auth/access'
 import type { HttpTransport } from '@/shared/api/http'
 import type { ProtectedReadBridge } from '@/shared/api/protected-read'
 import type { ProtectedReadContextValue } from '@/shared/api/ProtectedReadContext'
@@ -36,14 +37,14 @@ export function createStaticQrQueryOptions(deps: StaticQrQueryDependencies) {
       const before = getSessionSnapshot()
       if (!enabled || !transport || signal.aborted || !sameScope(scope, deps.currentScope()) ||
         before.phase !== 'authenticated' || before.sessionScopeId !== scope.sessionScopeId ||
-        !before.profile.permissions.includes('GET_STATIC_QRS')) throw safeHttpError(403)
+        !canWithPermissions(before.profile.permissions, 'staticQr.read')) throw safeHttpError(403)
       const result = await bridge.get({
         transport, endpoint: endpoints.staticQrs, query: toStaticQrQuery(filters), decode: decodeStaticQrPage,
       }, signal)
       const after = getSessionSnapshot()
       if (signal.aborted || !sameScope(scope, deps.currentScope()) ||
         after.phase !== 'authenticated' || after.sessionScopeId !== before.sessionScopeId ||
-        !after.profile.permissions.includes('GET_STATIC_QRS')) throw safeHttpError(403)
+        !canWithPermissions(after.profile.permissions, 'staticQr.read')) throw safeHttpError(403)
       return result
     },
     enabled,
