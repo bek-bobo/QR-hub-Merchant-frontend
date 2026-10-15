@@ -26,7 +26,9 @@ import { DynamicQrQuickFilters } from './DynamicQrQuickFilters'
 import { DynamicQrAdvancedFilterFields } from './DynamicQrAdvancedFilterFields'
 import { DynamicQrDetailsSheet } from './DynamicQrDetailsSheet'
 import { CancelQrConfirmationBody, CancelQrOutcome } from './CancelQrConfirmation'
+import { chooseSelectOption, openSelect } from '@/test/select-interaction'
 import { CreateQrContent } from './CreateQrContent'
+import { CreateQrDialog } from './CreateQrDialog'
 import { QrDisplayShell } from './QrDisplayShell'
 import { QrPresentation } from './QrPresentation'
 import { ExportButton } from './ExportButton'
@@ -152,4 +154,172 @@ it('preserves XLSX query, bytes, filename, pending intent and current-language c
  const host=await mount(value,<ExportButton applied={applied} terminalValid/>);await act(async()=>host.querySelector<HTMLButtonElement>('button')!.click());const first=state.xlsx.mock.calls[0]!
  await change(value,'ru');expect(host.textContent).toContain('Подготовка XLSX.');expect(state.xlsx).toHaveBeenCalledOnce();expect(state.xlsx.mock.calls[0]).toBe(first);expect(first[0].query).toEqual(toDynamicQrExportQuery(applied))
  const file={blob:new Blob([new Uint8Array([80,75,3,4,0,255])]),filename:'server-export.xlsx'};await act(async()=>pending.resolve(file));expect(state.handoff).toHaveBeenCalledExactlyOnceWith(file);expect(new Uint8Array(await file.blob.arrayBuffer())).toEqual(new Uint8Array([80,75,3,4,0,255]));expect(document.body.textContent).toContain('Скачивание XLSX передано браузеру.');await change(value,'en');expect(document.body.textContent).toContain('XLSX download handed off to the browser.');expect(state.xlsx).toHaveBeenCalledOnce();expect(state.handoff).toHaveBeenCalledOnce()
+})
+
+
+async function editCreateAmount(input: HTMLInputElement, raw: string) {
+ await act(async () => {
+  Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input, raw)
+  input.setSelectionRange(raw.length, raw.length)
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+ })
+}
+
+it.each(['uz', 'ru', 'en'] as const)('shows a confirmed bank-account rejection in the actual %s dialog and requires a new intent', async locale => {
+ const value = await runtime(locale), p = presentation(value), onClose = vi.fn()
+ state.create.mockResolvedValue({success:false,requestId:null,timeZone:null,error:{code:10023,tag:'BANK_ACCOUNT_STATUS_IS_NOT_ACTIVE',text:'unsafe server details'},data:null})
+ await mount(value, <CreateQrDialog open onOpenChange={onClose} />)
+ const trigger = document.querySelector<HTMLButtonElement>('#create-qr-terminal')!
+ await vi.waitFor(() => expect(trigger.disabled).toBe(false))
+ await chooseSelectOption(trigger, terminals[0]!.id)
+ await editCreateAmount(document.querySelector<HTMLInputElement>('#create-qr-amount')!, '1000.01')
+ await act(async () => document.querySelector('form')!.dispatchEvent(new Event('submit', {bubbles:true,cancelable:true})))
+ const dialog = document.querySelector('[role=dialog]')!
+ await vi.waitFor(() => expect(dialog.textContent).toContain(p.message('create.bankAccountInactive')))
+ expect(dialog.querySelector('h2')?.textContent).toBe(p.message('create.failed'))
+ expect(dialog.textContent).toContain(p.message('create.bankAccountInactiveGuidance'))
+ expect(dialog.textContent).not.toContain(p.message('create.checkFirst'))
+ expect(dialog.textContent).not.toContain(p.message('create.newRisk'))
+ expect(dialog.textContent).not.toContain('unsafe server details')
+ expect(state.create).toHaveBeenCalledTimes(1)
+ const newIntent = Array.from(dialog.querySelectorAll<HTMLButtonElement>('button')).find(button => button.textContent === p.message('actions.new'))!
+ await act(async () => newIntent.click())
+ expect(document.querySelector<HTMLInputElement>('#create-qr-amount')?.value).toBe('')
+ expect(document.querySelector('#create-qr-terminal')?.textContent).toContain(p.message('create.chooseTerminal'))
+ expect(state.create).toHaveBeenCalledTimes(1)
+ expect(onClose).not.toHaveBeenCalled()
+})
+
+it('hands keyboard selection focus to amount, supports immediate typing and preserves amount on terminal change', async () => {
+ const value=await runtime('en'),host=await mount(value,<CreateQrContent embedded />)
+ const input=host.querySelector<HTMLInputElement>('#create-qr-amount')!,trigger=host.querySelector<HTMLButtonElement>('[role=combobox]')!
+ expect(document.activeElement).not.toBe(input)
+ expect(input.dataset.validation).toBe('neutral')
+ await vi.waitFor(()=>expect(trigger.disabled).toBe(false))
+ await chooseSelectOption(trigger,terminals[0]!.id)
+ await vi.waitFor(()=>expect(document.activeElement).toBe(input))
+ await editCreateAmount(input,'12500,50')
+ expect(input.value).toBe('12 500,50')
+ expect(input.dataset.validation).toBe('valid')
+ expect(input.className).toContain('border-status-success-border')
+ expect(input.getAttribute('aria-invalid')).toBeNull()
+ await chooseSelectOption(trigger,'')
+ await chooseSelectOption(trigger,terminals[0]!.id)
+ await vi.waitFor(()=>expect(document.activeElement).toBe(input))
+ expect(input.value).toBe('12 500,50')
+ expect(input.selectionStart).toBe(input.value.length)
+ expect(input.selectionEnd).toBe(input.value.length)
+ await act(async()=>trigger.focus())
+ await change(value,'ru')
+ expect(document.activeElement).toBe(trigger)
+ expect(input.value).toBe('12 500,50')
+ expect(state.create).not.toHaveBeenCalled()
+})
+
+it.each([
+ ['1000','valid',100000],['999.99','invalid',null],
+ ['20000000.00','valid',2000000000],['20000000.01','invalid',null],
+ ['12 500.50','valid',1250050],['12 500,50','valid',1250050],
+ ['0001000.01','valid',100001],['0','invalid',null],['1000.','invalid',null],
+] as const)('uses canonical validation and exact submission for %s',async(raw,status,minor)=>{
+ const value=await runtime('en'),host=await mount(value,<CreateQrContent />)
+ await vi.waitFor(()=>expect(host.querySelector<HTMLButtonElement>('[role=combobox]')!.disabled).toBe(false))
+ await chooseSelectOption(host.querySelector<HTMLButtonElement>('[role=combobox]')!,terminals[0]!.id)
+ const input=host.querySelector<HTMLInputElement>('#create-qr-amount')!
+ await editCreateAmount(input,raw)
+ expect(input.dataset.validation).toBe(status)
+ const button=host.querySelector<HTMLButtonElement>('button[type=submit]')!
+ expect(button.disabled).toBe(status==='invalid')
+ if(status==='invalid') {
+  expect(input.className).toContain('border-destructive')
+  expect(input.getAttribute('aria-invalid')).toBe('true')
+  expect(input.getAttribute('aria-describedby')).toContain('create-qr-amount-error')
+  expect(host.querySelector('#create-qr-amount-error')?.getAttribute('role')).toBe('alert')
+ }
+ await act(async()=>host.querySelector('form')!.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})))
+ if(minor===null) expect(state.create).not.toHaveBeenCalled()
+ else expect(state.create).toHaveBeenCalledExactlyOnceWith({terminalId:terminals[0]!.id,amount:minor,currencyCode:'UZS'},scope)
+})
+
+it('keeps empty neutral until attempted submit and blocks malformed edits without losing the value',async()=>{
+ const value=await runtime('en'),host=await mount(value,<CreateQrContent />)
+ const input=host.querySelector<HTMLInputElement>('#create-qr-amount')!
+ expect(input.dataset.validation).toBe('neutral')
+ expect(input.getAttribute('aria-invalid')).toBeNull()
+ await act(async()=>host.querySelector('form')!.dispatchEvent(new Event('submit',{bubbles:true,cancelable:true})))
+ expect(input.dataset.validation).toBe('invalid')
+ expect(input.getAttribute('aria-describedby')).toContain('create-qr-amount-error')
+ expect(state.create).not.toHaveBeenCalled()
+ await chooseSelectOption(host.querySelector<HTMLButtonElement>('[role=combobox]')!,terminals[0]!.id)
+ await editCreateAmount(input,'1000.01')
+ for(const raw of ['1000.001','-1000','abc']) {
+  await editCreateAmount(input,raw)
+  expect(input.value).toBe('1 000.01')
+  expect(input.dataset.validation).toBe('valid')
+ }
+})
+
+it('does not focus amount on option loading or dropdown cancellation',async()=>{
+ const pending=deferred<typeof terminals>();state.terminals.mockReturnValue(pending.promise)
+ const value=await runtime('en'),host=await mount(value,<CreateQrContent />)
+ const input=host.querySelector<HTMLInputElement>('#create-qr-amount')!,trigger=host.querySelector<HTMLButtonElement>('[role=combobox]')!
+ expect(document.activeElement).not.toBe(input)
+ await act(async()=>pending.resolve(terminals))
+ await vi.waitFor(()=>expect(trigger.disabled).toBe(false))
+ expect(document.activeElement).not.toBe(input)
+ await openSelect(trigger)
+ await act(async()=>document.querySelector('[role=listbox]')!.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true,cancelable:true})))
+ await vi.waitFor(()=>expect(document.activeElement).toBe(trigger))
+ expect(input.dataset.validation).toBe('neutral')
+})
+
+it('keeps focus on the trigger after a touch selection without opening the amount keyboard',async()=>{
+ const value=await runtime('en'),host=await mount(value,<CreateQrContent />)
+ const input=host.querySelector<HTMLInputElement>('#create-qr-amount')!,trigger=host.querySelector<HTMLButtonElement>('[role=combobox]')!
+ await vi.waitFor(()=>expect(trigger.disabled).toBe(false))
+ await openSelect(trigger)
+ const option=document.querySelector<HTMLElement>('[role=option][data-value="'+terminals[0]!.id+'"]')!
+ await act(async()=>{
+  option.dispatchEvent(new PointerEvent('pointerdown',{pointerType:'touch',bubbles:true}))
+  option.dispatchEvent(new PointerEvent('pointerup',{pointerType:'touch',bubbles:true}))
+  option.click()
+ })
+ await vi.waitFor(()=>expect(document.activeElement).toBe(trigger))
+ expect(input.value).toBe('')
+ expect(trigger.textContent).toContain('Backend terminal')
+ expect(state.create).not.toHaveBeenCalled()
+})
+
+it('hands focus from the portaled terminal popup into the actual dialog and supports mouse selection',async()=>{
+ const value=await runtime('en');await mount(value,<CreateQrDialog open onOpenChange={()=>{}} />)
+ const trigger=document.querySelector<HTMLButtonElement>('#create-qr-terminal')!,input=document.querySelector<HTMLInputElement>('#create-qr-amount')!
+ await vi.waitFor(()=>expect(trigger.disabled).toBe(false))
+ expect(document.activeElement).not.toBe(input)
+ await openSelect(trigger)
+ const option=document.querySelector<HTMLElement>('[role=option][data-value="'+terminals[0]!.id+'"]')!
+ await act(async()=>{
+  option.dispatchEvent(new PointerEvent('pointerdown',{pointerType:'mouse',bubbles:true}))
+  option.dispatchEvent(new PointerEvent('pointerup',{pointerType:'mouse',bubbles:true}))
+ })
+ await vi.waitFor(()=>expect(document.activeElement).toBe(input))
+ expect(document.querySelector('[role=listbox]')).toBeNull()
+ expect(state.create).not.toHaveBeenCalled()
+})
+
+it('updates catalog month captions while the picker stays open without resetting range or navigation', async () => {
+ const value=await runtime('uz'),host=await mount(value,<DynamicQrQuickFilters {...quickProps} />)
+ await act(async()=>host.querySelector<HTMLButtonElement>('button[aria-label="Sana oralig‘ini tanlash"]')!.click())
+ const dialog=document.querySelector('[role=dialog]')!
+ const captions=()=>Array.from(dialog.querySelectorAll('h3')).map(node=>node.textContent)
+ expect(captions()).toContain('Oktabr 2026')
+ await change(value,'ru');expect(document.querySelector('[role=dialog]')).toBe(dialog)
+ expect(captions()).toContain('Октябрь 2026')
+ await change(value,'en');expect(captions()).toContain('October 2026')
+ for(let i=0;i<3;i++) await act(async()=>Array.from(dialog.querySelectorAll<HTMLButtonElement>('button')).find(button=>button.getAttribute('aria-label')==='Next month')!.click())
+ expect(captions()).toContain('January 2027')
+ await change(value,'uz');expect(captions()).toContain('Yanvar 2027')
+ expect(dialog.querySelector('[data-calendar-date="2027-01-01"]')).not.toBeNull()
+ expect(quickProps.onRangeApply).not.toHaveBeenCalled()
+ expect(quickProps.onRangeDraftChange).not.toHaveBeenCalled()
+ expect(dialog.textContent).not.toMatch(/M(?:0[1-9]|1[0-2])/)
 })

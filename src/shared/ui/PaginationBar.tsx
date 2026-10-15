@@ -9,11 +9,12 @@ import { Select } from '@/components/ui/select'
 import type { PageSize } from '@/shared/contracts/merchant-read'
 import {
   DEFAULT_PAGE_SIZE,
+  PAGE_SIZE_OPTIONS,
   PAGINATION_ELLIPSIS,
   createPaginationWindow,
 } from '@/shared/pagination'
 
-const pageSizes: readonly PageSize[] = [10, 20, 25, 50]
+const pageSizes = PAGE_SIZE_OPTIONS
 const pageButtonClasses = 'size-9 rounded-lg border-border/80 bg-surface text-sm font-medium text-text-primary hover:border-primary/30 hover:bg-brand-soft/50 sm:size-10 sm:text-base'
 
 export interface PaginationBarProps {
@@ -132,7 +133,6 @@ export function PaginationBar({
                 const size = pageSizes.find((option) => option === Number(event.target.value))
                 if (!disabled && size !== undefined) onPageSizeChange?.(size)
               }}>
-              {!pageSizes.includes(pageSize as PageSize) ? <option value={pageSize}>{message('pagination.perPage', { size: pageSize })}</option> : null}
               {pageSizes.map((size) => <option key={size} value={size}>{message('pagination.perPage', { size })}</option>)}
             </Select>
           </div>

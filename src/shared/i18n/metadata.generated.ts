@@ -51,6 +51,77 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "calendar.caption": {
+      "plural": false,
+      "params": [
+        "month",
+        "year"
+      ],
+      "interpolations": [
+        "month",
+        "year"
+      ]
+    },
+    "calendar.months.april": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.august": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.december": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.february": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.january": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.july": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.june": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.march": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.may": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.november": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.october": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "calendar.months.september": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "copy.failed": {
       "plural": false,
       "params": [],
@@ -1786,6 +1857,16 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "create.bankAccountInactive": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "create.bankAccountInactiveGuidance": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "create.bounds": {
       "plural": false,
       "params": [
@@ -2381,10 +2462,24 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "stats.failedHelp": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "stats.fee": {
       "plural": false,
       "params": [],
       "interpolations": []
+    },
+    "stats.infoLabel": {
+      "plural": false,
+      "params": [
+        "statistic"
+      ],
+      "interpolations": [
+        "statistic"
+      ]
     },
     "stats.total": {
       "plural": false,
@@ -2392,6 +2487,11 @@ export const messageMetadata = {
       "interpolations": []
     },
     "stats.unavailable": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "stats.unavailableHelp": {
       "plural": false,
       "params": [],
       "interpolations": []
@@ -2487,6 +2587,11 @@ export const messageMetadata = {
       "interpolations": []
     },
     "validation.amount": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "validation.amountRequired": {
       "plural": false,
       "params": [],
       "interpolations": []

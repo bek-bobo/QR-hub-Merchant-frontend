@@ -92,5 +92,22 @@
   "search": {
     "clear": "Qidiruvni tozalash",
     "apply": "Qidiruvni qo‘llash"
+  },
+  "calendar": {
+    "caption": "{{month}} {{year}}",
+    "months": {
+      "january": "Yanvar",
+      "february": "Fevral",
+      "march": "Mart",
+      "april": "Aprel",
+      "may": "May",
+      "june": "Iyun",
+      "july": "Iyul",
+      "august": "Avgust",
+      "september": "Sentabr",
+      "october": "Oktabr",
+      "november": "Noyabr",
+      "december": "Dekabr"
+    }
   }
 }

@@ -22,7 +22,7 @@ describe('read query keys', () => {
     const filters = { merchantId: '1', terminalId: 'T-Exact', regionId: '3', districtId: '4', search: 'QR', page: 0, size: 20 } as const
     const baseline = readKeys.staticQrs(scope, filters.terminalId, filters.page, filters.size, filters)
     for (const change of [{ merchantId: '5' }, { terminalId: 'T-Next' }, { regionId: '7' }, { districtId: '8' },
-      { search: 'Next' }, { page: 1 }, { size: 25 }]) {
+      { search: 'Next' }, { page: 1 }, { size: 100 }]) {
       const variant = { ...filters, ...change }
       expect(readKeys.staticQrs(scope, variant.terminalId, variant.page, variant.size, variant)).not.toEqual(baseline)
     }
@@ -35,7 +35,7 @@ describe('read query keys', () => {
     const filters = { merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', search: 'Terminal', page: 0, size: 20 } as const
     const baseline = readKeys.terminalList(scope, filters)
     for (const change of [{ merchantId: '5' }, { bankAccountId: '6' }, { regionId: '7' }, { districtId: '8' },
-      { search: 'Next' }, { page: 1 }, { size: 25 as const }]) expect(readKeys.terminalList(scope, { ...filters, ...change })).not.toEqual(baseline)
+      { search: 'Next' }, { page: 1 }, { size: 100 as const }]) expect(readKeys.terminalList(scope, { ...filters, ...change })).not.toEqual(baseline)
     expect(readKeys.terminalList(scope, { ...filters, regionId: ' 3 ', districtId: ' 4 ' })).toEqual(baseline)
     expect(readKeys.districtLookup(scope, '3')).not.toEqual(readKeys.districtLookup(scope, '4'))
     expect(readKeys.districtLookup(scope, ' 3 ')).toEqual(readKeys.districtLookup(scope, '3'))
@@ -48,7 +48,7 @@ describe('read query keys', () => {
   it('scopes stats by date and terminal while ignoring all list-only fields', () => {
     const baseline = readKeys.dynamicQrStats(scope, filters)
     const listVariant = { ...filters, merchantId: '1', bankAccountId: '2', distributionStatus: 20 as const,
-      search: 'abc', status: 25 as const, page: 3, size: 25 as const }
+      search: 'abc', status: 25 as const, page: 3, size: 100 as const }
     expect(readKeys.dynamicQrStats(scope, listVariant)).toEqual(baseline)
     expect(isReadQueryKey(baseline)).toBe(true)
     for (const change of [{ fromDate: '2026-09-02' }, { toDate: '2026-09-16' }, { terminalId: 'T-01' }]) {
@@ -127,7 +127,7 @@ describe('read query keys', () => {
     expect(readKeys.cashierList(scope, { ...filters, search: ' Cashier ' })).toEqual(baseline)
   })
   it('includes every P5 API-affecting filter and stays inside scoped cleanup', () => {
-    const filters = { merchantId: '2', terminalId: 'terminal-a', status: 0, search: ' device ', page: 1, size: 25 } as const
+    const filters = { merchantId: '2', terminalId: 'terminal-a', status: 0, search: ' device ', page: 1, size: 100 } as const
     const baseline = readKeys.p5List(scope, filters)
     expect(baseline).not.toEqual(readKeys.p5List(scope, { ...filters, terminalId: 'terminal-b' }))
     expect(baseline).not.toEqual(readKeys.p5List(scope, { ...filters, status: 1 }))

@@ -14,6 +14,9 @@
     "total": "Jami {{countText}} ta QR"
   },
   "stats": {
+    "infoLabel": "{{statistic}} haqida qo‘shimcha ma’lumot",
+    "unavailableHelp": "Ushbu muhitda umumiy statistika yoqilmagan. Bu QRlar mavjud emasligini anglatmaydi.",
+    "failedHelp": "Umumiy statistikani yuklab bo‘lmadi. Qayta so‘rash uchun yangilang.",
     "total": "Jami summa",
     "fee": "Xizmat haqi",
     "unavailable": "Statistika hozircha mavjud emas",
@@ -75,6 +78,8 @@
     "details": "Qo‘shimcha ma’lumotlar"
   },
   "create": {
+    "bankAccountInactive": "Bank hisobi holati faol emas",
+    "bankAccountInactiveGuidance": "Tanlangan terminalga bog‘langan bank hisobining holatini tekshiring.",
     "title": "Dinamik QR yaratish",
     "description": "Summa UZSda kiritiladi.",
     "dialogHelp": "Terminalni tanlang va summani UZSda kiriting.",
@@ -105,6 +110,7 @@
     "bounds": "Ruxsat etilgan summa: {{minimum}} – {{maximum}}"
   },
   "validation": {
+    "amountRequired": "Summani kiriting.",
     "amount": "Summani ko‘rsatilgan format va ruxsat etilgan oraliqda kiriting."
   },
   "cancel": {

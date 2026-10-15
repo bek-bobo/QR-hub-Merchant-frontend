@@ -10,7 +10,7 @@ import { toStaticQrListQuery, toTerminalListQuery, toBankAccountListQuery, toCas
 import { toP5ListQuery } from '@/shared/contracts/p5-filters'
 import { readKeys } from '@/shared/api/read-keys'
 
-const filters = { search: 'old', page: 3, size: 25 as const, merchantId: '1', bankAccountId: '2',
+const filters = { search: 'old', page: 3, size: 100 as const, merchantId: '1', bankAccountId: '2',
   terminalId: 'T1', regionId: '3', districtId: '4', status: 0 as const, distributionStatus: 20 as const,
   fromDate: '2026-10-01', toDate: '2026-10-07' }
 const scope = { source: 'live' as const, sessionScopeId: 'search-parity', accessRevision: 1 }
@@ -27,7 +27,7 @@ describe.each(domains)('$name raw Search contract', ({ apply, query, key }) => {
   it.each(['  abc  ', '   ', '', '+998 (90) 123-45-67', 'AbC!'])('preserves %j with coherent first page and all existing filters', (search) => {
     const next = apply(filters, search)
     expect(next).toEqual({ ...filters, search, page: 0 })
-    expect(query(next)).toMatchObject({ page: '0', size: '25' })
+    expect(query(next)).toMatchObject({ page: '0', size: '100' })
     if (search === '') expect(query(next)).not.toHaveProperty('search')
     else expect(query(next).search).toBe(search)
     expect(filters.page).toBe(3)

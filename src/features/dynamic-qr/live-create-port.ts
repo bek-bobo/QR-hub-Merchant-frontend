@@ -8,6 +8,7 @@ import { endpoints } from '@/shared/contracts/endpoints'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
 import type { CreateTerminalOption } from '@/shared/contracts/terminal-lookup.contract'
 import { isCurrentCreateQrRequest, type CreateQrPort } from './create-qr'
+import { decodeCreateBusinessRejection } from './create-business-errors'
 
 export interface LiveCreateQrContext {
   readonly scope: ReadScope
@@ -50,6 +51,11 @@ export function createLiveCreateQrPort(deps: LiveCreateQrPortDependencies): Crea
           body: request,
           signal,
         })
+        // Authorization failures must still reach protectedMutation/session handling.
+        if (response.status === 401 || response.status === 403) throw safeHttpError(response.status)
+        // Return proven rejection data through the session boundary; throwing here
+        // would erase it when protectedMutation normalizes a failed operation.
+        if (decodeCreateBusinessRejection(response.body)) return response.body
         if (!response.ok) throw safeHttpError(response.status)
         if (response.status !== 200) throw new Error('Dynamic QR create response was not confirmed.')
         return response.body

@@ -1,3 +1,4 @@
+import { isPageSize, PAGE_SIZE_OPTIONS } from '@/shared/pagination'
 import { Select } from '@/components/ui/select'
 import { useEffect, useState, useSyncExternalStore } from 'react'
 import { NavLink, Navigate, Route, Routes } from 'react-router'
@@ -23,8 +24,8 @@ import { actionScenarios, createDemoCancelPort, createDemoExportScenario, create
 
 // D4-ACTIONS-DEMO-ONLY. The entire route is loaded only through the DEV/demo boundary.
 function changePreviewStaticPageSize(current: StaticQrFilters, rawSize: string): StaticQrFilters {
-  if (rawSize !== '10' && rawSize !== '25' && rawSize !== '50') throw new Error('Unsupported preview page size.')
-  const size = rawSize === '25' ? 25 : rawSize === '50' ? 50 : 10
+  const size = Number(rawSize)
+  if (!isPageSize(size)) throw new Error('Unsupported preview page size.')
   return { ...current, page: 0, size }
 }
 
@@ -187,7 +188,7 @@ function StaticScenarioView({ scenario }: { readonly scenario: StaticScenario })
       <label className="text-sm">Sahifa hajmi
         <Select size="compact" value={filters.size}
           onChange={(event) => setFilters(changePreviewStaticPageSize(filters, event.target.value))}>
-          <option value="10">10</option><option value="25">25</option><option value="50">50</option>
+          {PAGE_SIZE_OPTIONS.map(size => <option key={size} value={size}>{size}</option>)}
         </Select>
       </label>
       {scenario === 'STATIC_TERMINAL_LOST' ? <Button type="button" variant="outline"

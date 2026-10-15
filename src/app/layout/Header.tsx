@@ -129,14 +129,14 @@ export function Header({
               >
                 {accountAccessible ? <Menu.Item
                   asChild
-                  className="flex cursor-default select-none items-center rounded-md px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-muted data-[highlighted]:text-text-primary"
+                  className="flex select-none items-center rounded-md px-2.5 py-2 text-sm outline-none data-[highlighted]:bg-muted data-[highlighted]:text-text-primary"
                 >
                   <Link to="/account">{message('header.profile')}</Link>
                 </Menu.Item> : null}
                 <Menu.Item
                   disabled={logoutPending || !canLogout}
                   onSelect={canLogout ? onLogout : undefined}
-                  className="flex cursor-default select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm text-destructive outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-destructive/10 dark:data-[highlighted]:bg-destructive/20"
+                  className="flex select-none items-center gap-2 rounded-md px-2.5 py-2 text-sm text-destructive outline-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[highlighted]:bg-destructive/10 dark:data-[highlighted]:bg-destructive/20"
                 >
                   <LogOutIcon className="size-4 shrink-0" aria-hidden="true" />
                   {auth.message('actions.logout')}

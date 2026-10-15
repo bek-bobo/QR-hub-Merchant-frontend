@@ -2,7 +2,8 @@ import { contractObject, requiredString, successEnvelopeData, type ReadScope } f
 import type { CurrencyOption } from '@/shared/contracts/currency.contract'
 import type { CreateTerminalOption } from '@/shared/contracts/terminal-lookup.contract'
 import { safeContractError } from '@/shared/api/errors'
-import { createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
+import { ActionBusinessRejectionError, createOneDispatchAction, invalidateAfterConfirmed, type ActionResult, type ActionSnapshot } from '@/shared/api/one-dispatch-action'
+import { decodeCreateBusinessRejection } from './create-business-errors'
 import { parseCreateAmount } from './create-amount'
 
 export interface CreateQrDraft {
@@ -40,6 +41,8 @@ export function createAmountBounds(terminal: CreateTerminalOption): { minimum: b
 }
 
 export function decodeCreateQrSuccess(payload: unknown): CreateQrSuccess {
+  const rejection = decodeCreateBusinessRejection(payload)
+  if (rejection) throw new ActionBusinessRejectionError(rejection)
   const data = contractObject(successEnvelopeData(payload))
   const pkey = requiredString(data.pkey)
   const link = requiredString(data.link)

@@ -92,5 +92,22 @@
   "search": {
     "clear": "Clear search",
     "apply": "Apply search"
+  },
+  "calendar": {
+    "caption": "{{month}} {{year}}",
+    "months": {
+      "january": "January",
+      "february": "February",
+      "march": "March",
+      "april": "April",
+      "may": "May",
+      "june": "June",
+      "july": "July",
+      "august": "August",
+      "september": "September",
+      "october": "October",
+      "november": "November",
+      "december": "December"
+    }
   }
 }

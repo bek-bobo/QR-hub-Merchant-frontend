@@ -58,7 +58,7 @@ describe('live read API registration', () => {
     const runtime = createLiveReadApi({ webBaseUrl: 'https://merchant.example/qh-merchant-web-api', environment: 'production', bridge: { get } })
     const signal = new AbortController().signal
     const filters = { fromDate: '2026-09-01', toDate: '2026-09-15', terminalId: ' T-01 ',
-      merchantId: '1', bankAccountId: '2', distributionStatus: 20, status: 25, search: 'abc', page: 2, size: 25 }
+      merchantId: '1', bankAccountId: '2', distributionStatus: 20, status: 25, search: 'abc', page: 2, size: 100 }
     await runtime.dynamicQrStats(filters, signal)
     const [request, passedSignal] = get.mock.calls[0]!
     expect(request.endpoint).toEqual({ service: 'web', method: 'GET', path: '/dynamic-qrs/stats', auth: 'bearer', body: 'none' })
@@ -141,10 +141,10 @@ describe('live read API registration', () => {
   it('builds the exact P5 list request without reset wiring', async () => {
     const get = vi.fn().mockResolvedValue({ content: [] })
     const runtime = createLiveReadApi({ webBaseUrl: 'https://merchant.example/qh-merchant-web-api', environment: 'production', bridge: { get } })
-    await runtime.p5List({ merchantId: '2', terminalId: 'terminal-a', status: 0, search: ' Device ', page: 1, size: 25 }, new AbortController().signal)
+    await runtime.p5List({ merchantId: '2', terminalId: 'terminal-a', status: 0, search: ' Device ', page: 1, size: 100 }, new AbortController().signal)
     expect(get.mock.calls[0]?.[0]).toMatchObject({
       endpoint: { method: 'GET', path: '/p5/get-all' },
-      query: { merchantId: '2', terminalId: 'terminal-a', status: '0', search: ' Device ', page: '1', size: '25' },
+      query: { merchantId: '2', terminalId: 'terminal-a', status: '0', search: ' Device ', page: '1', size: '100' },
     })
     expect(runtime).not.toHaveProperty('p5ResetPin')
   })

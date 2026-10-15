@@ -165,7 +165,7 @@ describe('cashier create one-dispatch lifecycle', () => {
   it('invalidates every current-scope cashier variant only when read is granted', async () => {
     const client = new QueryClient()
     const first = readKeys.cashierList(scope, { search: '', page: 0, size: 10 })
-    const second = readKeys.cashierList(scope, { search: 'X', page: 2, size: 25 })
+    const second = readKeys.cashierList(scope, { search: 'X', page: 2, size: 100 })
     const otherScope = readKeys.cashierList({ ...scope, accessRevision: 2 }, { search: '', page: 0, size: 10 })
     const terminal = readKeys.terminals(scope)
     for (const key of [first, second, otherScope, terminal]) client.setQueryData(key, {})

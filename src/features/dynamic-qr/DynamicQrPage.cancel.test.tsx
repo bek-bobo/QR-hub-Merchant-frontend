@@ -142,6 +142,25 @@ describe('production cancel list gate', () => {
     expect(html).toContain('Jami 1 ta QR')
   })
 
+  it('offers a labelled info trigger for unknown failures without exposing raw errors', () => {
+    queryState.stats.isError = true
+    Object.assign(queryState.stats, { error: new Error('private-token https://internal.example/stack') })
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+    expect(html).toContain('Jami summa haqida qo‘shimcha ma’lumot')
+    expect(html).not.toContain('private-token')
+    expect(html).not.toContain('internal.example')
+  })
+
+  it('does not mislabel query-disabled or valid zero statistics as request failures', () => {
+    queryState.statsEnabled = false; queryState.stats.isError = true
+    expect(pageWith(['GET_DYNAMIC_QRS'])).not.toContain('haqida qo‘shimcha ma’lumot')
+    queryState.statsEnabled = true; queryState.stats.isError = false
+    queryState.stats.data = { totalAmount: { minorUnits: '0', currency: 'UZS', scale: 2 }, totalServiceFeeAmount: { minorUnits: '0', currency: 'UZS', scale: 2 } }
+    const html = pageWith(['GET_DYNAMIC_QRS'])
+    expect(html).toContain('0.00 UZS')
+    expect(html).not.toContain('haqida qo‘shimcha ma’lumot')
+  })
+
   it('keeps disabled stats neutral and the list usable even with cached stats errors', () => {
     queryState.statsFeatureEnabled = false
     queryState.statsEnabled = false

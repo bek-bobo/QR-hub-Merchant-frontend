@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import {
   DEFAULT_PAGE_SIZE,
+  PAGE_SIZE_OPTIONS,
+  isPageSize,
   PAGINATION_ELLIPSIS,
   createPaginationWindow,
 } from './pagination'
 
 describe('createPaginationWindow', () => {
+  it('owns the exact shared page-size policy and rejects removed or invalid sizes', () => {
+    expect(PAGE_SIZE_OPTIONS).toEqual([10, 20, 50, 100])
+    for (const size of PAGE_SIZE_OPTIONS) expect(isPageSize(size)).toBe(true)
+    for (const size of [25, 0, -1, 101, NaN, 10.5]) expect(isPageSize(size)).toBe(false)
+  })
   it('uses one fixed production page size', () => {
     expect(DEFAULT_PAGE_SIZE).toBe(20)
   })

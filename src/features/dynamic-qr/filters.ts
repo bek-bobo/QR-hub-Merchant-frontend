@@ -1,3 +1,4 @@
+import { isPageSize } from '@/shared/pagination'
 import { safeContractError } from '@/shared/api/errors'
 import type {
   DynamicQrFilters,
@@ -52,7 +53,7 @@ export function toDynamicQrQuery(
     !isValidDateRange(filters) ||
     !Number.isSafeInteger(filters.page) ||
     filters.page < 0 ||
-    !([10, 20, 25, 50] as readonly number[]).includes(filters.size) ||
+    !isPageSize(filters.size) ||
     (filters.status !== undefined && !allowedStatuses.includes(filters.status)) ||
     (filters.distributionStatus !== undefined && !distributionStatuses.includes(filters.distributionStatus))
   ) {

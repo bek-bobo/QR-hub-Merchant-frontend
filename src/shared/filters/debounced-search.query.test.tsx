@@ -25,7 +25,7 @@ it('retains AbortSignal forwarding and dispatches only coherent effective querie
   let edit!: (text: string) => void
   function Harness() {
     const [draft, setDraft] = useState('old')
-    const [applied, setApplied] = useState({ search: 'old', page: 3, size: 25 as const,
+    const [applied, setApplied] = useState({ search: 'old', page: 3, size: 100 as const,
       fromDate: '2026-10-01', toDate: '2026-10-07' })
     useEffect(() => { edit = setDraft }, [])
     useDebouncedSearch(draft, applied.search, (search) => setApplied((current) => applyEffectiveSearch(current, search)))
@@ -46,7 +46,7 @@ it('retains AbortSignal forwarding and dispatches only coherent effective querie
     await act(async () => vi.advanceTimersByTimeAsync(1))
     expect(requests).toHaveLength(2)
     expect(requests[0]!.signal.aborted).toBe(true)
-    expect(Object.fromEntries(requests[1]!.url.searchParams)).toMatchObject({ search: '  new  ', page: '0', size: '25' })
+    expect(Object.fromEntries(requests[1]!.url.searchParams)).toMatchObject({ search: '  new  ', page: '0', size: '100' })
     await act(async () => edit('other'))
     await act(async () => vi.advanceTimersByTimeAsync(400))
     expect(requests).toHaveLength(3)

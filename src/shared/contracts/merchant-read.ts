@@ -1,3 +1,4 @@
+import type { PageSize } from '@/shared/pagination'
 import { safeContractError } from '@/shared/api/errors'
 
 export type ReadSource = 'live' | 'demo'
@@ -13,7 +14,7 @@ export type QrStatusKind =
   | 'rejected'
   | 'success'
   | 'unknown'
-export type PageSize = 10 | 20 | 25 | 50
+export type { PageSize } from '@/shared/pagination'
 export type Outcome = 'total' | 'success' | 'processing' | 'failed' | 'uncategorized'
 export type ChartGroupBy = 'HOUR' | 'DAY' | 'WEEK' | 'MONTH' | 'YEAR'
 export type DashboardGranularity = 'AUTO' | ChartGroupBy

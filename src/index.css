@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./shared/ui/cursor-policy.css" layer(base);
 
 @custom-variant dark (&:is(.dark *));
 
@@ -249,11 +250,6 @@ body {
   .dashboard-metric[data-outcome='processing'] { --metric-accent: var(--status-warning-indicator); }
   .dashboard-metric[data-outcome='failed'] { --metric-accent: var(--status-error-indicator); }
 
-  .dashboard-filter-toolbar button[aria-label='Sana oralig‘ini tanlash'] {
-    height: 2.25rem;
-    border-radius: 0.75rem;
-  }
-
   .dashboard-trend button[aria-pressed='true'] {
     border-color: color-mix(in srgb, var(--brand-primary) 20%, transparent);
     background: var(--brand-soft);
@@ -374,8 +370,7 @@ body {
     }
   }
 
-  .dynamic-qr-list .dynamic-qr-search input,
-  .dynamic-qr-list button[aria-label='Sana oralig‘ini tanlash'] {
+  .dynamic-qr-list .dynamic-qr-search input {
     height: 2.5rem;
     border-radius: 0.75rem;
   }

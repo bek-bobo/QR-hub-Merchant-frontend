@@ -21,7 +21,7 @@ describe('dynamic QR export filters', () => {
   })
   it('omits blank optional IDs and retains whitespace search while preserving the applied date range', () => {
     const query = toDynamicQrExportQuery({ fromDate: '2026-09-09', toDate: '2026-09-15',
-      merchantId: ' ', bankAccountId: '', terminalId: ' ', search: '  ', page: 4, size: 25 })
+      merchantId: ' ', bankAccountId: '', terminalId: ' ', search: '  ', page: 4, size: 100 })
     expect(query).toEqual({ fromDate: '2026-09-09', toDate: '2026-09-15', search: '  ' })
     expect(query).not.toHaveProperty('page')
     expect(query).not.toHaveProperty('size')

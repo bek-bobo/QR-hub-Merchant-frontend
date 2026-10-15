@@ -1,3 +1,4 @@
+import { isPageSize } from '@/shared/pagination'
 import { safeContractError } from '@/shared/api/errors'
 import type { PageSize } from './merchant-read'
 
@@ -15,7 +16,7 @@ function optionalLongId(value: string | undefined): string | undefined {
 }
 function optionalText(value: string | undefined): string | undefined { return value?.trim() || undefined }
 function base(filters: Pick<ManagementFilters, 'search' | 'page' | 'size'>): Record<string, string> {
-  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 20, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
+  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !isPageSize(filters.size)) throw safeContractError()
   const query: Record<string, string> = { page: String(filters.page), size: String(filters.size) }
   const search = filters.search
   if (search) query.search = search

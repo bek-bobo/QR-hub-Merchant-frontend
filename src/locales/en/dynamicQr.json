@@ -14,6 +14,9 @@
     "total": "Total QR codes: {{countText}}"
   },
   "stats": {
+    "infoLabel": "More information about {{statistic}}",
+    "unavailableHelp": "Summary statistics are not enabled in this environment. This does not mean that there are no QR codes.",
+    "failedHelp": "Summary statistics could not be loaded. Refresh to request them again.",
     "total": "Total amount",
     "fee": "Service fee",
     "unavailable": "Statistics are currently unavailable",
@@ -75,6 +78,8 @@
     "details": "Details"
   },
   "create": {
+    "bankAccountInactive": "The bank account is inactive",
+    "bankAccountInactiveGuidance": "Check the status of the bank account linked to the selected terminal.",
     "title": "Create dynamic QR",
     "description": "Enter the amount in UZS.",
     "dialogHelp": "Select a terminal and enter the amount in UZS.",
@@ -105,6 +110,7 @@
     "bounds": "Permitted amount: {{minimum}} – {{maximum}}"
   },
   "validation": {
+    "amountRequired": "Enter an amount.",
     "amount": "Enter the amount in the specified format and permitted range."
   },
   "cancel": {

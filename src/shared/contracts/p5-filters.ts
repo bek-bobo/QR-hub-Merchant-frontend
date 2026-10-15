@@ -1,3 +1,4 @@
+import { isPageSize } from '@/shared/pagination'
 import { safeContractError } from '@/shared/api/errors'
 import type { PageSize } from './merchant-read'
 import { dependentReadGate, type DependentLookupGateInput } from './management-filters'
@@ -29,7 +30,7 @@ function integerStatus(value: number | undefined): number | undefined {
 }
 
 export function toP5ListQuery(filters: P5Filters): Readonly<Record<string, string>> {
-  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !([10, 20, 25, 50] as readonly number[]).includes(filters.size)) throw safeContractError()
+  if (!Number.isSafeInteger(filters.page) || filters.page < 0 || !isPageSize(filters.size)) throw safeContractError()
   const query: Record<string, string> = { page: String(filters.page), size: String(filters.size) }
   const merchantId = optionalLongId(filters.merchantId)
   const terminalId = optionalText(filters.terminalId)

@@ -13,6 +13,8 @@ export interface SelectProps extends Omit<React.ComponentProps<'button'>, 'value
   readonly defaultValue?: string | number
   readonly onChange?: (event: SelectChangeEvent) => void
   readonly required?: boolean
+  /** Runs after an explicit popup selection releases focus, never on cancel/load. */
+  readonly onSelectionCloseAutoFocus?: (event: Event, pointerType: string) => void
   readonly autoComplete?: string
   readonly size?: 'default' | 'compact'
 }
@@ -42,13 +44,15 @@ function optionValue(option: OptionProps): string {
 }
 
 function Select({ className, children, value, defaultValue, onChange, disabled,
-  required, name, form, autoComplete, size = 'default', ref, ...triggerProps }: SelectProps) {
+  required, name, form, autoComplete, onSelectionCloseAutoFocus, size = 'default', ref, ...triggerProps }: SelectProps) {
   const options = collectOptions(children)
   const initialValue = String(defaultValue ?? optionValue(options.find((option) => !option.disabled) ?? {}))
   const [localValue, setLocalValue] = React.useState(initialValue)
   const currentValue = value === undefined ? localValue : String(value)
   const selected = options.find((option) => optionValue(option) === currentValue)
   const triggerRef = React.useRef<HTMLButtonElement | null>(null)
+  const selectionPending = React.useRef(false)
+  const selectionPointer = React.useRef('')
 
   React.useEffect(() => {
     const owner = form ? document.getElementById(form) : triggerRef.current?.closest('form')
@@ -70,7 +74,10 @@ function Select({ className, children, value, defaultValue, onChange, disabled,
         // A hidden Radix form control can emit an empty fallback if a lookup
         // removes the current ID. Reconciliation belongs to the feature;
         // only explicit item selections may change its business value here.
-        if (next.startsWith('option:')) change(next.slice('option:'.length))
+        if (next.startsWith('option:')) {
+          selectionPending.current = true
+          change(next.slice('option:'.length))
+        }
       }}>
       <SelectPrimitive.Trigger {...triggerProps} ref={(node) => {
         triggerRef.current = node
@@ -90,6 +97,13 @@ function Select({ className, children, value, defaultValue, onChange, disabled,
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content position="popper" sideOffset={4} collisionPadding={8}
+          onPointerUpCapture={(event) => { selectionPointer.current = event.pointerType }}
+          onKeyDownCapture={() => { selectionPointer.current = '' }}
+          onCloseAutoFocus={(event) => {
+            if (selectionPending.current) onSelectionCloseAutoFocus?.(event, selectionPointer.current)
+            selectionPending.current = false
+            selectionPointer.current = ''
+          }}
           data-slot="select-content"
           className="z-[100] max-h-[min(20rem,var(--radix-select-content-available-height))] w-[var(--radix-select-trigger-width)] max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-border/70 bg-popover p-1.5 text-sm font-normal text-text-primary shadow-[0_8px_30px_-10px_rgba(16,24,40,0.2)]">
           <SelectPrimitive.ScrollUpButton className="flex h-6 items-center justify-center text-text-secondary">

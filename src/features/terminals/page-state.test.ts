@@ -26,7 +26,7 @@ describe('terminal filter state', () => {
     expect(changeTerminalMerchantDraft(applied, '5')).toMatchObject({ merchantId: '5', bankAccountId: undefined, regionId: '3', districtId: '4' })
     expect(changeTerminalRegionDraft(applied, '6')).toMatchObject({ merchantId: '1', bankAccountId: '2', regionId: '6', districtId: undefined })
     expect(applied).toMatchObject({ merchantId: '1', bankAccountId: '2', regionId: '3', districtId: '4', page: 5 })
-    expect(resetTerminalFilters({ ...applied, size: 25 })).toEqual({ search: '', page: 0, size: 25 })
+    expect(resetTerminalFilters({ ...applied, size: 100 })).toEqual({ search: '', page: 0, size: 100 })
   })
 
   it('reconciles successful empty draft domains without mutating applied state or serializing stale IDs', () => {

@@ -23,7 +23,7 @@ describe('static QR applied filters', () => {
     expect(next).toEqual({ ...applied, search: '  QR-Exact  ', page: 0 })
     expect(applyStaticQrQuickSearch(next, '  QR-Exact  ')).toBe(next)
     expect(applyStaticQrQuickSearch(next, '')).toEqual({ ...applied, search: '', page: 0 })
-    expect(clearStaticTerminal({ ...applied, size: 25 })).toEqual({ search: '', page: 0, size: 25 })
+    expect(clearStaticTerminal({ ...applied, size: 100 })).toEqual({ search: '', page: 0, size: 100 })
   })
 
   it('clears only dependent drafts when merchant or region changes before Apply', () => {

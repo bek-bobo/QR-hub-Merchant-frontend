@@ -1,5 +1,5 @@
 import { useDynamicQrPresentation } from './presentation'
-import { useEffect, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useReadRuntime } from '@/app/read/useReadRuntime'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
@@ -52,6 +52,8 @@ export function CreateQrContent({
   const { adapter, available, currencyAllowed } = useLiveCreateQrAdapter()
   const [terminalId, setTerminalId] = useState('')
   const [amountInput, setAmountInput] = useState('')
+  const amountRef = useRef<HTMLInputElement>(null)
+  const [submitAttempted, setSubmitAttempted] = useState(false)
   const [actionMessage, setActionMessage] = useState<QrActionFeedback | null>(null)
   const terminals = useQuery(adapter.terminalOptions())
   const currencies = useQuery(adapter.currencyOptions(currencyAllowed))
@@ -67,6 +69,7 @@ export function CreateQrContent({
   const bounds = selected ? createAmountBounds(selected) : null
   const draft = { terminalId, amountInput, currencyCode }
   const amountValid = bounds ? parseCreateAmount(amountInput, bounds.minimum, bounds.maximum) !== null : false
+  const amountInvalid = Boolean(amountInput.trim() ? !amountValid : submitAttempted)
   const validRequest = adapter.requestForDraft(draft)
   const canCreate = adapter.canCreate()
   const canSubmit = Boolean(adapter.port() && validRequest && canCreate && controllerState.outcome.kind === 'idle' &&
@@ -87,6 +90,8 @@ export function CreateQrContent({
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    setSubmitAttempted(true)
+    if (!canSubmit) return
     onPendingChange?.(true)
     void controller.submit({
       draft, terminals: terminals.data ?? null, currencies: currencies.data ?? null,
@@ -103,6 +108,7 @@ export function CreateQrContent({
     if (!controller.beginNewIntent()) return
     setTerminalId('')
     setAmountInput('')
+    setSubmitAttempted(false)
     setActionMessage(null)
   }
 
@@ -120,6 +126,15 @@ export function CreateQrContent({
             <Select {...controlProps} value={terminalId}
               className={embedded ? `h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg ${terminalId ? 'text-text-primary' : 'text-text-secondary'}` : undefined}
               disabled={!runtime.capabilities.terminalLookup || !available || terminals.isPending || terminals.isError}
+              onSelectionCloseAutoFocus={(event, pointerType) => {
+                // Touch retains trigger focus to avoid opening the software keyboard.
+                if (pointerType === 'touch' || !amountRef.current?.isConnected) return
+                if (!terminalId || !selected || result || controllerState.closed) return
+                event.preventDefault()
+                amountRef.current.focus({ preventScroll: true })
+                const end = amountRef.current.value.length
+                amountRef.current.setSelectionRange(end, end)
+              }}
               onChange={(event) => setTerminalId(event.target.value)}>
               <option value="">{p.message('create.chooseTerminal')}</option>
               {terminals.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
@@ -139,9 +154,11 @@ export function CreateQrContent({
               {p.message('create.bounds', {minimum: formatMinorValue({minorUnits: String(bounds.minimum), scale: 2}), maximum: formatMoney({minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2})})}
             </span> : null}
           </>}
-          errorText={amountInput && bounds && !amountValid ? p.message('validation.amount') : undefined}>
-          {(controlProps) => <MoneyInput {...controlProps} value={amountInput} onValueChange={setAmountInput}
-            className={embedded ? 'h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg' : undefined} />}
+          errorText={amountInvalid ? (amountInput.trim() ? p.message('validation.amount') : p.message('validation.amountRequired')) : undefined}>
+          {(controlProps) => <MoneyInput {...controlProps} ref={amountRef} aria-required="true"
+            data-validation={amountInvalid ? 'invalid' : amountValid ? 'valid' : 'neutral'}
+            value={amountInput} onValueChange={setAmountInput}
+            className={`${embedded ? 'h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg' : ''} ${amountValid ? 'data-[validation=valid]:border-status-success-border data-[validation=valid]:focus-visible:border-status-success-border data-[validation=valid]:focus-visible:ring-status-success-border/30' : amountInvalid ? 'data-[validation=invalid]:border-destructive data-[validation=invalid]:focus-visible:border-destructive data-[validation=invalid]:focus-visible:ring-destructive/30 dark:data-[validation=invalid]:aria-invalid:border-destructive' : ''}`} />}
         </FormField>
         {!currencyAllowed ? <p role="status" className="text-sm">{p.message('create.currencyNoAccess')}</p> : null}
         {currencyAllowed && !available ? <p role="status" className="text-sm">{p.message('create.currenciesUnavailable')}</p> : null}

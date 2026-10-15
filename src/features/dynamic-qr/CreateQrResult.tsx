@@ -7,6 +7,7 @@ import { QrPresentation } from './QrPresentation'
 import { QrDisplayHeader } from './QrDisplayShell'
 import { writeQrClipboardText } from './qr-presentation'
 import { describeQrActionFeedback } from './feedback'
+import { getCreateBusinessError } from './create-business-errors'
 
 interface CreateQrResultProps {
   readonly result: CreateResultModel
@@ -24,6 +25,7 @@ function sameScope(left: ReadScope, right: ReadScope): boolean {
 
 export function CreateQrResult({ result, currentScope, canCreate, onClose, onNewIntent, showHeading = true }: CreateQrResultProps) {
   const p = useDynamicQrPresentation()
+  const businessError = result.kind === 'rejected' ? getCreateBusinessError(result.reason) : null
   if (!sameScope(result.scope, currentScope()) || !canCreate()) return null
 
   async function copyLink() {
@@ -57,7 +59,8 @@ export function CreateQrResult({ result, currentScope, canCreate, onClose, onNew
     </> : <>
       <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4">
         {showHeading ? <h3 className="text-lg font-semibold">{p.message('create.failed')}</h3> : null}
-        <p className="mt-2 text-sm">{result.kind === 'rejected' ? p.message('feedback.createRejected') : p.feedback(describeQrActionFeedback(result.reason))}</p>
+        <p className="mt-2 text-sm">{businessError ? p.message(businessError.message) : result.kind === 'rejected' ? p.message('feedback.createRejected') : p.feedback(describeQrActionFeedback(result.reason))}</p>
+        {businessError ? <p className="mt-1 text-sm text-text-secondary">{p.message(businessError.guidance)}</p> : null}
       </div>
     </>}
     {result.kind !== 'confirmed' ? <div className="flex flex-col-reverse gap-2 border-t pt-4 sm:flex-row sm:justify-end">

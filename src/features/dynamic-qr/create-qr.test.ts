@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { decodeCurrencyOptionsResponse } from '@/shared/contracts/currency.contract'
 import { decodeCreateTerminalOptionsResponse } from '@/shared/contracts/terminal-lookup.contract'
 import type { ReadScope } from '@/shared/contracts/merchant-read'
@@ -23,6 +23,18 @@ function deferred<T>() {
 }
 
 describe('create QR contract and controller', () => {
+  it.each(['', '999.99', '20000000.01', '-1000', '1000.001', '1e3', 'abc'])('blocks invalid direct controller submission: %s', async (amountInput) => {
+    const create = vi.fn()
+    const controller = createCreateQrController({
+      currentScope: () => ({ source: 'live', sessionScopeId: 'amount-ux', accessRevision: 1 }),
+      canCreate: () => true,
+      port: () => ({ create }),
+    })
+    expect((await controller.submit({ ...input, draft: { ...draft, amountInput } })).kind).toBe('not-sent')
+    expect(create).not.toHaveBeenCalled()
+    expect(controller.getSnapshot().kind).toBe('idle')
+  })
+
   it('intersects terminal limits with global UZS minor bounds', () => {
     const narrow = { ...terminals[0], minAmountMinor: '100001', maxAmountMinor: '200000' }
     expect(createAmountBounds(narrow)).toEqual({ minimum: 100001n, maximum: 200000n })

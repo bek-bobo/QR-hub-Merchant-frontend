@@ -125,7 +125,7 @@ describe('D3 dynamic QR simulation', () => {
         ...defaultFilters,
         terminalId: 'T-02',
         search: 'CHILONZOR',
-        size: 25,
+        size: 100,
       },
       new AbortController().signal,
     )
@@ -139,7 +139,7 @@ describe('D3 dynamic QR simulation', () => {
   it('returns rows in deterministic newest-first order', async () => {
     const simulator = createReadSimulator('NORMAL')
     const page = await simulator.api.dynamicQrs(
-      { ...defaultFilters, size: 25 },
+      { ...defaultFilters, size: 100 },
       new AbortController().signal,
     )
 

@@ -1,0 +1,20 @@
+/* Shared semantic defaults. Utility cursors (grab, not-allowed, etc.) keep
+   precedence through index.css's base layer. Never infer interactivity from
+   a generic div/span or from visual styling. */
+:where(
+  button, a[href], summary, select,
+  input[type='button'], input[type='submit'], input[type='reset'],
+  input[type='checkbox'], input[type='radio'],
+  [role='button'], [role='menuitem'], [role='menuitemradio'], [role='menuitemcheckbox']
+):not(:disabled):not([aria-disabled='true']):not([data-disabled]) {
+  cursor: pointer;
+}
+
+:where(
+  button, a[href], summary, select,
+  input[type='button'], input[type='submit'], input[type='reset'],
+  input[type='checkbox'], input[type='radio'],
+  [role='button'], [role='menuitem'], [role='menuitemradio'], [role='menuitemcheckbox']
+):is(:disabled, [aria-disabled='true'], [data-disabled]) {
+  cursor: default;
+}

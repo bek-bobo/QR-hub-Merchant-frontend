@@ -12,8 +12,9 @@ function daysInMonth(year: number, month: number): number {
   return [4, 6, 9, 11].includes(month) ? 30 : 31
 }
 
-export function formatOffsetlessDateTime(value: string): string {
-  const match = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?$/.exec(value)
+export function formatOffsetlessDateTime(value: string | null | undefined): string {
+  if (!value) return '—'
+  const match = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,9})?)?$/.exec(value)
   if (!match) return value || '—'
 
   const [, yearText, monthText, dayText, hourText, minuteText, secondText] = match
@@ -22,7 +23,7 @@ export function formatOffsetlessDateTime(value: string): string {
   const day = Number(dayText)
   const hour = Number(hourText)
   const minute = Number(minuteText)
-  const second = Number(secondText)
+  const second = Number(secondText ?? '0')
   if (month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month) ||
     hour > 23 || minute > 59 || second > 59) return value
 

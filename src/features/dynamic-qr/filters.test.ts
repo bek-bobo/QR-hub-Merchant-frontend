@@ -25,7 +25,7 @@ describe('dynamic QR filters', () => {
       search: '  Terminal A  ',
       status: 0,
       page: 9,
-      size: 25,
+      size: 100,
     })
 
     expect(applied.page).toBe(0)
@@ -35,7 +35,7 @@ describe('dynamic QR filters', () => {
       status: '0',
       search: '  Terminal A  ',
       page: '0',
-      size: '25',
+      size: '100',
     })
   })
 

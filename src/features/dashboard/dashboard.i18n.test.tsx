@@ -89,7 +89,7 @@ describe.each(['uz','ru','en'] as const)('dashboard resources and domain present
  })
  it('formats offsetless times and calendar dates without browser timezone conversion',async()=>{
   const value=await runtime(locale),p=createDashboardPresentation(locale,createMessages(value,'dashboard'))
-  expect(p.wallTime('2026-10-01T23:30:00')).toBe(`${p.date('2026-10-01')} 23:30`);expect(p.date('2026-02-30')).toBe('2026-02-30');expect(p.date('')).toBe('—')
+  expect(p.wallTime('2026-10-01T23:30:00')).toBe('01.10.2026 23:30');expect(p.date('2026-02-30')).toBe('2026-02-30');expect(p.date('')).toBe('—')
   expect(p.weekdays).toHaveLength(7);expect(p.weekdays[0]).toBe(new Intl.DateTimeFormat(p.intlLocale,{weekday:'short',timeZone:'UTC'}).format(new Date('2026-10-05T00:00:00Z')))
  })
 })
@@ -121,7 +121,7 @@ it('preserves an unfinished calendar draft, open month, selected-day identity an
  const host=await mount(value,<Calendar/>);await act(async()=>host.querySelector<HTMLButtonElement>(`button[aria-label="${words.uz.choose}"]`)!.click())
  const first=document.querySelector<HTMLButtonElement>('[data-calendar-date="2026-10-08"]')!;await act(async()=>first.click());expect(apply).not.toHaveBeenCalled();expect(draft).toHaveBeenLastCalledWith({fromDate:'2026-10-08',toDate:''})
  await change(value,'en');expect(document.querySelector('[data-calendar-date="2026-10-08"]')).toBe(first);expect(first.getAttribute('aria-pressed')).toBe('true');expect(document.querySelectorAll('button[aria-label="Next month"]')).toHaveLength(2);expect(apply).not.toHaveBeenCalled()
- expect(Array.from(document.querySelectorAll('h3')).map(node=>node.textContent)).toEqual(['Oct 2026','Nov 2026'])
+ expect(Array.from(document.querySelectorAll('h3')).map(node=>node.textContent)).toEqual(['October 2026','November 2026'])
  expect(document.querySelectorAll('button[aria-label="Keyingi oy"]')).toHaveLength(0)
  await act(async()=>document.querySelector<HTMLButtonElement>('[data-calendar-date="2026-10-10"]')!.click());expect(apply).toHaveBeenCalledExactlyOnceWith({fromDate:'2026-10-08',toDate:'2026-10-10'})
 })

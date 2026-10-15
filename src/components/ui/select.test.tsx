@@ -49,8 +49,8 @@ describe('shared Radix Select', () => {
       onPageChange={onPageChange} onPageSizeChange={onPageSizeChange} />)
     expect(h.trigger().getAttribute('aria-label')).toBe('Sahifadagi yozuvlar soni')
     expect(h.trigger().dataset.size).toBe('compact')
-    await chooseSelectOption(h.trigger(), '25')
-    expect(onPageSizeChange).toHaveBeenCalledWith(25)
+    await chooseSelectOption(h.trigger(), '100')
+    expect(onPageSizeChange).toHaveBeenCalledWith(100)
     expect(onPageChange).not.toHaveBeenCalled()
   })
   it('preserves exact IDs, optional clearing and controlled callbacks through keyboard selection', async () => {

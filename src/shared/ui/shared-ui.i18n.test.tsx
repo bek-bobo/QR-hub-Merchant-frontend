@@ -27,9 +27,9 @@ import { UzbekPhoneInput } from './UzbekPhoneInput'
 
 const locales = ['uz', 'ru', 'en'] as const
 const copy = {
-  uz: { loading: 'Yuklanmoqda', empty: 'Ma’lumot topilmadi', error: 'Ma’lumotni yuklab bo‘lmadi', noAccess: 'Ko‘rish uchun ruxsat yo‘q', retry: 'Qayta urinish', close: 'Yopish', filters: 'Filtrlar', previous: 'Oldingi sahifa', next: 'Keyingi sahifa', page: '2-sahifa, jami 3 sahifa', perPage: '25 / sah.', copied: 'Nusxalandi.', copyFailed: 'Nusxalab bo‘lmadi.', copyLink: 'Havolani nusxalash', toastClose: 'Bildirishnomani yopish', viewport: 'Bildirishnomalar (F8)', notification: 'Bildirishnoma', theme: 'Yorug‘', refresh: 'Yangilash', phone: 'O‘zbekiston telefon kodi: +998.', menu: 'Amallarni ochish', table: 'Jadval ustunlari' },
-  ru: { loading: 'Загрузка', empty: 'Данные не найдены', error: 'Не удалось загрузить данные', noAccess: 'Нет доступа к просмотру', retry: 'Повторить попытку', close: 'Закрыть', filters: 'Фильтры', previous: 'Предыдущая страница', next: 'Следующая страница', page: 'Страница 2 из 3', perPage: '25 / стр.', copied: 'Скопировано.', copyFailed: 'Не удалось скопировать.', copyLink: 'Скопировать ссылку', toastClose: 'Закрыть уведомление', viewport: 'Уведомления (F8)', notification: 'Уведомление', theme: 'Светлая', refresh: 'Обновить', phone: 'Телефонный код Узбекистана: +998.', menu: 'Открыть действия', table: 'Столбцы таблицы' },
-  en: { loading: 'Loading', empty: 'No data found', error: 'Unable to load data', noAccess: 'No viewing access', retry: 'Retry', close: 'Close', filters: 'Filters', previous: 'Previous page', next: 'Next page', page: 'Page 2 of 3', perPage: '25 / page', copied: 'Copied.', copyFailed: 'Unable to copy.', copyLink: 'Copy link', toastClose: 'Close notification', viewport: 'Notifications (F8)', notification: 'Notification', theme: 'Light', refresh: 'Refresh', phone: 'Uzbekistan telephone code: +998.', menu: 'Open actions', table: 'Table columns' },
+  uz: { loading: 'Yuklanmoqda', empty: 'Ma’lumot topilmadi', error: 'Ma’lumotni yuklab bo‘lmadi', noAccess: 'Ko‘rish uchun ruxsat yo‘q', retry: 'Qayta urinish', close: 'Yopish', filters: 'Filtrlar', previous: 'Oldingi sahifa', next: 'Keyingi sahifa', page: '2-sahifa, jami 3 sahifa', perPage: '100 / sah.', copied: 'Nusxalandi.', copyFailed: 'Nusxalab bo‘lmadi.', copyLink: 'Havolani nusxalash', toastClose: 'Bildirishnomani yopish', viewport: 'Bildirishnomalar (F8)', notification: 'Bildirishnoma', theme: 'Yorug‘', refresh: 'Yangilash', phone: 'O‘zbekiston telefon kodi: +998.', menu: 'Amallarni ochish', table: 'Jadval ustunlari' },
+  ru: { loading: 'Загрузка', empty: 'Данные не найдены', error: 'Не удалось загрузить данные', noAccess: 'Нет доступа к просмотру', retry: 'Повторить попытку', close: 'Закрыть', filters: 'Фильтры', previous: 'Предыдущая страница', next: 'Следующая страница', page: 'Страница 2 из 3', perPage: '100 / стр.', copied: 'Скопировано.', copyFailed: 'Не удалось скопировать.', copyLink: 'Скопировать ссылку', toastClose: 'Закрыть уведомление', viewport: 'Уведомления (F8)', notification: 'Уведомление', theme: 'Светлая', refresh: 'Обновить', phone: 'Телефонный код Узбекистана: +998.', menu: 'Открыть действия', table: 'Столбцы таблицы' },
+  en: { loading: 'Loading', empty: 'No data found', error: 'Unable to load data', noAccess: 'No viewing access', retry: 'Retry', close: 'Close', filters: 'Filters', previous: 'Previous page', next: 'Next page', page: 'Page 2 of 3', perPage: '100 / page', copied: 'Copied.', copyFailed: 'Unable to copy.', copyLink: 'Copy link', toastClose: 'Close notification', viewport: 'Notifications (F8)', notification: 'Notification', theme: 'Light', refresh: 'Refresh', phone: 'Uzbekistan telephone code: +998.', menu: 'Open actions', table: 'Table columns' },
 }
 const mounted: { root: Root; host: HTMLElement }[] = []
 beforeEach(() => {
@@ -72,7 +72,7 @@ describe.each(locales)('shared UI in %s', (locale) => {
   })
   it('renders full pagination messages, labels, and options without changing pagination values', async () => {
     const instance = await runtime(locale)
-    const host = await mount(instance, <PaginationBar ariaLabel="Caller navigation" currentPage={1} totalPages={3} totalItems={60} pageSize={25} onPageChange={() => {}} onPageSizeChange={() => {}} />)
+    const host = await mount(instance, <PaginationBar ariaLabel="Caller navigation" currentPage={1} totalPages={3} totalItems={60} pageSize={100} onPageChange={() => {}} onPageSizeChange={() => {}} />)
     const html = host.innerHTML
     for (const expected of [copy[locale].previous, copy[locale].next, copy[locale].page, copy[locale].perPage, 'Caller navigation']) expect(html).toContain(expected)
     expect(html).toContain('aria-current="page"')
@@ -122,7 +122,7 @@ describe('mounted shared state across UZ → RU → EN', () => {
       const [page, setPage] = useState(1), [value, setValue] = useState('draft')
       return <><input aria-label="fixture input" value={value} onChange={(event) => setValue(event.target.value)} />
         <button onClick={() => setValue('edited')}>Edit fixture</button>
-        <PaginationBar ariaLabel="Caller navigation" currentPage={page} totalPages={3} totalItems={60} pageSize={25} onPageChange={(next) => { onPage(next); setPage(next) }} onPageSizeChange={onSize} />
+        <PaginationBar ariaLabel="Caller navigation" currentPage={page} totalPages={3} totalItems={60} pageSize={100} onPageChange={(next) => { onPage(next); setPage(next) }} onPageSizeChange={onSize} />
         <LookupFilterSelect label="Caller lookup" value="stable-id" options={[{ id: 'stable-id', name: 'Caller option' }]} state="ready" allLabel="Caller all" emptyLabel="Caller empty" errorLabel="Caller error" onChange={onLookup} />
         <LoadingState /><EmptyState /><ErrorState onRetry={retry} /><NoAccessState />
       </>

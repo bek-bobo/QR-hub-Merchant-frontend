@@ -1,13 +1,14 @@
-import { useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useId, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { CalendarDaysIcon, ChevronLeftIcon, ChevronRightIcon, RotateCcwIcon } from 'lucide-react'
 import { Popover as PopoverPrimitive } from 'radix-ui'
 import { Button } from '@/components/ui/button'
 import type { DateRange } from '@/shared/contracts/merchant-read'
 import { getTashkentDatePreset } from '@/shared/filters/date-range'
+import { useMessages } from '@/shared/i18n/useMessages'
+import { formatCalendarMonthCaption, formatDateRangeEndpoint } from '@/shared/presentation/calendar'
 import {
   buildCalendarMonth,
   calendarMonthForRange,
-  formatCalendarMonthLabel,
   getCalendarPreviewRange,
   selectCalendarRangeDate,
   shiftCalendarMonth,
@@ -19,7 +20,6 @@ const weekdays = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'] as const
 // Calendar selection and layout calculations remain independent of locale.
 export interface DateRangePresentation {
   readonly weekdays: readonly string[]
-  month(value: string): string
   date(value: string, options?: Intl.DateTimeFormatOptions): string
   message(key: 'dates.choose' | 'dates.previous' | 'dates.next' | 'dates.reset'): string
 }
@@ -70,11 +70,13 @@ function CalendarMonth({
   readonly otherVisibleMonth?: string
   readonly navigation: ReactNode
 }) {
+  const common = useMessages('common')
+  const caption = formatCalendarMonthCaption(month, common)
   return (
-    <section className={className} aria-label={(presentation?.month(month) ?? formatCalendarMonthLabel(month))}>
+    <section className={className} aria-label={caption}>
       <div className="relative mb-3 flex h-8 items-center justify-center">
         <h3 className="text-center text-sm font-semibold text-text-primary">
-          {presentation?.month(month) ?? formatCalendarMonthLabel(month)}
+          {caption}
         </h3>
         {navigation}
       </div>
@@ -153,6 +155,7 @@ export function DateRangeQuickFilter({
   onApply,
   onReset,
 }: DateRangeQuickFilterProps) {
+  const rangeDescriptionId = useId()
   const [open, setOpen] = useState(false)
   const twoPanels = useSyncExternalStore(subscribeToPanelLayout, readTwoPanelLayout, singlePanelLayout)
   const [visibleMonth, setVisibleMonth] = useState(() => calendarMonthForRange(value))
@@ -199,15 +202,17 @@ export function DateRangeQuickFilter({
         <Button
           type="button"
           variant="outline"
-          className={triggerLabel ? 'h-8 max-w-full gap-2 px-3 font-normal' : 'h-9 w-full justify-between gap-3 px-3 font-normal sm:w-auto sm:min-w-64'}
+          data-date-range-trigger=""
+          aria-describedby={rangeDescriptionId}
+          className="h-12 w-full min-w-0 justify-between gap-3 rounded-2xl border-border bg-muted px-3 text-sm font-normal min-[375px]:text-base sm:w-80 sm:px-4 sm:text-lg dark:border-input dark:bg-muted"
           aria-label={presentation?.message('dates.choose') ?? (triggerLabel ? `Grafik sana oralig‘ini tanlash: ${triggerLabel}` : 'Sana oralig‘ini tanlash')}
         >
-          {triggerLabel ? <span>{triggerLabel}</span> : <span className="flex min-w-0 items-center gap-2">
-            <span>{presentation?.date(value.fromDate) ?? value.fromDate}</span>
+          {triggerLabel ? <span id={rangeDescriptionId}>{triggerLabel}</span> : <span id={rangeDescriptionId} className="flex min-w-0 items-center gap-2 tabular-nums">
+            <span>{formatDateRangeEndpoint(value.fromDate)}</span>
             <span aria-hidden="true" className="text-text-secondary">→</span>
-            <span>{value.toDate ? presentation?.date(value.toDate) ?? value.toDate : '…'}</span>
+            <span>{value.toDate ? formatDateRangeEndpoint(value.toDate) : '…'}</span>
           </span>}
-          <CalendarDaysIcon aria-hidden="true" className="shrink-0" />
+          <CalendarDaysIcon aria-hidden="true" className="size-5 shrink-0" />
         </Button>
       </PopoverPrimitive.Trigger>
       <PopoverPrimitive.Portal>

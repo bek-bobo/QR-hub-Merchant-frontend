@@ -56,8 +56,8 @@ describe('PaginationBar', () => {
     expect(options).toEqual([
       { value: '10', label: '10 / sah.' },
       { value: '20', label: '20 / sah.' },
-      { value: '25', label: '25 / sah.' },
       { value: '50', label: '50 / sah.' },
+      { value: '100', label: '100 / sah.' },
     ])
   })
 
@@ -74,7 +74,7 @@ describe('PaginationBar', () => {
     findAction(captureWithLocale(() => PaginationBar({ ...props, disabled: true })), 'Sahifadagi yozuvlar soni')
       .props.onChange?.(event('50'))
 
-    expect(onPageSizeChange.mock.calls).toEqual([[25]])
+    expect(onPageSizeChange.mock.calls).toEqual([[100]])
     expect(onPageChange).not.toHaveBeenCalled()
   })
 

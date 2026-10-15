@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useDebouncedSearch, applyEffectiveSearch } from './debounced-search'
 
-const initial = { search: 'old', page: 3, size: 25, terminalId: 'T1', status: 0,
+const initial = { search: 'old', page: 3, size: 100, terminalId: 'T1', status: 0,
   fromDate: '2026-10-01', toDate: '2026-10-07' }
 let root: Root | undefined
 let host: HTMLElement

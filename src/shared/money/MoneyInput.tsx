@@ -1,5 +1,6 @@
 import {
   useLayoutEffect,
+  useImperativeHandle,
   useRef,
   type ChangeEvent,
   type ComponentProps,
@@ -12,8 +13,9 @@ interface MoneyInputProps extends Omit<ComponentProps<typeof Input>, 'onChange' 
   readonly onValueChange: (value: string) => void
 }
 
-export function MoneyInput({ value, onValueChange, ...props }: MoneyInputProps) {
+export function MoneyInput({ value, onValueChange, ref, ...props }: MoneyInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
+  useImperativeHandle(ref, () => inputRef.current!, [])
   const pendingSelection = useRef<number | null>(null)
 
   useLayoutEffect(() => {

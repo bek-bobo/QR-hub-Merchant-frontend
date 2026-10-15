@@ -11,6 +11,19 @@ export interface MessageCatalog {
     "actions.reset": Record<string, never>
     "actions.retry": Record<string, never>
     "actions.save": Record<string, never>
+    "calendar.caption": { "month": string | number; "year": string | number }
+    "calendar.months.april": Record<string, never>
+    "calendar.months.august": Record<string, never>
+    "calendar.months.december": Record<string, never>
+    "calendar.months.february": Record<string, never>
+    "calendar.months.january": Record<string, never>
+    "calendar.months.july": Record<string, never>
+    "calendar.months.june": Record<string, never>
+    "calendar.months.march": Record<string, never>
+    "calendar.months.may": Record<string, never>
+    "calendar.months.november": Record<string, never>
+    "calendar.months.october": Record<string, never>
+    "calendar.months.september": Record<string, never>
     "copy.failed": Record<string, never>
     "copy.link": Record<string, never>
     "copy.success": Record<string, never>
@@ -332,6 +345,8 @@ export interface MessageCatalog {
     "cancel.unknown": Record<string, never>
     "cancel.warning": Record<string, never>
     "create.amount": Record<string, never>
+    "create.bankAccountInactive": Record<string, never>
+    "create.bankAccountInactiveGuidance": Record<string, never>
     "create.bounds": { "maximum": string | number; "minimum": string | number }
     "create.boundsUnavailable": Record<string, never>
     "create.checkFirst": Record<string, never>
@@ -449,9 +464,12 @@ export interface MessageCatalog {
     "page.stale": Record<string, never>
     "page.total": { "countText": string | number }
     "stats.failed": Record<string, never>
+    "stats.failedHelp": Record<string, never>
     "stats.fee": Record<string, never>
+    "stats.infoLabel": { "statistic": string | number }
     "stats.total": Record<string, never>
     "stats.unavailable": Record<string, never>
+    "stats.unavailableHelp": Record<string, never>
     "status.cancelled": Record<string, never>
     "status.expired": Record<string, never>
     "status.new": Record<string, never>
@@ -471,6 +489,7 @@ export interface MessageCatalog {
     "table.terminal": Record<string, never>
     "table.updatedAt": Record<string, never>
     "validation.amount": Record<string, never>
+    "validation.amountRequired": Record<string, never>
   }
   "staticQr": {
     "actions.details": Record<string, never>

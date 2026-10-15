@@ -1,9 +1,10 @@
+import { DynamicQrSummaryCard } from './DynamicQrSummaryCard'
 import { useDynamicQrPresentation } from './presentation'
 import { useDebouncedSearch } from '@/shared/filters/debounced-search'
 import { useState } from 'react'
 import { useAccessContext } from '@/shared/auth/useAccessContext'
 import { can } from '@/shared/auth/access'
-import { CreditCardIcon, InfoIcon, PercentIcon, PlusIcon, type LucideIcon } from 'lucide-react'
+import { CreditCardIcon, PercentIcon, PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { RefreshIconButton } from '@/components/RefreshIconButton'
 import {
@@ -78,60 +79,6 @@ function ListSkeleton() {
         <div key={index} className="h-10 animate-pulse rounded-lg bg-muted" />
       ))}
     </div>
-  )
-}
-
-function SummaryCard({
-  title,
-  value,
-  icon: Icon,
-  tone,
-  helper,
-}: {
-  readonly title: string
-  readonly value: string
-  readonly icon: LucideIcon
-  readonly tone: 'brand' | 'neutral'
-  readonly helper: string | null
-}) {
-  return (
-    <section
-      aria-label={title}
-      className={`relative min-w-0 overflow-hidden rounded-xl border p-5 ${
-        tone === 'brand'
-          ? 'border-brand/20 bg-linear-to-br from-surface/70 to-brand-soft'
-          : 'border-border bg-linear-to-br from-surface to-muted/40'
-      }`}
-    >
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 180 140"
-        preserveAspectRatio="none"
-        className={`pointer-events-none absolute inset-y-0 right-0 h-full w-2/5 ${tone === 'brand' ? 'text-brand/3' : 'text-text-secondary/3'}`}
-      >
-        <path fill="currentColor" d="M180 0C90 0 130 85 40 140H180Z" />
-        <path fill="currentColor" d="M180 55C115 50 70 105 0 140H180Z" />
-      </svg>
-      <div className="relative flex items-start gap-4">
-        <span className={`flex size-12 shrink-0 items-center justify-center rounded-xl ${
-          tone === 'brand' ? 'bg-brand/7 text-brand' : 'bg-muted text-text-primary'
-        }`}>
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="mt-0.5 text-sm font-semibold text-text-primary">{title}</h2>
-          <p className="mt-2 text-[28px] font-bold leading-tight tracking-tight text-text-primary [overflow-wrap:anywhere] sm:text-3xl">
-            {value}
-          </p>
-          {helper ? (
-            <p role="status" className="mt-2.5 flex items-start gap-2 text-xs leading-5 text-text-secondary">
-              <InfoIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-              <span>{helper}</span>
-            </p>
-          ) : null}
-        </div>
-      </div>
-    </section>
   )
 }
 
@@ -309,9 +256,9 @@ export function DynamicQrPage({
     list.data && list.data.page > 0 && list.data.content.length === 0,
   )
   const statsHelper = !statsFeatureEnabled
-    ? p.message('stats.unavailable')
+    ? { message: p.message('stats.unavailable'), explanation: p.message('stats.unavailableHelp') }
     : enabled.stats && stats.isError
-      ? p.message('stats.failed')
+      ? { message: p.message('stats.failed'), explanation: p.message('stats.failedHelp') }
       : null
 
   return (
@@ -327,19 +274,19 @@ export function DynamicQrPage({
         setSelectedQrRow(row)
       }} />
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
-        <SummaryCard
+        <DynamicQrSummaryCard
           title={p.message('stats.total')}
           icon={CreditCardIcon}
           tone="brand"
           value={enabled.stats && stats.data ? formatMoney(stats.data.totalAmount) : '—'}
-          helper={statsHelper}
+          helper={statsHelper ? { ...statsHelper, label: p.message('stats.infoLabel', { statistic: p.message('stats.total') }) } : null}
         />
-        <SummaryCard
+        <DynamicQrSummaryCard
           title={p.message('stats.fee')}
           icon={PercentIcon}
           tone="neutral"
           value={enabled.stats && stats.data ? formatMoney(stats.data.totalServiceFeeAmount) : '—'}
-          helper={statsHelper}
+          helper={statsHelper ? { ...statsHelper, label: p.message('stats.infoLabel', { statistic: p.message('stats.fee') }) } : null}
         />
       </div>
 
