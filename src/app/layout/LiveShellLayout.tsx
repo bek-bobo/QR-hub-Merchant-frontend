@@ -15,6 +15,7 @@ import { reduceMobileNavigationOpen } from './mobile-navigation-state'
 import { SidebarCollapseContext } from './sidebar-collapse-context'
 import { SidebarCollapseProvider } from './SidebarCollapseProvider'
 import './sidebar.css'
+import './sticky-header.css'
 
 const desktopSidebarQuery = '(min-width: 64rem)'
 
@@ -91,15 +92,17 @@ function ShellLayoutContent({
           />
         </aside>
         <div className="min-w-0 px-4 pt-4 sm:px-6 lg:px-7">
-          {header({
-            open: mobileNavigationOpen,
-            controls: 'live-mobile-navigation',
-            triggerRef: navigationTriggerRef,
-            openNavigation: () => dispatch({ type: 'set', open: true }),
-            sidebarCollapsed: collapsed,
-            toggleSidebar: toggleCollapsed,
-            sidebarToggleRef,
-          })}
+          <div className="merchant-shell-header sticky top-[env(safe-area-inset-top,0px)] z-30 min-w-0 bg-workspace">
+            {header({
+              open: mobileNavigationOpen,
+              controls: 'live-mobile-navigation',
+              triggerRef: navigationTriggerRef,
+              openNavigation: () => dispatch({ type: 'set', open: true }),
+              sidebarCollapsed: collapsed,
+              toggleSidebar: toggleCollapsed,
+              sidebarToggleRef,
+            })}
+          </div>
           <main className="min-w-0 py-6">{children}</main>
         </div>
       </div>

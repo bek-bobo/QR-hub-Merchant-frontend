@@ -1,0 +1,559 @@
+{
+  "baseline": {
+    "wrapperBackground": "rgba(0, 0, 0, 0)",
+    "headerRadius": "18px",
+    "scrollElement": "HTML",
+    "scrollY": 447.2000122070313
+  },
+  "cssZoom": "1",
+  "measurements": [
+    {
+      "label": "light desktop expanded scrolled",
+      "collapsed": "false",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 300,
+          "right": 1236.7999877929688,
+          "top": 0,
+          "width": 936.7999877929688,
+          "x": 300,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 447.2000122070313,
+      "viewport": [
+        1280,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(245, 247, 250)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 300,
+          "right": 1236.7999877929688,
+          "top": 0,
+          "width": 936.7999877929688,
+          "x": 300,
+          "y": 0
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "light desktop top settled",
+      "collapsed": "false",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 73.60000228881836,
+          "height": 57.60000228881836,
+          "left": 300,
+          "right": 1252,
+          "top": 16,
+          "width": 952,
+          "x": 300,
+          "y": 16
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 73.5999984741211,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 0,
+      "viewport": [
+        1280,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(245, 247, 250)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 73.60000228881836,
+          "height": 57.60000228881836,
+          "left": 300,
+          "right": 1252,
+          "top": 16,
+          "width": 952,
+          "x": 300,
+          "y": 16
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "light collapsed scrolled settled",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 100,
+          "right": 1236.800048828125,
+          "top": 0,
+          "width": 1136.800048828125,
+          "x": 100,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 403.2000122070313,
+      "viewport": [
+        1280,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(245, 247, 250)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 100,
+          "right": 1236.800048828125,
+          "top": 0,
+          "width": 1136.800048828125,
+          "x": 100,
+          "y": 0
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "dark desktop collapsed scrolled",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 100,
+          "right": 1236.800048828125,
+          "top": 0,
+          "width": 1136.800048828125,
+          "x": 100,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 403.2000122070313,
+      "viewport": [
+        1280,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(12, 17, 29)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 57.60000228881836,
+          "height": 57.60000228881836,
+          "left": 100,
+          "right": 1236.800048828125,
+          "top": 0,
+          "width": 1136.800048828125,
+          "x": 100,
+          "y": 0
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "dark tablet top",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 24,
+          "right": 728.7999877929688,
+          "top": 16,
+          "width": 704.7999877929688,
+          "x": 24,
+          "y": 16
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 0,
+      "viewport": [
+        768,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(12, 17, 29)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 24,
+          "right": 728.7999877929688,
+          "top": 16,
+          "width": 704.7999877929688,
+          "x": 24,
+          "y": 16
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "dark tablet scrolled",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 24,
+          "right": 728.7999877929688,
+          "top": 0,
+          "width": 704.7999877929688,
+          "x": 24,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 720,
+      "viewport": [
+        768,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(12, 17, 29)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 24,
+          "right": 728.7999877929688,
+          "top": 0,
+          "width": 704.7999877929688,
+          "x": 24,
+          "y": 0
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "dark mobile top",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 16,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 16
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 0,
+      "viewport": [
+        390,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(12, 17, 29)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 16,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 16
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "dark mobile scrolled",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 0,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "path": "/dashboard",
+      "scrollElement": "HTML",
+      "scrollY": 720,
+      "viewport": [
+        390,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(12, 17, 29)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 0,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 0
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "light mobile Dynamic QR top",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 16,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 16
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "path": "/dynamic-qrs",
+      "scrollElement": "HTML",
+      "scrollY": 0,
+      "viewport": [
+        390,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(245, 247, 250)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 69.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 16,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 16
+        },
+        "z": "30"
+      }
+    },
+    {
+      "label": "light mobile Dynamic QR scrolled",
+      "collapsed": "true",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "radius": "18px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 0,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 0
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px"
+      },
+      "mainDocumentTop": 69.59999990463257,
+      "path": "/dynamic-qrs",
+      "scrollElement": "HTML",
+      "scrollY": 76,
+      "viewport": [
+        390,
+        720
+      ],
+      "widthOverflow": false,
+      "wrapper": {
+        "background": "rgb(245, 247, 250)",
+        "overflow": "visible",
+        "position": "sticky",
+        "radius": "0px",
+        "rect": {
+          "bottom": 53.60000228881836,
+          "height": 53.60000228881836,
+          "left": 16,
+          "right": 359.20001220703125,
+          "top": 0,
+          "width": 343.20001220703125,
+          "x": 16,
+          "y": 0
+        },
+        "z": "30"
+      }
+    }
+  ],
+  "overlays": [
+    {
+      "label": "date picker",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 674.3875122070312,
+        "height": 370.3875122070313,
+        "left": 125,
+        "right": 797,
+        "top": 304,
+        "width": 672,
+        "x": 125,
+        "y": 304
+      },
+      "z": "50"
+    },
+    {
+      "label": "select",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 627.6000061035156,
+        "height": 157.60000610351562,
+        "left": 1070,
+        "right": 1214,
+        "top": 470,
+        "width": 144,
+        "x": 1070,
+        "y": 470
+      },
+      "z": "100"
+    },
+    {
+      "label": "filters",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 720,
+        "height": 720,
+        "left": 748.77685546875,
+        "right": 1288.77685546875,
+        "top": 0,
+        "width": 540,
+        "x": 748.77685546875,
+        "y": 0
+      },
+      "z": "50"
+    },
+    {
+      "label": "creation dialog",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 626.2250137329102,
+        "height": 532.4500122070312,
+        "left": 256,
+        "right": 1024,
+        "top": 93.7750015258789,
+        "width": 768,
+        "x": 256,
+        "y": 93.7750015258789
+      },
+      "z": "50"
+    },
+    {
+      "label": "language menu",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 202.6000061035156,
+        "height": 133.60000610351562,
+        "left": 1015,
+        "right": 1143,
+        "top": 69,
+        "width": 128,
+        "x": 1015,
+        "y": 69
+      },
+      "z": "50"
+    },
+    {
+      "label": "profile menu",
+      "hit": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 150.5999984741211,
+        "height": 81.5999984741211,
+        "left": 1083,
+        "right": 1227,
+        "top": 69,
+        "width": 144,
+        "x": 1083,
+        "y": 69
+      },
+      "z": "50"
+    }
+  ]
+}

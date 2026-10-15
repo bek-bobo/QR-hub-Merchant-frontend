@@ -1,0 +1,729 @@
+{
+  "baseline": {
+    "scrollElement": "HTML",
+    "position": "static",
+    "headerTopBefore": 16,
+    "scrollYAfter": 447.2000122070313,
+    "headerTopAfter": -431.2000122070313,
+    "mainDocumentTop": 73.60000610351562
+  },
+  "browserEnvironment": {
+    "colorMode": "dark",
+    "headerRadius": "18px",
+    "headerShadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+    "language": "en",
+    "scrollPadding": "112px"
+  },
+  "measurements": [
+    {
+      "label": "1280 expanded dashboard scrolled",
+      "clientHeight": 720,
+      "collapsed": "false",
+      "documentWidth": 1265,
+      "focused": null,
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 57.60000228881836,
+        "left": 300,
+        "top": 0,
+        "width": 936.7999877929688
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "scrollElement": "HTML",
+      "scrollHeight": 1167,
+      "scrollY": 447.2000122070313,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "1280 collapsed dashboard scrolled",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 1265,
+      "focused": "Expand sidebar",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 57.60000228881836,
+        "left": 100,
+        "top": 0,
+        "width": 1136.800048828125
+      },
+      "mainDocumentTop": 73.60000038146973,
+      "scrollElement": "HTML",
+      "scrollHeight": 1123,
+      "scrollY": 60,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "1280 collapsed light after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 1265,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 57.60000228881836,
+        "left": 100,
+        "top": 0,
+        "width": 1136.800048828125
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "scrollElement": "HTML",
+      "scrollHeight": 1123,
+      "scrollY": 403.2000122070313,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "320 dashboard before scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 305,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 16,
+        "width": 272.8000183105469
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 2495,
+      "scrollY": 0,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        320,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "320 dashboard after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 305,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 272.8000183105469
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "scrollElement": "HTML",
+      "scrollHeight": 2495,
+      "scrollY": 720,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        320,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "375 dashboard before scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 360,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 16,
+        "width": 328
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 2370,
+      "scrollY": 0,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        375,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "375 dashboard after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 360,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 328
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "scrollElement": "HTML",
+      "scrollHeight": 2370,
+      "scrollY": 720,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        375,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "390 dashboard before scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 16,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 2370,
+      "scrollY": 0,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "390 dashboard after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "scrollElement": "HTML",
+      "scrollHeight": 2370,
+      "scrollY": 720,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "768 dashboard before scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 753,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 24,
+        "top": 16,
+        "width": 704.7999877929688
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 1709,
+      "scrollY": 0,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        768,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "768 dashboard after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 753,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 24,
+        "top": 0,
+        "width": 704.7999877929688
+      },
+      "mainDocumentTop": 69.5999755859375,
+      "scrollElement": "HTML",
+      "scrollHeight": 1709,
+      "scrollY": 720,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        768,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "1920 dashboard before scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 1905,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 57.60000228881836,
+        "left": 100,
+        "top": 16,
+        "width": 1776.800048828125
+      },
+      "mainDocumentTop": 73.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 1123,
+      "scrollY": 0,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1920,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "1920 dashboard after scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 1905,
+      "focused": "Theme: Light. Switch to the next mode",
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 57.60000228881836,
+        "left": 100,
+        "top": 0,
+        "width": 1776.800048828125
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "scrollElement": "HTML",
+      "scrollHeight": 1123,
+      "scrollY": 403.2000122070313,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1920,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "390 dynamic QR scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": null,
+      "header": {
+        "background": "rgb(255, 255, 255)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.59999990463257,
+      "scrollElement": "HTML",
+      "scrollHeight": 796,
+      "scrollY": 76,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "390 dynamic QR Russian dark scrolled",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": "Тема: Тёмная. Переключить на следующий режим",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 16,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.5999984741211,
+      "scrollElement": "HTML",
+      "scrollHeight": 816,
+      "scrollY": 0,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "390 dynamic QR dark settled scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": "Language",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.59999990463257,
+      "scrollElement": "HTML",
+      "scrollHeight": 796,
+      "scrollY": 76,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "1280x320 dynamic QR desktop scroll",
+      "clientHeight": 320,
+      "collapsed": "true",
+      "documentWidth": 1265,
+      "focused": "Language",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 57.60000228881836,
+        "left": 100,
+        "top": 0,
+        "width": 1136.800048828125
+      },
+      "mainDocumentTop": 73.59999990463257,
+      "scrollElement": "HTML",
+      "scrollHeight": 556,
+      "scrollY": 76,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        320
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "final 390 Dynamic QR scroll",
+      "clientHeight": 720,
+      "collapsed": "true",
+      "documentWidth": 375,
+      "focused": "Choose a date range",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 53.60000228881836,
+        "left": 16,
+        "top": 0,
+        "width": 343.20001220703125
+      },
+      "mainDocumentTop": 69.59999990463257,
+      "scrollElement": "HTML",
+      "scrollHeight": 796,
+      "scrollY": 76,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        390,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "final 1280 expanded Dynamic QR short viewport",
+      "clientHeight": 320,
+      "collapsed": "false",
+      "documentWidth": 1265,
+      "focused": "Collapse sidebar",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 57.60000228881836,
+        "left": 300,
+        "top": 0,
+        "width": 936.7999877929688
+      },
+      "mainDocumentTop": 73.59999084472656,
+      "scrollElement": "HTML",
+      "scrollHeight": 571,
+      "scrollY": 251.1999969482422,
+      "url": "/dynamic-qrs",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        320
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    },
+    {
+      "label": "final dashboard expanded system theme",
+      "clientHeight": 720,
+      "collapsed": "false",
+      "documentWidth": 1265,
+      "focused": "Theme: System. Switch to the next mode",
+      "header": {
+        "background": "rgb(22, 27, 38)",
+        "height": 57.60000228881836,
+        "left": 300,
+        "top": 0,
+        "width": 936.7999877929688
+      },
+      "mainDocumentTop": 73.60000610351562,
+      "scrollElement": "HTML",
+      "scrollHeight": 1167,
+      "scrollY": 447.2000122070313,
+      "url": "/dashboard",
+      "verticalScrollContainers": [],
+      "viewport": [
+        1280,
+        720
+      ],
+      "wrapper": {
+        "position": "sticky",
+        "top": "0px",
+        "z": "30"
+      }
+    }
+  ],
+  "overlays": [
+    {
+      "label": "mobile calendar",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 349.38751220703125,
+        "height": 362.3875122070313,
+        "left": 16,
+        "right": 374.3999938964844,
+        "top": -13,
+        "width": 358.3999938964844,
+        "x": 16,
+        "y": -13
+      },
+      "z": "50"
+    },
+    {
+      "label": "pagination select",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 627.6000061035156,
+        "height": 157.60000610351562,
+        "left": 171,
+        "right": 299,
+        "top": 470,
+        "width": 128,
+        "x": 171,
+        "y": 470
+      },
+      "z": "100"
+    },
+    {
+      "label": "filters drawer",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 720,
+        "height": 720,
+        "left": 0,
+        "right": 390.3999938964844,
+        "top": 0,
+        "width": 390.3999938964844,
+        "x": 0,
+        "y": 0
+      },
+      "z": "50"
+    },
+    {
+      "label": "new QR dialog",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 650.3500137329102,
+        "height": 580.7000122070312,
+        "left": 12,
+        "right": 378.3999938964844,
+        "top": 69.6500015258789,
+        "width": 366.3999938964844,
+        "x": 12,
+        "y": 69.6500015258789
+      },
+      "z": "50"
+    },
+    {
+      "label": "mobile calendar settled",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 349.38751220703125,
+        "height": 362.3875122070313,
+        "left": 16,
+        "right": 374.3999938964844,
+        "top": -13,
+        "width": 358.3999938964844,
+        "x": 16,
+        "y": -13
+      },
+      "z": "50"
+    },
+    {
+      "label": "desktop calendar",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 674.3875122070312,
+        "height": 370.3875122070313,
+        "left": 125,
+        "right": 797,
+        "top": 304,
+        "width": 672,
+        "x": 125,
+        "y": 304
+      },
+      "z": "50"
+    },
+    {
+      "label": "mobile 844 calendar",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 776.3875122070312,
+        "height": 362.3875122070313,
+        "left": 16,
+        "right": 374.3999938964844,
+        "top": 414,
+        "width": 358.3999938964844,
+        "x": 16,
+        "y": 414
+      },
+      "z": "50"
+    },
+    {
+      "label": "baseline layout mobile calendar (sticky absent)",
+      "hitAtCenter": true,
+      "portaled": true,
+      "rect": {
+        "bottom": 754.3875122070312,
+        "height": 362.3875122070313,
+        "left": 16,
+        "right": 374.3999938964844,
+        "top": 392,
+        "width": 358.3999938964844,
+        "x": 16,
+        "y": 392
+      },
+      "z": "50"
+    }
+  ]
+}

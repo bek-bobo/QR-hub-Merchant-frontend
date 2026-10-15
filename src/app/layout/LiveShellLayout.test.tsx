@@ -62,6 +62,14 @@ describe('LiveShellLayout', () => {
     expect(html).toContain('>Dashboard</h1>')
     expect(aside).not.toContain('<main')
     expect(aside).not.toContain('<h1')
+    // Only the shell banner is sticky; main stays a sibling in document flow.
+    // This keeps content out of its stacking context and lets portaled overlays
+    // retain the application's existing z-50/z-100 hierarchy.
+    // The square workspace surface masks content behind the rounded banner,
+    // while visible overflow preserves non-portaled header tooltips.
+    expect(html).toMatch(/<div class="merchant-shell-header sticky top-\[env\(safe-area-inset-top,0px\)\] z-30 min-w-0 bg-workspace"><header/)
+    expect(html).toMatch(/<\/header><\/div><main class="min-w-0 py-6">/)
+    expect(html).not.toContain('overflow-x-hidden')
   })
 
   it('keeps header and page content usable with an empty filtered model', () => {

@@ -1,0 +1,5 @@
+/* The live shell scrolls with the document. Leave room for its tallest header
+   when anchors or keyboard focus bring content back into view. */
+html:has(.merchant-shell-header) {
+  scroll-padding-top: calc(7rem + env(safe-area-inset-top, 0px));
+}
