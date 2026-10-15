@@ -33,7 +33,7 @@ export function QrDisplayShell({ children, onOpenChange }: {
   return <Dialog.Root open onOpenChange={onOpenChange}>
     <Dialog.Portal>
       <Dialog.Overlay className="fixed inset-0 z-50 bg-black/45 supports-backdrop-filter:backdrop-blur-xs" />
-      <Dialog.Content className={`fixed left-1/2 top-1/2 z-50 ${QR_DISPLAY_SIZE_CLASSES} ${detailsSurfaceClasses} -translate-x-1/2 -translate-y-1/2 overflow-y-auto`}>
+      <Dialog.Content className={`fixed left-1/2 top-1/2 z-50 ${QR_DISPLAY_SIZE_CLASSES} ${detailsSurfaceClasses} -translate-x-1/2 -translate-y-1/2 overflow-y-auto md:[&>header]:py-4`}>
         <DetailsDialogHeader icon={QrCodeIcon} title={p.message('display.title')} subtitle={p.message('display.description')} />
         <Dialog.Close asChild>
           <Button type="button" variant="ghost" size="icon" className={detailsCloseClasses} aria-label={p.common('actions.close')}><XIcon aria-hidden="true" /></Button>

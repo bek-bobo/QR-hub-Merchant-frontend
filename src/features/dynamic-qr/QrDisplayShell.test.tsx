@@ -11,7 +11,7 @@ import { QrDisplayShell } from './QrDisplayShell'
 
 vi.mock('radix-ui', async (importOriginal) => {
   const actual = await importOriginal<typeof import('radix-ui')>()
-  const part = ({ children }: { children?: ReactNode }) => <div>{children}</div>
+  const part = ({ children, className }: { children?: ReactNode; className?: string }) => <div className={className}>{children}</div>
   return { ...actual, Dialog: { ...actual.Dialog, Root: part, Portal: part, Overlay: part,
     Content: part, Title: part, Description: part,
     Close: ({ children }: { children?: ReactNode }) => <div data-dialog-close>{children}</div> } }
@@ -58,6 +58,8 @@ describe('standardized QR display dialogs', () => {
     expect(html).not.toMatch(/>Yopish<\/button>/)
     expect(html).toContain('aria-label="Yopish"')
     expect(html).not.toContain('<footer')
+    expect(html).toContain('overflow-y-auto md:[&amp;&gt;header]:py-4')
+    expect(html).toContain('md:max-h-[calc(100dvh-3rem)]')
   })
 
   it('delegates dismissal to Radix with only the X close control and the existing callback', () => {

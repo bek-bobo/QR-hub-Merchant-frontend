@@ -78,6 +78,7 @@
     "details": "Details"
   },
   "create": {
+    "selectTerminalFirst": "Select a terminal before entering an amount.",
     "bankAccountInactive": "The bank account is inactive",
     "bankAccountInactiveGuidance": "Check the status of the bank account linked to the selected terminal.",
     "title": "Create dynamic QR",

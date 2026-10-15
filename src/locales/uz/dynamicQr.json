@@ -78,6 +78,7 @@
     "details": "Qo‘shimcha ma’lumotlar"
   },
   "create": {
+    "selectTerminalFirst": "Summa kiritish uchun avval terminalni tanlang.",
     "bankAccountInactive": "Bank hisobi holati faol emas",
     "bankAccountInactiveGuidance": "Tanlangan terminalga bog‘langan bank hisobining holatini tekshiring.",
     "title": "Dinamik QR yaratish",

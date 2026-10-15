@@ -38,7 +38,9 @@ export function BrandedQrPoster({ validatedLink, onReady }: BrandedQrPosterProps
     return () => { cancelled = true; cancelAnimationFrame(frame) }
   }, [original, onReady])
 
-  return <div role="group" aria-label={p.message('display.poster')} className="mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-sm"
+  // Bound only the screen preview. The 620×877 poster and export canvas remain
+  // unchanged; retain a readable minimum and allow the dialog to scroll below it.
+  return <div role="group" aria-label={p.message('display.poster')} className="mx-auto w-full max-w-md overflow-hidden rounded-2xl shadow-sm md:max-w-[min(28rem,max(14rem,calc((100dvh-15rem)*620/877)))]"
     style={{ aspectRatio: `${QR_POSTER.width} / ${QR_POSTER.height}`, backgroundColor: QR_POSTER.background }}>
     <div className="hidden" aria-hidden="true">
       <QRCodeCanvas ref={qrRef} value={original} size={600} level="M" marginSize={4}

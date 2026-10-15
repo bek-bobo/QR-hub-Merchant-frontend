@@ -67,12 +67,14 @@ export function CreateQrContent({
   const currencyCode = resolveCreateUzsCode(currencies.data)
   const selected = terminals.data?.find((item) => item.id === terminalId)
   const bounds = selected ? createAmountBounds(selected) : null
-  const draft = { terminalId, amountInput, currencyCode }
-  const amountValid = bounds ? parseCreateAmount(amountInput, bounds.minimum, bounds.maximum) !== null : false
-  const amountInvalid = Boolean(amountInput.trim() ? !amountValid : submitAttempted)
-  const validRequest = adapter.requestForDraft(draft)
   const canCreate = adapter.canCreate()
-  const canSubmit = Boolean(adapter.port() && validRequest && canCreate && controllerState.outcome.kind === 'idle' &&
+  const terminalReady = Boolean(runtime.capabilities.terminalLookup && available && canCreate &&
+    terminals.isSuccess && terminals.fetchStatus === 'idle' && selected && bounds)
+  const draft = { terminalId, amountInput, currencyCode }
+  const amountValid = terminalReady && bounds ? parseCreateAmount(amountInput, bounds.minimum, bounds.maximum) !== null : false
+  const amountInvalid = terminalReady && Boolean(amountInput.trim() ? !amountValid : submitAttempted)
+  const validRequest = adapter.requestForDraft(draft)
+  const canSubmit = Boolean(terminalReady && amountValid && adapter.port() && validRequest && canCreate && controllerState.outcome.kind === 'idle' &&
     !terminals.isPending && !terminals.isFetching && !terminals.isError &&
     !currencies.isPending && !currencies.isFetching && !currencies.isError)
 
@@ -90,7 +92,7 @@ export function CreateQrContent({
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setSubmitAttempted(true)
+    if (terminalReady) setSubmitAttempted(true)
     if (!canSubmit) return
     onPendingChange?.(true)
     void controller.submit({
@@ -129,7 +131,7 @@ export function CreateQrContent({
               onSelectionCloseAutoFocus={(event, pointerType) => {
                 // Touch retains trigger focus to avoid opening the software keyboard.
                 if (pointerType === 'touch' || !amountRef.current?.isConnected) return
-                if (!terminalId || !selected || result || controllerState.closed) return
+                if (!terminalReady || amountRef.current.disabled || result || controllerState.closed) return
                 event.preventDefault()
                 amountRef.current.focus({ preventScroll: true })
                 const end = amountRef.current.value.length
@@ -150,14 +152,15 @@ export function CreateQrContent({
         {selected && !bounds ? <p role="alert" className="text-sm text-destructive">{p.message('create.boundsUnavailable')}</p> : null}
         <FormField id="create-qr-amount" label={p.message('create.amount')}
           helpText={<>
-            {p.message('create.example')}{bounds ? <span className="mt-1.5 block">
+            {!terminalReady ? p.message('create.selectTerminalFirst') : <>{p.message('create.example')}{bounds ? <span className="mt-1.5 block">
               {p.message('create.bounds', {minimum: formatMinorValue({minorUnits: String(bounds.minimum), scale: 2}), maximum: formatMoney({minorUnits: String(bounds.maximum), currency: 'UZS', scale: 2})})}
-            </span> : null}
+            </span> : null}</>}
           </>}
           errorText={amountInvalid ? (amountInput.trim() ? p.message('validation.amount') : p.message('validation.amountRequired')) : undefined}>
           {(controlProps) => <MoneyInput {...controlProps} ref={amountRef} aria-required="true"
+            disabled={!terminalReady}
             data-validation={amountInvalid ? 'invalid' : amountValid ? 'valid' : 'neutral'}
-            value={amountInput} onValueChange={setAmountInput}
+            value={amountInput} onValueChange={(value) => { if (terminalReady) setAmountInput(value) }}
             className={`${embedded ? 'h-[52px] rounded-2xl bg-popover px-5 text-base md:text-lg' : ''} ${amountValid ? 'data-[validation=valid]:border-status-success-border data-[validation=valid]:focus-visible:border-status-success-border data-[validation=valid]:focus-visible:ring-status-success-border/30' : amountInvalid ? 'data-[validation=invalid]:border-destructive data-[validation=invalid]:focus-visible:border-destructive data-[validation=invalid]:focus-visible:ring-destructive/30 dark:data-[validation=invalid]:aria-invalid:border-destructive' : ''}`} />}
         </FormField>
         {!currencyAllowed ? <p role="status" className="text-sm">{p.message('create.currencyNoAccess')}</p> : null}

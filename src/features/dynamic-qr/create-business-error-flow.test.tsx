@@ -48,10 +48,24 @@ async function setup({ status = 200, body = envelope as unknown, failure = '' } 
       bridge: createProtectedReadBridge(session) }, queryClient, transport,
   }
   const adapter = createLiveCreateQrAdapter(() => context, scope)
-  return { controller: createCreateQrController(adapter.controllerDependencies), fetchImpl, scope, session }
+  return { controller: createCreateQrController(adapter.controllerDependencies), fetchImpl, scope, session, queryClient }
 }
 
 describe('HTTP → session → live adapter → decoder → controller → result presentation', () => {
+  it('blocks a direct controller call while cached terminals are being refreshed or removed', async () => {
+    const subject = await setup()
+    let resolve!: (value: typeof terminals) => void
+    const queryKey = [...readKeys.terminals(subject.scope), 'create-limits']
+    const refreshing = subject.queryClient.fetchQuery({ queryKey, queryFn: () => new Promise<typeof terminals>(yes => { resolve = yes }) })
+    expect(await subject.controller.submit(input)).toMatchObject({ kind: 'not-sent' })
+    expect(subject.fetchImpl).not.toHaveBeenCalled()
+    resolve([]); await refreshing
+    expect(await subject.controller.submit(input)).toMatchObject({ kind: 'not-sent' })
+    expect(subject.fetchImpl).not.toHaveBeenCalled()
+    subject.queryClient.setQueryData(queryKey, terminals)
+    expect(await subject.controller.submit(input)).toMatchObject({ kind: 'rejected' })
+    expect(subject.fetchImpl).toHaveBeenCalledTimes(1)
+  })
   it.each([200, 400, 422, 500])('recognizes the exact rejection in an HTTP %s envelope without replay', async status => {
     const subject = await setup({ status })
     expect(await subject.controller.submit(input)).toEqual({ kind: 'rejected', reason: envelope.error.tag })

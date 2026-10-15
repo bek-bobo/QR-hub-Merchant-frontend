@@ -1963,6 +1963,11 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "create.selectTerminalFirst": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "create.submit": {
       "plural": false,
       "params": [],

@@ -30,7 +30,7 @@ export function createLiveCreateQrAdapter(getCurrent: () => LiveWebContext, owne
     if (!sameScope(scope, ownerScope) || snapshot.phase !== 'authenticated' || snapshot.sessionScopeId !== scope.sessionScopeId) return null
     const terminals = queryClient.getQueryState<readonly CreateTerminalOption[]>([...readKeys.terminals(scope), 'create-limits'])
     const currencies = queryClient.getQueryState<readonly CurrencyOption[]>(readKeys.currencies(scope))
-    if (terminals?.status !== 'success' || terminals.isInvalidated || currencies?.status !== 'success' || currencies.isInvalidated) return null
+    if (terminals?.status !== 'success' || terminals.fetchStatus !== 'idle' || terminals.isInvalidated || currencies?.status !== 'success' || currencies.isInvalidated) return null
     return { scope, permissions: snapshot.profile.permissions, terminals: terminals.data ?? [], currencies: currencies.data ?? [] }
   }
   const port = createLiveCreateQrPort({ transport: null, getTransport: () => getCurrent().transport,

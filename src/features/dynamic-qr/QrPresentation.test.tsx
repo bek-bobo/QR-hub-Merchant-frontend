@@ -33,6 +33,7 @@ describe('shared QR presentation', () => {
 
     expect(html).toContain('md:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]')
     expect(html).toContain('max-w-md')
+    expect(html).toContain('md:max-w-[min(28rem,max(14rem,calc((100dvh-15rem)*620/877)))]')
     expect(html).toContain('background-color:#FA0A4B')
     expect(html).toContain('aspect-ratio:620 / 877')
     expect(html).toContain('BU YERDA QR - KOD YORDAMIDA')

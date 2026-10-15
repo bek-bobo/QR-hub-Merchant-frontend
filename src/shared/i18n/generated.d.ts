@@ -365,6 +365,7 @@ export interface MessageCatalog {
     "create.noUzs": Record<string, never>
     "create.pending": Record<string, never>
     "create.resultHelp": Record<string, never>
+    "create.selectTerminalFirst": Record<string, never>
     "create.submit": Record<string, never>
     "create.terminalNoAccess": Record<string, never>
     "create.terminalRemoved": Record<string, never>

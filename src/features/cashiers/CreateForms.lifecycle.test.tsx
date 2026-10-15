@@ -99,9 +99,10 @@ async function setup(flow: 'cashier' | 'QR', strict = false) {
     else await edit('#create-qr-amount', '1000')
   }
   const fill = async () => {
-    await fillFields()
+    if (flow === 'cashier') await fillFields()
     const select = host.querySelector<HTMLElement>('[role="combobox"]')!
     await chooseSelectOption(select, flow === 'cashier' ? 'new' : qrOptions[0]!.id)
+    if (flow === 'QR') await fillFields()
   }
   const submit = async () => { await act(async () => host.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))) }
   const toggle = async () => { await act(async () => host.querySelector('button')!.click()) }
@@ -159,8 +160,8 @@ describe.each(['cashier', 'QR'] as const)('F08 real %s create composition', (flo
     await h.fill()
     expect(h.host.querySelector<HTMLButtonElement>('button[type="submit"]')!.disabled).toBe(false)
     await h.toggle(); await h.revoke(); await h.toggle()
-    // Text fields remain editable after remount; do not select from the
-    // forbidden lookup. The committed replacement getter guards that render.
+    // Attempt edits without selecting from the forbidden lookup. QR amount
+    // stays disabled; the committed replacement getter guards this render.
     await h.fillFields()
     const submit = h.host.querySelector<HTMLButtonElement>('button[type="submit"]')!
     expect(submit.disabled).toBe(true)
