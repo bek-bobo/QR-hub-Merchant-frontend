@@ -3,10 +3,16 @@
   "profile": {
     "fullName": "F.I.Sh.",
     "phone": "Telefon",
-    "missing": "Ko‘rsatilmagan"
+    "missing": "Ko‘rsatilmagan",
+    "overview": "Profil haqida",
+    "accountId": "Hisob ID",
+    "role": "Rol",
+    "deviceType": "Qurilma turi",
+    "deviceWeb": "WEB"
   },
   "actions": {
-    "refresh": "Ma’lumotni yangilash"
+    "refresh": "Ma’lumotni yangilash",
+    "back": "Orqaga"
   },
   "states": {
     "refreshing": "Yangilanmoqda…"
@@ -15,5 +21,10 @@
     "changed": "Ma’lumotlar yangilandi.",
     "unchanged": "Ma’lumotlarda o‘zgarish yo‘q.",
     "failed": "Ma’lumotlarni yangilab bo‘lmadi."
+  },
+  "roles": {
+    "merchant": "Savdogar",
+    "cashier": "Kassir",
+    "unknown": "Hisob foydalanuvchisi"
   }
 }

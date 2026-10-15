@@ -208,13 +208,22 @@ export interface MessageCatalog {
     "states.waiting": Record<string, never>
   }
   "account": {
+    "actions.back": Record<string, never>
     "actions.refresh": Record<string, never>
     "feedback.changed": Record<string, never>
     "feedback.failed": Record<string, never>
     "feedback.unchanged": Record<string, never>
+    "profile.accountId": Record<string, never>
+    "profile.deviceType": Record<string, never>
+    "profile.deviceWeb": Record<string, never>
     "profile.fullName": Record<string, never>
     "profile.missing": Record<string, never>
+    "profile.overview": Record<string, never>
     "profile.phone": Record<string, never>
+    "profile.role": Record<string, never>
+    "roles.cashier": Record<string, never>
+    "roles.merchant": Record<string, never>
+    "roles.unknown": Record<string, never>
     "states.refreshing": Record<string, never>
     "title": Record<string, never>
   }

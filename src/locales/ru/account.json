@@ -3,10 +3,16 @@
   "profile": {
     "fullName": "Ф. И. О.",
     "phone": "Телефон",
-    "missing": "Не указано"
+    "missing": "Не указано",
+    "overview": "Обзор профиля",
+    "accountId": "ID аккаунта",
+    "role": "Роль",
+    "deviceType": "Тип устройства",
+    "deviceWeb": "WEB"
   },
   "actions": {
-    "refresh": "Обновить данные"
+    "refresh": "Обновить данные",
+    "back": "Назад"
   },
   "states": {
     "refreshing": "Обновление…"
@@ -15,5 +21,10 @@
     "changed": "Данные обновлены.",
     "unchanged": "Данные не изменились.",
     "failed": "Не удалось обновить данные."
+  },
+  "roles": {
+    "merchant": "Мерчант",
+    "cashier": "Кассир",
+    "unknown": "Пользователь аккаунта"
   }
 }

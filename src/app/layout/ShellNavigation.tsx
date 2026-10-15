@@ -12,17 +12,19 @@ interface ShellNavigationProps {
   readonly items: readonly ShellNavigationItem[]
   readonly label: string
   readonly onNavigate?: () => void
+  readonly desktop?: boolean
   readonly collapsed?: boolean
   readonly className?: string
 }
 
-export function ShellNavigation({ items, label, onNavigate, collapsed = false, className }: ShellNavigationProps) {
+export function ShellNavigation({ items, label, onNavigate, desktop = false, collapsed = false, className }: ShellNavigationProps) {
+  const iconRail = desktop || collapsed
   if (items.length === 0) {
     return null
   }
 
   return (
-    <nav className={cn('relative flex flex-col gap-2 p-3 pt-5', className)} aria-label={label}>
+    <nav data-sidebar-collapsed={iconRail ? collapsed : undefined} className={cn('relative flex flex-col gap-2 p-3 pt-5', className)} aria-label={label}>
       {items.map((item) => {
         const Icon = item.icon
         return (
@@ -30,10 +32,10 @@ export function ShellNavigation({ items, label, onNavigate, collapsed = false, c
             key={item.path}
             to={item.path}
             onClick={onNavigate}
-            aria-label={collapsed ? item.label : undefined}
+            aria-label={item.label}
             className={({ isActive }) =>
               `group relative flex min-h-13 items-center rounded-xl py-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-sidebar-ring focus-visible:outline-offset-2 ${
-                collapsed ? 'justify-center px-2' : 'gap-5 px-5'
+                iconRail ? 'px-3.5' : 'gap-5 px-5'
               } ${
                 isActive
                   ? 'bg-primary bg-linear-to-br from-primary to-primary-hover text-primary-foreground before:absolute before:inset-y-3.5 before:left-1 before:w-0.5 before:rounded-full before:bg-primary-foreground'
@@ -42,6 +44,7 @@ export function ShellNavigation({ items, label, onNavigate, collapsed = false, c
             }
           >
             <Icon className="size-5 shrink-0" aria-hidden="true" />
+            <span aria-hidden={iconRail ? true : undefined} className={iconRail ? 'desktop-sidebar-label absolute left-[3.375rem] right-3.5 overflow-hidden whitespace-nowrap' : undefined}>{item.label}</span>
             {collapsed ? (
               <span
                 role="tooltip"
@@ -49,9 +52,7 @@ export function ShellNavigation({ items, label, onNavigate, collapsed = false, c
               >
                 {item.label}
               </span>
-            ) : (
-              <span>{item.label}</span>
-            )}
+            ) : null}
           </NavLink>
         )
       })}

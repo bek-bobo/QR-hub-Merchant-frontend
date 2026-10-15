@@ -1,0 +1,21 @@
+/* Reveal text after the existing 200ms width transition has made room. */
+.desktop-sidebar-label {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 100ms ease-out 200ms, transform 100ms ease-out 200ms;
+}
+
+[data-sidebar-collapsed='true'] .desktop-sidebar-label {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition-duration: 70ms;
+  transition-delay: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .desktop-sidebar-label,
+  [data-sidebar-collapsed] .desktop-sidebar-label {
+    transition: none;
+    transform: none;
+  }
+}

@@ -12,12 +12,12 @@ import gbFlag from './flags/gb.svg'
 const shortLabels: Record<SupportedLocale, string> = { uz: 'O‘Z', ru: 'RU', en: 'EN' }
 const flagAssets: Record<SupportedLocale, string> = { uz: uzFlag, ru: ruFlag, en: gbFlag }
 
-function LocaleFlag({ locale }: { readonly locale: SupportedLocale }) {
+function LocaleFlag({ locale, compact = false }: { readonly locale: SupportedLocale; readonly compact?: boolean }) {
   return <img src={flagAssets[locale]} alt="" aria-hidden="true"
-    className="h-4 w-5 shrink-0 rounded-[3px] object-fill ring-1 ring-border/30" />
+    className={`${compact ? 'hidden sm:block ' : ''}h-4 w-5 shrink-0 rounded-[3px] object-fill ring-1 ring-border/30`} />
 }
 
-export function LocaleSelect() {
+export function LocaleSelect({ compact = false }: { readonly compact?: boolean }) {
   const { locale, ready, switchLocale } = useLocale()
   const { message } = useMessages('common')
   const [pending, setPending] = useState(false)
@@ -42,8 +42,8 @@ export function LocaleSelect() {
         <button type="button" data-locale-trigger aria-label={message('locale.label')}
           aria-describedby={statusId} aria-busy={pending} disabled={!ready}
           className="inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border border-border/70 bg-surface px-3 text-sm font-medium text-text-primary outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-surface disabled:cursor-default disabled:opacity-50 sm:gap-2.5 sm:px-3.5">
-          <GlobeIcon className="size-4 shrink-0 sm:size-[18px]" aria-hidden="true" />
-          <LocaleFlag locale={locale} />
+          <GlobeIcon className={compact ? "hidden size-[18px] shrink-0 sm:block" : "size-4 shrink-0 sm:size-[18px]"} aria-hidden="true" />
+          <LocaleFlag locale={locale} compact={compact} />
           <span lang={locale}>{shortLabels[locale]}</span>
           <ChevronDownIcon className="size-4 shrink-0" aria-hidden="true" />
         </button>

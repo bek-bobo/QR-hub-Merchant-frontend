@@ -1106,6 +1106,11 @@ export const messageMetadata = {
     }
   },
   "account": {
+    "actions.back": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "actions.refresh": {
       "plural": false,
       "params": [],
@@ -1126,6 +1131,21 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "profile.accountId": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "profile.deviceType": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "profile.deviceWeb": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "profile.fullName": {
       "plural": false,
       "params": [],
@@ -1136,7 +1156,32 @@ export const messageMetadata = {
       "params": [],
       "interpolations": []
     },
+    "profile.overview": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
     "profile.phone": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "profile.role": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "roles.cashier": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "roles.merchant": {
+      "plural": false,
+      "params": [],
+      "interpolations": []
+    },
+    "roles.unknown": {
       "plural": false,
       "params": [],
       "interpolations": []

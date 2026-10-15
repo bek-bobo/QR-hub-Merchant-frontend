@@ -3,10 +3,16 @@
   "profile": {
     "fullName": "Full name",
     "phone": "Phone",
-    "missing": "Not provided"
+    "missing": "Not provided",
+    "overview": "Profile overview",
+    "accountId": "Account ID",
+    "role": "Role",
+    "deviceType": "Device type",
+    "deviceWeb": "WEB"
   },
   "actions": {
-    "refresh": "Refresh information"
+    "refresh": "Refresh information",
+    "back": "Back"
   },
   "states": {
     "refreshing": "Refreshing…"
@@ -15,5 +21,10 @@
     "changed": "Information updated.",
     "unchanged": "Information is unchanged.",
     "failed": "Unable to refresh information."
+  },
+  "roles": {
+    "merchant": "Merchant",
+    "cashier": "Cashier",
+    "unknown": "Account user"
   }
 }

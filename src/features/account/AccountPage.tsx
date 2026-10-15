@@ -1,87 +1,69 @@
 import { useMessages } from '@/shared/i18n/useMessages'
-import { LogOutIcon, PhoneIcon, RefreshCwIcon, UserIcon } from 'lucide-react'
+import { MonitorIcon, PhoneIcon, RefreshCwIcon, UserIcon, UsersIcon } from 'lucide-react'
+import { Tooltip } from 'radix-ui'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { useAuth } from '@/shared/auth/useAuth'
 import { formatUzbekPhoneDisplay } from '@/shared/presentation/phone'
 
+// Display labels only; authorization still uses accepted GET_ME permissions.
+function profileRole(roles: readonly string[]) {
+  const unique = [...new Set(roles)]
+  if (unique.length !== 1) return 'roles.unknown'
+  if (unique[0] === 'ROLE_MERCHANT') return 'roles.merchant'
+  if (unique[0] === 'ROLE_MERCHANT_USER') return 'roles.cashier'
+  return 'roles.unknown'
+}
+
 export function AccountPage() {
   const { message } = useMessages('account')
-  const auth = useMessages('auth')
-  const canLogout = auth.critical('actions.logout').status === 'resolved'
   const { actions, pending, profile, profileRefreshMessage } = useAuth()
+  if (!profile) return null
+  const refreshLabel = pending.profileRefresh ? message('states.refreshing') : message('actions.refresh')
+  const fieldClass = 'min-w-0 space-y-1'
+  const labelClass = 'text-sm text-text-secondary 2xl:text-base'
+  const valueClass = 'text-base 2xl:text-lg font-semibold text-text-primary [overflow-wrap:anywhere]'
+  const iconClass = 'flex size-12 shrink-0 items-center justify-center rounded-full bg-muted/50 text-text-primary xl:size-14 2xl:size-16'
 
-  if (!profile) {
-    return null
-  }
-
-  return (
-    <div className="mx-auto w-full min-w-0 max-w-3xl">
-      <section aria-labelledby="account-title">
-        <Card className="gap-5 rounded-2xl border border-border/70 shadow-sm ring-0 [--card-spacing:--spacing(5)] sm:gap-6 sm:[--card-spacing:--spacing(6)]">
-          <CardHeader className="flex flex-row items-center gap-4">
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-soft text-brand">
-              <UserIcon className="size-5" aria-hidden="true" />
-            </span>
-            <CardTitle className="min-w-0 text-xl font-semibold text-text-primary">
-              <h2 id="account-title">{message('title')}</h2>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <dl className="grid gap-4 sm:grid-cols-2">
-              <div className="relative flex min-h-22 min-w-0 flex-col justify-center rounded-xl border border-border/70 bg-muted/20 py-4 pr-18 pl-5">
-                <dt className="text-sm text-text-secondary">
-                  {message('profile.fullName')}<span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
-                    <UserIcon className="size-5" aria-hidden="true" />
-                  </span>
-                </dt>
-                <dd className="mt-1 text-base font-semibold text-text-primary [overflow-wrap:anywhere]">
-                  {profile.fullname?.trim() ? profile.fullname : message('profile.missing')}
-                </dd>
-              </div>
-              <div className="relative flex min-h-22 min-w-0 flex-col justify-center rounded-xl border border-border/70 bg-muted/20 py-4 pr-18 pl-5">
-                <dt className="text-sm text-text-secondary">
-                  {message('profile.phone')}<span className="absolute top-1/2 right-5 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-muted text-text-secondary">
-                    <PhoneIcon className="size-5" aria-hidden="true" />
-                  </span>
-                </dt>
-                <dd className="mt-1 text-base font-semibold text-text-primary [overflow-wrap:anywhere]">
-                  {formatUzbekPhoneDisplay(profile.phone)}
-                </dd>
-              </div>
-            </dl>
-
-            {profileRefreshMessage ? (
-              <p className="text-sm text-text-secondary" role="status" aria-live="polite">
-                {message(profileRefreshMessage === 'changed' ? 'feedback.changed' : profileRefreshMessage === 'unchanged' ? 'feedback.unchanged' : 'feedback.failed')}
-              </p>
-            ) : null}
-
-            <div className="flex flex-col gap-3 border-t border-border/70 pt-5 sm:flex-row sm:flex-wrap">
-              <Button type="button" variant="outline"
-                disabled={pending.profileRefresh || pending.logout}
-                onClick={() => { if (!pending.profileRefresh && !pending.logout) void actions.refreshProfile() }}>
-                <RefreshCwIcon className="size-4" aria-hidden="true" />
-                {pending.profileRefresh ? message('states.refreshing') : message('actions.refresh')}
-              </Button>
-              <Button
-                type="button"
-                className="h-10 gap-2.5 rounded-lg bg-brand px-6 font-semibold text-primary-foreground shadow-sm hover:bg-primary-hover"
-                disabled={pending.logout || !canLogout}
-                onClick={() => { if (canLogout) void actions.logout() }}
-              >
-                <LogOutIcon className="size-4" aria-hidden="true" />
-                {pending.logout ? auth.message('states.signingOut') : auth.message('actions.logout')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-    </div>
-  )
+  return <section aria-labelledby="account-title" className="w-full min-w-0 pt-2">
+    <h2 id="account-title" className="sr-only">{message('title')}</h2>
+    <Card className="relative gap-0 rounded-2xl border border-border/70 p-5 shadow-sm ring-0 sm:p-7 xl:py-7 2xl:py-6 xl:pl-9 xl:pr-12">
+      <dl className="grid min-w-0 items-center gap-y-6 sm:grid-cols-2 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1.25fr)_minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="flex min-w-0 items-center gap-5 sm:pr-6 xl:gap-6">
+          <span aria-hidden="true" className="flex size-20 shrink-0 items-center justify-center rounded-full bg-brand-soft text-brand xl:size-24 2xl:size-26"><UserIcon className="size-9 stroke-[1.5] xl:size-11" /></span>
+          <div className={fieldClass}><dt className={labelClass}>{message('profile.fullName')}</dt>
+            <dd className={valueClass}>{profile.fullname?.trim() || message('profile.missing')}</dd></div>
+        </div>
+        <div className="flex min-w-0 items-center gap-4 border-t border-border pt-6 sm:min-h-20 sm:border-l sm:border-t-0 sm:px-6 sm:pt-0">
+          <span aria-hidden="true" className={iconClass}><PhoneIcon className="size-6 stroke-[1.7]" /></span>
+          <div className={fieldClass}><dt className={labelClass}>{message('profile.phone')}</dt>
+            <dd dir="ltr" className={valueClass}>{formatUzbekPhoneDisplay(profile.phone) || message('profile.missing')}</dd></div>
+        </div>
+        <div className="flex min-w-0 items-center gap-4 border-t border-border pt-6 sm:min-h-20 sm:pr-6 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0">
+          <span aria-hidden="true" className={iconClass}><UsersIcon className="size-6 stroke-[1.7]" /></span>
+          <div className={fieldClass}><dt className={labelClass}>{message('profile.role')}</dt>
+            <dd className="inline-flex max-w-full rounded-full bg-brand-soft px-4 py-1.5 text-sm 2xl:text-base font-semibold text-brand [overflow-wrap:anywhere] dark:text-status-error-foreground">{message(profileRole(profile.roles))}</dd></div>
+        </div>
+        <div className="flex min-w-0 items-center gap-4 border-t border-border pt-6 sm:min-h-20 sm:border-l sm:pl-6 xl:border-t-0 xl:pt-0">
+          <span aria-hidden="true" className={iconClass}><MonitorIcon className="size-6 stroke-[1.7]" /></span>
+          <div className={fieldClass}><dt className={labelClass}>{message('profile.deviceType')}</dt>
+            {/* Current client environment, not a fabricated GET_ME field. */}
+            <dd className={valueClass}>{message('profile.deviceWeb')}</dd></div>
+        </div>
+      </dl>
+      <div className="absolute right-2 top-2">
+        <Tooltip.Provider delayDuration={200}><Tooltip.Root>
+          <Tooltip.Trigger asChild><Button type="button" variant="ghost" size="icon" className="size-8 rounded-lg text-text-secondary"
+            aria-label={refreshLabel} aria-busy={pending.profileRefresh} disabled={pending.profileRefresh || pending.logout}
+            onClick={() => { if (!pending.profileRefresh && !pending.logout) void actions.refreshProfile() }}>
+            <RefreshCwIcon className={pending.profileRefresh ? 'size-3.5 motion-safe:animate-spin' : 'size-3.5'} aria-hidden="true" />
+          </Button></Tooltip.Trigger>
+          <Tooltip.Portal><Tooltip.Content side="top" sideOffset={8} collisionPadding={12} className="z-[110] max-w-[calc(100vw-1.5rem)] rounded-xl border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-sm">{refreshLabel}</Tooltip.Content></Tooltip.Portal>
+        </Tooltip.Root></Tooltip.Provider>
+      </div>
+    </Card>
+      {profileRefreshMessage ? <p className="mt-4 text-sm text-text-secondary" role="status" aria-live="polite">
+        {message(profileRefreshMessage === 'changed' ? 'feedback.changed' : profileRefreshMessage === 'unchanged' ? 'feedback.unchanged' : 'feedback.failed')}
+      </p> : null}
+  </section>
 }

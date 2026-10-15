@@ -10,9 +10,11 @@ import {
   Route,
   Routes,
   useLocation,
+  useNavigate,
 } from 'react-router'
 import { Header } from '@/app/layout/Header'
 import { LiveShellLayout } from '@/app/layout/LiveShellLayout'
+import { SidebarCollapseProvider } from '@/app/layout/SidebarCollapseProvider'
 import { LiveRouteStatus } from '@/app/LiveRouteStatus'
 import { AppRecoveryBoundary } from '@/app/AppRecoveryBoundary'
 import {
@@ -59,11 +61,14 @@ function LiveShell({
   children,
   pageTitle,
   pageIcon,
+  accountHeader = false,
 }: {
   children: ReactNode
   pageTitle?: string
   pageIcon?: ReactNode
+  accountHeader?: boolean
 }) {
+  const navigate = useNavigate()
   const messages = useMessages('shell')
   const { message } = messages
   const access = useAccessContext()
@@ -78,6 +83,8 @@ function LiveShell({
     <LiveShellLayout
       header={(navigation) => (
         <Header
+          accountHeader={accountHeader}
+          onBack={accountHeader ? () => { if (window.history.state?.idx > 0) void navigate(-1); else void navigate('/') } : undefined}
           title={pageTitle}
           titleIcon={pageIcon}
           titleAsHeading={Boolean(pageTitle)}
@@ -87,6 +94,7 @@ function LiveShell({
           onOpenNavigation={navigation.openNavigation}
           sidebarCollapsed={navigation.sidebarCollapsed}
           onToggleSidebar={navigation.toggleSidebar}
+          sidebarToggleRef={navigation.sidebarToggleRef}
           identityLabel={identityLabel}
           identitySecondary={profile?.roles[0]}
           compactAccountControls
@@ -129,6 +137,7 @@ function LoginRoute() {
 
 function AccountRoute() {
   const { message } = useMessages('shell')
+  const account = useMessages('account')
   const access = useAccessContext()
   const { sessionPhase } = useAuth()
   const runtime = useReadRuntime()
@@ -160,7 +169,7 @@ function AccountRoute() {
   }
 
   return (
-    <LiveShell pageTitle={message('navigation.account')}>
+    <LiveShell pageTitle={account.message('title')} accountHeader>
       <Suspense fallback={<LoadingState title={message('routes.accountLoading')} />}><AccountPage /></Suspense>
     </LiveShell>
   )
@@ -434,9 +443,11 @@ function LiveNotFoundRoute() {
 }
 
 export function LiveRouter() {
+  const { sessionScopeId } = useAuth()
   return (
     <AppRecoveryBoundary>
       <BrowserRouter>
+        <SidebarCollapseProvider key={sessionScopeId ?? 'anonymous'}>
         <Routes>
           <Route path="/login" element={<LoginRoute />} />
           <Route path="/account" element={<AccountRoute />} />
@@ -459,6 +470,7 @@ export function LiveRouter() {
           <Route path="/403" element={<ForbiddenRoute />} />
           <Route path="*" element={<LiveNotFoundRoute />} />
         </Routes>
+        </SidebarCollapseProvider>
       </BrowserRouter>
     </AppRecoveryBoundary>
   )

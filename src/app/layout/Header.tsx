@@ -11,12 +11,15 @@ interface HeaderProps {
   title?: string
   titleAsHeading?: boolean
   titleIcon?: ReactNode
+  accountHeader?: boolean
+  onBack?: () => void
   onOpenNavigation?: () => void
   navigationOpen?: boolean
   navigationControls?: string
   navigationTriggerRef?: Ref<HTMLButtonElement>
   sidebarCollapsed?: boolean
   onToggleSidebar?: () => void
+  sidebarToggleRef?: Ref<HTMLButtonElement>
   identityLabel?: string
   identitySecondary?: string
   compactAccountControls?: boolean
@@ -29,12 +32,15 @@ export function Header({
   title,
   titleAsHeading = false,
   titleIcon,
+  accountHeader = false,
+  onBack,
   onOpenNavigation,
   navigationOpen = false,
   navigationControls,
   navigationTriggerRef,
   sidebarCollapsed = false,
   onToggleSidebar,
+  sidebarToggleRef,
   identityLabel,
   identitySecondary,
   compactAccountControls = false,
@@ -44,11 +50,13 @@ export function Header({
 }: HeaderProps) {
   const { message } = useMessages('shell')
   const auth = useMessages('auth')
+  const account = useMessages('account')
   const canLogout = auth.critical('actions.logout').status === 'resolved'
   return (
-    <header className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/70 bg-surface px-4 py-2 shadow-sm sm:gap-4 sm:px-6">
+    <header className={`flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/70 bg-surface px-4 shadow-sm sm:gap-4 sm:px-6 ${accountHeader ? 'py-3 sm:py-3.5' : 'py-2'}`}>
       <div className="flex min-w-0 items-center gap-3">
-        {onOpenNavigation ? (
+        {accountHeader && onBack ? <Button type="button" variant="ghost" size="icon" className="size-10 shrink-0 rounded-xl bg-muted/50 sm:size-12" aria-label={account.message('actions.back')} onClick={onBack}><ChevronLeftIcon className="size-6" aria-hidden="true" /></Button> : null}
+        {!accountHeader && onOpenNavigation ? (
           <Button
             type="button"
             variant="outline"
@@ -63,11 +71,11 @@ export function Header({
             <MenuIcon aria-hidden="true" />
           </Button>
         ) : null}
-        {onToggleSidebar ? (
+        {!accountHeader && onToggleSidebar ? (
           <Button type="button" variant="ghost" size="icon"
             className="hidden size-10 transition-colors duration-150 hover:border-brand/30 hover:bg-brand-soft! hover:text-brand! focus-visible:border-brand focus-visible:ring-brand/50 active:bg-brand/15! active:text-brand! active:not-aria-[haspopup]:translate-y-0 dark:hover:text-status-error-foreground! dark:active:bg-brand/25! dark:active:text-status-error-foreground! lg:inline-flex"
             aria-label={sidebarCollapsed ? message('navigation.expand') : message('navigation.collapse')}
-            aria-expanded={!sidebarCollapsed} onClick={onToggleSidebar}>
+            ref={sidebarToggleRef} aria-expanded={!sidebarCollapsed} onClick={onToggleSidebar}>
             {sidebarCollapsed ? <ChevronRightIcon className="size-6" aria-hidden="true" /> : <ChevronLeftIcon className="size-6" aria-hidden="true" />}
           </Button>
         ) : null}
@@ -78,7 +86,7 @@ export function Header({
         ) : null}
         {title ? (
           titleAsHeading ? (
-            <h1 className={`min-w-0 truncate text-lg font-semibold tracking-tight text-text-primary sm:text-xl ${titleIcon ? '' : 'lg:border-l lg:border-border lg:pl-5'}`}>
+            <h1 className={`min-w-0 truncate text-lg font-semibold tracking-tight text-text-primary sm:text-xl ${titleIcon || accountHeader ? '' : 'lg:border-l lg:border-border lg:pl-5'}`}>
               {title}
             </h1>
           ) : (
@@ -89,7 +97,20 @@ export function Header({
         ) : null}
       </div>
 
-      {onLogout && compactAccountControls ? (
+      {onLogout && accountHeader ? (
+        <div className="flex shrink-0 items-center gap-1 sm:gap-4">
+          <LocaleSelect compact />
+          <span aria-hidden="true" className="hidden h-7 border-l border-border/70 sm:block" />
+          <ThemeModeSelect compact />
+          <span aria-hidden="true" className="hidden h-7 border-l border-border/70 sm:block" />
+          <Button type="button" variant="ghost" className="size-9 shrink-0 rounded-xl bg-brand-soft text-brand hover:bg-brand-soft/80 dark:text-status-error-foreground sm:h-11 sm:w-auto sm:gap-2 sm:px-4"
+            aria-label={logoutPending ? auth.message('states.signingOut') : auth.message('actions.logout')}
+            disabled={logoutPending || !canLogout} onClick={canLogout ? onLogout : undefined}>
+            <LogOutIcon className="size-5" aria-hidden="true" />
+            <span className="sr-only sm:not-sr-only">{logoutPending ? auth.message('states.signingOut') : auth.message('actions.logout')}</span>
+          </Button>
+        </div>
+      ) : onLogout && compactAccountControls ? (
         <div className="flex min-w-0 shrink-0 items-center gap-1 sm:gap-2">
           <LocaleSelect />
           <ThemeModeSelect compact />

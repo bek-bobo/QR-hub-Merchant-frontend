@@ -1,0 +1,32 @@
+[
+  {
+    "active": "Dynamic QRs",
+    "collapsed": "true",
+    "path": "/dynamic-qrs",
+    "width": 72
+  },
+  {
+    "active": "Static QRs",
+    "collapsed": "true",
+    "path": "/static-qrs",
+    "width": 72
+  },
+  {
+    "active": "Dashboard",
+    "collapsed": "true",
+    "path": "/dashboard",
+    "width": 72
+  },
+  {
+    "active": "Cashiers",
+    "collapsed": "true",
+    "path": "/cashiers",
+    "width": 72
+  },
+  {
+    "active": "Terminals",
+    "collapsed": "true",
+    "path": "/terminals",
+    "width": 72
+  }
+]

@@ -102,11 +102,11 @@ describe.each(['uz', 'ru', 'en'] as const)('shell/auth/account in %s', (locale) 
   })
   it('renders account labels and outcome feedback while keeping backend identity literal', async () => {
     const instance = await runtime(locale), value = authValue()
-    const host = await mount(instance, <AuthContext value={value}><AccountPage /><LoginPage /></AuthContext>)
+    const host = await mount(instance, <AuthContext value={value}><Header accountHeader onLogout={value.actions.logout} logoutPending={value.pending.logout} /><AccountPage /><LoginPage /></AuthContext>)
     for (const text of [copy[locale].account, copy[locale].fullName, copy[locale].refresh, 'shell.navigation.account', '+998 90 000 00 00']) expect(host.textContent).toContain(text)
     expect(host.textContent).not.toContain('remoteUnconfirmed')
     expect(value.actions.refreshProfile).not.toHaveBeenCalled(); expect(value.actions.logout).not.toHaveBeenCalled()
-    const buttons = [...host.querySelectorAll<HTMLButtonElement>('section[aria-labelledby="account-title"] button')]
+    const buttons = [host.querySelector<HTMLButtonElement>('section[aria-labelledby="account-title"] button')!, host.querySelector<HTMLButtonElement>(`header button[aria-label="${copy[locale].logout}"]`)!]
     expect(buttons).toHaveLength(2)
     expect(buttons[0].disabled).toBe(false)
     await act(async () => buttons[0].click())
@@ -258,6 +258,9 @@ describe('mounted locale selection and state preservation', () => {
     const host = await mount(instance, <QueryClientProvider client={client}><AuthProvider api={api}><ReadProvider webBaseUrl="http://localhost:3001" environment="development"><Observer /><LiveRouter /></ReadProvider></AuthProvider></QueryClientProvider>)
     await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
     expect(observed?.sessionPhase).toBe('authenticated')
+    const accountHeading = host.querySelector('header h1')!
+    expect(accountHeading.previousElementSibling?.tagName).toBe('BUTTON')
+    expect(accountHeading.parentElement?.querySelector('span[aria-hidden="true"]')).toBeNull()
     const lockRequests = vi.mocked(navigator.locks.request).mock.calls.length
     const authBefore = observed, tokens = createTokenPersistence(localStorage).read(), device = localStorage.getItem(DEVICE_KEY_STORAGE_KEY), requests = vi.mocked(api.getMe).mock.calls.length
     await selectRussian(host.querySelector<HTMLButtonElement>('[data-locale-trigger]')!); expect(host.textContent).toContain(copy.ru.account)
@@ -274,7 +277,7 @@ describe('mounted locale selection and state preservation', () => {
     const api = makeAuthApi({ getMe: vi.fn().mockResolvedValue({ ...syntheticProfileA, permissions: ['GET_ME'] }), logout: vi.fn().mockRejectedValue(new Error('private server failure')) })
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     let observed: AuthContextValue | undefined
-    function Fixture() { const current = useAuth(); useLayoutEffect(() => { observed = current }, [current]); return current.sessionPhase === 'authenticated' ? <AccountPage /> : <LoginPage /> }
+    function Fixture() { const current = useAuth(); useLayoutEffect(() => { observed = current }, [current]); return current.sessionPhase === 'authenticated' ? <><Header accountHeader onLogout={current.actions.logout} logoutPending={current.pending.logout}/><AccountPage /></> : <LoginPage /> }
     const host = await mount(instance, <QueryClientProvider client={client}><AuthProvider api={api}><Fixture /></AuthProvider></QueryClientProvider>)
     await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)) })
     const refresh = host.querySelector<HTMLButtonElement>('section[aria-labelledby="account-title"] button')!
@@ -283,7 +286,7 @@ describe('mounted locale selection and state preservation', () => {
     const requests = vi.mocked(api.getMe).mock.calls.length
     await switchTo(instance, 'ru'); expect(host.textContent).toContain('Данные не изменились.')
     await switchTo(instance, 'en'); expect(host.textContent).toContain('Information is unchanged.'); expect(api.getMe).toHaveBeenCalledTimes(requests)
-    const logout = [...host.querySelectorAll<HTMLButtonElement>('section[aria-labelledby="account-title"] button')]
+    const logout = [...host.querySelectorAll<HTMLButtonElement>('header button')]
       .find((button) => button.textContent === copy.en.logout)!
     expect(logout.textContent).toBe(copy.en.logout)
     await act(async () => { logout.click(); await new Promise((resolve) => setTimeout(resolve, 0)) })
